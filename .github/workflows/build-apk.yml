@@ -184,25 +184,29 @@ jobs:
         working-directory: apk-build/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon 2>&1 | tail -40
-          echo "=== Build output structure ==="
-          find . -name "*.apk" -type f 2>/dev/null || echo "No APK found in build"
-          find app/build/outputs -type f 2>/dev/null | head -20 || echo "No outputs"
+          # Try release build, fallback to debug
+          ./gradlew assembleRelease --no-daemon 2>&1 | tail -40 ||           ./gradlew assembleDebug --no-daemon 2>&1 | tail -40
+          echo "=== Searching for APK ==="
+          find . -name "*.apk" -type f 2>/dev/null || echo "No APK found"
+          FOUND_APK=$(find . -name "*.apk" -type f | head -1)
+          if [ -n "$FOUND_APK" ]; then
+            cp "$FOUND_APK" "$GITHUB_WORKSPACE/WHOAMISEC-Business-v16.apk"
+            echo "APK copied: $(du -sh $GITHUB_WORKSPACE/WHOAMISEC-Business-v16.apk)"
+          else
+            echo "Listing build directory:"
+            ls -laR app/build/ 2>/dev/null || echo "No build dir"
+            exit 1
+          fi
 
       - name: Verify WHOAMISEC Business APK
         run: |
-          echo "Searching for APK..."
-          find apk-build/android/ -name "*.apk" -type f 2>/dev/null
-          APK=$(find apk-build/android/ -name "*.apk" -type f | head -1)
-          if [ -z "$APK" ]; then
-            echo "ERROR: No APK found anywhere!"
-            find apk-build/android/app/build/outputs/ -type f 2>/dev/null || echo "No outputs dir"
+          if [ -f "WHOAMISEC-Business-v16.apk" ]; then
+            echo "✅ APK verified: $(du -sh WHOAMISEC-Business-v16.apk)"
+            file WHOAMISEC-Business-v16.apk
+          else
+            echo "❌ APK not found at workspace root!"
             exit 1
           fi
-          echo "Found APK: $APK"
-          echo "Size: $(du -sh $APK)"
-          cp "$APK" WHOAMISEC-Business-v16.apk
-          echo "Copied to WHOAMISEC-Business-v16.apk"
 
       # ════════════════════════════════════════════════════════
       # Release
