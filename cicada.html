@@ -343,10 +343,7 @@
 <canvas id="rain"></canvas>
 <div class="tag">@proplanwh</div>
 
-<!-- Real cicada sound -->
-<audio id="cicadaAudio" loop preload="auto">
-    <source src="cicada-sound.mp3" type="audio/mpeg">
-</audio>
+<!-- Cicada sound starts on first click via Web Audio API -->
 
 <div class="st" id="sndBtn" onclick="toggleSound()">&#x1F997;</div>
 
@@ -536,18 +533,72 @@
     draw();
 })();
 
-/* ── 2. CICADA SOUND (real MP3) ── */
-const audioEl=document.getElementById('cicadaAudio');
-audioEl.volume=0.3;
-let sndMuted=false;
+/* ── 2. CICADA SOUND (Web Audio API — original synthesized buzz) ── */
+let audioCtx=null,cicadaNodes=[],sndPlaying=false,sndMuted=false;
 
+function createCicadaSound(){
+    if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const now=audioCtx.currentTime;
+
+    /* Main buzz — sawtooth at 5500 Hz with FM trill */
+    const osc1=audioCtx.createOscillator();
+    osc1.type='sawtooth';
+    osc1.frequency.setValueAtTime(5500,now);
+    const lfo1=audioCtx.createOscillator();
+    lfo1.frequency.setValueAtTime(35,now);
+    const lfoG1=audioCtx.createGain();
+    lfoG1.gain.setValueAtTime(800,now);
+    lfo1.connect(lfoG1);lfoG1.connect(osc1.frequency);
+
+    /* AM pulse */
+    const lfo2=audioCtx.createOscillator();
+    lfo2.frequency.setValueAtTime(18,now);
+    const lfoG2=audioCtx.createGain();
+    lfoG2.gain.setValueAtTime(0.3,now);
+    lfo2.connect(lfoG2);
+
+    /* Second harmonic — square at 8200 Hz */
+    const osc2=audioCtx.createOscillator();
+    osc2.type='square';
+    osc2.frequency.setValueAtTime(8200,now);
+    const lfo3=audioCtx.createOscillator();
+    lfo3.frequency.setValueAtTime(28,now);
+    const lfoG3=audioCtx.createGain();
+    lfoG3.gain.setValueAtTime(600,now);
+    lfo3.connect(lfoG3);lfoG3.connect(osc2.frequency);
+
+    /* Master gain + bandpass filter */
+    const master=audioCtx.createGain();
+    master.gain.setValueAtTime(0.06,now);
+    const filt=audioCtx.createBiquadFilter();
+    filt.type='bandpass';
+    filt.frequency.setValueAtTime(6000,now);
+    filt.Q.setValueAtTime(2,now);
+
+    osc1.connect(filt);osc2.connect(filt);
+    lfo2.connect(lfoG2);lfoG2.connect(master.gain);
+    filt.connect(master);master.connect(audioCtx.destination);
+
+    [osc1,osc2,lfo1,lfo2,lfo3].forEach(n=>n.start(now));
+    cicadaNodes=[osc1,osc2,lfo1,lfo2,lfo3];
+    sndPlaying=true;
+}
+function stopCicadaSound(){
+    cicadaNodes.forEach(n=>{try{n.stop()}catch(e){}});
+    cicadaNodes=[];sndPlaying=false;
+}
 function toggleSound(){
     const b=document.getElementById('sndBtn');
-    if(sndMuted){audioEl.play();sndMuted=false;b.classList.remove('muted')}
-    else{audioEl.pause();sndMuted=true;b.classList.add('muted')}
+    if(sndMuted){if(!sndPlaying)createCicadaSound();sndMuted=false;b.classList.remove('muted')}
+    else{stopCicadaSound();sndMuted=true;b.classList.add('muted')}
 }
-document.addEventListener('click',function o(){audioEl.play().catch(()=>{});document.removeEventListener('click',o)},{once:true});
-document.addEventListener('touchstart',function o(){audioEl.play().catch(()=>{});document.removeEventListener('touchstart',o)},{once:true});
+/* Auto-start on first interaction */
+function startOnInteract(){createCicadaSound();
+    document.removeEventListener('click',startOnInteract);
+    document.removeEventListener('touchstart',startOnInteract);
+}
+document.addEventListener('click',startOnInteract);
+document.addEventListener('touchstart',startOnInteract);
 
 /* ── 3. PUZZLES ── */
 const puzzles=[
