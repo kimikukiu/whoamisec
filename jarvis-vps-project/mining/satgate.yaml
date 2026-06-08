@@ -1,0 +1,11 @@
+upstream: http://localhost:11434
+port: 3000
+pricing:
+  default: 2          # 2 sats per 1k tokeni
+  models:
+    glm4: 5           # model premium = preț mai mare
+    llama3: 1
+capacity:
+  maxConcurrent: 4    # protejezi VPS-ul
+freeTier:
+  creditsPerDay: 250  # primele 250 requesturi/zi gratis (clienți test)
