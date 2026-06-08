@@ -33,11 +33,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK
+      - name: Setup Android SDK & NDK
         uses: android-actions/setup-android@v3
 
-      - name: Accept Android licenses
-        run: yes | sdkmanager --licenses 2>/dev/null || true
+      - name: Accept Android licenses & install build-tools
+        run: |
+          yes | sdkmanager --licenses 2>/dev/null || true
+          sdkmanager "build-tools;34.0.0" "platforms;android-34" "platform-tools" 2>/dev/null || true
 
       # ── Signing keystore ──────────────────────────────────────
       - name: Generate keystore
@@ -57,10 +59,13 @@ jobs:
           cat > "$GITHUB_WORKSPACE/patch_gradle.py" << 'PY'
           import re, sys, os
 
-          gradle = "android/app/build.gradle"
+          gradle = sys.argv[1] if len(sys.argv) > 1 else "android/app/build.gradle"
+          if not os.path.exists(gradle):
+              print(f"SKIP: {gradle} not found (Capacitor will create it)")
+              sys.exit(0)
+
           content = open(gradle).read()
 
-          # Fix SDK versions
           for old, new in [
               (r'minSdkVersion\s+\d+',    'minSdkVersion 23'),
               (r'minSdk\s+\d+',           'minSdk 23'),
@@ -71,10 +76,8 @@ jobs:
           ]:
               content = re.sub(old, new, content)
 
-          # Remove any existing splits block
           content = re.sub(r'splits\s*\{[^}]*(?:\{[^}]*\}[^}]*)?\}', '', content, flags=re.DOTALL)
 
-          # Inject universal ABI splits before the last closing brace of android {}
           universal = '''
               splits {
                   abi {
@@ -129,8 +132,8 @@ jobs:
           }
           EOF
 
-          ./node_modules/.bin/cap add android
-          ./node_modules/.bin/cap sync android
+          npx cap add android
+          npx cap sync android
 
       - name: Patch Gradle — JARVIS MIND
         working-directory: apk-build
@@ -140,7 +143,7 @@ jobs:
         working-directory: apk-build/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleRelease --no-daemon 2>&1 | tail -30
 
       - name: Sign JARVIS MIND APK
         run: |
@@ -149,6 +152,11 @@ jobs:
                    -name "*universal*.apk" 2>/dev/null | head -1)
           [ -z "$APK_IN" ] && APK_IN=$(find apk-build/android/app/build/outputs/apk/release \
                                         -name "*.apk" | head -1)
+          if [ -z "$APK_IN" ]; then
+            echo "ERROR: No APK found!"
+            find apk-build/android/app/build/outputs/ -type f 2>/dev/null || true
+            exit 1
+          fi
           echo "Signing: $APK_IN"
           "$ANDROID_HOME/build-tools/$BUILD_TOOLS/zipalign" -v 4 "$APK_IN" jm-aligned.apk
           "$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner" sign \
@@ -168,7 +176,7 @@ jobs:
           cp whoamisec-business-app.html apk-build/www/index.html
 
           cd apk-build
-          rm -rf android node_modules
+          rm -rf android node_modules capacitor.config.json
 
           npm install --save-dev \
             @capacitor/cli@latest \
@@ -184,8 +192,8 @@ jobs:
           }
           EOF
 
-          ./node_modules/.bin/cap add android
-          ./node_modules/.bin/cap sync android
+          npx cap add android
+          npx cap sync android
 
       - name: Patch Gradle — WHOAMISEC Business
         working-directory: apk-build
@@ -195,7 +203,7 @@ jobs:
         working-directory: apk-build/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleRelease --no-daemon 2>&1 | tail -30
 
       - name: Sign WHOAMISEC Business APK
         run: |
@@ -204,6 +212,10 @@ jobs:
                    -name "*universal*.apk" 2>/dev/null | head -1)
           [ -z "$APK_IN" ] && APK_IN=$(find apk-build/android/app/build/outputs/apk/release \
                                         -name "*.apk" | head -1)
+          if [ -z "$APK_IN" ]; then
+            echo "ERROR: No APK found!"
+            exit 1
+          fi
           echo "Signing: $APK_IN"
           "$ANDROID_HOME/build-tools/$BUILD_TOOLS/zipalign" -v 4 "$APK_IN" ws-aligned.apk
           "$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner" sign \
@@ -228,20 +240,10 @@ jobs:
 
             | File | Description |
             |------|-------------|
-            | `JARVIS-MIND-v3.apk` | JARVIS MIND Commander — VPS, 2700 agents, AI, SSH, Plans |
-            | `WHOAMISEC-Business-v16.apk` | Business — XMR Mining, Monero, Plans, Invite Friend |
+            | `JARVIS-MIND-v3.apk` | JARVIS MIND — VPS, 2700 agents, Commander, Plans |
+            | `WHOAMISEC-Business-v16.apk` | Business — XMR Mining, Monero, Plans |
 
-            ### Compatibility
-            - Android **6.0+** (API 23)
-            - **armeabi-v7a** (32-bit ARM) + **arm64-v8a** (64-bit ARM) + **x86** + **x86_64**
-            - Universal APK — one file, installs on any Android
-
-            ### Install
-            1. Download APK
-            2. Settings → Security → **Allow unknown sources**
-            3. Tap APK → Install
-
-            > Source code, SDK, swarm tools and agent configs NOT included in APK.
+            - Android **6.0+** (API 23) — Universal APK
           files: |
             JARVIS-MIND-v3.apk
             WHOAMISEC-Business-v16.apk
