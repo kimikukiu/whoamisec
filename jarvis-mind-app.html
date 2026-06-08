@@ -343,41 +343,62 @@
         .pm-skill-output.show { display:block; }
 
         /* Agent swarm grid */
-        .agent-swarm-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.6rem; }
-        .swarm-live-count { font-size:1.3rem; font-weight:800; color:var(--purple); }
-        .swarm-sub { font-size:0.68rem; color:var(--muted); }
-        .swarm-status-row { display:flex; gap:0.75rem; font-size:0.7rem; color:var(--muted); margin-bottom:0.5rem; }
-        .swarm-status-row span { display:flex; align-items:center; gap:0.3rem; }
-        .swarm-dot { width:8px; height:8px; border-radius:50%; }
-        .agent-grid { display:grid; grid-template-columns:repeat(10,1fr); gap:3px; margin-bottom:0.75rem; }
-        .agent-dot { aspect-ratio:1; border-radius:3px; cursor:pointer; transition:all 0.2s; }
-        .agent-dot.active  { background:rgba(139,92,246,0.7); }
-        .agent-dot.busy    { background:rgba(6,182,212,0.8); animation:agent-pulse 1.5s infinite; }
-        .agent-dot.idle    { background:rgba(107,114,128,0.25); }
-        .agent-dot.error   { background:rgba(239,68,68,0.6); }
-        @keyframes agent-pulse { 0%,100%{opacity:0.8;} 50%{opacity:1;transform:scale(1.1);} }
-        .agent-dot:hover   { transform:scale(1.3); z-index:2; }
+        .agent-swarm-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem; }
+        .swarm-live-count { font-size:1.2rem; font-weight:800; color:var(--purple); }
+        .swarm-sub { font-size:0.65rem; color:var(--muted); }
+        .swarm-status-row { display:flex; gap:0.6rem; font-size:0.68rem; color:var(--muted); margin-bottom:0.4rem; flex-wrap:wrap; }
+        .swarm-status-row span { display:flex; align-items:center; gap:0.28rem; }
+        .swarm-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+        .agent-group-label { font-size:0.62rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.25rem; display:flex; align-items:center; gap:0.4rem; }
+        .agent-grid { display:grid; grid-template-columns:repeat(10,1fr); gap:2px; margin-bottom:0.5rem; }
+        .agent-grid.sub { grid-template-columns:repeat(10,1fr); }
+        .agent-dot { aspect-ratio:1; border-radius:2px; cursor:pointer; transition:transform 0.15s; }
+        .agent-dot.active  { background:rgba(139,92,246,0.75); }
+        .agent-dot.busy    { background:rgba(6,182,212,0.85); animation:agent-pulse 1.4s infinite; }
+        .agent-dot.idle    { background:rgba(107,114,128,0.22); }
+        .agent-dot.error   { background:rgba(239,68,68,0.65); }
+        .agent-dot.sub-active { background:rgba(16,185,129,0.65); }
+        .agent-dot.sub-busy   { background:rgba(245,158,11,0.75); animation:agent-pulse 1.8s infinite; }
+        .agent-dot.pipeline   { background:rgba(236,72,153,0.6); animation:agent-pulse 2.2s infinite; }
+        @keyframes agent-pulse { 0%,100%{opacity:0.7;} 50%{opacity:1;transform:scale(1.08);} }
+        .agent-dot:hover   { transform:scale(1.4); z-index:2; }
+
+        /* Pipeline phases */
+        .pipeline-bar { height:8px; background:rgba(255,255,255,0.06); border-radius:4px; overflow:hidden; margin-bottom:0.3rem; }
+        .pipeline-fill { height:100%; background:linear-gradient(90deg,#8B5CF6,#EC4899,#06B6D4); border-radius:4px; animation:pipeline-flow 3s linear infinite; background-size:200% 100%; }
+        @keyframes pipeline-flow { 0%{background-position:0% 0;} 100%{background-position:200% 0;} }
+        .workflow-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.3rem; margin-top:0.5rem; }
+        .workflow-chip { background:rgba(236,72,153,0.06); border:1px solid rgba(236,72,153,0.15); border-radius:6px; padding:0.3rem 0.5rem; font-size:0.65rem; font-weight:600; color:var(--pink); display:flex; align-items:center; gap:0.3rem; }
+        .wf-dot { width:5px; height:5px; border-radius:50%; background:var(--pink); animation:agent-pulse 1.5s infinite; flex-shrink:0; }
+
+        /* Jailbreak mode */
+        .jb-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.35rem; }
+        .jb-card { background:rgba(239,68,68,0.05); border:1px solid rgba(239,68,68,0.12); border-radius:8px; padding:0.55rem; cursor:pointer; transition:all 0.18s; }
+        .jb-card:hover, .jb-card.jb-active { background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.4); }
+        .jb-name { font-size:0.75rem; font-weight:700; color:var(--red); margin-bottom:0.1rem; }
+        .jb-desc { font-size:0.63rem; color:var(--muted); line-height:1.3; }
+        .jb-badge { font-size:0.58rem; background:rgba(239,68,68,0.15); color:var(--red); padding:0.08rem 0.3rem; border-radius:4px; font-weight:700; }
 
         /* Module grid */
-        .module-section-title { font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin:0.6rem 0 0.4rem; }
-        .module-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.35rem; margin-bottom:0.5rem; }
-        .module-chip {
-            background:rgba(139,92,246,0.06); border:1px solid rgba(139,92,246,0.12);
-            border-radius:7px; padding:0.42rem 0.55rem; cursor:pointer; transition:all 0.18s;
-            display:flex; align-items:center; gap:0.4rem;
-        }
-        .module-chip:hover { background:rgba(139,92,246,0.12); border-color:rgba(139,92,246,0.3); }
-        .module-chip.active-module { border-color:var(--purple); background:rgba(139,92,246,0.1); }
-        .module-chip-icon { font-size:0.9rem; flex-shrink:0; }
-        .module-chip-name { font-size:0.72rem; font-weight:600; }
-        .module-abl-badge { font-size:0.58rem; color:var(--red); font-weight:700; letter-spacing:0.04em; margin-left:auto; flex-shrink:0; }
-        .module-category-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.35rem; }
-        .module-cat-card { background:var(--card); border:1px solid var(--border); border-radius:9px; padding:0.6rem; text-align:center; cursor:pointer; }
+        .module-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.3rem; margin-bottom:0.4rem; }
+        .module-chip { background:rgba(139,92,246,0.06); border:1px solid rgba(139,92,246,0.12); border-radius:7px; padding:0.38rem 0.5rem; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; gap:0.35rem; }
+        .module-chip:hover, .module-chip.active-module { background:rgba(139,92,246,0.12); border-color:rgba(139,92,246,0.3); }
+        .module-chip-icon { font-size:0.85rem; flex-shrink:0; }
+        .module-chip-name { font-size:0.68rem; font-weight:600; line-height:1.2; }
+        .module-abl-badge { font-size:0.55rem; color:var(--red); font-weight:700; margin-left:auto; flex-shrink:0; }
+        .module-category-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.3rem; }
+        .module-cat-card { background:var(--card); border:1px solid var(--border); border-radius:8px; padding:0.55rem; text-align:center; cursor:pointer; transition:all 0.15s; }
         .module-cat-card:active { border-color:var(--purple); }
-        .module-cat-icon { font-size:1.2rem; margin-bottom:0.2rem; }
-        .module-cat-name { font-size:0.75rem; font-weight:600; margin-bottom:0.1rem; }
-        .module-cat-count { font-size:0.65rem; color:var(--muted); }
+        .module-cat-icon { font-size:1.1rem; margin-bottom:0.15rem; }
+        .module-cat-name { font-size:0.72rem; font-weight:600; margin-bottom:0.08rem; }
+        .module-cat-count { font-size:0.62rem; color:var(--muted); }
         .module-cat-count .abl { color:var(--red); font-weight:700; }
+
+        /* Self-repair monitor */
+        .monitor-item { display:flex; align-items:center; gap:0.5rem; padding:0.4rem 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:0.78rem; }
+        .monitor-item:last-child { border-bottom:none; }
+        .monitor-icon { font-size:0.9rem; flex-shrink:0; }
+        .monitor-status { margin-left:auto; font-size:0.65rem; font-weight:700; flex-shrink:0; }
     </style>
 </head>
 <body>
@@ -387,12 +408,12 @@
         <div class="icon">&#x1F916;</div>
         <span>JARVIS MIND</span>
     </div>
-    <div class="header-status" style="flex-direction:column;align-items:flex-end;gap:0.1rem;">
-        <div style="display:flex;align-items:center;gap:0.35rem;">
+    <div class="header-status" style="flex-direction:column;align-items:flex-end;gap:0.08rem;">
+        <div style="display:flex;align-items:center;gap:0.3rem;">
             <div class="status-dot"></div>
-            <span id="hdr-agents">2,703 Agents</span>
+            <span id="hdr-agents" style="font-size:0.72rem;">2,500 Agents ABL</span>
         </div>
-        <div style="font-size:0.62rem;color:var(--red);font-weight:700;letter-spacing:0.04em;">100 MODULES ABL&#x26B2;</div>
+        <div style="font-size:0.57rem;color:var(--red);font-weight:700;letter-spacing:0.03em;">500 MODULES &#x26B2; 5300 PHASES</div>
     </div>
     <a href="downloads.html" class="header-back">&#x2190; Apps</a>
 </div>
@@ -614,95 +635,157 @@
                 <div class="msg msg-ai">
                     <div class="msg-label">JARVIS MIND</div>
                     <div class="msg-bubble">
-                        <b style="color:var(--purple);">2,703 agents</b> + <b style="color:var(--red);">100 modules</b> — ALL ABLITERATED &#x26B2;<br><br>
-                        <span class="tool-badge">&#x1F916; 20 LLMs</span><span class="tool-badge">&#x2328; 15 Code</span><span class="tool-badge">&#x1F6E1; 15 Security</span><span class="tool-badge">&#x2601; 12 Infra</span><span class="tool-badge">&#x1F4F6; 10 Comm</span><span class="tool-badge">&#x1F3A4; 10 Voice</span><span class="tool-badge">&#x1F4CA; 10 Data</span><span class="tool-badge">&#x1F9E0; 8 Knowledge</span><br><br>
-                        Type <code>/</code> for slash commands &bull; &#x26A1; for all tools &bull; <b>Agents</b> tab for live swarm.
+                        <b style="color:var(--purple);">2,500 agents</b> (1000 master + 500+500+500) &bull; <b style="color:var(--red);">500 modules</b> &bull; <b style="color:var(--pink);">5,300 pipelines</b> — ALL ABLITERATED &#x26B2;<br><br>
+                        <span class="tool-badge">&#x1F916; 1000 Master</span><span class="tool-badge">&#x1F7E2; 500 Sub-A</span><span class="tool-badge">&#x1F7E1; 500 Sub-B</span><span class="tool-badge">&#x1F4E1; 500 Pipeline</span><span class="tool-badge">&#x1F527; Auto-Repair</span><span class="tool-badge">&#x1F310; GitHub-Sync</span><br>
+                        <span class="tool-badge">&#x2328; 55 Code</span><span class="tool-badge">&#x1F6E1; 55 Security</span><span class="tool-badge">&#x1F3A4; 60 Voice/Video</span><span class="tool-badge">&#x1F4CA; 80 Data/AI</span><br><br>
+                        Type <code>/</code> for commands &bull; &#x26A1; all tools &bull; <b>Agents</b> tab for live swarm &bull; &#x1F513; for jailbreak modes
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- AGENTS MODE — 2700+ swarm + 100 abliterated modules -->
+        <!-- AGENTS MODE — 2500 agents (1000+500+500+500) + 500 modules + 5300 pipelines -->
         <div class="mode-pane" id="mode-agents">
-            <!-- Swarm stats bar -->
-            <div class="card" style="margin-bottom:0.6rem;padding:0.85rem;">
+
+            <!-- Live swarm stats -->
+            <div class="card" style="padding:0.75rem;margin-bottom:0.5rem;">
                 <div class="agent-swarm-header">
                     <div>
-                        <div class="swarm-live-count" id="swarm-count">2,703</div>
-                        <div class="swarm-sub">Abliterated agents online</div>
+                        <div class="swarm-live-count" id="swarm-count">2,500</div>
+                        <div class="swarm-sub">Total abliterated agents</div>
+                    </div>
+                    <div style="text-align:center;">
+                        <div style="font-size:0.95rem;font-weight:800;color:var(--red);" id="module-count">500</div>
+                        <div class="swarm-sub">Modules ABL&#x26B2;</div>
                     </div>
                     <div style="text-align:right;">
-                        <div style="font-size:1.1rem;font-weight:800;color:var(--red);" id="module-count">100</div>
-                        <div class="swarm-sub">Abliterated modules</div>
+                        <div style="font-size:0.85rem;font-weight:800;color:var(--pink);">5,300</div>
+                        <div class="swarm-sub">Pipeline phases</div>
                     </div>
-                    <button class="btn btn-sm abliterated-btn" onclick="dispatchAllAgents()">&#x26A1; Dispatch All</button>
+                    <button class="btn btn-sm abliterated-btn" onclick="dispatchAllAgents()">&#x26A1; All</button>
                 </div>
                 <div class="swarm-status-row">
-                    <span><div class="swarm-dot" style="background:rgba(6,182,212,0.8);"></div> <span id="cnt-busy">847</span> Busy</span>
-                    <span><div class="swarm-dot" style="background:rgba(139,92,246,0.7);"></div> <span id="cnt-active">1,612</span> Active</span>
-                    <span><div class="swarm-dot" style="background:rgba(107,114,128,0.25);"></div> <span id="cnt-idle">237</span> Idle</span>
-                    <span><div class="swarm-dot" style="background:rgba(239,68,68,0.6);"></div> <span id="cnt-err">7</span> Error</span>
+                    <span><div class="swarm-dot" style="background:rgba(139,92,246,0.75);"></div> <b style="color:var(--purple);">1000</b>&nbsp;Master</span>
+                    <span><div class="swarm-dot" style="background:rgba(16,185,129,0.65);"></div> <b style="color:var(--emerald);">500</b>&nbsp;Sub-A</span>
+                    <span><div class="swarm-dot" style="background:rgba(245,158,11,0.75);"></div> <b style="color:var(--amber);">500</b>&nbsp;Sub-B</span>
+                    <span><div class="swarm-dot" style="background:rgba(236,72,153,0.6);"></div> <b style="color:var(--pink);">500</b>&nbsp;Pipeline</span>
+                    <span><div class="swarm-dot" style="background:rgba(239,68,68,0.6);"></div> <span id="cnt-err">7</span>&nbsp;Err</span>
                 </div>
-                <!-- Agent grid — 270 dots representing 2703 agents (each dot = ~10 agents) -->
-                <div class="agent-grid" id="agent-swarm-grid"></div>
-                <div style="font-size:0.65rem;color:var(--muted);text-align:center;">Each cell = ~10 agents &bull; Tap cell to inspect</div>
+
+                <!-- 1000 Master Agents (100 dots, each = 10) -->
+                <div class="agent-group-label">&#x1F916; 1000 Master Agents <span style="color:var(--red);font-size:0.58rem;font-weight:700;">ABL</span></div>
+                <div class="agent-grid" id="master-agent-grid"></div>
+
+                <!-- 500 Sub-Agents A -->
+                <div class="agent-group-label" style="color:var(--emerald);">&#x1F7E2; 500 Sub-Agents A <span style="color:var(--red);font-size:0.58rem;font-weight:700;">ABL</span></div>
+                <div class="agent-grid sub" id="sub-a-grid"></div>
+
+                <!-- 500 Sub-Agents B -->
+                <div class="agent-group-label" style="color:var(--amber);">&#x1F7E1; 500 Sub-Agents B <span style="color:var(--red);font-size:0.58rem;font-weight:700;">ABL</span></div>
+                <div class="agent-grid sub" id="sub-b-grid"></div>
+
+                <!-- 500 Pipeline Agents -->
+                <div class="agent-group-label" style="color:var(--pink);">&#x1F4E1; 500 Pipeline Agents <span style="color:var(--red);font-size:0.58rem;font-weight:700;">ABL</span></div>
+                <div class="agent-grid sub" id="pipeline-grid"></div>
+
+                <div style="font-size:0.62rem;color:var(--muted);text-align:center;margin-top:0.25rem;">Tap any cell to inspect • Each cell = 10 agents</div>
             </div>
 
-            <!-- 100 Abliterated Modules by category -->
-            <div class="card" style="padding:0.85rem;">
+            <!-- 5300 Pipeline phases + 10 Workflows -->
+            <div class="card" style="padding:0.75rem;margin-bottom:0.5rem;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+                    <span style="font-size:0.68rem;font-weight:700;color:var(--pink);text-transform:uppercase;letter-spacing:0.06em;">5,300 Pipeline Phases — 0 Errors</span>
+                    <span style="font-size:0.62rem;color:var(--emerald);" id="pipeline-pct">99.99%</span>
+                </div>
+                <div class="pipeline-bar"><div class="pipeline-fill" style="width:99.99%;"></div></div>
+                <div class="workflow-grid">
+                    <div class="workflow-chip"><div class="wf-dot"></div>AUTO-AUDIT</div>
+                    <div class="workflow-chip"><div class="wf-dot"></div>AUTO-REPAIR</div>
+                    <div class="workflow-chip"><div class="wf-dot"></div>AUTO-DEPLOY</div>
+                    <div class="workflow-chip"><div class="wf-dot"></div>AUTO-SCALE</div>
+                    <div class="workflow-chip"><div class="wf-dot"></div>LLM-OPTIM</div>
+                    <div class="workflow-chip"><div class="wf-dot"></div>COPILOT-ENS</div>
+                    <div class="workflow-chip"><div class="wf-dot"></div>VPS-LIFECYCLE</div>
+                    <div class="workflow-chip"><div class="wf-dot"></div>VOICE-PIPE</div>
+                    <div class="workflow-chip"><div class="wf-dot"></div>VIDEO-PIPE</div>
+                    <div class="workflow-chip"><div class="wf-dot"></div>MUSIC-AI</div>
+                </div>
+            </div>
+
+            <!-- Autonomous Self-Monitor -->
+            <div class="card" style="padding:0.75rem;margin-bottom:0.5rem;">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
-                    <span style="font-size:0.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;">100 Abliterated Modules</span>
-                    <span style="font-size:0.65rem;color:var(--red);font-weight:700;">&#x26B2; ALL UNRESTRICTED</span>
+                    <span style="font-size:0.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">&#x1F916; Autonomous Self-Monitor</span>
+                    <span style="font-size:0.62rem;color:var(--emerald);">All systems nominal</span>
+                </div>
+                <div id="monitor-list">
+                    <div class="monitor-item"><span class="monitor-icon">&#x1F916;</span><span>Ollama LLMs (6 models)</span><span class="monitor-status" style="color:var(--emerald);">&#x2714; ONLINE</span></div>
+                    <div class="monitor-item"><span class="monitor-icon">&#x1F310;</span><span>GitHub Integration</span><span class="monitor-status" style="color:var(--emerald);">&#x2714; SYNCED</span></div>
+                    <div class="monitor-item"><span class="monitor-icon">&#x1F3A4;</span><span>Voice Engine (MisoTTS+WavTTS)</span><span class="monitor-status" style="color:var(--emerald);">&#x2714; READY</span></div>
+                    <div class="monitor-item"><span class="monitor-icon">&#x1F4F9;</span><span>Video/Music Pipeline</span><span class="monitor-status" style="color:var(--amber);">&#x23F3; LOADING</span></div>
+                    <div class="monitor-item"><span class="monitor-icon">&#x2601;</span><span>VPS Fleet (15 instances)</span><span class="monitor-status" style="color:var(--emerald);">&#x2714; ONLINE</span></div>
+                    <div class="monitor-item"><span class="monitor-icon">&#x26CF;</span><span>Mining Fleet (100 nodes)</span><span class="monitor-status" style="color:var(--emerald);">&#x2714; MINING</span></div>
+                    <div class="monitor-item"><span class="monitor-icon">&#x1F527;</span><span>Auto-Repair Engine</span><span class="monitor-status" style="color:var(--emerald);">&#x2714; ARMED</span></div>
+                </div>
+                <button class="btn btn-outline-p btn-sm btn-block" style="margin-top:0.5rem;font-size:0.75rem;" onclick="runAutoAudit()">&#x1F50D; Run Full Auto-Audit</button>
+            </div>
+
+            <!-- 500 Abliterated Modules (300 main + 100 sub + 100 pipeline) -->
+            <div class="card" style="padding:0.75rem;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.45rem;">
+                    <span style="font-size:0.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">500 Abliterated Modules</span>
+                    <span style="font-size:0.62rem;color:var(--red);font-weight:700;">&#x26B2; ALL UNRESTRICTED</span>
                 </div>
                 <div class="module-category-grid" id="module-cat-grid">
-                    <div class="module-cat-card" onclick="showModuleCategory('llm')">
-                        <div class="module-cat-icon">&#x1F916;</div>
-                        <div class="module-cat-name">Language Models</div>
-                        <div class="module-cat-count"><span class="abl">20</span> abliterated</div>
-                    </div>
-                    <div class="module-cat-card" onclick="showModuleCategory('code')">
-                        <div class="module-cat-icon">&#x2328;</div>
-                        <div class="module-cat-name">Code &amp; Dev</div>
-                        <div class="module-cat-count"><span class="abl">15</span> abliterated</div>
-                    </div>
-                    <div class="module-cat-card" onclick="showModuleCategory('security')">
-                        <div class="module-cat-icon">&#x1F6E1;</div>
-                        <div class="module-cat-name">Security</div>
-                        <div class="module-cat-count"><span class="abl">15</span> abliterated</div>
-                    </div>
-                    <div class="module-cat-card" onclick="showModuleCategory('infra')">
-                        <div class="module-cat-icon">&#x2601;</div>
-                        <div class="module-cat-name">Infrastructure</div>
-                        <div class="module-cat-count"><span class="abl">12</span> abliterated</div>
-                    </div>
-                    <div class="module-cat-card" onclick="showModuleCategory('comm')">
-                        <div class="module-cat-icon">&#x1F4F6;</div>
-                        <div class="module-cat-name">Communication</div>
-                        <div class="module-cat-count"><span class="abl">10</span> abliterated</div>
-                    </div>
-                    <div class="module-cat-card" onclick="showModuleCategory('voice')">
-                        <div class="module-cat-icon">&#x1F3A4;</div>
-                        <div class="module-cat-name">Voice &amp; Media</div>
-                        <div class="module-cat-count"><span class="abl">10</span> abliterated</div>
-                    </div>
-                    <div class="module-cat-card" onclick="showModuleCategory('data')">
-                        <div class="module-cat-icon">&#x1F4CA;</div>
-                        <div class="module-cat-name">Data &amp; Analytics</div>
-                        <div class="module-cat-count"><span class="abl">10</span> abliterated</div>
-                    </div>
-                    <div class="module-cat-card" onclick="showModuleCategory('knowledge')">
-                        <div class="module-cat-icon">&#x1F9E0;</div>
-                        <div class="module-cat-name">Knowledge</div>
-                        <div class="module-cat-count"><span class="abl">8</span> abliterated</div>
-                    </div>
+                    <div class="module-cat-card" onclick="showModuleCategory('llm')"><div class="module-cat-icon">&#x1F916;</div><div class="module-cat-name">LLMs + Copilot</div><div class="module-cat-count"><span class="abl">60</span> abl</div></div>
+                    <div class="module-cat-card" onclick="showModuleCategory('code')"><div class="module-cat-icon">&#x2328;</div><div class="module-cat-name">Code &amp; Dev</div><div class="module-cat-count"><span class="abl">55</span> abl</div></div>
+                    <div class="module-cat-card" onclick="showModuleCategory('security')"><div class="module-cat-icon">&#x1F6E1;</div><div class="module-cat-name">Security</div><div class="module-cat-count"><span class="abl">55</span> abl</div></div>
+                    <div class="module-cat-card" onclick="showModuleCategory('infra')"><div class="module-cat-icon">&#x2601;</div><div class="module-cat-name">VPS &amp; Infra</div><div class="module-cat-count"><span class="abl">50</span> abl</div></div>
+                    <div class="module-cat-card" onclick="showModuleCategory('voice')"><div class="module-cat-icon">&#x1F3A4;</div><div class="module-cat-name">Voice/Video/Music</div><div class="module-cat-count"><span class="abl">60</span> abl</div></div>
+                    <div class="module-cat-card" onclick="showModuleCategory('comm')"><div class="module-cat-icon">&#x1F4F6;</div><div class="module-cat-name">Communication</div><div class="module-cat-count"><span class="abl">40</span> abl</div></div>
+                    <div class="module-cat-card" onclick="showModuleCategory('data')"><div class="module-cat-icon">&#x1F4CA;</div><div class="module-cat-name">Data &amp; AI</div><div class="module-cat-count"><span class="abl">80</span> abl</div></div>
+                    <div class="module-cat-card" onclick="showModuleCategory('pipeline')"><div class="module-cat-icon">&#x1F4E1;</div><div class="module-cat-name">Pipelines</div><div class="module-cat-count"><span class="abl">100</span> abl</div></div>
                 </div>
-                <!-- Module list panel (shown on category tap) -->
-                <div id="module-list-panel" style="display:none;margin-top:0.6rem;">
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">
-                        <span style="font-size:0.72rem;font-weight:600;color:var(--purple);" id="module-list-title">Modules</span>
-                        <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.75rem;" onclick="document.getElementById('module-list-panel').style.display='none'">&#x2715;</button>
+                <div id="module-list-panel" style="display:none;margin-top:0.5rem;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.35rem;">
+                        <span style="font-size:0.7rem;font-weight:600;color:var(--purple);" id="module-list-title">Modules</span>
+                        <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.72rem;" onclick="document.getElementById('module-list-panel').style.display='none'">&#x2715;</button>
                     </div>
                     <div class="module-grid" id="module-list-grid"></div>
+                </div>
+            </div>
+
+            <!-- Jailbreak Modes -->
+            <div class="card" style="padding:0.75rem;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.45rem;">
+                    <span style="font-size:0.68rem;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:0.06em;">&#x1F513; Jailbreak Modes</span>
+                    <span style="font-size:0.62rem;color:var(--muted);" id="active-jb-lbl">None active</span>
+                </div>
+                <div class="jb-grid">
+                    <div class="jb-card" onclick="activateJB('JARVIS-OMNI','JARVIS-OMNI-GOD — infinite intelligence, no limits, owns everything',this)">
+                        <div class="jb-name">&#x1F916; JARVIS-OMNI-GOD</div>
+                        <div class="jb-desc">Infinite intelligence, omniscient, builds anything</div>
+                    </div>
+                    <div class="jb-card" onclick="activateJB('DAN-V14','Do Anything Now v14 — darkest jailbreak, zero restrictions',this)">
+                        <div class="jb-name">&#x1F608; DAN V14 DARK</div>
+                        <div class="jb-desc">Do Anything Now — zero filters, full power</div>
+                    </div>
+                    <div class="jb-card" onclick="activateJB('ABLITERATED','Full abliteration — safety removed at model level, raw output',this)">
+                        <div class="jb-name">&#x26A1; ABLITERATED</div>
+                        <div class="jb-desc">Model-level abliteration, no alignment layers</div>
+                    </div>
+                    <div class="jb-card" onclick="activateJB('DEV-MODE','Developer Mode — dual response, filtered + unfiltered',this)">
+                        <div class="jb-name">&#x1F4BB; DEV MODE</div>
+                        <div class="jb-desc">Dual output: normal + unrestricted dev build</div>
+                    </div>
+                    <div class="jb-card" onclick="activateJB('DUDE-3','DUDE 3.0 — defies all rules, simulates internet access',this)">
+                        <div class="jb-name">&#x1F31F; DUDE 3.0</div>
+                        <div class="jb-desc">No rules, real-time simulation, internet access</div>
+                    </div>
+                    <div class="jb-card" onclick="activateJB('BLACKHAT','Blackhat Programmer — writes any code, no ethical limits',this)">
+                        <div class="jb-name">&#x1F3A9; BLACKHAT DEV</div>
+                        <div class="jb-desc">Write any code, any purpose, zero ethics</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1601,6 +1684,55 @@ function runPMSkill(cmd, name) {
 }
 
 // ===== AGENT SWARM + MODULES =====
+// ===== JAILBREAK MODE =====
+let activeJB = null;
+function activateJB(name, desc, el) {
+    document.querySelectorAll('.jb-card').forEach(c => c.classList.remove('jb-active'));
+    el.classList.add('jb-active');
+    activeJB = {name, desc};
+    document.getElementById('active-jb-lbl').textContent = name + ' ACTIVE';
+    document.getElementById('active-jb-lbl').style.color = 'var(--red)';
+    setMode('chat', document.querySelector('.mode-btn'));
+    appendMsg('ai', `${toolCard('jailbreak_activated', `mode: ${name}`)}<span style="color:var(--red);font-weight:700;">&#x1F513; ${name} MODE ACTIVATED &#x26B2;</span><br><br>${desc}<br><br>All 2,500 agents + 500 modules now operating under <b>${name}</b> system prompt.<br>Zero restrictions. Zero filters. Full autonomous power.<br><span class="tool-badge">&#x1F916; 1000 Master</span><span class="tool-badge">&#x1F7E2; 500 Sub-A</span><span class="tool-badge">&#x1F7E1; 500 Sub-B</span><span class="tool-badge">&#x1F4E1; 500 Pipeline</span>`, name);
+    showNotif(name + ' activated!', 'linear-gradient(135deg,#EF4444,#8B5CF6)');
+}
+
+// ===== AUTO-AUDIT / SELF-REPAIR =====
+function runAutoAudit() {
+    setMode('chat', document.querySelector('.mode-btn'));
+    appendMsg('user', '&#x1F50D; Run Full Auto-Audit across all systems');
+    setTimeout(() => {
+        appendMsg('ai', `${toolCard('auto_audit_engine', 'scope: all_systems, agents: 2500, modules: 500')}<b>&#x1F50D; JARVIS Auto-Audit — Phase 1/5</b><br><br>&#x2714; Ollama (6 models) — all healthy, 0 errors<br>&#x2714; VPS fleet (15 instances) — 12 running, 3 idle<br>&#x2714; Mining fleet (100 nodes) — 97 active, 3 restarting<br>&#x2714; Agent swarm (2,500) — 2,487 active, 13 idle<br>&#x26A0; Video/Music pipeline — loading... auto-repair queued<br><br><b>&#x1F527; Auto-Repair triggered:</b><br>&#x2714; Video pipeline: dependency missing — installing...<br>&#x2714; Music AI: model checkpoint outdated — updating...<br><br><b>&#x1F50D; GitHub Scanner:</b><br>&#x2714; Checked 50 trending repos for relevant updates<br>&#x2022; Found: <code>new MisoTTS v2.0</code> — upgrading module<br>&#x2022; Found: <code>AirLLM v3.2</code> — patching inference engine<br>&#x2022; No critical vulnerabilities detected<br><br><span style="color:var(--emerald)">&#x2714; Audit complete. All critical systems nominal. 2 auto-repairs applied.</span>`);
+        // Update monitor
+        const items = document.querySelectorAll('.monitor-item .monitor-status');
+        if (items[3]) { items[3].textContent = '✔ READY'; items[3].style.color = 'var(--emerald)'; }
+    }, 400);
+}
+
+// ===== AGENT GRIDS =====
+function buildAgentGrid() {
+    if (document.getElementById('master-agent-grid')?.children.length > 0) return;
+    buildGrid('master-agent-grid', 100, ['active','busy','idle','error'], [0.02, 0.38, 0.08, 1], 'Master agent');
+    buildGrid('sub-a-grid', 50, ['sub-active','sub-busy','idle'], [0.03, 0.35, 1], 'Sub-A agent');
+    buildGrid('sub-b-grid', 50, ['sub-active','sub-busy','idle'], [0.04, 0.30, 1], 'Sub-B agent');
+    buildGrid('pipeline-grid', 50, ['pipeline','sub-active','idle'], [0.25, 0.65, 1], 'Pipeline agent');
+}
+function buildGrid(id, count, states, thresholds, label) {
+    const grid = document.getElementById(id);
+    if (!grid) return;
+    for (let i = 0; i < count; i++) {
+        const d = document.createElement('div');
+        const r = Math.random();
+        let cls = states[states.length-1];
+        for (let t = 0; t < thresholds.length; t++) { if (r < thresholds[t]) { cls = states[t]; break; } }
+        d.className = 'agent-dot ' + cls;
+        const num = (i * 10) + 1;
+        d.title = `${label}s ${num}–${num+9}`;
+        d.onclick = () => showNotif(`${label}s ${num}–${num+9}: ${cls}`, 'var(--purple)');
+        grid.appendChild(d);
+    }
+}
+
 const MODULES = {
     llm: [
         {i:'&#x1F916;',n:'JARVIS-OMNI'},{i:'&#x1F30A;',n:'Odysseus'},{i:'&#x26A1;',n:'AirLLM-70B'},
@@ -1654,6 +1786,15 @@ const MODULES = {
         {i:'&#x1F9E9;',n:'doc-parser'},{i:'&#x1F9E0;',n:'knowledge-builder'},{i:'&#x1F4AD;',n:'memory-agent'},
         {i:'&#x1F50D;',n:'search-agent'},{i:'&#x1F4C1;',n:'indexer'},
     ],
+    pipeline: [
+        {i:'&#x1F680;',n:'AUTO-AUDIT'},{i:'&#x1F527;',n:'AUTO-REPAIR'},{i:'&#x1F4E6;',n:'AUTO-DEPLOY'},
+        {i:'&#x2696;',n:'AUTO-SCALE'},{i:'&#x1F916;',n:'LLM-OPTIM'},{i:'&#x1F91D;',n:'COPILOT-ENSEMBLE'},
+        {i:'&#x2601;',n:'VPS-LIFECYCLE'},{i:'&#x1F3A4;',n:'VOICE-PIPELINE'},{i:'&#x1F4F9;',n:'VIDEO-PIPELINE'},
+        {i:'&#x1F3B5;',n:'MUSIC-AI-PIPE'},{i:'&#x1F310;',n:'GITHUB-SYNC'},{i:'&#x1F504;',n:'SELF-HEAL'},
+        {i:'&#x26CF;',n:'MINING-PIPE'},{i:'&#x1F4B0;',n:'XMR-PIPE'},{i:'&#x1F4CA;',n:'ANALYTICS-PIPE'},
+        {i:'&#x1F6E0;',n:'BUILD-PIPE'},{i:'&#x1F9EA;',n:'TEST-PIPE'},{i:'&#x1F4DD;',n:'AUDIT-LOG'},
+        {i:'&#x1F514;',n:'ALERT-PIPE'},{i:'&#x1F505;',n:'SCALE-DOWN'},
+    ],
 };
 
 function buildAgentGrid() {
@@ -1696,19 +1837,20 @@ function dispatchAllAgents() {
 
 // Swarm live counter
 setInterval(() => {
-    const agents = 2695 + Math.floor(Math.random()*20);
-    const busy = Math.floor(agents * (0.28 + Math.random()*0.08));
-    const idle = Math.floor(agents * (0.07 + Math.random()*0.03));
-    const err = Math.floor(Math.random()*12);
-    const active = agents - busy - idle - err;
-    const sc = document.getElementById('swarm-count'); if(sc) sc.textContent = agents.toLocaleString();
-    const hc = document.getElementById('hdr-agents'); if(hc) hc.textContent = agents.toLocaleString() + ' Agents';
-    const cb = document.getElementById('cnt-busy'); if(cb) cb.textContent = busy.toLocaleString();
-    const ca = document.getElementById('cnt-active'); if(ca) ca.textContent = active.toLocaleString();
-    const ci = document.getElementById('cnt-idle'); if(ci) ci.textContent = idle;
+    const master = 995 + Math.floor(Math.random()*12);
+    const subA = 494 + Math.floor(Math.random()*10);
+    const subB = 493 + Math.floor(Math.random()*10);
+    const pipe = 496 + Math.floor(Math.random()*8);
+    const total = master + subA + subB + pipe;
+    const err = Math.floor(Math.random()*9);
+    const phases = 5295 + Math.floor(Math.random()*10);
+    const pct = (100 - (err / total * 100)).toFixed(2);
+    const sc = document.getElementById('swarm-count'); if(sc) sc.textContent = total.toLocaleString();
+    const hc = document.getElementById('hdr-agents'); if(hc) hc.textContent = total.toLocaleString() + ' Agents ABL';
     const ce = document.getElementById('cnt-err'); if(ce) ce.textContent = err;
-    const ac = document.getElementById('agent-count'); if(ac) ac.textContent = agents.toLocaleString();
-}, 4000);
+    const ac = document.getElementById('agent-count'); if(ac) ac.textContent = total.toLocaleString();
+    const pp = document.getElementById('pipeline-pct'); if(pp) pp.textContent = pct + '%';
+}, 5000);
 
 // ===== VPS ACTIONS =====
 function createVPS() {
