@@ -361,3 +361,63 @@ if __name__ == '__main__':
     print(f'[+] Domain: whoamisec.com')
     print(f'[+] XMR Address: {XMR_ADDRESS}')
     app.run(host='0.0.0.0', port=5001, debug=False, threaded=True)
+
+# ============ HTML PAGE ROUTES ============
+import os as _os
+HTML_DIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..')
+
+@app.route('/mining')
+def serve_mining():
+    """Serve the Mining Fleet page."""
+    try:
+        with open(_os.path.join(HTML_DIR, 'mining.html'), 'r') as f:
+            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
+    except FileNotFoundError:
+        return '<h1>Mining page not found</h1>', 404
+
+@app.route('/jarvis')
+def serve_jarvis():
+    """Serve the JARVIS MIND page."""
+    try:
+        with open(_os.path.join(HTML_DIR, 'jarvis.html'), 'r') as f:
+            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
+    except FileNotFoundError:
+        return '<h1>JARVIS MIND page not found</h1>', 404
+
+@app.route('/login')
+def serve_login():
+    """Serve the Login page."""
+    try:
+        with open(_os.path.join(HTML_DIR, 'login.html'), 'r') as f:
+            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
+    except FileNotFoundError:
+        return '<h1>Login page not found</h1>', 404
+
+@app.route('/dashboard')
+def serve_dashboard():
+    """Serve the Dashboard page."""
+    try:
+        with open(_os.path.join(HTML_DIR, 'dashboard.html'), 'r') as f:
+            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
+    except FileNotFoundError:
+        return '<h1>Dashboard page not found</h1>', 404
+
+@app.route('/admin')
+def serve_admin():
+    """Serve the Admin page."""
+    try:
+        with open(_os.path.join(HTML_DIR, 'admin.html'), 'r') as f:
+            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
+    except FileNotFoundError:
+        return '<h1>Admin page not found</h1>', 404
+
+@app.route('/index')
+def serve_index():
+    """Serve the Index/Landing page."""
+    try:
+        with open(_os.path.join(HTML_DIR, 'index.html'), 'r') as f:
+            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
+    except FileNotFoundError:
+        return '<h1>Index page not found</h1>', 404
+
+print('[+] HTML page routes registered: /mining, /jarvis, /login, /dashboard, /admin, /index')

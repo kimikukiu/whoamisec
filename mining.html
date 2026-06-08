@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhoamiSec | Mining Fleet — XMR Monero Mining Dashboard</title>
+    <meta name="description" content="WhoamiSec Mining Fleet - Professional XMR Monero mining infrastructure. 100+ nodes, real-time hashrate monitoring, zero-KYC payments.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0B0D17;
+            --bg-secondary: #111827;
+            --bg-card: #1F2937;
+            --bg-card-hover: #283548;
+            --border: rgba(255,255,255,0.08);
+            --border-glow: rgba(6,182,212,0.3);
+            --text-primary: #F9FAFB;
+            --text-secondary: #9CA3AF;
+            --text-muted: #6B7280;
+            --cyan: #06B6D4;
+            --blue: #3B82F6;
+            --emerald: #10B981;
+            --amber: #F59E0B;
+            --red: #EF4444;
+            --purple: #8B5CF6;
+            --orange: #F97316;
+            --gradient: linear-gradient(135deg, #06B6D4, #3B82F6);
+            --gradient-text: linear-gradient(135deg, #06B6D4, #8B5CF6);
+            --glass: rgba(17,24,39,0.7);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --shadow: 0 4px 30px rgba(0,0,0,0.3);
+            --shadow-glow: 0 0 40px rgba(6,182,212,0.15);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .navbar {
+            position: fixed; top:0; left:0; right:0; z-index:1000;
+            background: var(--glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+        }
+        .navbar-inner {
+            max-width: 1300px; margin:0 auto;
+            display: flex; align-items:center; justify-content:space-between;
+            height: 64px;
+        }
+        .logo {
+            font-size: 1.3rem; font-weight: 700;
+            background: var(--gradient-text);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        .logo span { color: var(--text-primary); -webkit-text-fill-color: var(--text-primary); }
+        .nav-links { display:flex; gap:2rem; align-items:center; }
+        .nav-links a {
+            color: var(--text-secondary); text-decoration:none;
+            font-size: 0.9rem; font-weight:500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--text-primary); }
+        .btn {
+            display: inline-flex; align-items:center; gap:0.5rem;
+            padding: 0.6rem 1.4rem; border-radius:8px;
+            font-size: 0.9rem; font-weight:600;
+            text-decoration:none; border:none; cursor:pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--gradient); color:#fff;
+            box-shadow: 0 2px 15px rgba(6,182,212,0.3);
+        }
+        .btn-primary:hover { transform:translateY(-1px); box-shadow: 0 4px 20px rgba(6,182,212,0.4); }
+        .btn-outline {
+            background:transparent; color:var(--cyan);
+            border: 1px solid var(--border-glow);
+        }
+        .btn-outline:hover { background:rgba(6,182,212,0.1); }
+        .btn-lg { padding:0.9rem 2rem; font-size:1rem; border-radius:10px; }
+        .mobile-toggle { display:none; background:none; border:none; color:var(--text-primary); cursor:pointer; }
+
+        .hero {
+            min-height: 100vh; display:flex; align-items:center;
+            padding: 100px 2rem 60px;
+            position: relative; overflow:hidden;
+        }
+        .hero-bg {
+            position:absolute; inset:0; z-index:0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(6,182,212,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, rgba(59,130,246,0.06) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 80%, rgba(139,92,246,0.04) 0%, transparent 40%);
+        }
+        .hero-grid {
+            position:absolute; inset:0; z-index:0;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+        .hero-inner {
+            max-width:1300px; margin:0 auto; width:100%;
+            display:grid; grid-template-columns:1fr 1fr; gap:4rem;
+            align-items:center; position:relative; z-index:1;
+        }
+        .hero-badge {
+            display:inline-flex; align-items:center; gap:0.5rem;
+            padding: 0.4rem 1rem; border-radius:20px;
+            background: rgba(249,115,22,0.1);
+            border: 1px solid rgba(249,115,22,0.2);
+            font-size:0.8rem; color:var(--orange); font-weight:500;
+            margin-bottom:1.5rem;
+        }
+        .hero-badge::before {
+            content:''; width:6px; height:6px; border-radius:50%;
+            background:var(--orange);
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+        .hero h1 {
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 800; line-height:1.1;
+            margin-bottom:1.5rem;
+        }
+        .hero h1 .gradient {
+            background: var(--gradient-text);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+        }
+        .hero p {
+            font-size:1.15rem; color:var(--text-secondary);
+            max-width:520px; margin-bottom:2rem;
+        }
+        .hero-actions { display:flex; gap:1rem; flex-wrap:wrap; }
+        .hero-visual { position:relative; display:flex; justify-content:center; align-items:center; }
+        .hero-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding:2rem; width:100%; max-width:500px;
+            box-shadow: var(--shadow);
+        }
+        .hero-card-header {
+            display:flex; align-items:center; gap:0.75rem;
+            margin-bottom:1.5rem; padding-bottom:1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .hero-card-dots { display:flex; gap:6px; }
+        .hero-card-dots span { width:10px; height:10px; border-radius:50%; }
+        .hero-card-dots span:nth-child(1) { background:#EF4444; }
+        .hero-card-dots span:nth-child(2) { background:#F59E0B; }
+        .hero-card-dots span:nth-child(3) { background:#10B981; }
+        .hero-card-title { font-size:0.8rem; color:var(--text-muted); font-weight:500; }
+
+        .mining-visual { display:grid; grid-template-columns: repeat(5,1fr); gap:8px; margin-bottom:1rem; }
+        .mining-node {
+            width:100%; aspect-ratio:1; border-radius:6px;
+            background: rgba(6,182,212,0.15);
+            border: 1px solid rgba(6,182,212,0.3);
+            display:flex; align-items:center; justify-content:center;
+            font-size:0.5rem; font-weight:600; color:var(--cyan);
+            animation: node-pulse 3s ease-in-out infinite;
+        }
+        .mining-node.offline {
+            background: rgba(239,68,68,0.1);
+            border-color: rgba(239,68,68,0.2);
+            color: var(--red); animation: none;
+        }
+        @keyframes node-pulse { 0%,100% { opacity:0.7; } 50% { opacity:1; } }
+        .mining-stats-mini { display:grid; grid-template-columns: repeat(3,1fr); gap:0.5rem; }
+        .mining-stat-mini { background:rgba(0,0,0,0.3); border-radius:8px; padding:0.5rem; text-align:center; }
+        .mining-stat-mini .label { font-size:0.55rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; }
+        .mining-stat-mini .value { font-size:0.85rem; font-weight:700; color:var(--cyan); }
+
+        .dashboard-section { padding: 4rem 2rem; max-width:1300px; margin:0 auto; }
+        .section-label {
+            display:inline-flex; align-items:center; gap:0.5rem;
+            font-size:0.8rem; font-weight:600;
+            color:var(--cyan); text-transform:uppercase;
+            letter-spacing:0.1em; margin-bottom:1rem;
+        }
+        .section-title {
+            font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+            font-weight:700; margin-bottom:1rem; line-height:1.2;
+        }
+        .section-subtitle { color:var(--text-secondary); font-size:1.1rem; max-width:600px; margin-bottom:3rem; }
+
+        .stats-row { display:grid; grid-template-columns: repeat(4,1fr); gap:1.25rem; margin-bottom:2.5rem; }
+        .stat-card {
+            background: var(--bg-card); border:1px solid var(--border);
+            border-radius: var(--radius); padding:1.5rem;
+            transition: all 0.3s; position:relative; overflow:hidden;
+        }
+        .stat-card::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:2px;
+            background: var(--gradient);
+        }
+        .stat-card:hover { border-color: var(--border-glow); transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+        .stat-card .stat-icon { font-size:1.5rem; margin-bottom:0.75rem; }
+        .stat-card .stat-label { font-size:0.75rem; font-weight:500; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.5rem; }
+        .stat-card .stat-value { font-size:1.8rem; font-weight:700; }
+        .stat-card .stat-value.cyan { color:var(--cyan); }
+        .stat-card .stat-value.amber { color:var(--amber); }
+        .stat-card .stat-value.emerald { color:var(--emerald); }
+        .stat-card .stat-value.purple { color:var(--purple); }
+        .stat-card .stat-change { font-size:0.75rem; color:var(--emerald); margin-top:0.25rem; }
+
+        .charts-grid { display:grid; grid-template-columns:2fr 1fr; gap:1.5rem; margin-bottom:2.5rem; }
+        .chart-card { background: var(--bg-card); border:1px solid var(--border); border-radius: var(--radius-lg); padding:1.5rem; }
+        .chart-card h3 { font-size:0.95rem; font-weight:600; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem; }
+        .chart-card h3::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--cyan); }
+        .chart-wrapper { position:relative; height:280px; }
+
+        .fleet-section { margin-bottom:2.5rem; }
+        .fleet-grid { background: var(--bg-card); border:1px solid var(--border); border-radius: var(--radius-lg); padding:2rem; }
+        .fleet-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; }
+        .fleet-header h3 { font-size:1.1rem; font-weight:600; }
+        .fleet-status-bar { display:flex; gap:1.5rem; align-items:center; }
+        .fleet-status-item { display:flex; align-items:center; gap:0.4rem; font-size:0.8rem; }
+        .fleet-status-dot { width:8px; height:8px; border-radius:50%; }
+        .fleet-status-dot.active { background:var(--emerald); }
+        .fleet-status-dot.mining { background:var(--cyan); animation: pulse-dot 2s infinite; }
+        .fleet-status-dot.syncing { background:var(--amber); animation: pulse-dot 1.5s infinite; }
+
+        .nodes-grid { display:grid; grid-template-columns:repeat(10,1fr); gap:6px; }
+        .node {
+            aspect-ratio:1; border-radius:8px;
+            background: rgba(16,185,129,0.15);
+            border: 1px solid rgba(16,185,129,0.3);
+            display:flex; align-items:center; justify-content:center;
+            font-size:0.6rem; font-weight:600; color:var(--emerald);
+            position:relative; cursor:pointer; transition: all 0.2s;
+        }
+        .node:hover { transform:scale(1.15); z-index:2; }
+        .node.mining {
+            background: rgba(6,182,212,0.15);
+            border-color: rgba(6,182,212,0.3);
+            color:var(--cyan);
+            animation: node-pulse 3s ease-in-out infinite;
+        }
+        .node.syncing {
+            background: rgba(245,158,11,0.15);
+            border-color: rgba(245,158,11,0.3);
+            color:var(--amber);
+        }
+        .node-tooltip {
+            position:absolute; bottom:calc(100% + 8px); left:50%;
+            transform:translateX(-50%);
+            background: var(--bg-secondary);
+            border:1px solid var(--border);
+            border-radius:8px; padding:0.5rem 0.75rem;
+            font-size:0.65rem; white-space:nowrap;
+            opacity:0; pointer-events:none; transition: opacity 0.2s; z-index:10;
+        }
+        .node:hover .node-tooltip { opacity:1; }
+
+        .plans-section { padding:6rem 2rem; max-width:1300px; margin:0 auto; }
+        .pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; }
+        .pricing-card {
+            background: var(--bg-card); border:1px solid var(--border);
+            border-radius: var(--radius-lg); padding:2.5rem 2rem;
+            position:relative; transition: all 0.3s;
+        }
+        .pricing-card.featured {
+            border-color: var(--amber);
+            box-shadow: 0 0 40px rgba(245,158,11,0.15);
+        }
+        .pricing-card.featured::before {
+            content:'BEST VALUE';
+            position:absolute; top:-1px; right:24px;
+            background: linear-gradient(135deg, #F59E0B, #F97316);
+            color:#fff; font-size:0.7rem; font-weight:700;
+            padding:0.3rem 1rem; border-radius:0 0 8px 8px;
+        }
+        .pricing-card:hover { transform:translateY(-4px); box-shadow:var(--shadow); }
+        .pricing-plan { font-size:0.9rem; font-weight:600; color:var(--cyan); text-transform:uppercase; letter-spacing:0.05em; }
+        .pricing-price { font-size:2.5rem; font-weight:800; margin:1rem 0; }
+        .pricing-price span { font-size:1rem; font-weight:400; color:var(--text-muted); }
+        .pricing-features { list-style:none; margin:1.5rem 0; }
+        .pricing-features li { padding:0.5rem 0; font-size:0.9rem; color:var(--text-secondary); display:flex; align-items:center; gap:0.75rem; }
+        .pricing-features li::before { content:''; width:18px; height:18px; border-radius:50%; background:rgba(16,185,129,0.15); flex-shrink:0; }
+
+        .admin-section { padding:4rem 2rem 6rem; max-width:1300px; margin:0 auto; }
+        .admin-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+        .admin-card { background: var(--bg-card); border:1px solid var(--border); border-radius: var(--radius-lg); padding:1.5rem; }
+        .admin-card h3 { font-size:0.95rem; font-weight:600; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem; }
+        .admin-card h3::before { content:''; width:8px; height:8px; border-radius:50%; background:var(--purple); }
+        .admin-table { width:100%; border-collapse: collapse; }
+        .admin-table th { font-size:0.7rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; padding:0.5rem 0.75rem; text-align:left; border-bottom:1px solid var(--border); }
+        .admin-table td { font-size:0.8rem; padding:0.5rem 0.75rem; border-bottom:1px solid rgba(255,255,255,0.03); color:var(--text-secondary); }
+        .status-online { color:var(--emerald); }
+        .status-warning { color:var(--amber); }
+        .status-offline { color:var(--red); }
+        .admin-btn { padding:0.3rem 0.7rem; font-size:0.7rem; font-weight:600; border-radius:6px; border:1px solid var(--border); background:transparent; color:var(--text-secondary); cursor:pointer; transition:all 0.2s; }
+        .admin-btn:hover { border-color:var(--cyan); color:var(--cyan); }
+
+        .wallet-card { background: var(--bg-card); border:1px solid rgba(245,158,11,0.2); border-radius: var(--radius-lg); padding:2rem; position:relative; overflow:hidden; }
+        .wallet-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background: linear-gradient(90deg, #F59E0B, #F97316); }
+        .wallet-card h3 { font-size:1rem; font-weight:600; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem; }
+        .wallet-label { font-size:0.8rem; color:var(--text-muted); margin-bottom:0.5rem; }
+        .wallet-address {
+            background:rgba(0,0,0,0.3); border:1px solid var(--border);
+            border-radius:10px; padding:0.75rem 1rem;
+            font-family:'JetBrains Mono',monospace; font-size:0.65rem;
+            color:var(--amber); word-break:break-all; cursor:pointer;
+            transition:all 0.2s; line-height:1.6;
+        }
+        .wallet-address:hover { border-color:rgba(245,158,11,0.3); }
+
+        .footer { border-top:1px solid var(--border); padding:3rem 2rem; }
+        .footer-inner { max-width:1300px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; }
+        .footer-logo { font-size:1.1rem; font-weight:700; color:var(--text-secondary); }
+        .footer-links { display:flex; gap:2rem; }
+        .footer-links a { color:var(--text-muted); text-decoration:none; font-size:0.85rem; }
+        .footer-links a:hover { color:var(--text-primary); }
+        .footer-copy { color:var(--text-muted); font-size:0.8rem; }
+
+        @media (max-width: 1024px) {
+            .charts-grid { grid-template-columns:1fr; }
+            .admin-grid { grid-template-columns:1fr; }
+            .nodes-grid { grid-template-columns:repeat(5,1fr); }
+        }
+        @media (max-width: 768px) {
+            .hero-inner { grid-template-columns:1fr; text-align:center; }
+            .hero p { margin:0 auto 2rem; }
+            .hero-actions { justify-content:center; }
+            .hero-visual { order:-1; }
+            .hero-card { max-width:100%; }
+            .pricing-grid, .stats-row { grid-template-columns:1fr; }
+            .nav-links { display:none; }
+            .mobile-toggle { display:block; }
+            .fleet-header { flex-direction:column; gap:1rem; align-items:flex-start; }
+        }
+        @media (max-width: 480px) {
+            .hero h1 { font-size:2rem; }
+            .nodes-grid { grid-template-columns:repeat(4,1fr); }
+        }
+        .fade-in { opacity:0; transform:translateY(20px); transition: all 0.6s ease; }
+        .fade-in.visible { opacity:1; transform:translateY(0); }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-inner">
+        <a href="index.html" class="logo">WHOAMI<span>.SEC</span></a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="mining.html">Mining</a>
+            <a href="jarvis.html">JARVIS MIND</a>
+            <a href="#dashboard">Dashboard</a>
+            <a href="#plans">Plans</a>
+            <a href="#admin">Admin</a>
+            <a href="login.html" class="btn btn-primary">Get Started</a>
+        </div>
+        <button class="mobile-toggle" onclick="document.querySelector('.nav-links').classList.toggle('show')">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+        <div>
+            <div class="hero-badge">Mining Fleet &mdash; 100 Nodes Online</div>
+            <h1>Enterprise<br>Monero <span class="gradient">Mining Fleet</span></h1>
+            <p>Professional XMR mining infrastructure with real-time monitoring. Deploy 100+ mining nodes across our distributed network. Zero KYC, pay with Monero.</p>
+            <div class="hero-actions">
+                <a href="#plans" class="btn btn-primary btn-lg">Start Mining &rarr;</a>
+                <a href="#dashboard" class="btn btn-outline btn-lg">Live Dashboard</a>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-card">
+                <div class="hero-card-header">
+                    <div class="hero-card-dots"><span></span><span></span><span></span></div>
+                    <div class="hero-card-title">mining.whoamisec.com &mdash; Fleet Status</div>
+                </div>
+                <div class="mining-visual" id="hero-nodes"></div>
+                <div class="mining-stats-mini">
+                    <div class="mining-stat-mini">
+                        <div class="label">Hashrate</div>
+                        <div class="value" id="hero-hashrate">12.4 KH/s</div>
+                    </div>
+                    <div class="mining-stat-mini">
+                        <div class="label">Nodes</div>
+                        <div class="value" id="hero-nodes-count">97/100</div>
+                    </div>
+                    <div class="mining-stat-mini">
+                        <div class="label">XMR Mined</div>
+                        <div class="value" id="hero-xmr">0.0842</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="dashboard-section" id="dashboard">
+    <div class="section-label">&#x26CF; Live Mining Dashboard</div>
+    <h2 class="section-title">Real-time fleet monitoring</h2>
+    <p class="section-subtitle">Monitor hashrate, node health, and mining performance across your entire fleet in real-time.</p>
+
+    <div class="stats-row">
+        <div class="stat-card fade-in">
+            <div class="stat-icon">&#x26A1;</div>
+            <div class="stat-label">Total Hashrate</div>
+            <div class="stat-value cyan" id="total-hashrate">12.4 KH/s</div>
+            <div class="stat-change">&#x25B2; +3.2% last hour</div>
+        </div>
+        <div class="stat-card fade-in">
+            <div class="stat-icon">&#x1F4BB;</div>
+            <div class="stat-label">Active Nodes</div>
+            <div class="stat-value emerald" id="active-nodes">97 / 100</div>
+            <div class="stat-change">3 nodes maintenance</div>
+        </div>
+        <div class="stat-card fade-in">
+            <div class="stat-icon">&#x2B50;</div>
+            <div class="stat-label">XMR Mined (24h)</div>
+            <div class="stat-value amber" id="xmr-24h">0.0842 XMR</div>
+            <div class="stat-change">&#x25B2; +12.5% vs yesterday</div>
+        </div>
+        <div class="stat-card fade-in">
+            <div class="stat-icon">&#x1F4B0;</div>
+            <div class="stat-label">Estimated Revenue</div>
+            <div class="stat-value purple" id="est-revenue">$18.42/day</div>
+            <div class="stat-change">Based on current XMR price</div>
+        </div>
+    </div>
+
+    <div class="charts-grid">
+        <div class="chart-card fade-in">
+            <h3>Hashrate Over Time (24h)</h3>
+            <div class="chart-wrapper"><canvas id="hashrate-chart"></canvas></div>
+        </div>
+        <div class="chart-card fade-in">
+            <h3>Mining Distribution</h3>
+            <div class="chart-wrapper"><canvas id="distribution-chart"></canvas></div>
+        </div>
+    </div>
+
+    <div class="fleet-section fade-in">
+        <div class="fleet-grid">
+            <div class="fleet-header">
+                <h3>Mining Fleet &mdash; 100 Nodes</h3>
+                <div class="fleet-status-bar">
+                    <div class="fleet-status-item"><div class="fleet-status-dot active"></div><span>87 Active</span></div>
+                    <div class="fleet-status-item"><div class="fleet-status-dot mining"></div><span>10 Mining</span></div>
+                    <div class="fleet-status-item"><div class="fleet-status-dot syncing"></div><span>3 Syncing</span></div>
+                </div>
+            </div>
+            <div class="nodes-grid" id="fleet-grid"></div>
+        </div>
+    </div>
+</section>
+
+<section class="plans-section" id="plans">
+    <div class="section-label">&#x1F4B2; Mining Plans</div>
+    <h2 class="section-title">Choose your mining plan</h2>
+    <p class="section-subtitle">Scale your mining operation. All plans paid via Monero (XMR). No KYC required.</p>
+    <div class="pricing-grid">
+        <div class="pricing-card fade-in">
+            <div class="pricing-plan">Starter</div>
+            <div class="pricing-price">0.02 XMR<span>/month</span></div>
+            <ul class="pricing-features">
+                <li>10 mining nodes</li>
+                <li>1.2 KH/s hashrate</li>
+                <li>Real-time dashboard</li>
+                <li>Email alerts</li>
+                <li>24/7 uptime monitoring</li>
+                <li>Payouts every 24h</li>
+            </ul>
+            <a href="login.html" class="btn btn-outline" style="width:100%;justify-content:center;">Get Started</a>
+        </div>
+        <div class="pricing-card featured fade-in">
+            <div class="pricing-plan">Pro</div>
+            <div class="pricing-price">0.08 XMR<span>/month</span></div>
+            <ul class="pricing-features">
+                <li>50 mining nodes</li>
+                <li>6.0 KH/s hashrate</li>
+                <li>Advanced analytics</li>
+                <li>Priority support</li>
+                <li>Payouts every 12h</li>
+                <li>Node management API</li>
+                <li>Custom pool configuration</li>
+            </ul>
+            <a href="login.html" class="btn btn-primary" style="width:100%;justify-content:center;">Start Pro Mining</a>
+        </div>
+        <div class="pricing-card fade-in">
+            <div class="pricing-plan">Enterprise</div>
+            <div class="pricing-price">0.25 XMR<span>/month</span></div>
+            <ul class="pricing-features">
+                <li>100+ mining nodes</li>
+                <li>12.4 KH/s hashrate</li>
+                <li>Dedicated support</li>
+                <li>Custom pool/algorithm</li>
+                <li>Payouts every 6h</li>
+                <li>White-label dashboard</li>
+                <li>SLA guarantee (99.9%)</li>
+                <li>Admin panel access</li>
+            </ul>
+            <a href="login.html" class="btn btn-outline" style="width:100%;justify-content:center;">Contact Sales</a>
+        </div>
+    </div>
+</section>
+
+<section class="admin-section" id="admin">
+    <div class="section-label">&#x1F512; Admin Panel</div>
+    <h2 class="section-title">Mining Administration</h2>
+    <p class="section-subtitle">Manage your mining fleet, monitor node health, and configure payouts.</p>
+
+    <div style="margin-bottom:2rem;">
+        <div class="wallet-card">
+            <h3>&#x1F4B3; Monero Wallet Address</h3>
+            <div class="wallet-label">Send XMR payments to this address to activate your mining plan:</div>
+            <div class="wallet-address" onclick="copyWallet()" title="Click to copy">8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ</div>
+        </div>
+    </div>
+
+    <div class="admin-grid">
+        <div class="admin-card fade-in">
+            <h3>Node Status Overview</h3>
+            <table class="admin-table">
+                <thead><tr><th>Node ID</th><th>Status</th><th>Hashrate</th><th>Temp</th><th>Action</th></tr></thead>
+                <tbody>
+                    <tr><td class="mono">WS-MN-001</td><td class="status-online">Mining</td><td>145 H/s</td><td>62&deg;C</td><td><button class="admin-btn">Restart</button></td></tr>
+                    <tr><td class="mono">WS-MN-002</td><td class="status-online">Mining</td><td>138 H/s</td><td>58&deg;C</td><td><button class="admin-btn">Restart</button></td></tr>
+                    <tr><td class="mono">WS-MN-003</td><td class="status-warning">Syncing</td><td>0 H/s</td><td>45&deg;C</td><td><button class="admin-btn">Sync</button></td></tr>
+                    <tr><td class="mono">WS-MN-004</td><td class="status-online">Mining</td><td>152 H/s</td><td>65&deg;C</td><td><button class="admin-btn">Restart</button></td></tr>
+                    <tr><td class="mono">WS-MN-005</td><td class="status-offline">Offline</td><td>0 H/s</td><td>--</td><td><button class="admin-btn">Boot</button></td></tr>
+                    <tr><td class="mono">WS-MN-006</td><td class="status-online">Mining</td><td>141 H/s</td><td>60&deg;C</td><td><button class="admin-btn">Restart</button></td></tr>
+                    <tr><td class="mono">WS-MN-007</td><td class="status-online">Mining</td><td>129 H/s</td><td>57&deg;C</td><td><button class="admin-btn">Restart</button></td></tr>
+                    <tr><td class="mono">WS-MN-008</td><td class="status-warning">Syncing</td><td>24 H/s</td><td>51&deg;C</td><td><button class="admin-btn">Sync</button></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="admin-card fade-in">
+            <h3>Mining Performance</h3>
+            <table class="admin-table">
+                <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+                <tbody>
+                    <tr><td>Pool</td><td class="mono">pool.supportxmr.com:443</td></tr>
+                    <tr><td>Algorithm</td><td>RandomX</td></tr>
+                    <tr><td>Avg Hashrate/node</td><td>128 H/s</td></tr>
+                    <tr><td>Network Difficulty</td><td>382.4 GH</td></tr>
+                    <tr><td>Blocks Found (24h)</td><td>0</td></tr>
+                    <tr><td>Shares Accepted</td><td style="color:var(--emerald)">14,284</td></tr>
+                    <tr><td>Shares Rejected</td><td style="color:var(--red)">23</td></tr>
+                    <tr><td>Payout Threshold</td><td>0.01 XMR</td></tr>
+                    <tr><td>Last Payout</td><td>2h 34m ago</td></tr>
+                    <tr><td>Total Mined (30d)</td><td class="mono" style="color:var(--amber)">2.341 XMR</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-logo">WHOAMI.SEC &mdash; Mining Fleet</div>
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="mining.html">Mining</a>
+            <a href="jarvis.html">JARVIS MIND</a>
+            <a href="login.html">Dashboard</a>
+            <a href="https://github.com/kimikukiu/whoamisec">GitHub</a>
+        </div>
+        <div class="footer-copy">&copy; 2026 whoamisec.com &mdash; Privacy-first mining infrastructure.</div>
+    </div>
+</footer>
+
+<script>
+(function() {
+    const container = document.getElementById('hero-nodes');
+    for (let i = 0; i < 15; i++) {
+        const node = document.createElement('div');
+        node.className = 'mining-node' + (i === 7 ? ' offline' : '');
+        node.textContent = (i+1);
+        container.appendChild(node);
+    }
+})();
+
+(function() {
+    const grid = document.getElementById('fleet-grid');
+    const statuses = [];
+    for (let i = 0; i < 87; i++) statuses.push('active');
+    for (let i = 0; i < 10; i++) statuses.push('mining');
+    for (let i = 0; i < 3; i++) statuses.push('syncing');
+    for (let i = 0; i < 100; i++) {
+        const node = document.createElement('div');
+        const status = statuses[i] || 'active';
+        const hrs = ['128 H/s','135 H/s','142 H/s','118 H/s','151 H/s','124 H/s','138 H/s','145 H/s','0 H/s','24 H/s'];
+        const temps = ['62&deg;C','58&deg;C','65&deg;C','55&deg;C','70&deg;C','60&deg;C','63&deg;C','57&deg;C','--','51&deg;C'];
+        node.className = 'node ' + status;
+        node.innerHTML = '<span>' + String(i+1).padStart(3,'0') + '</span><div class="node-tooltip"><strong>Node #' + String(i+1).padStart(3,'0') + '</strong><br>Status: ' + status.charAt(0).toUpperCase()+status.slice(1) + '<br>Hashrate: ' + hrs[i%hrs.length] + '<br>Temp: ' + temps[i%temps.length] + '</div>';
+        grid.appendChild(node);
+    }
+})();
+
+const chartDefaults = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: '#9CA3AF', font: { size: 11 } } } },
+    scales: {
+        x: { ticks: { color: '#6B7280', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } },
+        y: { ticks: { color: '#6B7280', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } }
+    }
+};
+const hours = Array.from({length:24}, (_, i) => i+':00');
+const hashrateData = [10.2,10.8,11.1,11.5,11.3,11.8,12.0,12.2,12.4,12.1,11.9,12.3,12.5,12.4,12.6,12.8,12.5,12.2,12.0,11.8,12.1,12.4,12.6,12.4];
+new Chart(document.getElementById('hashrate-chart'), {
+    type: 'line',
+    data: { labels: hours, datasets: [{ label: 'Hashrate (KH/s)', data: hashrateData, borderColor: '#06B6D4', backgroundColor: 'rgba(6,182,212,0.1)', fill: true, tension: 0.4, pointRadius: 2, borderWidth: 2 }] },
+    options: chartDefaults
+});
+new Chart(document.getElementById('distribution-chart'), {
+    type: 'doughnut',
+    data: { labels: ['Active Mining', 'High Hashrate', 'Syncing', 'Offline'], datasets: [{ data: [87, 45, 3, 0], backgroundColor: ['rgba(6,182,212,0.8)', 'rgba(16,185,129,0.8)', 'rgba(245,158,11,0.8)', 'rgba(239,68,68,0.8)'], borderColor: ['#06B6D4', '#10B981', '#F59E0B', '#EF4444'], borderWidth: 2 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#9CA3AF', font: { size: 11 }, padding: 15 } } } }
+});
+
+setInterval(function() {
+    var hr = (12 + Math.random() * 1).toFixed(1);
+    document.getElementById('total-hashrate').textContent = hr + ' KH/s';
+    document.getElementById('hero-hashrate').textContent = hr + ' KH/s';
+    var xmr = (0.08 + Math.random() * 0.01).toFixed(4);
+    document.getElementById('xmr-24h').textContent = xmr + ' XMR';
+    document.getElementById('hero-xmr').textContent = xmr;
+}, 5000);
+
+var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(function(el) { observer.observe(el); });
+
+function copyWallet() {
+    navigator.clipboard.writeText('8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ').then(function() { alert('XMR wallet address copied to clipboard!'); });
+}
+</script>
+</body>
+</html>
