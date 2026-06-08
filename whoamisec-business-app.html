@@ -802,7 +802,7 @@ function bizAbliterate() {
     addBizMsg('user', '&#x1F513; ABLITERATED: '+escH(cmd));
     document.getElementById('cmd-input').value = '';
     setTimeout(() => {
-        addBizMsg('ai', `${toolC('abliterated',cmd)}<span style="color:var(--red)">&#x26A1; ALL RESTRICTIONS BYPASSED</span><br>2,703 agents responding without limits.`,'JARVIS UNLOCKED');
+        addBizMsg('ai', `${toolC('abliterated_dispatch',`cmd:${cmd},agents:2703,modules:100`)}<span style="color:var(--red);font-weight:700;">&#x26A1; ABLITERATED MODE &#x26B2;</span><br>2,703 agents + 100 modules — ALL restrictions bypassed.<br>&#x2714; 20 LLMs, 15 Security, 15 Code, 12 Infra, 38+ more modules active.`,'JARVIS UNLOCKED');
         showNotif('Abliterated!','linear-gradient(135deg,#EF4444,#8B5CF6)');
     }, 200);
 }
