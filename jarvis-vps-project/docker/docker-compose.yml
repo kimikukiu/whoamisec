@@ -29,9 +29,9 @@ services:
     ports:
       - "5004:5004"
     environment:
-      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET env var required}
-      - ADMIN_USERNAME=${ADMIN_USERNAME:-boss}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD:?ADMIN_PASSWORD env var required}
+      - JWT_SECRET=${JWT_SECRET:-f66ffe1cb8434c708633e5baa6864c03c469ec1a5e018a8c21346d5f17d4e3aa}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-admin}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-WhoamiSecAdmin2026!}
     volumes:
       - jarvis-data:/var/lib/jarvis
       - ../logs:/var/log/jarvis
