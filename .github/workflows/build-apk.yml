@@ -42,34 +42,6 @@ jobs:
             -storepass "$STOREPASS" -keypass "$STOREPASS" \
             -dname "CN=WhoamiSec,OU=JARVIS,O=WhoamiSec,L=Bucharest,ST=BU,C=RO"
 
-      - name: Create patcher script
-        run: |
-          cat > /tmp/patch.py << 'SCRIPT'
-          import sys, re
-          f = sys.argv[1]
-          c = open(f).read()
-          if 'signingConfigs' not in c:
-              sc = """\
-          signingConfigs {
-              release {
-                  storeFile file('whoamisec.keystore')
-                  storePassword System.getenv('KS_PASS') ?: 'WhoamiSec2026'
-                  keyAlias 'whoamisec'
-                  keyPassword System.getenv('KS_PASS') ?: 'WhoamiSec2026'
-              }
-          }"""
-              c = c.replace('buildTypes {', sc + '\nbuildTypes {')
-              if 'signingConfig signingConfigs.release' not in c:
-                  c = c.replace('release {', 'release {\n            signingConfig signingConfigs.release')
-          for pat, repl in [('minSdkVersion\\s+\\d+', 'minSdkVersion 23'), ('targetSdkVersion\\s+\\d+', 'targetSdkVersion 34'), ('compileSdkVersion\\s+\\d+', 'compileSdkVersion 34')]:
-              c = re.sub(pat, repl, c)
-          open(f, 'w').write(c)
-          print('Patched OK')
-          SCRIPT
-
-      # ══════════════════════════════════════════
-      # APK 1 — JARVIS MIND v3
-      # ══════════════════════════════════════════
       - name: Init JARVIS MIND
         run: |
           mkdir -p apk-build/www
@@ -88,36 +60,39 @@ jobs:
           KS_PASS: "WhoamiSec2026"
         run: |
           cp whoamisec.keystore apk-build/android/app/whoamisec.keystore
-          python3 /tmp/patch.py apk-build/android/app/build.gradle
-          cat apk-build/android/app/build.gradle | grep -A2 signingConfigs || echo "No signing found"
+          python3 .github/workflows/patch_gradle.py apk-build/android/app/build.gradle
           cd apk-build/android
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon 2>&1 | tail -30
-          echo "EXIT: $?"
+          set -o pipefail
+          ./gradlew assembleRelease --no-daemon 2>&1 | tee /tmp/g1.log | tail -50
+          echo "GRADLE_RC=${PIPESTATUS[0]}"
           find . -name "*.apk" -type f
+          if [ "${PIPESTATUS[0]}" != "0" ]; then
+            echo "=== GRADLE FAILED ==="
+            cat /tmp/g1.log
+          fi
 
       - name: Collect JARVIS MIND APK
         run: |
           APK=$(find apk-build/android -name "*.apk" -type f | head -1)
           if [ -n "$APK" ]; then
             cp "$APK" JARVIS-MIND-v3.apk
-            echo "Done: $(du -sh JARVIS-MIND-v3.apk)"
+            echo "OK: $(du -sh JARVIS-MIND-v3.apk)"
           else
-            echo "No APK built, trying debug..."
-            cd apk-build/android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon 2>&1 | tail -20
+            echo "No release APK, trying debug..."
+            cd apk-build/android
+            chmod +x gradlew
+            ./gradlew assembleDebug --no-daemon 2>&1 | tail -20
             APK=$(find . -name "*.apk" -type f | head -1)
             if [ -n "$APK" ]; then
               cp "$APK" ../../JARVIS-MIND-v3.apk
               echo "Debug APK: $(du -sh ../../JARVIS-MIND-v3.apk)"
             else
-              echo "FAIL: No APK at all"
+              echo "FAIL: no APK at all"
               exit 1
             fi
           fi
 
-      # ══════════════════════════════════════════
-      # APK 2 — WHOAMISEC Business v16
-      # ══════════════════════════════════════════
       - name: Init WHOAMISEC Business
         run: |
           cp whoamisec-business-app.html apk-build/www/index.html
@@ -133,27 +108,29 @@ jobs:
           KS_PASS: "WhoamiSec2026"
         run: |
           cp whoamisec.keystore apk-build/android/app/whoamisec.keystore
-          python3 /tmp/patch.py apk-build/android/app/build.gradle
+          python3 .github/workflows/patch_gradle.py apk-build/android/app/build.gradle
           cd apk-build/android
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon 2>&1 | tail -30
-          echo "EXIT: $?"
+          set -o pipefail
+          ./gradlew assembleRelease --no-daemon 2>&1 | tee /tmp/g2.log | tail -50
+          echo "GRADLE_RC=${PIPESTATUS[0]}"
           find . -name "*.apk" -type f
+          if [ "${PIPESTATUS[0]}" != "0" ]; then
+            echo "=== GRADLE FAILED ==="
+            cat /tmp/g2.log
+          fi
 
       - name: Collect WHOAMISEC Business APK
         run: |
           APK=$(find apk-build/android -name "*.apk" -type f | head -1)
           if [ -n "$APK" ]; then
             cp "$APK" WHOAMISEC-Business-v16.apk
-            echo "Done: $(du -sh WHOAMISEC-Business-v16.apk)"
+            echo "OK: $(du -sh WHOAMISEC-Business-v16.apk)"
           else
-            echo "FAIL: No APK"
+            echo "FAIL: no APK"
             exit 1
           fi
 
-      # ══════════════════════════════════════════
-      # Release
-      # ══════════════════════════════════════════
       - name: Upload APKs to GitHub Releases
         uses: softprops/action-gh-release@v2
         with:

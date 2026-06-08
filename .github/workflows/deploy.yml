@@ -30,20 +30,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Prepare web artifact
         run: |
           mkdir -p _site
-          # Copy only web-facing files
           cp index.html login.html dashboard.html admin.html jarvis.html mining.html cicada.html downloads.html _site/ 2>/dev/null || true
           cp jarvis-mind-app.html whoamisec-business-app.html _site/ 2>/dev/null || true
           cp manifest.json sw.js _site/ 2>/dev/null || true
           cp cicada-sound.mp3 _site/ 2>/dev/null || true
           cp CNAME _site/ 2>/dev/null || true
-          ls -la _site/
-          echo "Files to deploy:"
-          find _site -type f | wc -l
-
+          echo "Site files:"
+          ls _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site
@@ -54,10 +50,6 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    permissions:
-      pages: write
-      id-token: write
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
-        continue-on-error: true
