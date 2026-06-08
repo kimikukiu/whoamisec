@@ -496,6 +496,76 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',
 </audio>
 
 <script>
+// ── VPS API CONFIG ────────────────────────────────────────────
+const VPS = {
+  cicada: 'https://whoamisec.com/cicada3301',
+  api:    'https://whoamisec.com/api'
+};
+
+async function cicadaPost(path, body) {
+  try {
+    const r = await fetch(VPS.cicada + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(8000)
+    });
+    return r.ok ? await r.json() : null;
+  } catch { return null; }
+}
+async function cicadaGet(path) {
+  try {
+    const r = await fetch(VPS.cicada + path, { signal: AbortSignal.timeout(8000) });
+    return r.ok ? await r.json() : null;
+  } catch { return null; }
+}
+
+async function loadLeaderboardFromVPS() {
+  const data = await cicadaGet('/api/leaderboard');
+  if (!data || !data.leaderboard) return;
+  const lb = document.getElementById('leaderboard-list');
+  if (!lb) return;
+  lb.innerHTML = '';
+  data.leaderboard.slice(0, 10).forEach((p, i) => {
+    lb.innerHTML += `<div class="lb-row">
+      <span class="lb-rank">#${i+1}</span>
+      <span class="lb-name">${p.username || 'Anonymous'}</span>
+      <span class="lb-pts">${p.total_points || 0} pts</span>
+      <span class="lb-xmr" style="color:#ff9500">${(p.total_rewards_xmr||0).toFixed(4)} XMR</span>
+    </div>`;
+  });
+}
+
+async function submitPuzzleToVPS(puzzleId, answer, username, wallet) {
+  const data = await cicadaPost('/api/puzzle/submit', { puzzle_id: puzzleId, answer, username, xmr_wallet: wallet });
+  return data;
+}
+
+async function registerOnVPS(username, wallet) {
+  const data = await cicadaPost('/api/register', { username, wallet });
+  return data;
+}
+
+// Load leaderboard from VPS when tab is opened
+function switchToLeaderboard() {
+  loadLeaderboardFromVPS();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Check VPS connectivity
+  cicadaGet('/api/puzzle/list').then(data => {
+    const dot = document.getElementById('vps-dot');
+    const lbl = document.getElementById('vps-lbl');
+    if (data) {
+      if (dot) dot.style.background = '#39ff14';
+      if (lbl) lbl.textContent = 'VPS ONLINE';
+    } else {
+      if (dot) dot.style.background = '#ff2020';
+      if (lbl) lbl.textContent = 'VPS OFFLINE';
+    }
+  });
+});
+
 // ── MATRIX RAIN ──────────────────────────────────────────────
 const canvas = document.getElementById('matrix-canvas');
 const ctx = canvas.getContext('2d');

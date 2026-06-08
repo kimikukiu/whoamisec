@@ -12,6 +12,7 @@ import io
 import base64
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, render_template_string, send_file
+from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_socketio import SocketIO, emit
 from PIL import Image, ImageDraw, ImageFont
@@ -19,6 +20,7 @@ import numpy as np
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = secrets.token_hex(32)
+CORS(app, origins='*', allow_headers=['Content-Type', 'Authorization'])
 jwt = JWTManager(app)
 socketio = SocketIO(app, cors_allowed_origins='*')
 

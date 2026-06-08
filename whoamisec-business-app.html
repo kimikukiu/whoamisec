@@ -756,6 +756,88 @@
 <div class="notif" id="notif"></div>
 
 <script>
+// ── VPS API CONFIG ────────────────────────────────────────────
+const VPS = {
+  api:  'https://whoamisec.com/api',
+  sub:  'https://whoamisec.com/subscription',
+  xmr:  'https://whoamisec.com/monero',
+  admin: { user: 'admin', pass: 'WhoamiSecAdmin2026!' }
+};
+
+let bsToken = localStorage.getItem('bs_token') || null;
+
+async function bsPost(url, body) {
+  try {
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(bsToken ? { 'Authorization': 'Bearer ' + bsToken } : {}) },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(8000)
+    });
+    return r.ok ? await r.json() : null;
+  } catch { return null; }
+}
+async function bsGet(url) {
+  try {
+    const r = await fetch(url, {
+      headers: bsToken ? { 'Authorization': 'Bearer ' + bsToken } : {},
+      signal: AbortSignal.timeout(8000)
+    });
+    return r.ok ? await r.json() : null;
+  } catch { return null; }
+}
+
+async function bsLogin() {
+  const data = await bsPost(VPS.api + '/login', { username: VPS.admin.user, password: VPS.admin.pass });
+  if (data && data.token) { bsToken = data.token; localStorage.setItem('bs_token', bsToken); return true; }
+  return false;
+}
+
+async function bsCheckOnline() {
+  const dot = document.getElementById('bs-vps-dot');
+  const lbl = document.getElementById('bs-vps-lbl');
+  const data = await bsGet(VPS.api + '/v1/health');
+  if (data) {
+    if (dot) dot.style.background = '#39ff14';
+    if (lbl) lbl.textContent = 'ONLINE';
+    if (!bsToken) bsLogin();
+    bsLoadStats();
+  } else {
+    if (dot) dot.style.background = '#ff2020';
+    if (lbl) lbl.textContent = 'OFFLINE';
+  }
+}
+
+async function bsLoadStats() {
+  const stats = await bsGet(VPS.xmr + '/api/stats');
+  if (stats) {
+    const el = document.getElementById('xmr-balance');
+    if (el && stats.balance_xmr != null) el.textContent = stats.balance_xmr.toFixed(4) + ' XMR';
+  }
+  const subs = await bsGet(VPS.sub + '/api/stats');
+  if (subs) {
+    const el = document.getElementById('active-users');
+    if (el && subs.active_users != null) el.textContent = subs.active_users.toLocaleString();
+  }
+}
+
+async function bsPurchasePlan(planName, xmrPrice) {
+  if (!bsToken) await bsLogin();
+  const wallet = prompt('Enter your XMR wallet address:');
+  if (!wallet) return;
+  const data = await bsPost(VPS.sub + '/api/plan/select', { plan: planName, wallet, price_xmr: xmrPrice });
+  if (data && data.success) {
+    showNotif('✓ Plan ' + planName + ' activated! Send ' + xmrPrice + ' XMR to complete.', 'success');
+  } else {
+    showNotif('Send ' + xmrPrice + ' XMR to activate ' + planName, 'info');
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  bsCheckOnline();
+  setInterval(bsCheckOnline, 30000);
+});
+
 function switchTab(name, btn) {
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));

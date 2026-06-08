@@ -66,24 +66,15 @@ jobs:
           find ios -name "project.pbxproj" -exec \
             perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = [\d.]+/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' {} \;
 
-      - name: Resolve SPM packages — JARVIS MIND
-        working-directory: apk-build/ios/App
-        run: |
-          xcodebuild -resolvePackageDependencies \
-            -workspace App.xcworkspace \
-            -scheme App \
-            -clonedSourcePackagesDirPath /tmp/spm-jm 2>&1 | tail -5 || true
-
       - name: Build archive — JARVIS MIND
         working-directory: apk-build/ios/App
         run: |
           xcodebuild \
-            -workspace App.xcworkspace \
+            -project App.xcodeproj \
             -scheme App \
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/JarvisMind.xcarchive" \
-            -clonedSourcePackagesDirPath /tmp/spm-jm \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
@@ -133,24 +124,15 @@ jobs:
           find ios -name "project.pbxproj" -exec \
             perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = [\d.]+/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' {} \;
 
-      - name: Resolve SPM packages — WHOAMISEC Business
-        working-directory: apk-build/ios/App
-        run: |
-          xcodebuild -resolvePackageDependencies \
-            -workspace App.xcworkspace \
-            -scheme App \
-            -clonedSourcePackagesDirPath /tmp/spm-ws 2>&1 | tail -5 || true
-
       - name: Build archive — WHOAMISEC Business
         working-directory: apk-build/ios/App
         run: |
           xcodebuild \
-            -workspace App.xcworkspace \
+            -project App.xcodeproj \
             -scheme App \
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/WhoamiSecBusiness.xcarchive" \
-            -clonedSourcePackagesDirPath /tmp/spm-ws \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
@@ -201,24 +183,15 @@ jobs:
           find ios -name "project.pbxproj" -exec \
             perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = [\d.]+/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' {} \;
 
-      - name: Resolve SPM packages — CICADA 3301
-        working-directory: apk-build/ios/App
-        run: |
-          xcodebuild -resolvePackageDependencies \
-            -workspace App.xcworkspace \
-            -scheme App \
-            -clonedSourcePackagesDirPath /tmp/spm-c3 2>&1 | tail -5 || true
-
       - name: Build archive — CICADA 3301
         working-directory: apk-build/ios/App
         run: |
           xcodebuild \
-            -workspace App.xcworkspace \
+            -project App.xcodeproj \
             -scheme App \
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/Cicada3301.xcarchive" \
-            -clonedSourcePackagesDirPath /tmp/spm-c3 \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \

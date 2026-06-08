@@ -1510,6 +1510,78 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINVmUfEce3uSfnES7ZNTSkERao5k80/emlP3LBCNJ2qt
 <div class="notif" id="notif"></div>
 
 <script>
+// ── VPS API CONFIG ────────────────────────────────────────────
+const VPS = {
+  api:    'https://whoamisec.com/api',
+  jarvis: 'https://whoamisec.com/jarvis',
+  sub:    'https://whoamisec.com/subscription',
+  xmr:    'https://whoamisec.com/monero',
+  cicada: 'https://whoamisec.com/cicada3301',
+  admin:  { user: 'admin', pass: 'WhoamiSecAdmin2026!' }
+};
+
+let vpsToken = localStorage.getItem('vps_token') || null;
+
+async function vpsPost(url, body) {
+  try {
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(vpsToken ? { 'Authorization': 'Bearer ' + vpsToken } : {}) },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(8000)
+    });
+    return r.ok ? await r.json() : null;
+  } catch { return null; }
+}
+async function vpsGet(url) {
+  try {
+    const r = await fetch(url, {
+      headers: vpsToken ? { 'Authorization': 'Bearer ' + vpsToken } : {},
+      signal: AbortSignal.timeout(8000)
+    });
+    return r.ok ? await r.json() : null;
+  } catch { return null; }
+}
+
+async function vpsLogin() {
+  const data = await vpsPost(VPS.jarvis + '/api/login', { username: VPS.admin.user, password: VPS.admin.pass });
+  if (data && data.token) {
+    vpsToken = data.token;
+    localStorage.setItem('vps_token', vpsToken);
+    return true;
+  }
+  return false;
+}
+
+async function vpsCheckOnline() {
+  const dot = document.getElementById('vps-status-dot');
+  const lbl = document.getElementById('vps-status-lbl');
+  const data = await vpsGet(VPS.api + '/v1/health');
+  if (data) {
+    if (dot) { dot.style.background = '#39ff14'; }
+    if (lbl) lbl.textContent = 'VPS ONLINE';
+    if (!vpsToken) vpsLogin();
+  } else {
+    if (dot) { dot.style.background = '#ff2020'; }
+    if (lbl) lbl.textContent = 'VPS OFFLINE';
+  }
+}
+
+async function loadVpsStats() {
+  if (!vpsToken) await vpsLogin();
+  const stats = await vpsGet(VPS.jarvis + '/api/stats');
+  if (stats) {
+    const el = document.getElementById('vps-agents-count');
+    if (el && stats.agents) el.textContent = stats.agents.toLocaleString();
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  vpsCheckOnline();
+  setInterval(vpsCheckOnline, 30000);
+  loadVpsStats();
+});
+
 // ===== TAB SWITCHING =====
 function switchTab(name, btn) {
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
