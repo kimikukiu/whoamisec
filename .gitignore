@@ -1,0 +1,25 @@
+# Secrets — never commit these
+.env
+*.env
+jarvis-vps-project/docker/.env
+jarvis-vps-project/mining/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+
+# Logs
+*.log
+/tmp/
+
+# APK build artifacts
+android/
+node_modules/
+*.apk
+
+# OS
+.DS_Store
+Thumbs.db

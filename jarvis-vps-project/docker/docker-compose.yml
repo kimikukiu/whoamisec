@@ -29,9 +29,9 @@ services:
     ports:
       - "5004:5004"
     environment:
-      - JWT_SECRET=SuperSecretKeyChangeMe123!
-      - ADMIN_USERNAME=boss
-      - ADMIN_PASSWORD=WhoamiSecBoss2026!
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET env var required}
+      - ADMIN_USERNAME=${ADMIN_USERNAME:-boss}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:?ADMIN_PASSWORD env var required}
     volumes:
       - jarvis-data:/var/lib/jarvis
       - ../logs:/var/log/jarvis
@@ -135,8 +135,8 @@ services:
       context: ../mining
       dockerfile: Dockerfile.miner
     ports:
-      - "8080:80"
-      - "8081:8081"
+      - "8082:80"
+      - "8083:8081"
     volumes:
       - miner-data:/var/lib/xmrig
     networks:
