@@ -689,6 +689,14 @@
                 <div class="agent-grid sub" id="pipeline-grid"></div>
 
                 <div style="font-size:0.62rem;color:var(--muted);text-align:center;margin-top:0.25rem;">Tap any cell to inspect • Each cell = 10 agents</div>
+                <!-- 32 JARVIS OMNI Category Legend -->
+                <div style="margin-top:0.45rem;border-top:1px solid rgba(255,255,255,0.05);padding-top:0.4rem;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.2rem;">
+                        <span style="font-size:0.6rem;font-weight:700;color:var(--purple);letter-spacing:0.04em;">32 JARVIS OMNI Categories — ABL</span>
+                        <button style="background:none;border:1px solid rgba(139,92,246,0.2);color:var(--purple);font-size:0.6rem;padding:0.08rem 0.35rem;border-radius:4px;cursor:pointer;" onclick="const cl=document.getElementById('cat-legend');cl.style.display=cl.style.display==='flex'?'none':'flex'">&#x25BC; Show</button>
+                    </div>
+                    <div id="cat-legend" style="display:none;flex-wrap:wrap;gap:0.2rem;"></div>
+                </div>
             </div>
 
             <!-- 5300 Pipeline phases + 10 Workflows -->
@@ -727,7 +735,10 @@
                     <div class="monitor-item"><span class="monitor-icon">&#x26CF;</span><span>Mining Fleet (100 nodes)</span><span class="monitor-status" style="color:var(--emerald);">&#x2714; MINING</span></div>
                     <div class="monitor-item"><span class="monitor-icon">&#x1F527;</span><span>Auto-Repair Engine</span><span class="monitor-status" style="color:var(--emerald);">&#x2714; ARMED</span></div>
                 </div>
-                <button class="btn btn-outline-p btn-sm btn-block" style="margin-top:0.5rem;font-size:0.75rem;" onclick="runAutoAudit()">&#x1F50D; Run Full Auto-Audit</button>
+                <div style="display:flex;gap:0.4rem;margin-top:0.5rem;">
+                    <button class="btn btn-outline-p btn-sm" style="flex:1;font-size:0.72rem;" onclick="runAutoAudit()">&#x1F50D; Auto-Audit</button>
+                    <button class="btn btn-sm" style="flex:1;font-size:0.72rem;background:rgba(6,182,212,0.1);color:var(--cyan);border:1px solid rgba(6,182,212,0.2);" onclick="runGithubScan()">&#x1F310; GitHub Scan</button>
+                </div>
             </div>
 
             <!-- 500 Abliterated Modules (300 main + 100 sub + 100 pipeline) -->
@@ -1285,6 +1296,8 @@ const SLASH_COMMANDS = [
     { cmd: '/mining', desc: 'Mining fleet status & control' },
     { cmd: '/agents', desc: 'Dispatch to all 2700+ abliterated agents' },
     { cmd: '/skills30', desc: 'Last 30 days skills tracker' },
+    { cmd: '/github', desc: 'GitHub scanner — find repo updates & integration suggestions' },
+    { cmd: '/ollama', desc: 'Ollama model manager — list, pull, run local models' },
 ];
 
 function showSlashDropdown(input) {
@@ -1394,6 +1407,8 @@ const AI_RESPONSES = {
     '/roadmap': (q) => `${toolCard('pm_skills_roadmap', `goal: ${q}`)}<br><b>Product Roadmap: ${q}</b><br><br>&#x1F7E2; Q3 2026 — MVP: Core feature + XMR payments<br>&#x1F7E1; Q4 2026 — Beta: Invite-only, 500 users<br>&#x1F7E0; Q1 2027 — Launch: Public + marketing push<br>&#x26AA; Q2 2027 — Scale: 10K users, white-label`,
     '/vps': (q) => `${toolCard('jarvis_vps_create', `spec: ${q}`)}<br>Provisioning VPS &#x2014; <code>${q}</code><br><br>&#x2714; IP assigned: 10.100.5.${Math.floor(Math.random()*254)}<br>&#x2714; Ubuntu 22.04 installed<br>&#x2714; SSH key injected<br>&#x2714; JARVIS agent deployed (port 5004)<br>&#x2714; Firewall rules applied<br><span style="color:var(--emerald)">VPS online in 12s</span>`,
     '/agents': (q) => `${toolCard('agent_swarm_dispatch', `command: ${q}`)}<br>Dispatching to all 2,703 agents...<br><br>&#x2714; Command broadcast via swarm bus<br>&#x2714; 2,703 agents acknowledged<br>&#x2714; Task distributed across 15 VPS nodes<br>Progress: <code>████████░░</code> 80% — ETA 4s`,
+    '/github': (q) => `${toolCard('github_intelligence_scanner',`scope:18 repos+trending, query:${q||'all'}`)}<b>&#x1F310; JARVIS GitHub Intelligence</b><br><br>Scanning 18 integrated repos + GitHub trending...<br><br><b>Updates detected:</b><br>&#x26A0; <code>misotts</code> — v2.1 released (was v2.0) &#x2022; <b>UPDATE QUEUED</b><br>&#x26A0; <code>airllm</code> — patch 3.2.1 fixes GPU memory leak &#x2022; <b>PATCHING</b><br>&#x2714; <code>opencve-docker</code> — 847 new CVEs indexed today<br>&#x2714; <code>odysseus</code> — new MCP tool: browser-use added<br>&#x2714; <code>drozer-agent</code> — Android 14 compatibility patch<br>&#x2714; <code>sigma</code> — 23 new detection rules (2026 threats)<br>&#x2714; <code>wapi</code> — WhatsApp baileys v6.7 available<br><br><b>&#x1F4A1; New repos JARVIS suggests integrating:</b><br>&#x2022; <code>browser-use</code> — browser automation, pairs with Odysseus<br>&#x2022; <code>graphRAG</code> — graph-based RAG upgrade for obsidian-wiki<br>&#x2022; <code>litellm</code> — unified LLM proxy (sigma fallback layer)<br>&#x2022; <code>openai/swarm</code> — swarm patterns for 2500-agent system<br><br><span style="color:var(--emerald)">&#x2714; 0 critical vulns. 2 auto-updates applied. 4 suggestions queued.</span>`,
+    '/ollama': (q) => `${toolCard('ollama_model_manager',`action:${q||'list'}`)}<b>&#x1F916; Ollama Local Models</b><br><br>Server: <code>nohup ollama serve &gt; ollama.log 2&gt;&amp;1 &amp;</code> (auto-restart ON)<br><br><b>Loaded models:</b><br>&#x2714; <code>tinyllama:1.1b</code>&nbsp;&nbsp;&nbsp; 637 MB &nbsp;— ultra-fast<br>&#x2714; <code>phi:2.7b</code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1.6 GB &nbsp;— reasoning<br>&#x2714; <code>qwen2.5:0.5b</code>&nbsp;&nbsp;&nbsp; 394 MB &nbsp;— fastest<br>&#x2714; <code>llama3.2:1b</code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1.3 GB &nbsp;— balanced<br>&#x2714; <code>deepseek-coder:1.3b</code> 776 MB — code<br>&#x2714; <code>granite-code:3b</code>&nbsp;&nbsp;&nbsp; 2.0 GB — enterprise code<br><br><span style="color:var(--emerald)">Ollama health: OK &#x2022; Auto-restart: ON &#x2022; 6 models ready</span>`,
     'default': (q, model) => {
         const m = model || 'JARVIS-OMNI';
         const responses = [
@@ -1702,35 +1717,134 @@ function runAutoAudit() {
     setMode('chat', document.querySelector('.mode-btn'));
     appendMsg('user', '&#x1F50D; Run Full Auto-Audit across all systems');
     setTimeout(() => {
-        appendMsg('ai', `${toolCard('auto_audit_engine', 'scope: all_systems, agents: 2500, modules: 500')}<b>&#x1F50D; JARVIS Auto-Audit — Phase 1/5</b><br><br>&#x2714; Ollama (6 models) — all healthy, 0 errors<br>&#x2714; VPS fleet (15 instances) — 12 running, 3 idle<br>&#x2714; Mining fleet (100 nodes) — 97 active, 3 restarting<br>&#x2714; Agent swarm (2,500) — 2,487 active, 13 idle<br>&#x26A0; Video/Music pipeline — loading... auto-repair queued<br><br><b>&#x1F527; Auto-Repair triggered:</b><br>&#x2714; Video pipeline: dependency missing — installing...<br>&#x2714; Music AI: model checkpoint outdated — updating...<br><br><b>&#x1F50D; GitHub Scanner:</b><br>&#x2714; Checked 50 trending repos for relevant updates<br>&#x2022; Found: <code>new MisoTTS v2.0</code> — upgrading module<br>&#x2022; Found: <code>AirLLM v3.2</code> — patching inference engine<br>&#x2022; No critical vulnerabilities detected<br><br><span style="color:var(--emerald)">&#x2714; Audit complete. All critical systems nominal. 2 auto-repairs applied.</span>`);
-        // Update monitor
+        appendMsg('ai', `${toolCard('auto_audit_engine','scope:all_systems, agents:2500, modules:500, repos:18')}<b>&#x1F50D; JARVIS Auto-Audit — 5 Phases Complete</b><br><br><b>Phase 1 — System Health:</b><br>&#x2714; Ollama (tinyllama,phi,qwen2.5,llama3.2,deepseek-coder,granite-code) — 6/6 healthy<br>&#x2714; VPS fleet (15 instances) — 12 running, 3 idle<br>&#x2714; Mining fleet (100 nodes) — 97 active, 3 restarting<br>&#x2714; Agent swarm (2,500) — 2,487 active, 13 idle, 7 errors→auto-restarting<br><br><b>Phase 2 — GitHub Intelligence (18 repos):</b><br>&#x26A0; <code>misotts</code> v2.1 available — auto-update queued<br>&#x26A0; <code>airllm</code> patch 3.2.1 — GPU memory fix — patching<br>&#x2714; <code>opencve-docker</code> — 847 new CVEs, database updated<br>&#x2714; <code>drozer-agent</code> — Android 14 compat patch applied<br>&#x2714; <code>sigma,mephisto,wapi,9drive,graphify</code> — all current<br><br><b>Phase 3 — Pipeline Integrity (5,300 phases):</b><br>&#x2714; AUTO-AUDIT, AUTO-REPAIR, AUTO-DEPLOY — all nominal<br>&#x26A0; VIDEO-PIPELINE — dependency missing → auto-installing ffmpeg<br>&#x26A0; MUSIC-AI-PIPE — checkpoint stale → pulling latest<br><br><b>Phase 4 — Security Scan:</b><br>&#x2714; 0 critical CVEs in deployed code<br>&#x2714; JWT tokens valid, XMR wallet secure<br><br><b>Phase 5 — Auto-Repair Results:</b><br>&#x2714; Video pipeline restored in 4.2s<br>&#x2714; Music AI updated, 2 models refreshed<br><br><span style="color:var(--emerald)">&#x2714; Audit complete. 0 critical errors. 4 auto-repairs applied. All 32 agent categories nominal.</span>`);
         const items = document.querySelectorAll('.monitor-item .monitor-status');
         if (items[3]) { items[3].textContent = '✔ READY'; items[3].style.color = 'var(--emerald)'; }
+        const gitItem = document.querySelector('.monitor-item:nth-child(2) .monitor-status');
+        if (gitItem) { gitItem.textContent = '✔ UPDATED'; gitItem.style.color = 'var(--cyan)'; }
     }, 400);
 }
 
-// ===== AGENT GRIDS =====
+function runGithubScan() {
+    setMode('chat', document.querySelector('.mode-btn'));
+    appendMsg('user', '&#x1F310; GitHub Intelligence Scan — check all repos for updates &amp; suggestions');
+    setTimeout(() => {
+        appendMsg('ai', AI_RESPONSES['/github']('all repos'));
+        document.querySelectorAll('.monitor-item').forEach(item => {
+            if (item.textContent.includes('GitHub')) {
+                const st = item.querySelector('.monitor-status');
+                if (st) { st.textContent = '✔ SCANNED'; st.style.color = 'var(--cyan)'; }
+            }
+        });
+    }, 500);
+}
+
+// ===== AGENT GRIDS — 32 JARVIS OMNI CATEGORIES =====
+const AGENT_CATEGORIES = [
+    {id:'CORE_KERNEL',icon:'⚙',desc:'Core OS kernel, memory & process mgmt'},
+    {id:'LLM_ORCHESTRATOR',icon:'🤖',desc:'Routes & load-balances LLM models'},
+    {id:'MULTI_LLM_HUB',icon:'🌐',desc:'Hub: Llama,DeepSeek,Qwen,Mistral,Dolphin'},
+    {id:'COPILOT_ENGINE',icon:'💡',desc:'AI copilot — code completion, PR review'},
+    {id:'VOICE_ENGINE_AI',icon:'🎤',desc:'Voice synthesis/recognition — MisoTTS,WavTTS'},
+    {id:'VIDEO_ENGINE_AI',icon:'📹',desc:'Video processing, generation & streaming'},
+    {id:'MUSIC_ENGINE_AI',icon:'🎵',desc:'AI music generation & audio composition'},
+    {id:'VPS_CLOUD_ENGINE',icon:'☁',desc:'VPS lifecycle — provision, scale, destroy'},
+    {id:'NETWORK_SECURITY_AI',icon:'🛡',desc:'Firewall, IDS/IPS, DDoS, CVE scanning'},
+    {id:'DATABASE_AI',icon:'🗄',desc:'DB mgmt — query optim, backup, migrate'},
+    {id:'FILE_SYSTEM_AI',icon:'📂',desc:'File ops — indexing, search, 9Drive storage'},
+    {id:'API_GATEWAY_AI',icon:'🔌',desc:'API gateway — rate limit, auth, versioning'},
+    {id:'MONITORING',icon:'📡',desc:'System monitoring — metrics, alerts, anomaly'},
+    {id:'TESTING',icon:'🧪',desc:'Automated testing — unit, E2E, security'},
+    {id:'DEPLOYMENT_CI_CD',icon:'🚀',desc:'CI/CD — build, test, deploy, rollback'},
+    {id:'WORKFLOW_AUTOMATION',icon:'⚡',desc:'Workflow — task queues, scheduling, events'},
+    {id:'CODE_GENERATION',icon:'💻',desc:'Code gen — stynx-code, free-coding-models'},
+    {id:'REPAIR_SELF_HEALING',icon:'🔧',desc:'Self-heal — detect failures, auto-restart'},
+    {id:'INTELLIGENCE_LEARNING',icon:'🧠',desc:'Adaptive ML — fine-tuning, RL, memory'},
+    {id:'COMMUNICATION',icon:'💬',desc:'WhatsApp(WAPI), Email, Slack, Telegram'},
+    {id:'AUTH_IDENTITY',icon:'🔐',desc:'JWT, OAuth2, MFA, zero-trust identity'},
+    {id:'UI_UX_AI',icon:'🎨',desc:'UI/UX gen — responsive, dark mode, mobile'},
+    {id:'GITHUB_INTEGRATION',icon:'🔗',desc:'Repo scan, PR review, issue tracking'},
+    {id:'SMART_CONTRACT',icon:'📜',desc:'Monero XMR, DeFi, automated crypto payments'},
+    {id:'IOT_DEVICE_MGR',icon:'📱',desc:'IoT mgmt — Drozer Android audit, device fleet'},
+    {id:'DOCKER_CONTAINER',icon:'🐳',desc:'Container ops — build, push, Kubernetes'},
+    {id:'CRYPTOGRAPHY',icon:'🔒',desc:'XMR wallet, key mgmt, encrypt/decrypt'},
+    {id:'OMNI_AGENT_CONTROLLER',icon:'🌌',desc:'Meta-controller — coordinates all swarms'},
+    {id:'REALTIME_STREAM',icon:'⚡',desc:'WebSocket, SSE, live dashboard updates'},
+    {id:'MULTI_AGENT_SWARM',icon:'🐝',desc:'Swarm intelligence — 2500 agent consensus'},
+    {id:'AUTONOMOUS_DEVOPS',icon:'🤖',desc:'Zero-touch deploy, auto-scale, self-manage'},
+    {id:'CROSS_PLATFORM_BRIDGE',icon:'🌉',desc:'APK/PWA bridge, web-native, RPC bridge'},
+];
+const PIPE_CATEGORIES = ['AUTO-AUDIT','AUTO-REPAIR','AUTO-DEPLOY','AUTO-SCALE','LLM-OPTIM','COPILOT-ENS','VPS-LIFECYCLE','VOICE-PIPE','VIDEO-PIPE','MUSIC-AI','GITHUB-SYNC','SELF-HEAL','MINING-PIPE','XMR-PIPE','ANALYTICS-PIPE','BUILD-PIPE','TEST-PIPE','AUDIT-LOG','ALERT-PIPE','SCALE-DOWN'];
+
 function buildAgentGrid() {
     if (document.getElementById('master-agent-grid')?.children.length > 0) return;
-    buildGrid('master-agent-grid', 100, ['active','busy','idle','error'], [0.02, 0.38, 0.08, 1], 'Master agent');
-    buildGrid('sub-a-grid', 50, ['sub-active','sub-busy','idle'], [0.03, 0.35, 1], 'Sub-A agent');
-    buildGrid('sub-b-grid', 50, ['sub-active','sub-busy','idle'], [0.04, 0.30, 1], 'Sub-B agent');
-    buildGrid('pipeline-grid', 50, ['pipeline','sub-active','idle'], [0.25, 0.65, 1], 'Pipeline agent');
-}
-function buildGrid(id, count, states, thresholds, label) {
-    const grid = document.getElementById(id);
-    if (!grid) return;
-    for (let i = 0; i < count; i++) {
-        const d = document.createElement('div');
-        const r = Math.random();
-        let cls = states[states.length-1];
-        for (let t = 0; t < thresholds.length; t++) { if (r < thresholds[t]) { cls = states[t]; break; } }
-        d.className = 'agent-dot ' + cls;
-        const num = (i * 10) + 1;
-        d.title = `${label}s ${num}–${num+9}`;
-        d.onclick = () => showNotif(`${label}s ${num}–${num+9}: ${cls}`, 'var(--purple)');
-        grid.appendChild(d);
+    const masterGrid = document.getElementById('master-agent-grid');
+    if (masterGrid) {
+        for (let i = 0; i < 100; i++) {
+            const d = document.createElement('div');
+            const r = Math.random();
+            const cls = r<0.02?'error':r<0.40?'busy':r<0.48?'idle':'active';
+            d.className = 'agent-dot ' + cls;
+            const cat = AGENT_CATEGORIES[Math.floor(i*32/100)];
+            const base = i*10+1;
+            d.title = `[${cat.id}] ${cat.desc} | Agents ${base}–${base+9}`;
+            d.onclick = () => showNotif(`${cat.icon} ${cat.id}: ${cls.toUpperCase()}`, cls==='error'?'#EF4444':'var(--purple)');
+            masterGrid.appendChild(d);
+        }
     }
+    const subAGrid = document.getElementById('sub-a-grid');
+    if (subAGrid) {
+        for (let i = 0; i < 50; i++) {
+            const d = document.createElement('div');
+            const r = Math.random();
+            const cls = r<0.03?'error':r<0.35?'sub-busy':r<0.45?'idle':'sub-active';
+            d.className = 'agent-dot ' + cls;
+            const cat = AGENT_CATEGORIES[Math.floor(i*16/50)];
+            d.title = `[SUB-A:${cat.id}] ${cat.desc} | Agents ${i*10+1}–${i*10+10}`;
+            d.onclick = () => showNotif(`Sub-A ${cat.icon} ${cat.id}`, 'var(--emerald)');
+            subAGrid.appendChild(d);
+        }
+    }
+    const subBGrid = document.getElementById('sub-b-grid');
+    if (subBGrid) {
+        for (let i = 0; i < 50; i++) {
+            const d = document.createElement('div');
+            const r = Math.random();
+            const cls = r<0.04?'error':r<0.30?'sub-busy':r<0.42?'idle':'sub-active';
+            d.className = 'agent-dot ' + cls;
+            const cat = AGENT_CATEGORIES[16+Math.floor(i*16/50)];
+            d.title = `[SUB-B:${cat.id}] ${cat.desc} | Agents ${i*10+1}–${i*10+10}`;
+            d.onclick = () => showNotif(`Sub-B ${cat.icon} ${cat.id}`, 'var(--amber)');
+            subBGrid.appendChild(d);
+        }
+    }
+    const pipeGrid = document.getElementById('pipeline-grid');
+    if (pipeGrid) {
+        for (let i = 0; i < 50; i++) {
+            const d = document.createElement('div');
+            const r = Math.random();
+            const cls = r<0.25?'pipeline':r<0.65?'sub-active':'idle';
+            d.className = 'agent-dot ' + cls;
+            const pc = PIPE_CATEGORIES[Math.floor(i*20/50)];
+            d.title = `[PIPELINE:${pc}] Phase ${i*10+1}–${i*10+10}`;
+            d.onclick = () => showNotif(`Pipeline: ${pc}`, 'var(--pink)');
+            pipeGrid.appendChild(d);
+        }
+    }
+    buildCatLegend();
+}
+
+function buildCatLegend() {
+    const el = document.getElementById('cat-legend');
+    if (!el || el.children.length > 0) return;
+    AGENT_CATEGORIES.forEach(c => {
+        const chip = document.createElement('div');
+        chip.style.cssText = 'font-size:0.55rem;padding:0.1rem 0.28rem;border-radius:4px;background:rgba(139,92,246,0.07);border:1px solid rgba(139,92,246,0.14);color:var(--muted);white-space:nowrap;cursor:pointer;';
+        chip.title = c.desc;
+        chip.textContent = c.icon + ' ' + c.id;
+        chip.onclick = () => showNotif(`${c.icon} ${c.id}: ${c.desc}`, 'var(--purple)');
+        el.appendChild(chip);
+    });
 }
 
 const MODULES = {
@@ -1796,21 +1910,6 @@ const MODULES = {
         {i:'&#x1F514;',n:'ALERT-PIPE'},{i:'&#x1F505;',n:'SCALE-DOWN'},
     ],
 };
-
-function buildAgentGrid() {
-    const grid = document.getElementById('agent-swarm-grid');
-    if (!grid || grid.children.length > 0) return;
-    // 270 dots = 2703 agents (each ~10)
-    for (let i = 0; i < 270; i++) {
-        const d = document.createElement('div');
-        const r = Math.random();
-        d.className = 'agent-dot ' + (r < 0.025 ? 'error' : r < 0.09 ? 'idle' : r < 0.4 ? 'busy' : 'active');
-        const agentNum = (i * 10) + 1;
-        d.title = `Agents ${agentNum}–${agentNum+9}`;
-        d.onclick = () => showNotif(`Agents ${agentNum}–${agentNum+9}: ${d.className.includes('busy') ? 'Processing task' : d.className.includes('idle') ? 'Idle — awaiting command' : d.className.includes('error') ? 'Error — restarting' : 'Active'}`, d.className.includes('error') ? '#EF4444' : 'var(--purple)');
-        grid.appendChild(d);
-    }
-}
 
 function showModuleCategory(cat) {
     const mods = MODULES[cat] || [];
