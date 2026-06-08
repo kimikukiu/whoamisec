@@ -3,451 +3,501 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WHOAMI.SEC | Admin Panel</title>
+    <title>WhoamiSec | Admin Panel</title>
+    <meta name="description" content="WhoamiSec Admin Panel - Manage users, credits, and monitor platform activity.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --green: #00ff41;
-            --green-dim: #00cc33;
-            --green-dark: #008822;
-            --green-glow: rgba(0,255,65,0.3);
-            --bg-dark: #0a0a0a;
-            --bg-mid: #1a1a2e;
-            --bg-card: rgba(10,15,10,0.85);
-            --border: rgba(0,255,65,0.2);
-            --text-dim: #66ff88;
-            --text-darker: #339955;
-            --red: #ff0040;
-            --amber: #ffaa00;
+            --bg-primary: #0B0D17;
+            --bg-secondary: #111827;
+            --bg-card: #1F2937;
+            --bg-card-hover: #283548;
+            --border: rgba(255,255,255,0.08);
+            --border-glow: rgba(6,182,212,0.3);
+            --text-primary: #F9FAFB;
+            --text-secondary: #9CA3AF;
+            --text-muted: #6B7280;
+            --cyan: #06B6D4;
+            --blue: #3B82F6;
+            --emerald: #10B981;
+            --amber: #F59E0B;
+            --red: #EF4444;
+            --purple: #8B5CF6;
+            --gradient: linear-gradient(135deg, #06B6D4, #3B82F6);
+            --gradient-text: linear-gradient(135deg, #06B6D4, #8B5CF6);
+            --glass: rgba(17,24,39,0.7);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --shadow: 0 4px 30px rgba(0,0,0,0.3);
+            --shadow-glow: 0 0 40px rgba(6,182,212,0.15);
         }
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            font-family: 'Fira Code', monospace;
-            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-mid) 50%, #0d1117 100%);
-            color: var(--green);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
             min-height: 100vh;
         }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        code, .mono { font-family: 'JetBrains Mono', monospace; }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 24px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            margin-bottom: 24px;
+        /* ---- NAVBAR ---- */
+        .navbar {
+            position: fixed; top:0; left:0; right:0; z-index:1000;
+            background: var(--glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
         }
-        .header-left { display: flex; align-items: center; gap: 16px; }
-        .logo { font-size: 1.3rem; font-weight: 700; text-shadow: 0 0 15px var(--green-glow); text-decoration: none; color: var(--green); }
-        .logo span { color: var(--red); }
-        .admin-badge {
-            padding: 4px 12px;
-            background: rgba(255,0,64,0.1);
-            border: 1px solid rgba(255,0,64,0.3);
-            border-radius: 4px;
-            font-size: 0.7rem;
-            color: var(--red);
-            letter-spacing: 2px;
+        .navbar-inner {
+            max-width: 1200px; margin:0 auto;
+            display: flex; align-items:center; justify-content:space-between;
+            height: 64px;
         }
-        .btn-nav {
-            padding: 8px 16px;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.7rem;
-            background: transparent;
-            color: var(--green-dim);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            cursor: pointer;
+        .logo {
+            font-size: 1.3rem; font-weight: 700;
+            background: var(--gradient-text);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             text-decoration: none;
-            letter-spacing: 1px;
-            transition: all 0.3s;
         }
-        .btn-nav:hover {
-            background: rgba(0,255,65,0.1);
-            border-color: var(--green);
-        }
-        .btn-nav.danger {
+        .logo span { color: var(--text-primary); -webkit-text-fill-color: var(--text-primary); }
+        .nav-right { display:flex; align-items:center; gap:0.75rem; }
+        .admin-badge {
+            display: inline-flex; align-items:center; gap:0.35rem;
+            padding: 0.3rem 0.75rem;
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 6px;
+            font-size: 0.7rem; font-weight: 600;
             color: var(--red);
-            border-color: rgba(255,0,64,0.3);
-        }
-        .btn-nav.danger:hover {
-            background: rgba(255,0,64,0.1);
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        .section-title {
-            font-size: 1rem;
-            letter-spacing: 3px;
             text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .btn {
+            display: inline-flex; align-items:center; gap:0.5rem;
+            padding: 0.45rem 0.9rem; border-radius:8px;
+            font-size: 0.8rem; font-weight:500;
+            text-decoration:none; border:none; cursor:pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-ghost {
+            background: transparent; color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.15); }
+        .btn-danger {
+            background: transparent; color: var(--red);
+            border: 1px solid rgba(239,68,68,0.2);
+        }
+        .btn-danger:hover { background: rgba(239,68,68,0.1); }
+
+        /* ---- MAIN ---- */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 88px 2rem 3rem;
         }
 
-        .users-table-container {
+        /* ---- STATS ---- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: var(--radius);
+            padding: 1.25rem;
+        }
+        .stat-label {
+            font-size: 0.75rem; font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+        .stat-value {
+            font-size: 1.6rem; font-weight: 700;
+        }
+        .stat-value.cyan { color: var(--cyan); }
+        .stat-value.amber { color: var(--amber); }
+        .stat-value.emerald { color: var(--emerald); }
+        .stat-value.purple { color: var(--purple); }
+
+        /* ---- TABLE ---- */
+        .table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
             overflow: hidden;
         }
+        .table-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .table-header h2 {
+            font-size: 1.05rem; font-weight: 600;
+        }
+
         .users-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.8rem;
         }
         .users-table thead {
-            background: rgba(0,255,65,0.05);
-            border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.2);
         }
         .users-table th {
-            padding: 12px 16px;
+            padding: 0.75rem 1.25rem;
             text-align: left;
             font-size: 0.7rem;
-            color: var(--text-darker);
-            letter-spacing: 1px;
+            font-weight: 600;
+            color: var(--text-muted);
             text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-bottom: 1px solid var(--border);
         }
         .users-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid rgba(0,255,65,0.05);
+            padding: 0.75rem 1.25rem;
+            font-size: 0.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: var(--text-secondary);
         }
         .users-table tr:hover {
-            background: rgba(0,255,65,0.02);
+            background: rgba(255,255,255,0.02);
         }
-        .users-table .admin-badge {
-            padding: 2px 8px;
-            font-size: 0.6rem;
+        .users-table tr:last-child td { border-bottom: none; }
+
+        .user-name { color: var(--text-primary); font-weight: 500; }
+        .badge {
+            display: inline-flex;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
-        .admin-yes {
-            background: rgba(255,0,64,0.1);
-            border: 1px solid rgba(255,0,64,0.3);
-            border-radius: 3px;
+        .badge-admin {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.2);
             color: var(--red);
         }
-        .admin-no {
-            color: var(--text-darker);
+        .badge-user {
+            background: rgba(6,182,212,0.1);
+            border: 1px solid rgba(6,182,212,0.2);
+            color: var(--cyan);
+        }
+        .badge-plan {
+            background: rgba(139,92,246,0.1);
+            border: 1px solid rgba(139,92,246,0.2);
+            color: var(--purple);
         }
 
         .credits-input {
-            font-family: 'Fira Code', monospace;
+            font-family: 'JetBrains Mono', monospace;
             font-size: 0.75rem;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.3);
             color: var(--amber);
-            border: 1px solid rgba(255,170,0,0.2);
-            border-radius: 4px;
-            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.4rem 0.6rem;
             width: 80px;
             text-align: center;
             outline: none;
         }
         .credits-input:focus {
             border-color: var(--amber);
-            box-shadow: 0 0 10px rgba(255,170,0,0.2);
+            box-shadow: 0 0 0 2px rgba(245,158,11,0.1);
         }
 
         .btn-update {
-            padding: 6px 14px;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.65rem;
-            background: var(--green);
-            color: #000;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            letter-spacing: 1px;
+            padding: 0.4rem 0.75rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.7rem;
             font-weight: 600;
-            transition: all 0.3s;
+            background: var(--gradient);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .btn-update:hover {
-            background: #33ff66;
-            box-shadow: 0 0 15px var(--green-glow);
+        .btn-update:hover { box-shadow: 0 2px 10px rgba(6,182,212,0.3); }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
         }
 
         .error-box {
-            background: rgba(255,0,64,0.1);
-            border: 1px solid rgba(255,0,64,0.3);
-            border-radius: 6px;
-            padding: 12px;
-            font-size: 0.75rem;
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: var(--radius);
+            padding: 0.75rem 1rem;
+            font-size: 0.8rem;
             color: var(--red);
-            margin-bottom: 16px;
+            margin-bottom: 1rem;
             display: none;
         }
         .error-box.show { display: block; }
 
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-darker);
-            font-size: 0.8rem;
-        }
-
-        .stats-bar {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-        .mini-stat {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px 24px;
-            flex: 1;
-            min-width: 150px;
-        }
-        .mini-stat .label {
-            font-size: 0.65rem;
-            color: var(--text-darker);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .mini-stat .value {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-top: 4px;
-        }
-        .mini-stat .value.amber { color: var(--amber); }
-
+        /* ---- TOAST ---- */
         .toast {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            padding: 12px 20px;
+            padding: 0.75rem 1.25rem;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.75rem;
-            color: var(--green);
+            border-radius: var(--radius);
+            font-size: 0.8rem;
+            color: var(--text-primary);
             z-index: 1000;
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.3s;
+            box-shadow: var(--shadow);
         }
         .toast.show { transform: translateY(0); opacity: 1; }
-        .toast.error { border-color: rgba(255,0,64,0.3); color: var(--red); }
+        .toast.error { border-color: rgba(239,68,68,0.3); color: var(--red); }
+        .toast.success { border-color: rgba(16,185,129,0.3); color: var(--emerald); }
 
+        /* ---- RESPONSIVE ---- */
         @media (max-width: 768px) {
-            header { flex-direction: column; gap: 12px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .main-container { padding: 80px 1rem 2rem; }
+            .navbar { padding: 0 1rem; }
             .users-table { font-size: 0.7rem; }
-            .users-table th, .users-table td { padding: 8px; }
+            .users-table th, .users-table td { padding: 0.5rem 0.75rem; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="header-left">
-                <a href="index.html" class="logo">WHOAMI<span>.SEC</span></a>
-                <span class="admin-badge">ADMIN PANEL</span>
-            </div>
-            <div style="display:flex;gap:8px;">
-                <a href="dashboard.html" class="btn-nav">DASHBOARD</a>
-                <a href="index.html" class="btn-nav">HOME</a>
-                <button class="btn-nav danger" onclick="logout()">LOGOUT</button>
-            </div>
-        </header>
 
-        <div class="stats-bar">
-            <div class="mini-stat">
-                <div class="label">Total Users</div>
-                <div class="value" id="total-users">0</div>
-            </div>
-            <div class="mini-stat">
-                <div class="label">Total Credits Issued</div>
-                <div class="value amber" id="total-credits">0</div>
-            </div>
-            <div class="mini-stat">
-                <div class="label">Admin Users</div>
-                <div class="value" id="admin-count">0</div>
-            </div>
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="navbar-inner">
+        <a href="index.html" class="logo">WHOAMI<span>.SEC</span></a>
+        <div class="nav-right">
+            <span class="admin-badge">Admin Panel</span>
+            <a href="dashboard.html" class="btn btn-ghost">Dashboard</a>
+            <a href="index.html" class="btn btn-ghost">Home</a>
+            <button class="btn btn-danger" onclick="logout()">Sign Out</button>
         </div>
+    </div>
+</nav>
 
-        <div class="section-header">
-            <h2 class="section-title">&#128101; USER MANAGEMENT</h2>
-            <button class="btn-nav" onclick="loadUsers()">&#8635; REFRESH</button>
+<div class="main-container">
+    <!-- STATS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value cyan" id="stat-users">0</div>
         </div>
+        <div class="stat-card">
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value amber" id="stat-revenue">0 XMR</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">API Requests</div>
+            <div class="stat-value emerald" id="stat-requests">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Transactions</div>
+            <div class="stat-value purple" id="stat-txns">0</div>
+        </div>
+    </div>
 
-        <div class="error-box" id="error-box"></div>
+    <div class="error-box" id="error-box"></div>
 
-        <div class="users-table-container">
-            <div class="loading" id="loading">Loading users...</div>
-            <table class="users-table" id="users-table" style="display:none">
+    <!-- USERS TABLE -->
+    <div class="table-card">
+        <div class="table-header">
+            <h2>User Management</h2>
+            <button class="btn btn-ghost" onclick="loadData()">&#8635; Refresh</button>
+        </div>
+        <div class="loading" id="loading">Loading platform data...</div>
+        <div style="display:none;overflow-x:auto" id="table-wrapper">
+            <table class="users-table" id="users-table">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Username</th>
+                        <th>User</th>
                         <th>Email</th>
+                        <th>Plan</th>
                         <th>Credits</th>
                         <th>Admin</th>
-                        <th>Created</th>
-                        <th>Action</th>
+                        <th>API Key</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="users-tbody"></tbody>
             </table>
         </div>
     </div>
+</div>
 
-    <div class="toast" id="toast"></div>
+<div class="toast" id="toast"></div>
 
-    <script>
-        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:5001' : '';
+<script>
+    const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:5001' : '';
 
-        function getToken() { return localStorage.getItem('whoamisec_token'); }
+    function getToken() { return localStorage.getItem('whoamisec_token'); }
 
-        function showError(msg) {
-            const box = document.getElementById('error-box');
-            box.textContent = msg;
-            box.classList.add('show');
-        }
-        function hideError() { document.getElementById('error-box').classList.remove('show'); }
+    function showError(msg) {
+        document.getElementById('error-box').textContent = msg;
+        document.getElementById('error-box').classList.add('show');
+    }
+    function hideError() { document.getElementById('error-box').classList.remove('show'); }
 
-        function showToast(msg, isError = false) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.className = 'toast' + (isError ? ' error' : '');
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
+    function showToast(msg, type = '') {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.className = 'toast ' + type;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
 
-        // Check admin access
-        (async function() {
-            const token = getToken();
-            if (!token) { window.location.href = 'login.html'; return; }
-            try {
-                const res = await fetch(API_BASE + '/api/auth/me', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                if (!res.ok) throw new Error('Not authenticated');
-                const data = await res.json();
-                const user = data.user || data;
-                if (!user.is_admin) {
-                    showError('Access denied. Admin privileges required.');
-                    return;
-                }
-                loadUsers();
-            } catch (e) {
-                showError('Authentication failed. Please log in again.');
-                setTimeout(() => { window.location.href = 'login.html'; }, 2000);
-            }
-        })();
-
-        async function loadUsers() {
-            hideError();
-            const loading = document.getElementById('loading');
-            const table = document.getElementById('users-table');
-            loading.style.display = 'block';
-            loading.textContent = 'Loading users...';
-            table.style.display = 'none';
-
-            try {
-                const res = await fetch(API_BASE + '/api/admin/users', {
-                    headers: { 'Authorization': 'Bearer ' + getToken() }
-                });
-                if (!res.ok) throw new Error('Failed to fetch users');
-                const users = await res.json();
-
-                loading.style.display = 'none';
-                table.style.display = 'table';
-
-                const tbody = document.getElementById('users-tbody');
-                tbody.innerHTML = '';
-
-                let totalCredits = 0;
-                let adminCount = 0;
-
-                users.forEach(user => {
-                    totalCredits += user.credits || 0;
-                    if (user.is_admin) adminCount++;
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td style="color:var(--text-darker)">#${user.id}</td>
-                        <td style="color:var(--green)">${escapeHTML(user.username)}</td>
-                        <td style="color:var(--text-dim)">${escapeHTML(user.email || '---')}</td>
-                        <td>
-                            <input type="number" class="credits-input" value="${user.credits || 0}" data-userid="${user.id}" data-original="${user.credits || 0}">
-                        </td>
-                        <td>
-                            ${user.is_admin ? '<span class="admin-badge admin-yes">ADMIN</span>' : '<span class="admin-no">USER</span>'}
-                        </td>
-                        <td style="color:var(--text-darker);font-size:0.7rem">${user.created_at ? new Date(user.created_at).toLocaleDateString() : '---'}</td>
-                        <td>
-                            <button class="btn-update" onclick="updateCredits(${user.id}, this)">UPDATE</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                document.getElementById('total-users').textContent = users.length;
-                document.getElementById('total-credits').textContent = totalCredits.toLocaleString();
-                document.getElementById('admin-count').textContent = adminCount;
-
-            } catch (e) {
-                loading.textContent = 'Failed to load users. Check that the backend is running.';
-                loading.style.color = 'var(--red)';
-            }
-        }
-
-        async function updateCredits(userId, btn) {
-            const input = document.querySelector(`.credits-input[data-userid="${userId}"]`);
-            const newCredits = parseInt(input.value);
-            const original = parseInt(input.dataset.original);
-
-            if (newCredits === original) {
-                showToast('No changes to apply');
+    // Check admin access & load data
+    (async function init() {
+        const token = getToken();
+        if (!token) { window.location.href = 'login.html'; return; }
+        try {
+            const res = await fetch(API_BASE + '/api/v1/auth/me', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (!res.ok) throw new Error('Not authenticated');
+            const data = await res.json();
+            const user = data.user || data;
+            if (!user.is_admin) {
+                showError('Access denied. Admin privileges required.');
                 return;
             }
+            loadData();
+        } catch (e) {
+            showError('Authentication failed.');
+            setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+        }
+    })();
 
-            btn.disabled = true;
-            btn.textContent = '...';
+    async function loadData() {
+        hideError();
+        const loading = document.getElementById('loading');
+        const tableWrapper = document.getElementById('table-wrapper');
+        loading.style.display = 'block';
+        tableWrapper.style.display = 'none';
 
-            try {
-                const res = await fetch(API_BASE + '/api/admin/user/' + userId + '/credits', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + getToken()
-                    },
-                    body: JSON.stringify({ credits: newCredits })
-                });
-
-                if (res.ok) {
-                    showToast('Credits updated to ' + newCredits);
-                    input.dataset.original = newCredits;
-                    btn.textContent = 'DONE';
-                    setTimeout(() => { btn.textContent = 'UPDATE'; }, 1500);
-                    // Refresh stats
-                    const totalEl = document.getElementById('total-credits');
-                    const currentTotal = parseInt(totalEl.textContent.replace(/,/g, ''));
-                    totalEl.textContent = (currentTotal - original + newCredits).toLocaleString();
-                } else {
-                    const data = await res.json();
-                    showToast(data.error || 'Update failed', true);
-                    btn.textContent = 'UPDATE';
-                }
-            } catch (e) {
-                showToast('Failed to update credits', true);
-                btn.textContent = 'UPDATE';
+        try {
+            // Load stats
+            const statsRes = await fetch(API_BASE + '/api/v1/admin/stats', {
+                headers: { 'Authorization': 'Bearer ' + getToken() }
+            });
+            if (statsRes.ok) {
+                const stats = await statsRes.json();
+                document.getElementById('stat-users').textContent = stats.total_users || 0;
+                document.getElementById('stat-revenue').textContent = (stats.revenue_xmr || 0).toFixed(6) + ' XMR';
+                document.getElementById('stat-requests').textContent = (stats.total_api_requests || 0).toLocaleString();
+                document.getElementById('stat-txns').textContent = stats.total_transactions || 0;
             }
-            btn.disabled = false;
+
+            // Load users
+            const usersRes = await fetch(API_BASE + '/api/v1/admin/users', {
+                headers: { 'Authorization': 'Bearer ' + getToken() }
+            });
+            if (!usersRes.ok) throw new Error('Failed to fetch users');
+            const users = await usersRes.json();
+
+            loading.style.display = 'none';
+            tableWrapper.style.display = 'block';
+
+            const tbody = document.getElementById('users-tbody');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="mono" style="color:var(--text-muted)">#${user.id}</td>
+                    <td class="user-name">${escapeHTML(user.username)}</td>
+                    <td>${escapeHTML(user.email || '---')}</td>
+                    <td><span class="badge badge-plan">${escapeHTML(user.plan || 'starter')}</span></td>
+                    <td>
+                        <input type="number" class="credits-input" value="${user.credits || 0}" data-userid="${user.id}" data-original="${user.credits || 0}">
+                    </td>
+                    <td><span class="badge ${user.is_admin ? 'badge-admin' : 'badge-user'}">${user.is_admin ? 'Admin' : 'User'}</span></td>
+                    <td class="mono" style="font-size:0.65rem;max-width:120px;overflow:hidden;text-overflow:ellipsis" title="${escapeHTML(user.api_key || '')}">${escapeHTML(user.api_key || '---')}</td>
+                    <td style="color:var(--text-muted);font-size:0.75rem">${user.created_at ? new Date(user.created_at).toLocaleDateString() : '---'}</td>
+                    <td>
+                        <button class="btn-update" onclick="updateUser(${user.id}, this)">Save</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (e) {
+            loading.textContent = 'Failed to load data. Make sure the backend is running.';
+            loading.style.color = 'var(--red)';
+        }
+    }
+
+    async function updateUser(userId, btn) {
+        const input = document.querySelector(`.credits-input[data-userid="${userId}"]`);
+        const newCredits = parseInt(input.value);
+        const original = parseInt(input.dataset.original);
+
+        if (newCredits === original) {
+            showToast('No changes to save');
+            return;
         }
 
-        function escapeHTML(str) {
-            const div = document.createElement('div');
-            div.textContent = str || '';
-            return div.innerHTML;
-        }
+        btn.disabled = true;
+        btn.textContent = '...';
 
-        function logout() {
-            localStorage.removeItem('whoamisec_token');
-            window.location.href = 'login.html';
+        try {
+            const res = await fetch(API_BASE + '/api/v1/admin/user/' + userId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + getToken()
+                },
+                body: JSON.stringify({ credits: newCredits })
+            });
+
+            if (res.ok) {
+                showToast('Credits updated to ' + newCredits, 'success');
+                input.dataset.original = newCredits;
+                btn.textContent = 'Saved';
+                setTimeout(() => { btn.textContent = 'Save'; }, 1500);
+            } else {
+                const data = await res.json();
+                showToast(data.error || 'Update failed', 'error');
+                btn.textContent = 'Save';
+            }
+        } catch (e) {
+            showToast('Failed to update', 'error');
+            btn.textContent = 'Save';
         }
-    </script>
+        btn.disabled = false;
+    }
+
+    function escapeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+    }
+
+    function logout() {
+        localStorage.removeItem('whoamisec_token');
+        window.location.href = 'login.html';
+    }
+</script>
 </body>
 </html>

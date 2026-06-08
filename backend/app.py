@@ -238,12 +238,8 @@ def chat():
 
 # ============ MODELS LIST ============
 @app.route('/api/v1/models', methods=['GET'])
-@jwt_required()
 def list_models():
-    return jsonify({'models': AVAILABLE_MODELS})
-
-@app.route('/api/v1/models', methods=['GET'])
-def list_models_public():
+    """Public models list - no auth required for discovery."""
     return jsonify({'models': AVAILABLE_MODELS})
 
 # ============ ADMIN ============

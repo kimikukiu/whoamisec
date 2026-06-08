@@ -3,608 +3,697 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WHOAMI.SEC | Dashboard</title>
+    <title>WhoamiSec | Dashboard</title>
+    <meta name="description" content="WhoamiSec Dashboard - Manage your AI credits, chat with models, and make payments.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --green: #00ff41;
-            --green-dim: #00cc33;
-            --green-dark: #008822;
-            --green-glow: rgba(0,255,65,0.3);
-            --bg-dark: #0a0a0a;
-            --bg-mid: #1a1a2e;
-            --bg-card: rgba(10,15,10,0.85);
-            --border: rgba(0,255,65,0.2);
-            --text-dim: #66ff88;
-            --text-darker: #339955;
-            --red: #ff0040;
-            --amber: #ffaa00;
+            --bg-primary: #0B0D17;
+            --bg-secondary: #111827;
+            --bg-card: #1F2937;
+            --bg-card-hover: #283548;
+            --border: rgba(255,255,255,0.08);
+            --border-glow: rgba(6,182,212,0.3);
+            --text-primary: #F9FAFB;
+            --text-secondary: #9CA3AF;
+            --text-muted: #6B7280;
+            --cyan: #06B6D4;
+            --blue: #3B82F6;
+            --emerald: #10B981;
+            --amber: #F59E0B;
+            --red: #EF4444;
+            --purple: #8B5CF6;
+            --gradient: linear-gradient(135deg, #06B6D4, #3B82F6);
+            --gradient-text: linear-gradient(135deg, #06B6D4, #8B5CF6);
+            --glass: rgba(17,24,39,0.7);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --shadow: 0 4px 30px rgba(0,0,0,0.3);
+            --shadow-glow: 0 0 40px rgba(6,182,212,0.15);
         }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Fira Code', monospace;
-            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-mid) 50%, #0d1117 100%);
-            color: var(--green);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
             min-height: 100vh;
         }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        code, .mono { font-family: 'JetBrains Mono', monospace; }
 
-        /* Header */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 24px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            margin-bottom: 24px;
+        /* ---- NAVBAR ---- */
+        .navbar {
+            position: fixed; top:0; left:0; right:0; z-index:1000;
+            background: var(--glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
         }
-        .header-left { display: flex; align-items: center; gap: 16px; }
-        .logo { font-size: 1.3rem; font-weight: 700; text-shadow: 0 0 15px var(--green-glow); text-decoration: none; color: var(--green); }
-        .logo span { color: var(--red); }
-        .user-info { font-size: 0.8rem; color: var(--text-dim); }
-        .user-info .username { color: var(--green); font-weight: 600; }
-        .credits-badge {
-            display: flex; align-items: center; gap: 8px;
-            padding: 6px 14px;
-            border: 1px solid rgba(255,170,0,0.3);
+        .navbar-inner {
+            max-width: 1200px; margin:0 auto;
+            display: flex; align-items:center; justify-content:space-between;
+            height: 64px;
+        }
+        .logo {
+            font-size: 1.3rem; font-weight: 700;
+            background: var(--gradient-text);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        .logo span { color: var(--text-primary); -webkit-text-fill-color: var(--text-primary); }
+        .nav-right { display:flex; align-items:center; gap:1rem; }
+        .nav-username {
+            font-size: 0.85rem; font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .credits-chip {
+            display: inline-flex; align-items:center; gap:0.4rem;
+            padding: 0.4rem 0.9rem;
+            background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.2);
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.8rem; font-weight: 600;
             color: var(--amber);
         }
-        .header-right { display: flex; align-items: center; gap: 16px; }
-        .btn-logout {
-            padding: 8px 20px;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.75rem;
-            background: transparent;
-            color: var(--red);
-            border: 1px solid rgba(255,0,64,0.3);
-            border-radius: 6px;
-            cursor: pointer;
-            letter-spacing: 1px;
-            transition: all 0.3s;
+        .btn {
+            display: inline-flex; align-items:center; gap:0.5rem;
+            padding: 0.5rem 1rem; border-radius:8px;
+            font-size: 0.85rem; font-weight:600;
+            text-decoration:none; border:none; cursor:pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
         }
-        .btn-logout:hover {
-            background: rgba(255,0,64,0.1);
-            border-color: var(--red);
+        .btn-ghost {
+            background: transparent; color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.15); }
+        .btn-danger {
+            background: transparent; color: var(--red);
+            border: 1px solid rgba(239,68,68,0.2);
+        }
+        .btn-danger:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.4); }
+
+        /* ---- MAIN LAYOUT ---- */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 88px 2rem 3rem;
         }
 
-        /* Stats Grid */
+        /* ---- STATS GRID ---- */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 24px;
-            position: relative;
-            overflow: hidden;
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            transition: all 0.2s;
         }
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--green), transparent);
+        .stat-card:hover {
+            border-color: rgba(255,255,255,0.12);
+            background: var(--bg-card-hover);
         }
         .stat-label {
-            font-size: 0.7rem;
-            color: var(--text-darker);
-            letter-spacing: 2px;
+            font-size: 0.75rem; font-weight: 500;
+            color: var(--text-muted);
             text-transform: uppercase;
-            margin-bottom: 8px;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
         }
         .stat-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            text-shadow: 0 0 15px var(--green-glow);
+            font-size: 1.6rem; font-weight: 700;
         }
-        .stat-value.amber { color: var(--amber); text-shadow: 0 0 15px rgba(255,170,0,0.3); }
+        .stat-value.cyan { color: var(--cyan); }
+        .stat-value.amber { color: var(--amber); }
+        .stat-value.emerald { color: var(--emerald); }
+        .stat-value.purple { color: var(--purple); }
 
-        /* Main Layout */
-        .main-grid {
+        /* ---- MAIN GRID ---- */
+        .content-grid {
             display: grid;
-            grid-template-columns: 1fr 350px;
-            gap: 24px;
+            grid-template-columns: 1fr 360px;
+            gap: 1.5rem;
         }
-        @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } }
 
-        /* Chat Section */
-        .chat-section {
+        /* ---- CHAT SECTION ---- */
+        .chat-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: var(--radius-lg);
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            height: 560px;
         }
         .chat-header {
-            padding: 16px 20px;
+            padding: 1rem 1.25rem;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .chat-header h3 { font-size: 0.85rem; letter-spacing: 2px; }
-        .model-select {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.75rem;
-            background: rgba(0,0,0,0.5);
-            color: var(--green);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 6px 12px;
-            cursor: pointer;
+        .chat-header h3 {
+            font-size: 0.95rem; font-weight: 600;
+            display: flex; align-items: center; gap: 0.5rem;
         }
-        .model-select option { background: #0a0a0a; color: var(--green); }
+        .chat-header h3::before {
+            content: '';
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--emerald);
+        }
+        .model-select {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.3);
+            color: var(--cyan);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.4rem 0.75rem;
+            cursor: pointer;
+            outline: none;
+        }
+        .model-select option { background: #111827; }
+
         .chat-messages {
             flex: 1;
-            padding: 20px;
-            min-height: 350px;
-            max-height: 450px;
+            padding: 1.25rem;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 0.75rem;
         }
         .chat-messages::-webkit-scrollbar { width: 4px; }
         .chat-messages::-webkit-scrollbar-track { background: transparent; }
-        .chat-messages::-webkit-scrollbar-thumb { background: var(--green-dark); border-radius: 2px; }
+        .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
         .message {
             max-width: 85%;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 0.8rem;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
             line-height: 1.6;
             word-wrap: break-word;
         }
         .message.user {
             align-self: flex-end;
-            background: rgba(0,255,65,0.1);
-            border: 1px solid var(--green-dark);
-            color: var(--green);
+            background: var(--gradient);
+            color: #fff;
+            border-bottom-right-radius: 4px;
         }
         .message.assistant {
             align-self: flex-start;
             background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: var(--text-dim);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            border-bottom-left-radius: 4px;
         }
         .message.system {
             align-self: center;
-            color: var(--text-darker);
-            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-size: 0.75rem;
             text-align: center;
-            padding: 8px;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 20px;
         }
         .message .role {
             font-size: 0.65rem;
-            color: var(--text-darker);
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.25rem;
             display: block;
+            font-weight: 600;
         }
+        .message.user .role { color: rgba(255,255,255,0.7); }
 
         .chat-input-area {
-            padding: 16px;
+            padding: 1rem 1.25rem;
             border-top: 1px solid var(--border);
             display: flex;
-            gap: 12px;
+            gap: 0.75rem;
         }
         .chat-input {
             flex: 1;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.8rem;
-            background: rgba(0,0,0,0.5);
-            color: var(--green);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            background: rgba(0,0,0,0.3);
+            color: var(--text-primary);
             border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 12px 16px;
+            border-radius: 10px;
+            padding: 0.7rem 1rem;
             outline: none;
-            transition: border-color 0.3s;
+            transition: all 0.2s;
         }
-        .chat-input:focus { border-color: var(--green); box-shadow: 0 0 10px var(--green-glow); }
-        .chat-input::placeholder { color: var(--text-darker); }
+        .chat-input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(6,182,212,0.1);
+        }
+        .chat-input::placeholder { color: var(--text-muted); }
         .btn-send {
-            padding: 12px 24px;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.8rem;
+            padding: 0.7rem 1.25rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
             font-weight: 600;
-            letter-spacing: 1px;
-            background: var(--green);
-            color: #000;
+            background: var(--gradient);
+            color: #fff;
             border: none;
-            border-radius: 6px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            box-shadow: 0 2px 10px rgba(6,182,212,0.2);
         }
-        .btn-send:hover { background: #33ff66; box-shadow: 0 0 20px var(--green-glow); }
-        .btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-send:hover { box-shadow: 0 4px 15px rgba(6,182,212,0.3); transform: translateY(-1px); }
+        .btn-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        /* Sidebar */
-        .sidebar { display: flex; flex-direction: column; gap: 24px; }
+        /* ---- SIDEBAR ---- */
+        .sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
 
-        /* Monero Payment */
-        .xmr-card {
+        /* Payment Card */
+        .payment-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 24px;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
         }
-        .xmr-card h3 {
-            font-size: 0.85rem;
-            letter-spacing: 2px;
-            color: var(--amber);
-            margin-bottom: 16px;
+        .payment-card h3 {
+            font-size: 0.95rem; font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex; align-items: center; gap: 0.5rem;
         }
-        .xmr-address-box {
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,170,0,0.2);
+        .payment-badge {
+            display: inline-flex;
+            padding: 0.2rem 0.6rem;
+            background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.2);
             border-radius: 6px;
-            padding: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--amber);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .xmr-address {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
             font-size: 0.65rem;
             color: var(--amber);
             word-break: break-all;
-            margin-bottom: 12px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            line-height: 1.5;
         }
-        .xmr-address-box:hover { border-color: var(--amber); }
-        .btn-check {
+        .xmr-address:hover {
+            border-color: rgba(245,158,11,0.3);
+        }
+        .payment-plans {
+            display: flex; flex-direction: column; gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .plan-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.6rem 0.75rem;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+        }
+        .plan-item:hover { border-color: var(--border-glow); background: var(--bg-card-hover); }
+        .plan-item.active { border-color: var(--cyan); }
+        .plan-name { font-weight: 500; }
+        .plan-price { color: var(--amber); font-weight: 600; font-size: 0.75rem; }
+        .btn-pay {
             width: 100%;
-            padding: 10px;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.75rem;
-            background: transparent;
-            color: var(--amber);
-            border: 1px solid rgba(255,170,0,0.3);
-            border-radius: 6px;
+            margin-top: 0.75rem;
+            padding: 0.65rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: var(--gradient);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
             cursor: pointer;
-            letter-spacing: 1px;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
-        .btn-check:hover { background: rgba(255,170,0,0.1); border-color: var(--amber); }
+        .btn-pay:hover { box-shadow: 0 4px 15px rgba(6,182,212,0.3); }
 
         /* Account Card */
         .account-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 24px;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
         }
         .account-card h3 {
-            font-size: 0.85rem;
-            letter-spacing: 2px;
-            margin-bottom: 16px;
+            font-size: 0.95rem; font-weight: 600;
+            margin-bottom: 1rem;
         }
         .account-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(0,255,65,0.05);
-            font-size: 0.75rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.8rem;
         }
-        .account-row .label { color: var(--text-darker); }
-        .account-row .value { color: var(--green); font-weight: 500; }
+        .account-row:last-child { border: none; }
+        .account-row .label { color: var(--text-muted); }
+        .account-row .value { color: var(--text-primary); font-weight: 500; }
 
-        /* Status */
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.7rem;
-            color: var(--text-darker);
-        }
-        .status-dot {
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: var(--green);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--green-glow); }
-            50% { opacity: 0.7; box-shadow: 0 0 0 6px transparent; }
-        }
-
-        /* Toast */
+        /* ---- TOAST ---- */
         .toast {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            padding: 12px 20px;
+            padding: 0.75rem 1.25rem;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.75rem;
-            color: var(--green);
+            border-radius: var(--radius);
+            font-size: 0.8rem;
+            color: var(--text-primary);
             z-index: 1000;
             transform: translateY(100px);
             opacity: 0;
             transition: all 0.3s;
+            box-shadow: var(--shadow);
         }
         .toast.show { transform: translateY(0); opacity: 1; }
-        .toast.error { border-color: rgba(255,0,64,0.3); color: var(--red); }
+        .toast.error { border-color: rgba(239,68,68,0.3); color: var(--red); }
+        .toast.success { border-color: rgba(16,185,129,0.3); color: var(--emerald); }
+
+        /* ---- RESPONSIVE ---- */
+        @media (max-width: 900px) {
+            .content-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .chat-card { height: 450px; }
+        }
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .main-container { padding: 80px 1rem 2rem; }
+            .navbar { padding: 0 1rem; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="header-left">
-                <a href="index.html" class="logo">WHOAMI<span>.SEC</span></a>
-                <div class="user-info">
-                    <span class="username" id="display-username">---</span>
-                    <span style="color:var(--text-darker)"> | </span>
-                    <div class="status-indicator">
-                        <div class="status-dot"></div>
-                        <span>CONNECTED</span>
-                    </div>
-                </div>
-            </div>
-            <div class="header-right">
-                <div class="credits-badge">
-                    <span>&#8383;</span>
-                    <span id="display-credits">0</span> CREDITS
-                </div>
-                <button class="btn-logout" onclick="logout()">LOGOUT</button>
-            </div>
-        </header>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">API Calls</div>
-                <div class="stat-value" id="stat-api-calls">0</div>
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="navbar-inner">
+        <a href="index.html" class="logo">WHOAMI<span>.SEC</span></a>
+        <div class="nav-right">
+            <span class="nav-username" id="nav-username">---</span>
+            <div class="credits-chip">
+                <span>&#9733;</span>
+                <span id="nav-credits">0</span>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">XMR Balance</div>
-                <div class="stat-value amber" id="stat-xmr">0.0000</div>
+            <button class="btn btn-danger" onclick="logout()" style="padding:0.4rem 0.8rem; font-size:0.8rem;">Sign Out</button>
+        </div>
+    </div>
+</nav>
+
+<div class="main-container">
+    <!-- STATS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Credits Remaining</div>
+            <div class="stat-value cyan" id="stat-credits">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Current Plan</div>
+            <div class="stat-value purple" id="stat-plan">Starter</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Models Available</div>
+            <div class="stat-value emerald" id="stat-models">6</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Session Time</div>
+            <div class="stat-value amber" id="stat-session">0:00</div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="content-grid">
+        <!-- CHAT -->
+        <div class="chat-card">
+            <div class="chat-header">
+                <h3>AI Chat</h3>
+                <select class="model-select" id="model-select">
+                    <option value="tinyllama">TinyLlama 1.1B</option>
+                    <option value="phi:2.7b">Phi 2.7B</option>
+                    <option value="qwen2.5:0.5b">Qwen 2.5 0.5B</option>
+                    <option value="llama3.2:1b" selected>Llama 3.2 1B</option>
+                    <option value="deepseek-coder:1.3b">DeepSeek Coder 1.3B</option>
+                    <option value="granite-code:3b">Granite Code 3B</option>
+                </select>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Models Available</div>
-                <div class="stat-value" id="stat-models">4</div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="message system">Welcome to WhoamiSec AI Chat. Select a model and start building.</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Session Duration</div>
-                <div class="stat-value" id="stat-session">0:00</div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chat-input" placeholder="Type your message..." autocomplete="off">
+                <button class="btn-send" id="btn-send" onclick="sendMessage()">Send</button>
             </div>
         </div>
 
-        <div class="main-grid">
-            <div class="chat-section">
-                <div class="chat-header">
-                    <h3>&#129302; AI CHAT</h3>
-                    <select class="model-select" id="model-select">
-                        <option value="llama3.2:1b">llama3.2:1b</option>
-                        <option value="phi:2.7b">phi:2.7b</option>
-                        <option value="tinyllama:1.1b">tinyllama:1.1b</option>
-                        <option value="deepseek-coder:6.7b" selected>deepseek-coder:6.7b</option>
-                    </select>
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <!-- PAYMENT -->
+            <div class="payment-card">
+                <h3>Top Up Credits <span class="payment-badge">XMR</span></h3>
+                <div class="xmr-address" id="xmr-wallet" onclick="copyXMR()" title="Click to copy">Loading...</div>
+                <div class="payment-plans">
+                    <div class="plan-item" onclick="selectPlan('pro', this)" data-plan="pro">
+                        <span class="plan-name">Pro Plan</span>
+                        <span class="plan-price">0.05 XMR</span>
+                    </div>
+                    <div class="plan-item" onclick="selectPlan('enterprise', this)" data-plan="enterprise">
+                        <span class="plan-name">Enterprise Plan</span>
+                        <span class="plan-price">0.15 XMR</span>
+                    </div>
                 </div>
-                <div class="chat-messages" id="chat-messages">
-                    <div class="message system">Welcome to WHOAMI.SEC AI Chat. Select a model and start a conversation.</div>
-                </div>
-                <div class="chat-input-area">
-                    <input type="text" class="chat-input" id="chat-input" placeholder="Enter your message..." autocomplete="off">
-                    <button class="btn-send" id="btn-send" onclick="sendMessage()">SEND</button>
-                </div>
+                <button class="btn-pay" onclick="verifyPayment()">Verify Payment</button>
             </div>
 
-            <div class="sidebar">
-                <div class="xmr-card">
-                    <h3>&#8383; MONERO PAYMENTS</h3>
-                    <div class="xmr-address-box" id="xmr-wallet" onclick="copyXMR()">
-                        Loading...
-                    </div>
-                    <button class="btn-check" onclick="checkPayment()">CHECK PAYMENT</button>
+            <!-- ACCOUNT -->
+            <div class="account-card">
+                <h3>Account</h3>
+                <div class="account-row">
+                    <span class="label">Username</span>
+                    <span class="value" id="acct-username">---</span>
                 </div>
-
-                <div class="account-card">
-                    <h3>&#128100; ACCOUNT</h3>
-                    <div class="account-row">
-                        <span class="label">Username</span>
-                        <span class="value" id="acct-username">---</span>
-                    </div>
-                    <div class="account-row">
-                        <span class="label">Email</span>
-                        <span class="value" id="acct-email">---</span>
-                    </div>
-                    <div class="account-row">
-                        <span class="label">Credits</span>
-                        <span class="value" id="acct-credits">---</span>
-                    </div>
-                    <div class="account-row">
-                        <span class="label">Joined</span>
-                        <span class="value" id="acct-joined">---</span>
-                    </div>
-                    <div class="account-row" style="border:none">
-                        <span class="label">Admin</span>
-                        <span class="value" id="acct-admin">---</span>
-                    </div>
+                <div class="account-row">
+                    <span class="label">Email</span>
+                    <span class="value" id="acct-email">---</span>
+                </div>
+                <div class="account-row">
+                    <span class="label">API Key</span>
+                    <span class="value mono" style="font-size:0.65rem;max-width:180px;overflow:hidden;text-overflow:ellipsis" id="acct-apikey">---</span>
+                </div>
+                <div class="account-row">
+                    <span class="label">Joined</span>
+                    <span class="value" id="acct-joined">---</span>
+                </div>
+                <div class="account-row">
+                    <span class="label">Admin</span>
+                    <span class="value" id="acct-admin">---</span>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="toast" id="toast"></div>
+<div class="toast" id="toast"></div>
 
-    <script>
-        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:5001' : '';
+<script>
+    const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:5001' : '';
+    let selectedPlan = 'pro';
 
-        function getToken() {
-            return localStorage.getItem('whoamisec_token');
+    function getToken() { return localStorage.getItem('whoamisec_token'); }
+
+    function showToast(msg, type = '') {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.className = 'toast ' + type;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Init
+    (function init() {
+        if (!getToken()) { window.location.href = 'login.html'; return; }
+        loadUser();
+        loadPayments();
+        setInterval(updateSession, 1000);
+    })();
+
+    // Session timer
+    let sessionStart = Date.now();
+    function updateSession() {
+        const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
+        const min = Math.floor(elapsed / 60);
+        const sec = elapsed % 60;
+        document.getElementById('stat-session').textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    async function loadUser() {
+        try {
+            const res = await fetch(API_BASE + '/api/v1/auth/me', {
+                headers: { 'Authorization': 'Bearer ' + getToken() }
+            });
+            if (!res.ok) throw new Error('Not authenticated');
+            const data = await res.json();
+            const user = data.user || data;
+            document.getElementById('nav-username').textContent = user.username || 'unknown';
+            document.getElementById('nav-credits').textContent = user.credits || 0;
+            document.getElementById('stat-credits').textContent = (user.credits || 0).toLocaleString();
+            document.getElementById('stat-plan').textContent = (user.plan || 'starter').charAt(0).toUpperCase() + (user.plan || 'starter').slice(1);
+            document.getElementById('acct-username').textContent = user.username || '---';
+            document.getElementById('acct-email').textContent = user.email || '---';
+            document.getElementById('acct-apikey').textContent = user.api_key || '---';
+            document.getElementById('acct-joined').textContent = user.created_at ? new Date(user.created_at).toLocaleDateString() : '---';
+            document.getElementById('acct-admin').textContent = user.is_admin ? 'Yes' : 'No';
+        } catch (e) {
+            console.error('Failed to load user:', e);
+            if (e.message === 'Not authenticated') window.location.href = 'login.html';
         }
+    }
 
-        function showToast(msg, isError = false) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.className = 'toast' + (isError ? ' error' : '');
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        // Check auth on load
-        (function checkAuth() {
-            const token = getToken();
-            if (!token) {
-                window.location.href = 'login.html';
-                return;
-            }
-            loadUser();
-            loadStats();
-            loadXMRAddress();
-            setInterval(loadStats, 10000);
-            setInterval(updateSession, 1000);
-        })();
-
-        // Session timer
-        let sessionStart = Date.now();
-        function updateSession() {
-            const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
-            const min = Math.floor(elapsed / 60);
-            const sec = elapsed % 60;
-            document.getElementById('stat-session').textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
-        }
-
-        async function loadUser() {
-            try {
-                const res = await fetch(API_BASE + '/api/auth/me', {
-                    headers: { 'Authorization': 'Bearer ' + getToken() }
-                });
-                if (!res.ok) throw new Error('Not authenticated');
+    async function loadPayments() {
+        try {
+            const res = await fetch(API_BASE + '/api/v1/payments/info');
+            if (res.ok) {
                 const data = await res.json();
-                const user = data.user || data;
-                document.getElementById('display-username').textContent = user.username || 'unknown';
-                document.getElementById('display-credits').textContent = user.credits || 0;
-                document.getElementById('acct-username').textContent = user.username || '---';
-                document.getElementById('acct-email').textContent = user.email || '---';
-                document.getElementById('acct-credits').textContent = user.credits || '0';
-                document.getElementById('acct-joined').textContent = user.created_at ? new Date(user.created_at).toLocaleDateString() : '---';
-                document.getElementById('acct-admin').textContent = user.is_admin ? 'YES' : 'NO';
-            } catch (e) {
-                console.error('Failed to load user:', e);
+                document.getElementById('xmr-wallet').textContent = data.address || 'No address available';
             }
+        } catch (e) {
+            document.getElementById('xmr-wallet').textContent = '8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ';
         }
+    }
 
-        async function loadStats() {
-            try {
-                const res = await fetch(API_BASE + '/api/auth/me', {
-                    headers: { 'Authorization': 'Bearer ' + getToken() }
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    const user = data.user || data;
-                    document.getElementById('stat-api-calls').textContent = user.api_calls || Math.floor(Math.random() * 500);
-                    document.getElementById('stat-xmr').textContent = (user.xmr_balance || 0).toFixed(4);
-                    document.getElementById('display-credits').textContent = user.credits || 0;
-                }
-            } catch (e) {
-                console.error('Stats error:', e);
-            }
-        }
+    function selectPlan(plan, el) {
+        selectedPlan = plan;
+        document.querySelectorAll('.plan-item').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+    }
 
-        async function loadXMRAddress() {
-            try {
-                const res = await fetch(API_BASE + '/api/payments/monero', {
-                    headers: { 'Authorization': 'Bearer ' + getToken() }
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    document.getElementById('xmr-wallet').textContent = data.address || 'No address available';
+    async function sendMessage() {
+        const input = document.getElementById('chat-input');
+        const msg = input.value.trim();
+        if (!msg) return;
+
+        const messagesDiv = document.getElementById('chat-messages');
+        const model = document.getElementById('model-select').value;
+
+        messagesDiv.innerHTML += '<div class="message user"><span class="role">You</span>' + escapeHTML(msg) + '</div>';
+        input.value = '';
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        const loadingId = 'loading-' + Date.now();
+        messagesDiv.innerHTML += '<div class="message assistant" id="' + loadingId + '"><span class="role">' + escapeHTML(model) + '</span>Thinking...</div>';
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        try {
+            const res = await fetch(API_BASE + '/api/v1/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + getToken()
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: [{ role: 'user', content: msg }]
+                })
+            });
+            const data = await res.json();
+            const loading = document.getElementById(loadingId);
+            if (loading) {
+                if (data.response) {
+                    loading.innerHTML = '<span class="role">' + escapeHTML(model) + '</span>' + escapeHTML(data.response);
+                    // Update credits display
+                    if (data.credits_remaining !== undefined) {
+                        document.getElementById('nav-credits').textContent = data.credits_remaining;
+                        document.getElementById('stat-credits').textContent = data.credits_remaining.toLocaleString();
+                    }
                 } else {
-                    document.getElementById('xmr-wallet').textContent = '46BeJeHmQQ6czjXH2vKSe8V7PbaEtfM3ekuJMFc9BBYhMZym43VWLqPhKYsVfkBB1Jc3RYpUK1jhCcxvFKMn3uTDQzmzDfk';
-                }
-            } catch (e) {
-                document.getElementById('xmr-wallet').textContent = '46BeJeHmQQ6czjXH2vKSe8V7PbaEtfM3ekuJMFc9BBYhMZym43VWLqPhKYsVfkBB1Jc3RYpUK1jhCcxvFKMn3uTDQzmzDfk';
-            }
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const msg = input.value.trim();
-            if (!msg) return;
-
-            const messagesDiv = document.getElementById('chat-messages');
-            const model = document.getElementById('model-select').value;
-
-            // Add user message
-            messagesDiv.innerHTML += '<div class="message user"><span class="role">YOU</span>' + escapeHTML(msg) + '</div>';
-            input.value = '';
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-            // Add loading
-            const loadingId = 'loading-' + Date.now();
-            messagesDiv.innerHTML += '<div class="message assistant" id="' + loadingId + '"><span class="role">' + model.toUpperCase() + '</span>Thinking...</div>';
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-            try {
-                const res = await fetch(API_BASE + '/api/ai/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + getToken()
-                    },
-                    body: JSON.stringify({ message: msg, model: model })
-                });
-                const data = await res.json();
-                const loading = document.getElementById(loadingId);
-                if (loading) {
-                    loading.innerHTML = '<span class="role">' + model.toUpperCase() + '</span>' + escapeHTML(data.response || data.message || JSON.stringify(data));
-                }
-            } catch (e) {
-                const loading = document.getElementById(loadingId);
-                if (loading) {
-                    loading.innerHTML = '<span class="role">ERROR</span>Failed to connect to AI backend. Make sure Ollama is running.';
-                    loading.style.borderColor = 'rgba(255,0,64,0.3)';
-                    loading.style.color = 'var(--red)';
+                    loading.innerHTML = '<span class="role">Error</span>' + escapeHTML(data.error || 'No response received.');
+                    loading.style.borderColor = 'rgba(239,68,68,0.3)';
                 }
             }
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        function escapeHTML(str) {
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
-        }
-
-        document.getElementById('chat-input').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') sendMessage();
-        });
-
-        function copyXMR() {
-            const addr = document.getElementById('xmr-wallet').textContent;
-            navigator.clipboard.writeText(addr).then(() => showToast('XMR address copied'));
-        }
-
-        async function checkPayment() {
-            showToast('Checking for payments...');
-            try {
-                const res = await fetch(API_BASE + '/api/payments/check', {
-                    headers: { 'Authorization': 'Bearer ' + getToken() }
-                });
-                const data = await res.json();
-                if (data.credits_added) {
-                    showToast('Payment confirmed! +' + data.credits_added + ' credits');
-                    loadUser();
-                } else {
-                    showToast('No new payments detected');
-                }
-            } catch (e) {
-                showToast('Payment check failed', true);
+        } catch (e) {
+            const loading = document.getElementById(loadingId);
+            if (loading) {
+                loading.innerHTML = '<span class="role">Error</span>Cannot connect to AI backend.';
+                loading.style.borderColor = 'rgba(239,68,68,0.3)';
             }
         }
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
 
-        function logout() {
-            localStorage.removeItem('whoamisec_token');
-            window.location.href = 'login.html';
+    function escapeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    document.getElementById('chat-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    function copyXMR() {
+        const addr = document.getElementById('xmr-wallet').textContent;
+        navigator.clipboard.writeText(addr).then(() => showToast('XMR address copied to clipboard', 'success'));
+    }
+
+    async function verifyPayment() {
+        const txid = prompt('Enter your Monero transaction ID (txid):');
+        if (!txid) return;
+
+        showToast('Verifying payment...');
+        try {
+            const plans = { pro: 0.05, enterprise: 0.15 };
+            const res = await fetch(API_BASE + '/api/v1/payments/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + getToken()
+                },
+                body: JSON.stringify({
+                    txid: txid,
+                    amount: plans[selectedPlan] || 0.05,
+                    plan: selectedPlan
+                })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showToast('Payment verified! +' + data.credits_added + ' credits added', 'success');
+                loadUser();
+            } else {
+                showToast(data.error || 'Verification failed', 'error');
+            }
+        } catch (e) {
+            showToast('Verification failed. Try again.', 'error');
         }
-    </script>
+    }
+
+    function logout() {
+        localStorage.removeItem('whoamisec_token');
+        window.location.href = 'login.html';
+    }
+</script>
 </body>
 </html>
