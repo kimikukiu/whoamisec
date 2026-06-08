@@ -216,7 +216,63 @@ jobs:
           echo "Size: $(du -sh WHOAMISEC-Business-v16.apk)"
 
       # ════════════════════════════════════════════════════════
-      # Release
+      # APK 3 — CICADA 3301
+      # ════════════════════════════════════════════════════════
+      - name: Init Capacitor — CICADA 3301
+        run: |
+          cp cicada-omni-app.html apk-build/www/index.html
+          cp cicada-sound.mp3     apk-build/www/ 2>/dev/null || true
+
+          cd apk-build
+          rm -rf android node_modules
+
+          npm install --save-dev \
+            @capacitor/cli@latest \
+            @capacitor/core@latest \
+            @capacitor/android@latest
+
+          cat > capacitor.config.json << 'EOF'
+          {
+            "appId": "com.cicada3301.omni",
+            "appName": "CICADA 3301",
+            "webDir": "www",
+            "server": {"androidScheme": "https"}
+          }
+          EOF
+
+          ./node_modules/.bin/cap add android
+          ./node_modules/.bin/cap sync android
+
+      - name: Patch Gradle — CICADA 3301
+        working-directory: apk-build
+        run: python3 "$GITHUB_WORKSPACE/patch_gradle.py"
+
+      - name: Build CICADA 3301 release APK
+        working-directory: apk-build/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Sign CICADA 3301 APK
+        run: |
+          BUILD_TOOLS=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)
+          APK_IN=$(find apk-build/android/app/build/outputs/apk/release \
+                   -name "*universal*.apk" 2>/dev/null | head -1)
+          [ -z "$APK_IN" ] && APK_IN=$(find apk-build/android/app/build/outputs/apk/release \
+                                        -name "*.apk" | head -1)
+          echo "Signing: $APK_IN"
+          "$ANDROID_HOME/build-tools/$BUILD_TOOLS/zipalign" -v 4 "$APK_IN" cicada-aligned.apk
+          "$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner" sign \
+            --ks "$GITHUB_WORKSPACE/whoamisec.keystore" \
+            --ks-pass pass:"$KS_PASS" \
+            --key-pass pass:"$KS_PASS" \
+            --ks-key-alias "$KS_ALIAS" \
+            --out CICADA-3301.apk \
+            cicada-aligned.apk
+          echo "Size: $(du -sh CICADA-3301.apk)"
+
+      # ════════════════════════════════════════════════════════
+      # Release — all 3 APKs
       # ════════════════════════════════════════════════════════
       - name: Upload APKs to GitHub Releases
         uses: softprops/action-gh-release@v2
@@ -230,21 +286,23 @@ jobs:
             |------|-------------|
             | `JARVIS-MIND-v3.apk` | JARVIS MIND Commander — VPS, 2700 agents, AI, SSH, Plans |
             | `WHOAMISEC-Business-v16.apk` | Business — XMR Mining, Monero, Plans, Invite Friend |
+            | `CICADA-3301.apk` | CICADA 3301 — Puzzle platform, XMR rewards, matrix UI, Telegram |
 
-            ### Compatibility
+            ### Compatibility — ALL 3 APKs
             - Android **6.0+** (API 23)
             - **armeabi-v7a** (32-bit ARM) + **arm64-v8a** (64-bit ARM) + **x86** + **x86_64**
-            - Universal APK — one file, installs on any Android
+            - Universal APK — one file installs on ANY Android device
 
             ### Install
-            1. Download APK
+            1. Download APK to phone
             2. Settings → Security → **Allow unknown sources**
             3. Tap APK → Install
 
-            > Source code, SDK, swarm tools and agent configs NOT included in APK.
+            > Source code, SDK, swarm tools and agent configs NOT included in any APK.
           files: |
             JARVIS-MIND-v3.apk
             WHOAMISEC-Business-v16.apk
+            CICADA-3301.apk
           draft: false
           prerelease: false
         env:

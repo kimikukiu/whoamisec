@@ -169,6 +169,72 @@ jobs:
           echo "IPA: $(du -sh $GITHUB_WORKSPACE/WHOAMISEC-Business-v16.ipa)"
 
       # ════════════════════════════════════════════════════════
+      # IPA 3 — CICADA 3301
+      # ════════════════════════════════════════════════════════
+      - name: Init Capacitor — CICADA 3301 iOS
+        run: |
+          cp cicada-omni-app.html apk-build/www/index.html
+          cp cicada-sound.mp3     apk-build/www/ 2>/dev/null || true
+
+          cd apk-build
+          rm -rf ios node_modules
+
+          npm install --save-dev \
+            @capacitor/cli@latest \
+            @capacitor/core@latest \
+            @capacitor/ios@latest
+
+          cat > capacitor.config.json << 'EOF'
+          {
+            "appId": "com.cicada3301.omni",
+            "appName": "CICADA 3301",
+            "webDir": "www",
+            "server": {"iosScheme": "https"}
+          }
+          EOF
+
+          ./node_modules/.bin/cap add ios
+          ./node_modules/.bin/cap sync ios
+
+      - name: Patch iOS — CICADA 3301
+        working-directory: apk-build
+        run: |
+          find ios -name "project.pbxproj" -exec \
+            perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = [\d.]+/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' {} \;
+          if [ -f ios/App/Podfile ]; then
+            perl -pi -e "s/platform :ios, '[\d.]+'/platform :ios, '13.0'/" ios/App/Podfile
+          fi
+
+      - name: Pod install — CICADA 3301
+        working-directory: apk-build/ios/App
+        run: pod install --repo-update
+
+      - name: Build archive — CICADA 3301
+        working-directory: apk-build/ios/App
+        run: |
+          xcodebuild \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Cicada3301.xcarchive" \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=NO \
+            clean archive 2>&1 | tee /tmp/xcode-c3.log | grep -E "error:|warning:|ARCHIVE|BUILD" || true
+          ls "$RUNNER_TEMP/Cicada3301.xcarchive" && echo "Archive OK" || (cat /tmp/xcode-c3.log; exit 1)
+
+      - name: Package CICADA 3301 IPA
+        run: |
+          APP=$(find "$RUNNER_TEMP/Cicada3301.xcarchive/Products" -name "*.app" | head -1)
+          mkdir -p /tmp/payload_c3/Payload
+          cp -r "$APP" "/tmp/payload_c3/Payload/CICADA 3301.app"
+          cd /tmp/payload_c3
+          zip -r "$GITHUB_WORKSPACE/CICADA-3301.ipa" Payload/
+          echo "IPA: $(du -sh $GITHUB_WORKSPACE/CICADA-3301.ipa)"
+
+      # ════════════════════════════════════════════════════════
       # Release
       # ════════════════════════════════════════════════════════
       - name: Upload IPAs to GitHub Releases
@@ -183,9 +249,10 @@ jobs:
             |------|-------------|
             | `JARVIS-MIND-v3.ipa` | JARVIS MIND — VPS, 2700 agents, Commander, SSH, Plans |
             | `WHOAMISEC-Business-v16.ipa` | Business — XMR Mining, Monero, Plans, Invite Friend |
+            | `CICADA-3301.ipa` | CICADA 3301 — Puzzle platform, matrix UI, XMR rewards, Telegram |
 
-            ### Compatibility
-            - **iOS 13.0+** — iPhone 6s and newer, all iPads
+            ### Compatibility — ALL 3 IPAs
+            - **iOS 13.0+** — iPhone 6s and newer, ALL iPads
             - **arm64** universal binary
 
             ### Install (no App Store needed)
@@ -195,10 +262,11 @@ jobs:
             | **Sideloadly** | sideloadly.io | Free |
             | **TrollStore** | GitHub | Free (iOS 14-16.7) |
 
-            > Source code, SDK and agent configs NOT included in IPA.
+            > Source code, SDK and agent configs NOT included in any IPA.
           files: |
             JARVIS-MIND-v3.ipa
             WHOAMISEC-Business-v16.ipa
+            CICADA-3301.ipa
           draft: false
           prerelease: false
         env:
