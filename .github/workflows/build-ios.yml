@@ -1,0 +1,208 @@
+name: Build iOS IPAs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'jarvis-mind-app.html'
+      - 'whoamisec-business-app.html'
+      - 'manifest.json'
+      - 'sw.js'
+      - '.github/workflows/build-ios.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Select latest Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods --no-document
+
+      # ── Helper: patch iOS Info.plist + config ─────────────────
+      - name: Create patch helper
+        run: |
+          cat > patch_ios.sh << 'PATCH'
+          #!/bin/bash
+          # Patch Podfile for universal iOS deployment target
+          if [ -f ios/App/Podfile ]; then
+            sed -i '' "s/platform :ios, '[0-9.]*/platform :ios, '13.0/" ios/App/Podfile
+          fi
+          # Patch xcodeproj deployment target to iOS 13
+          find ios -name "project.pbxproj" -exec \
+            sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]*/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' {} \;
+          PATCH
+          chmod +x patch_ios.sh
+
+      # ════════════════════════════════════════════════════════
+      # IPA 1 — JARVIS MIND v3
+      # ════════════════════════════════════════════════════════
+      - name: Prepare www — JARVIS MIND
+        run: |
+          mkdir -p apk-build/www
+          cp jarvis-mind-app.html apk-build/www/index.html
+          cp manifest.json        apk-build/www/ 2>/dev/null || true
+          cp sw.js                apk-build/www/ 2>/dev/null || true
+
+      - name: Capacitor init — JARVIS MIND iOS
+        working-directory: apk-build
+        run: |
+          cat > package.json << 'EOF'
+          {"name":"jarvis-mind","version":"3.0.0","scripts":{"build":"echo ok"}}
+          EOF
+          npm install --save @capacitor/core@latest @capacitor/ios@latest
+          cat > capacitor.config.json << 'EOF'
+          {
+            "appId": "com.whoamisec.jarvis",
+            "appName": "JARVIS MIND",
+            "webDir": "www",
+            "server": {"iosScheme": "https"},
+            "ios": {"contentInset": "automatic"}
+          }
+          EOF
+          npx cap add ios
+          npx cap sync ios
+
+      - name: Patch iOS config — JARVIS MIND
+        working-directory: apk-build
+        run: bash ../patch_ios.sh
+
+      - name: Install Pods — JARVIS MIND
+        working-directory: apk-build/ios/App
+        run: pod install --repo-update
+
+      - name: Build IPA — JARVIS MIND (unsigned, for sideload)
+        working-directory: apk-build/ios/App
+        run: |
+          xcodebuild \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/JarvisMind.xcarchive" \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=NO \
+            archive 2>&1 | xcpretty || true
+
+      - name: Package JARVIS MIND IPA
+        run: |
+          mkdir -p "$RUNNER_TEMP/payload/JARVIS MIND.app"
+          cp -r "$RUNNER_TEMP/JarvisMind.xcarchive/Products/Applications/App.app/." \
+                "$RUNNER_TEMP/payload/JARVIS MIND.app/"
+          cd "$RUNNER_TEMP"
+          zip -r "$GITHUB_WORKSPACE/JARVIS-MIND-v3.ipa" payload/
+          echo "IPA size: $(du -sh $GITHUB_WORKSPACE/JARVIS-MIND-v3.ipa)"
+
+      # ════════════════════════════════════════════════════════
+      # IPA 2 — WHOAMISEC Business v16
+      # ════════════════════════════════════════════════════════
+      - name: Prepare www — WHOAMISEC Business
+        run: cp whoamisec-business-app.html apk-build/www/index.html
+
+      - name: Capacitor reinit — WHOAMISEC Business iOS
+        working-directory: apk-build
+        run: |
+          rm -rf ios node_modules
+          npm install --save @capacitor/core@latest @capacitor/ios@latest
+          cat > capacitor.config.json << 'EOF'
+          {
+            "appId": "com.whoamisec.business",
+            "appName": "WHOAMISEC Business",
+            "webDir": "www",
+            "server": {"iosScheme": "https"},
+            "ios": {"contentInset": "automatic"}
+          }
+          EOF
+          npx cap add ios
+          npx cap sync ios
+
+      - name: Patch iOS config — WHOAMISEC Business
+        working-directory: apk-build
+        run: bash ../patch_ios.sh
+
+      - name: Install Pods — WHOAMISEC Business
+        working-directory: apk-build/ios/App
+        run: pod install --repo-update
+
+      - name: Build IPA — WHOAMISEC Business (unsigned)
+        working-directory: apk-build/ios/App
+        run: |
+          xcodebuild \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/WhoamiSecBusiness.xcarchive" \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=NO \
+            archive 2>&1 | xcpretty || true
+
+      - name: Package WHOAMISEC Business IPA
+        run: |
+          mkdir -p "$RUNNER_TEMP/payload2/WHOAMISEC Business.app"
+          cp -r "$RUNNER_TEMP/WhoamiSecBusiness.xcarchive/Products/Applications/App.app/." \
+                "$RUNNER_TEMP/payload2/WHOAMISEC Business.app/"
+          cd "$RUNNER_TEMP"
+          zip -r "$GITHUB_WORKSPACE/WHOAMISEC-Business-v16.ipa" payload2/
+          echo "IPA size: $(du -sh $GITHUB_WORKSPACE/WHOAMISEC-Business-v16.ipa)"
+
+      # ════════════════════════════════════════════════════════
+      # Upload to same GitHub Release as APK build (or new one)
+      # ════════════════════════════════════════════════════════
+      - name: Get version tag
+        id: ver
+        run: echo "tag=apk-$(date +'%Y%m%d-%H%M')-ios" >> $GITHUB_OUTPUT
+
+      - name: Release IPAs
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: "WhoamiSec iOS — ${{ steps.ver.outputs.tag }}"
+          body: |
+            ## WhoamiSec iOS IPAs (unsigned — sideload)
+
+            | File | Description |
+            |------|-------------|
+            | `JARVIS-MIND-v3.ipa` | JARVIS MIND Commander — VPS, 2700 agents, Commander, SSH |
+            | `WHOAMISEC-Business-v16.ipa` | Business Commander — XMR Mining, Monero, Agent swarm |
+
+            ### Compatibility
+            - iOS 13.0+ (iPhone 6s and newer — covers 99%+ active iPhones)
+            - Universal binary: **arm64** (all modern iPhones/iPads)
+            - iPad compatible
+
+            ### Install (sideload — no App Store needed)
+            **Option 1 — AltStore (free):**
+            1. Install AltStore on Mac/PC from altstore.io
+            2. Connect iPhone → install IPA via AltStore
+
+            **Option 2 — Sideloadly (free):**
+            1. Download Sideloadly from sideloadly.io
+            2. Connect iPhone → drag IPA → sign with Apple ID
+
+            **Option 3 — TrollStore (jailbreak-free on iOS 14-16):**
+            - Install directly, no resigning needed
+
+            > Source code, SDK, swarm tools and agent configs are **NOT included** in the IPA.
+          files: |
+            JARVIS-MIND-v3.ipa
+            WHOAMISEC-Business-v16.ipa
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
