@@ -424,9 +424,9 @@
     <div class="tab-pane active" id="tab-dashboard">
         <div class="stats-row">
             <div class="stat-box">
-                <div class="stat-label">VPS Active</div>
-                <div class="stat-value purple" id="vps-count">12</div>
-                <div class="stat-sub">of 15 created</div>
+                <div class="stat-label">VPS Online</div>
+                <div class="stat-value purple" id="vps-count">2</div>
+                <div class="stat-sub">256GB each</div>
             </div>
             <div class="stat-box">
                 <div class="stat-label">Agents Online</div>
@@ -434,9 +434,9 @@
                 <div class="stat-sub">abliterated</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Sites Live</div>
-                <div class="stat-value emerald">6</div>
-                <div class="stat-sub">whoamisec + 5</div>
+                <div class="stat-label">Domains Live</div>
+                <div class="stat-value emerald">10</div>
+                <div class="stat-sub">8 subs + 2 domains</div>
             </div>
             <div class="stat-box">
                 <div class="stat-label">Uptime</div>
@@ -471,29 +471,49 @@
 
         <div class="card">
             <div class="card-title">Service Status</div>
+            <!-- VPS-01 services -->
+            <div style="font-size:0.62rem;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.06em;padding:0.3rem 0 0.2rem;">
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--emerald);display:inline-block;margin-right:0.3rem;"></span>VPS-01 (256GB) — whoamisec.com
+            </div>
             <div class="vps-item">
-                <div class="vps-info"><h4>WhoamiSec API</h4><p>Port 5001</p></div>
+                <div class="vps-info"><h4>Nginx + SSL</h4><p>80/443 — all subdomains</p></div>
                 <span class="vps-status status-running">Running</span>
             </div>
             <div class="vps-item">
-                <div class="vps-info"><h4>JARVIS Admin</h4><p>Port 5004</p></div>
+                <div class="vps-info"><h4>WhoamiSec API</h4><p>api.whoamisec.com : 5001</p></div>
                 <span class="vps-status status-running">Running</span>
             </div>
             <div class="vps-item">
-                <div class="vps-info"><h4>Ollama Models</h4><p>Port 11434 — 6 models</p></div>
+                <div class="vps-info"><h4>JARVIS Admin</h4><p>jarvis.whoamisec.com : 5004</p></div>
                 <span class="vps-status status-running">Running</span>
             </div>
             <div class="vps-item">
-                <div class="vps-info"><h4>Open WebUI</h4><p>Port 8080</p></div>
+                <div class="vps-info"><h4>Ollama</h4><p>localhost:11434 — 6 models</p></div>
                 <span class="vps-status status-running">Running</span>
             </div>
             <div class="vps-item">
-                <div class="vps-info"><h4>Subscriptions</h4><p>Port 5005</p></div>
+                <div class="vps-info"><h4>APK Downloads</h4><p>downloads.whoamisec.com</p></div>
+                <span class="vps-status status-running">Running</span>
+            </div>
+            <!-- VPS-02 services -->
+            <div style="font-size:0.62rem;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:0.06em;padding:0.5rem 0 0.2rem;border-top:1px solid rgba(255,255,255,0.04);margin-top:0.25rem;">
+                <span style="width:6px;height:6px;border-radius:50%;background:var(--cyan);display:inline-block;margin-right:0.3rem;"></span>VPS-02 (256GB) — cicada.omni
+            </div>
+            <div class="vps-item">
+                <div class="vps-info"><h4>Nginx + SSL</h4><p>80/443 — cicada.omni</p></div>
                 <span class="vps-status status-running">Running</span>
             </div>
             <div class="vps-item">
-                <div class="vps-info"><h4>OneAPI Gateway</h4><p>Port 3001</p></div>
-                <span class="vps-status status-provisioning">Starting</span>
+                <div class="vps-info"><h4>Cicada Platform</h4><p>cicada.omni : 5002</p></div>
+                <span class="vps-status status-running">Running</span>
+            </div>
+            <div class="vps-item">
+                <div class="vps-info"><h4>APK Mirror</h4><p>apk.cicada.omni</p></div>
+                <span class="vps-status status-running">Running</span>
+            </div>
+            <div class="vps-item">
+                <div class="vps-info"><h4>XMR Mining Daemon</h4><p>xmrig — 100 nodes</p></div>
+                <span class="vps-status status-running">Running</span>
             </div>
         </div>
     </div>
@@ -566,34 +586,55 @@
         <div class="card">
             <div class="card-title">Active VPS Instances</div>
             <div id="vps-list">
-                <div class="vps-item">
-                    <div>
-                        <div class="vps-info"><h4>vps_admin_001</h4><p>10.100.0.1 &bull; 256GB RAM &bull; 64 Core</p></div>
-                        <span class="vps-status status-running" style="margin-top:0.3rem;display:inline-block;">Running</span>
+                <!-- VPS-01 -->
+                <div style="padding:0.6rem 0 0.3rem;">
+                    <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;">
+                        <span style="width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block;"></span>
+                        <span style="font-size:0.65rem;font-weight:700;color:var(--emerald);letter-spacing:0.04em;">VPS-01 — whoamisec.com</span>
                     </div>
-                    <div class="vps-actions">
-                        <button class="btn btn-outline-r btn-sm" onclick="vpsAction('stop','vps_admin_001')">Stop</button>
-                        <button class="btn btn-outline-g btn-sm" onclick="vpsAction('restart','vps_admin_001')">Restart</button>
+                    <div class="vps-item" style="padding:0.5rem 0;">
+                        <div>
+                            <div class="vps-info"><h4>vps-01-prod</h4><p>185.230.X.1 &bull; 256GB RAM &bull; 64 Core &bull; 2TB SSD</p></div>
+                            <div style="font-size:0.65rem;color:var(--muted);margin-top:0.2rem;">Nginx &bull; Flask API &bull; Ollama &bull; Downloads &bull; APKs &bull; 8 subdomains</div>
+                            <span class="vps-status status-running" style="margin-top:0.3rem;display:inline-block;">&#x2714; Online</span>
+                        </div>
+                        <div class="vps-actions">
+                            <button class="btn btn-outline-r btn-sm" onclick="vpsAction('stop','vps-01-prod')">Stop</button>
+                            <button class="btn btn-outline-g btn-sm" onclick="vpsAction('restart','vps-01-prod')">Restart</button>
+                        </div>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.25rem;margin-top:0.1rem;">
+                        <span style="font-size:0.58rem;background:rgba(139,92,246,0.1);color:var(--purple);padding:0.08rem 0.35rem;border-radius:4px;border:1px solid rgba(139,92,246,0.18);">whoamisec.com</span>
+                        <span style="font-size:0.58rem;background:rgba(139,92,246,0.1);color:var(--purple);padding:0.08rem 0.35rem;border-radius:4px;border:1px solid rgba(139,92,246,0.18);">api.*</span>
+                        <span style="font-size:0.58rem;background:rgba(139,92,246,0.1);color:var(--purple);padding:0.08rem 0.35rem;border-radius:4px;border:1px solid rgba(139,92,246,0.18);">dashboard.*</span>
+                        <span style="font-size:0.58rem;background:rgba(139,92,246,0.1);color:var(--purple);padding:0.08rem 0.35rem;border-radius:4px;border:1px solid rgba(139,92,246,0.18);">admin.*</span>
+                        <span style="font-size:0.58rem;background:rgba(139,92,246,0.1);color:var(--purple);padding:0.08rem 0.35rem;border-radius:4px;border:1px solid rgba(139,92,246,0.18);">jarvis.*</span>
+                        <span style="font-size:0.58rem;background:rgba(139,92,246,0.1);color:var(--purple);padding:0.08rem 0.35rem;border-radius:4px;border:1px solid rgba(139,92,246,0.18);">mining.*</span>
+                        <span style="font-size:0.58rem;background:rgba(139,92,246,0.1);color:var(--purple);padding:0.08rem 0.35rem;border-radius:4px;border:1px solid rgba(139,92,246,0.18);">downloads.*</span>
+                        <span style="font-size:0.58rem;background:rgba(139,92,246,0.1);color:var(--purple);padding:0.08rem 0.35rem;border-radius:4px;border:1px solid rgba(139,92,246,0.18);">apps.*</span>
                     </div>
                 </div>
-                <div class="vps-item">
-                    <div>
-                        <div class="vps-info"><h4>vps_mining_001</h4><p>10.100.1.1 &bull; 128GB RAM &bull; 32 Core</p></div>
-                        <span class="vps-status status-running" style="margin-top:0.3rem;display:inline-block;">Running</span>
+                <!-- VPS-02 -->
+                <div style="padding:0.6rem 0 0.3rem;border-top:1px solid rgba(255,255,255,0.05);margin-top:0.3rem;">
+                    <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;">
+                        <span style="width:7px;height:7px;border-radius:50%;background:var(--cyan);display:inline-block;"></span>
+                        <span style="font-size:0.65rem;font-weight:700;color:var(--cyan);letter-spacing:0.04em;">VPS-02 — cicada.omni</span>
                     </div>
-                    <div class="vps-actions">
-                        <button class="btn btn-outline-r btn-sm" onclick="vpsAction('stop','vps_mining_001')">Stop</button>
-                        <button class="btn btn-outline-g btn-sm" onclick="vpsAction('restart','vps_mining_001')">Restart</button>
+                    <div class="vps-item" style="padding:0.5rem 0;">
+                        <div>
+                            <div class="vps-info"><h4>vps-02-cicada</h4><p>194.165.X.1 &bull; 256GB RAM &bull; 32 Core &bull; 1TB SSD</p></div>
+                            <div style="font-size:0.65rem;color:var(--muted);margin-top:0.2rem;">Nginx &bull; Cicada Platform &bull; APK Mirror &bull; XMR Mining</div>
+                            <span class="vps-status status-running" style="margin-top:0.3rem;display:inline-block;">&#x2714; Online</span>
+                        </div>
+                        <div class="vps-actions">
+                            <button class="btn btn-outline-r btn-sm" onclick="vpsAction('stop','vps-02-cicada')">Stop</button>
+                            <button class="btn btn-outline-g btn-sm" onclick="vpsAction('restart','vps-02-cicada')">Restart</button>
+                        </div>
                     </div>
-                </div>
-                <div class="vps-item">
-                    <div>
-                        <div class="vps-info"><h4>vps_api_001</h4><p>10.100.2.1 &bull; 64GB RAM &bull; 16 Core</p></div>
-                        <span class="vps-status status-stopped" style="margin-top:0.3rem;display:inline-block;">Stopped</span>
-                    </div>
-                    <div class="vps-actions">
-                        <button class="btn btn-outline-g btn-sm" onclick="vpsAction('start','vps_api_001')">Start</button>
-                        <button class="btn btn-outline-g btn-sm" onclick="vpsAction('restart','vps_api_001')">Restart</button>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.25rem;margin-top:0.1rem;">
+                        <span style="font-size:0.58rem;background:rgba(6,182,212,0.08);color:var(--cyan);padding:0.08rem 0.35rem;border-radius:4px;border:1px solid rgba(6,182,212,0.18);">cicada.omni</span>
+                        <span style="font-size:0.58rem;background:rgba(6,182,212,0.08);color:var(--cyan);padding:0.08rem 0.35rem;border-radius:4px;border:1px solid rgba(6,182,212,0.18);">apk.cicada.omni</span>
+                        <span style="font-size:0.58rem;background:rgba(6,182,212,0.08);color:var(--cyan);padding:0.08rem 0.35rem;border-radius:4px;border:1px solid rgba(6,182,212,0.18);">puzzle.cicada.omni</span>
                     </div>
                 </div>
             </div>
@@ -803,6 +844,28 @@
 
         <!-- CODE MODE — VS Code style -->
         <div class="mode-pane" id="mode-code">
+
+            <!-- VS Help panel (collapsible) -->
+            <div id="vs-help-panel" style="background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:8px;padding:0.6rem 0.75rem;margin-bottom:0.55rem;font-size:0.7rem;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">
+                    <span style="font-weight:700;color:var(--purple);">&#x2328; VS Code Editor — What it does</span>
+                    <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.7rem;" onclick="document.getElementById('vs-help-body').style.display=document.getElementById('vs-help-body').style.display==='none'?'block':'none'">&#x25BC;</button>
+                </div>
+                <div id="vs-help-body" style="display:block;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.35rem 0.6rem;color:var(--text2);line-height:1.5;">
+                        <div><span style="color:var(--purple);font-family:'JetBrains Mono',monospace;font-size:0.65rem;">Ctrl+Enter</span> — Run code via JARVIS</div>
+                        <div><span style="color:var(--purple);font-family:'JetBrains Mono',monospace;font-size:0.65rem;">Tab</span> — Insert 2-space indent</div>
+                        <div><span style="color:var(--purple);font-family:'JetBrains Mono',monospace;font-size:0.65rem;">▶ Run</span> — Execute via stynx-code engine</div>
+                        <div><span style="color:var(--purple);font-family:'JetBrains Mono',monospace;font-size:0.65rem;">🔍 Analyze</span> — AirLLM security + style audit</div>
+                        <div><span style="color:var(--purple);font-family:'JetBrains Mono',monospace;font-size:0.65rem;">💬 To Chat</span> — Send code to AI Commander</div>
+                        <div><span style="color:var(--purple);font-family:'JetBrains Mono',monospace;font-size:0.65rem;">Ln/Col</span> — Live cursor position in status bar</div>
+                    </div>
+                    <div style="margin-top:0.4rem;padding-top:0.35rem;border-top:1px solid rgba(255,255,255,0.05);color:var(--muted);font-size:0.65rem;">
+                        Engine: <span style="color:var(--emerald);">stynx-code</span> + <span style="color:var(--cyan);">free-coding-models (150+)</span> + <span style="color:var(--purple);">AirLLM 70B</span> &bull; Supports: Python, JS, Bash, Go, Rust, HTML, SQL, YAML
+                    </div>
+                </div>
+            </div>
+
             <div class="code-header">
                 <input class="code-fname" id="code-fname" placeholder="filename.py" />
                 <select class="code-lang-sel" id="code-lang" onchange="updateVSLang()">
@@ -816,21 +879,24 @@
                     <span style="width:8px;height:8px;border-radius:50%;background:var(--purple);display:inline-block;"></span>
                     <span id="vs-fname-display">filename.py</span>
                     <span style="flex:1;"></span>
-                    <span style="font-size:0.65rem;">stynx-code + free-coding-models</span>
+                    <span id="vs-char-count" style="font-size:0.62rem;color:var(--muted);">0 chars</span>
+                    <span style="margin-left:0.4rem;font-size:0.65rem;">stynx-code + free-coding-models</span>
                 </div>
                 <!-- Editor with line numbers -->
                 <div style="display:flex;">
                     <div id="vs-line-nums" style="background:rgba(0,0,0,0.2);padding:0.5rem 0.4rem;font-family:'JetBrains Mono',monospace;font-size:0.73rem;color:var(--muted);text-align:right;line-height:1.55;min-width:30px;user-select:none;white-space:pre;">1</div>
                     <textarea class="code-editor" id="code-editor" spellcheck="false" style="border:none;border-radius:0;"
-                        placeholder="# Paste or write code..."
-                        oninput="updateVSLineNums()" onkeydown="codeEditorTab(event)" onclick="updateVSLineNums()"></textarea>
+                        placeholder="# Write or paste code here&#10;# Ctrl+Enter to run instantly via JARVIS&#10;# Tab = indent, 🔍 Analyze = AI security audit&#10;# 💬 To Chat = send to AI Commander"
+                        oninput="updateVSLineNums()" onkeydown="codeEditorTab(event)" onclick="updateVSLineNums()" onkeyup="updateVSLineNums()"></textarea>
                 </div>
                 <!-- Status bar -->
                 <div style="display:flex;align-items:center;gap:0.5rem;padding:0.18rem 0.6rem;background:rgba(139,92,246,0.08);border-top:1px solid rgba(139,92,246,0.1);font-size:0.62rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">
                     <span style="color:var(--purple);" id="vs-cursor-pos">Ln 1, Col 1</span>
                     <span>•</span><span style="color:var(--purple);" id="vs-lang-status">Python</span>
+                    <span>•</span><span id="vs-line-count">1 line</span>
                     <span style="flex:1;"></span>
-                    <span style="color:var(--muted);">Ctrl+Enter = Run</span>
+                    <span style="color:var(--emerald);font-weight:600;">Ctrl+Enter = Run</span>
+                    <span>•</span><span>Tab = indent</span>
                 </div>
             </div>
             <div class="code-actions">
@@ -838,6 +904,7 @@
                 <button class="btn btn-outline-p btn-sm" style="flex:1;" onclick="analyzeCode()">&#x1F50D; Analyze</button>
                 <button class="btn btn-sm" style="background:rgba(107,114,128,0.15);color:var(--muted);" onclick="copyCode()">Copy</button>
                 <button class="btn btn-sm" style="background:rgba(107,114,128,0.15);color:var(--muted);" onclick="sendCodeToChat()">&#x1F4AC; To Chat</button>
+                <button class="btn btn-sm" style="background:rgba(6,182,212,0.1);color:var(--cyan);border:1px solid rgba(6,182,212,0.2);" onclick="clearCode()">&#x1F5D1;</button>
             </div>
             <div class="code-output" id="code-output"></div>
         </div>
@@ -846,9 +913,8 @@
         <div class="mode-pane" id="mode-terminal">
             <div class="term-vps-row">
                 <select class="model-selector" id="term-vps" style="margin-bottom:0;flex:1;font-size:0.78rem;">
-                    <option>vps_admin_001 (10.100.0.1)</option>
-                    <option>vps_mining_001 (10.100.1.1)</option>
-                    <option>vps_api_001 (10.100.2.1)</option>
+                    <option>VPS-01 — whoamisec.com (185.230.X.1 / 256GB)</option>
+                    <option>VPS-02 — cicada.omni (194.165.X.1 / 256GB)</option>
                     <option>Local Sandbox</option>
                 </select>
                 <button class="btn btn-grad btn-sm" onclick="termConnect()">Connect</button>
@@ -1130,65 +1196,140 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINVmUfEce3uSfnES7ZNTSkERao5k80/emlP3LBCNJ2qt
 
     <!-- TAB 5: WEBSITES -->
     <div class="tab-pane" id="tab-websites">
-        <div class="card">
-            <div class="card-title">Hosted Websites — 6 Active</div>
+
+        <!-- VPS-01 whoamisec.com domains -->
+        <div class="card" style="border-color:rgba(139,92,246,0.25);margin-bottom:0.75rem;">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+                <span style="width:8px;height:8px;border-radius:50%;background:var(--emerald);display:inline-block;animation:pulse-dot 2s infinite;"></span>
+                <span class="card-title" style="margin-bottom:0;">VPS-01 (256GB) — whoamisec.com</span>
+                <span style="font-size:0.6rem;color:var(--muted);margin-left:auto;">8 subdomains live</span>
+            </div>
             <div class="site-item">
-                <div class="site-info"><h4>whoamisec.com</h4><p>Landing + Login + Dashboard + Admin</p></div>
+                <div class="site-info"><h4>whoamisec.com</h4><p>Landing page &bull; Login &bull; Zero-KYC security platform</p></div>
                 <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
                     <span class="site-badge badge-live">Live</span>
                     <button class="btn btn-outline-g btn-sm" onclick="openSite('index.html')">Open</button>
                 </div>
             </div>
             <div class="site-item">
-                <div class="site-info"><h4>MINER_FLEET</h4><p>XMR mining — 100 nodes</p></div>
-                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
-                    <span class="site-badge badge-live">Live</span>
-                    <button class="btn btn-outline-g btn-sm" onclick="openSite('mining.html')">Open</button>
-                </div>
-            </div>
-            <div class="site-item">
-                <div class="site-info"><h4>JARVIS Admin Panel</h4><p>VPS creation + Audit logs</p></div>
-                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
-                    <span class="site-badge badge-live">Live</span>
-                    <button class="btn btn-outline-g btn-sm" onclick="openSite('jarvis.html')">Open</button>
-                </div>
-            </div>
-            <div class="site-item">
-                <div class="site-info"><h4>Cicada 3301</h4><p>Puzzle platform — XMR rewards</p></div>
-                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
-                    <span class="site-badge badge-live">Live</span>
-                    <button class="btn btn-outline-g btn-sm" onclick="openSite('cicada.html')">Open</button>
-                </div>
-            </div>
-            <div class="site-item">
-                <div class="site-info"><h4>Subscriptions</h4><p>6-plan system — XMR payments</p></div>
+                <div class="site-info"><h4>dashboard.whoamisec.com</h4><p>Subscriptions &bull; 6-plan system &bull; XMR payments</p></div>
                 <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
                     <span class="site-badge badge-live">Live</span>
                     <button class="btn btn-outline-g btn-sm" onclick="openSite('dashboard.html')">Open</button>
                 </div>
             </div>
             <div class="site-item">
-                <div class="site-info"><h4>Downloads</h4><p>APK + PWA download portal</p></div>
+                <div class="site-info"><h4>admin.whoamisec.com</h4><p>Admin panel &bull; User management &bull; Audit logs</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span class="site-badge badge-live">Live</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="openSite('admin.html')">Open</button>
+                </div>
+            </div>
+            <div class="site-item">
+                <div class="site-info"><h4>api.whoamisec.com</h4><p>Flask REST API &bull; JWT &bull; Ollama AI models &bull; Port 5001</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span class="site-badge badge-live">Live</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="openSite('/api/v1/status')">Status</button>
+                </div>
+            </div>
+            <div class="site-item">
+                <div class="site-info"><h4>jarvis.whoamisec.com</h4><p>JARVIS MIND Admin &bull; VPS control &bull; Commander</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span class="site-badge badge-live">Live</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="openSite('jarvis.html')">Open</button>
+                </div>
+            </div>
+            <div class="site-item">
+                <div class="site-info"><h4>mining.whoamisec.com</h4><p>XMR RandomX fleet &bull; 100 nodes &bull; xmrig dashboard</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span class="site-badge badge-live">Live</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="openSite('mining.html')">Open</button>
+                </div>
+            </div>
+            <div class="site-item">
+                <div class="site-info"><h4>downloads.whoamisec.com</h4><p>APK downloads &bull; PWA install &bull; WHOAMISEC-Business + JARVIS-MIND</p></div>
                 <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
                     <span class="site-badge badge-live">Live</span>
                     <button class="btn btn-outline-g btn-sm" onclick="openSite('downloads.html')">Open</button>
                 </div>
             </div>
+            <div class="site-item">
+                <div class="site-info"><h4>apps.whoamisec.com</h4><p>APK file hosting &bull; WHOAMISEC-Business-v16.apk &bull; JARVIS-MIND-v3.apk</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span class="site-badge badge-live">Live</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="openSite('downloads.html')">APKs</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VPS-02 cicada.omni domains -->
+        <div class="card" style="border-color:rgba(6,182,212,0.25);margin-bottom:0.75rem;">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+                <span style="width:8px;height:8px;border-radius:50%;background:var(--cyan);display:inline-block;animation:pulse-dot 2s infinite;"></span>
+                <span class="card-title" style="margin-bottom:0;color:var(--cyan);">VPS-02 (256GB) — cicada.omni</span>
+                <span style="font-size:0.6rem;color:var(--muted);margin-left:auto;">3 subdomains live</span>
+            </div>
+            <div class="site-item">
+                <div class="site-info"><h4>cicada.omni</h4><p>Cicada 3301 puzzle platform &bull; XMR rewards &bull; Cryptography challenges</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span class="site-badge badge-live">Live</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="openSite('cicada.html')">Open</button>
+                </div>
+            </div>
+            <div class="site-item">
+                <div class="site-info"><h4>apk.cicada.omni</h4><p>APK mirror &bull; WHOAMISEC-Business-v16.apk &bull; JARVIS-MIND-v3.apk</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span class="site-badge badge-live">Live</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="showNotif('APK mirror: cicada.omni/apk')">Info</button>
+                </div>
+            </div>
+            <div class="site-item">
+                <div class="site-info"><h4>puzzle.cicada.omni</h4><p>Interactive puzzle vault &bull; Multi-level cryptography</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span class="site-badge badge-live">Live</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="openSite('cicada.html')">Open</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- APK downloads summary -->
+        <div class="card" style="border-color:rgba(16,185,129,0.2);">
+            <div class="card-title">APK Distribution — Both VPS</div>
+            <div class="site-item">
+                <div class="site-info"><h4>WHOAMISEC-Business-v16.apk</h4><p>Business Commander &bull; XMR &bull; Agent swarm</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span style="font-size:0.62rem;color:var(--emerald);">2 mirrors</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="openSite('downloads.html')">Download</button>
+                </div>
+            </div>
+            <div class="site-item">
+                <div class="site-info"><h4>JARVIS-MIND-v3.apk</h4><p>JARVIS MIND Commander &bull; VPS &bull; 2500 agents</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span style="font-size:0.62rem;color:var(--emerald);">2 mirrors</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="openSite('downloads.html')">Download</button>
+                </div>
+            </div>
         </div>
 
         <div class="card">
-            <div class="card-title">Website Factory — Create New Site</div>
+            <div class="card-title">Deploy New Subdomain</div>
             <div style="display:flex;flex-direction:column;gap:0.75rem;">
                 <div class="form-field">
-                    <label>What site do you want to create?</label>
+                    <label>What site to build?</label>
                     <input type="text" id="site-desc" placeholder="e.g. E-commerce shop with Monero payments...">
                 </div>
-                <div class="form-field">
-                    <label>Domain name</label>
-                    <input type="text" id="site-domain" placeholder="mysite.whoamisec.com">
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>Domain</label>
+                        <input type="text" id="site-domain" placeholder="sub.whoamisec.com">
+                    </div>
+                    <div class="form-field">
+                        <label>Target VPS</label>
+                        <select id="site-vps"><option>VPS-01 (whoamisec.com)</option><option>VPS-02 (cicada.omni)</option></select>
+                    </div>
                 </div>
                 <button class="btn btn-grad btn-lg btn-block" onclick="createSite()">
-                    &#x26A1; Build Site with 2700+ Agents
+                    &#x26A1; Build &amp; Deploy with 2700+ Agents
                 </button>
             </div>
         </div>
@@ -1485,6 +1626,16 @@ function updateVSLineNums() {
     document.getElementById('vs-cursor-pos').textContent = `Ln ${ln}, Col ${col}`;
     const fn = document.getElementById('code-fname').value || 'file';
     document.getElementById('vs-fname-display').textContent = fn;
+    const lc = document.getElementById('vs-line-count');
+    if (lc) lc.textContent = `${lines} line${lines===1?'':'s'}`;
+    const cc = document.getElementById('vs-char-count');
+    if (cc) cc.textContent = `${ed.value.length} chars`;
+}
+function clearCode() {
+    document.getElementById('code-editor').value = '';
+    document.getElementById('code-output').classList.remove('show');
+    updateVSLineNums();
+    showNotif('Editor cleared');
 }
 function updateVSLang() {
     const lang = document.getElementById('code-lang').value;
@@ -1549,7 +1700,11 @@ const TERM_DEMOS = {
     'free -h': `       total   used   free\nMem:   256G    148G   108G\nSwap:  16G     0B     16G`,
     'uptime': `up 142 days, 3:21, load average: 0.42, 0.38, 0.41`,
     'whoami': 'jarvis',
-    'hostname': 'whoamisec-vps-001',
+    'hostname': 'vps-01-prod.whoamisec.com',
+    'nginx -t': 'nginx: the configuration file /etc/nginx/nginx.conf syntax is ok\nnginx: configuration file /etc/nginx/nginx.conf test is successful',
+    'nginx -s reload': '[OK] nginx reloaded — all 8 virtual hosts active',
+    'ls /var/www/whoamisec/': 'index.html  dashboard.html  admin.html  cicada.html  mining.html  downloads.html  apps/  jarvis.html',
+    'ls /var/apk/': 'WHOAMISEC-Business-v16.apk  JARVIS-MIND-v3.apk  checksums.sha256',
     'xmrig --status': `Mining: ON  Hashrate: 845 H/s  Pool: supportxmr.com  Accepted: 1,284`,
     'default': (cmd) => `bash: ${cmd}: command dispatched to JARVIS agent swarm\n[OK] 2700+ agents processing: "${cmd.slice(0,40)}"`
 };
