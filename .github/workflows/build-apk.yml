@@ -36,10 +36,9 @@ jobs:
 
       - name: Generate keystore
         run: |
-          STOREPASS="${STOREPASS:-WhoamiSec2026}"
           keytool -genkeypair -v -keystore whoamisec.keystore -alias whoamisec \
             -keyalg RSA -keysize 2048 -validity 10000 \
-            -storepass "$STOREPASS" -keypass "$STOREPASS" \
+            -storepass WhoamiSec2026 -keypass WhoamiSec2026 \
             -dname "CN=WhoamiSec,OU=JARVIS,O=WhoamiSec,L=Bucharest,ST=BU,C=RO"
 
       - name: Init JARVIS MIND
@@ -55,42 +54,28 @@ jobs:
           npx cap add android 2>&1 | tail -3
           npx cap sync android 2>&1 | tail -3
 
-      - name: Patch + Build JARVIS MIND
-        env:
-          KS_PASS: "WhoamiSec2026"
+      - name: Build JARVIS MIND
         run: |
-          cp whoamisec.keystore apk-build/android/app/whoamisec.keystore
-          python3 .github/workflows/patch_gradle.py apk-build/android/app/build.gradle
           cd apk-build/android
           chmod +x gradlew
-          set -o pipefail
-          ./gradlew assembleRelease --no-daemon 2>&1 | tee /tmp/g1.log | tail -50
-          echo "GRADLE_RC=${PIPESTATUS[0]}"
+          ./gradlew assembleDebug 2>&1 | tee /tmp/jm.log
+          echo "EXIT=$?"
           find . -name "*.apk" -type f
-          if [ "${PIPESTATUS[0]}" != "0" ]; then
-            echo "=== GRADLE FAILED ==="
-            cat /tmp/g1.log
-          fi
-
-      - name: Collect JARVIS MIND APK
-        run: |
-          APK=$(find apk-build/android -name "*.apk" -type f | head -1)
+          APK=$(find . -name "*.apk" -type f | head -1)
           if [ -n "$APK" ]; then
-            cp "$APK" JARVIS-MIND-v3.apk
-            echo "OK: $(du -sh JARVIS-MIND-v3.apk)"
+            BUILD_TOOLS=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)
+            echo "Build tools: $BUILD_TOOLS"
+            "$ANDROID_HOME/build-tools/$BUILD_TOOLS/zipalign" -f 4 "$APK" /tmp/jm-aligned.apk
+            "$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner" sign \
+              --ks "$GITHUB_WORKSPACE/whoamisec.keystore" \
+              --ks-pass pass:WhoamiSec2026 --key-pass pass:WhoamiSec2026 \
+              --ks-key-alias whoamisec \
+              --out "$GITHUB_WORKSPACE/JARVIS-MIND-v3.apk" /tmp/jm-aligned.apk
+            echo "SIGNED: $(du -sh $GITHUB_WORKSPACE/JARVIS-MIND-v3.apk)"
           else
-            echo "No release APK, trying debug..."
-            cd apk-build/android
-            chmod +x gradlew
-            ./gradlew assembleDebug --no-daemon 2>&1 | tail -20
-            APK=$(find . -name "*.apk" -type f | head -1)
-            if [ -n "$APK" ]; then
-              cp "$APK" ../../JARVIS-MIND-v3.apk
-              echo "Debug APK: $(du -sh ../../JARVIS-MIND-v3.apk)"
-            else
-              echo "FAIL: no APK at all"
-              exit 1
-            fi
+            echo "BUILD FAILED"
+            cat /tmp/jm.log
+            exit 1
           fi
 
       - name: Init WHOAMISEC Business
@@ -103,31 +88,26 @@ jobs:
           npx cap add android 2>&1 | tail -3
           npx cap sync android 2>&1 | tail -3
 
-      - name: Patch + Build WHOAMISEC Business
-        env:
-          KS_PASS: "WhoamiSec2026"
+      - name: Build WHOAMISEC Business
         run: |
-          cp whoamisec.keystore apk-build/android/app/whoamisec.keystore
-          python3 .github/workflows/patch_gradle.py apk-build/android/app/build.gradle
           cd apk-build/android
           chmod +x gradlew
-          set -o pipefail
-          ./gradlew assembleRelease --no-daemon 2>&1 | tee /tmp/g2.log | tail -50
-          echo "GRADLE_RC=${PIPESTATUS[0]}"
+          ./gradlew assembleDebug 2>&1 | tee /tmp/ws.log
+          echo "EXIT=$?"
           find . -name "*.apk" -type f
-          if [ "${PIPESTATUS[0]}" != "0" ]; then
-            echo "=== GRADLE FAILED ==="
-            cat /tmp/g2.log
-          fi
-
-      - name: Collect WHOAMISEC Business APK
-        run: |
-          APK=$(find apk-build/android -name "*.apk" -type f | head -1)
+          APK=$(find . -name "*.apk" -type f | head -1)
           if [ -n "$APK" ]; then
-            cp "$APK" WHOAMISEC-Business-v16.apk
-            echo "OK: $(du -sh WHOAMISEC-Business-v16.apk)"
+            BUILD_TOOLS=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)
+            "$ANDROID_HOME/build-tools/$BUILD_TOOLS/zipalign" -f 4 "$APK" /tmp/ws-aligned.apk
+            "$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner" sign \
+              --ks "$GITHUB_WORKSPACE/whoamisec.keystore" \
+              --ks-pass pass:WhoamiSec2026 --key-pass pass:WhoamiSec2026 \
+              --ks-key-alias whoamisec \
+              --out "$GITHUB_WORKSPACE/WHOAMISEC-Business-v16.apk" /tmp/ws-aligned.apk
+            echo "SIGNED: $(du -sh $GITHUB_WORKSPACE/WHOAMISEC-Business-v16.apk)"
           else
-            echo "FAIL: no APK"
+            echo "BUILD FAILED"
+            cat /tmp/ws.log
             exit 1
           fi
 
@@ -137,7 +117,7 @@ jobs:
           tag_name: apk-${{ github.run_number }}
           name: "WhoamiSec APKs Build #${{ github.run_number }}"
           body: |
-            APKs built with Capacitor v6 + Gradle
+            APKs built with Capacitor v6, signed with apksigner
           files: |
             JARVIS-MIND-v3.apk
             WHOAMISEC-Business-v16.apk
