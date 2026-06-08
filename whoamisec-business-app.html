@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WHOAMISEC Business</title>
+    <meta name="description" content="WHOAMISEC Business App — Ollama monetization, Mining fleet, Monero wallet, Settings.">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#06B6D4">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0B0D17;
+            --bg2: #111827;
+            --card: #1F2937;
+            --border: rgba(255,255,255,0.08);
+            --cyan: #06B6D4;
+            --blue: #3B82F6;
+            --emerald: #10B981;
+            --amber: #F59E0B;
+            --red: #EF4444;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+            --text: #F9FAFB;
+            --text2: #9CA3AF;
+            --muted: #6B7280;
+            --grad: linear-gradient(135deg, #06B6D4, #3B82F6);
+            --grad2: linear-gradient(135deg, #10B981, #06B6D4);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        html, body { height:100%; overflow:hidden; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header */
+        .app-header {
+            display:flex; align-items:center; justify-content:space-between;
+            padding: 1rem 1.25rem;
+            background: rgba(17,24,39,0.95);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            flex-shrink:0;
+        }
+        .app-header-logo { display:flex; align-items:center; gap:0.6rem; }
+        .app-header-logo .icon {
+            width:32px; height:32px; border-radius:8px;
+            background:var(--grad); display:flex; align-items:center;
+            justify-content:center; font-size:1rem;
+        }
+        .app-header-logo span { font-size:0.95rem; font-weight:700; color:var(--text); }
+        .header-status {
+            display:flex; align-items:center; gap:0.4rem;
+            font-size:0.75rem; color:var(--emerald);
+        }
+        .status-dot {
+            width:6px; height:6px; border-radius:50%;
+            background:var(--emerald); animation:pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+        .header-back {
+            color:var(--cyan); font-size:0.85rem; text-decoration:none;
+            padding:0.3rem 0.6rem; border-radius:6px;
+            border:1px solid rgba(6,182,212,0.2);
+        }
+
+        /* Tab Content Area */
+        .app-content {
+            flex:1; overflow-y:auto; overflow-x:hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tab-pane { display:none; padding:1.25rem; min-height:100%; }
+        .tab-pane.active { display:block; }
+
+        /* Bottom Tab Bar */
+        .tab-bar {
+            display:flex; background:rgba(17,24,39,0.98);
+            border-top:1px solid var(--border);
+            flex-shrink:0;
+        }
+        .tab-btn {
+            flex:1; display:flex; flex-direction:column;
+            align-items:center; justify-content:center;
+            padding:0.6rem 0.25rem;
+            background:none; border:none; cursor:pointer;
+            color:var(--muted); transition:color 0.2s;
+            min-height:56px;
+        }
+        .tab-btn.active { color:var(--cyan); }
+        .tab-btn .tab-icon { font-size:1.3rem; margin-bottom:0.2rem; }
+        .tab-btn .tab-label { font-size:0.65rem; font-weight:600; text-transform:uppercase; letter-spacing:0.03em; }
+
+        /* Cards */
+        .card {
+            background:var(--card); border:1px solid var(--border);
+            border-radius:12px; padding:1.25rem; margin-bottom:1rem;
+        }
+        .card-title {
+            font-size:0.75rem; font-weight:600; color:var(--muted);
+            text-transform:uppercase; letter-spacing:0.08em; margin-bottom:1rem;
+        }
+        .card h3 { font-size:1rem; font-weight:600; margin-bottom:0.5rem; }
+
+        /* Stats Row */
+        .stats-row { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem; }
+        .stat-box {
+            background:var(--card); border:1px solid var(--border);
+            border-radius:10px; padding:1rem;
+        }
+        .stat-label { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.3rem; }
+        .stat-value { font-size:1.4rem; font-weight:700; }
+        .stat-value.cyan { color:var(--cyan); }
+        .stat-value.emerald { color:var(--emerald); }
+        .stat-value.amber { color:var(--amber); }
+        .stat-value.purple { color:var(--purple); }
+        .stat-sub { font-size:0.7rem; color:var(--muted); margin-top:0.2rem; }
+
+        /* Model List */
+        .model-row {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0.75rem 0; border-bottom:1px solid rgba(255,255,255,0.04);
+        }
+        .model-row:last-child { border-bottom:none; }
+        .model-info { display:flex; flex-direction:column; gap:0.2rem; }
+        .model-name { font-size:0.9rem; font-weight:500; }
+        .model-meta { font-size:0.75rem; color:var(--muted); }
+        .model-badge {
+            padding:0.2rem 0.6rem; border-radius:20px;
+            font-size:0.7rem; font-weight:600;
+        }
+        .badge-active { background:rgba(16,185,129,0.1); color:var(--emerald); border:1px solid rgba(16,185,129,0.2); }
+        .badge-idle { background:rgba(107,114,128,0.1); color:var(--muted); border:1px solid var(--border); }
+
+        /* Plan Cards */
+        .plan-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; }
+        .plan-card {
+            background:var(--bg2); border:1px solid var(--border);
+            border-radius:10px; padding:1rem;
+        }
+        .plan-card.featured { border-color:var(--cyan); box-shadow:0 0 20px rgba(6,182,212,0.1); }
+        .plan-name { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--cyan); margin-bottom:0.4rem; }
+        .plan-price { font-size:1.2rem; font-weight:700; margin-bottom:0.4rem; }
+        .plan-price small { font-size:0.7rem; font-weight:400; color:var(--muted); }
+        .plan-detail { font-size:0.75rem; color:var(--text2); }
+
+        /* Mining Nodes */
+        .node-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:0.5rem; margin-bottom:1rem; }
+        .node-dot {
+            aspect-ratio:1; border-radius:6px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:0.6rem; font-weight:700; color:rgba(255,255,255,0.6);
+        }
+        .node-dot.active { background:rgba(16,185,129,0.2); border:1px solid rgba(16,185,129,0.3); color:var(--emerald); }
+        .node-dot.idle { background:rgba(107,114,128,0.1); border:1px solid var(--border); }
+        .node-dot.error { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:var(--red); }
+
+        /* Monero */
+        .wallet-address {
+            background:var(--bg); border-radius:8px; padding:0.75rem;
+            font-family:'JetBrains Mono',monospace; font-size:0.65rem;
+            color:var(--cyan); word-break:break-all; line-height:1.6;
+            border:1px solid rgba(6,182,212,0.15); margin-bottom:1rem;
+        }
+        .wallet-balance {
+            text-align:center; padding:1.5rem 0;
+        }
+        .wallet-balance .amount { font-size:2.2rem; font-weight:800; color:var(--amber); }
+        .wallet-balance .denom { font-size:1rem; color:var(--muted); margin-left:0.3rem; }
+        .wallet-balance .usd { font-size:0.85rem; color:var(--muted); margin-top:0.3rem; }
+
+        /* Settings */
+        .setting-row {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0.9rem 0; border-bottom:1px solid rgba(255,255,255,0.04);
+        }
+        .setting-row:last-child { border-bottom:none; }
+        .setting-label { font-size:0.9rem; }
+        .setting-sub { font-size:0.75rem; color:var(--muted); margin-top:0.1rem; }
+        .setting-input {
+            background:var(--bg); border:1px solid var(--border);
+            border-radius:6px; padding:0.4rem 0.7rem;
+            color:var(--text); font-size:0.8rem;
+            font-family:'JetBrains Mono',monospace;
+            width:160px; text-align:right;
+        }
+        .toggle {
+            width:42px; height:24px; border-radius:12px;
+            border:none; cursor:pointer; position:relative;
+            transition:background 0.2s;
+        }
+        .toggle.on { background:var(--cyan); }
+        .toggle.off { background:var(--muted); }
+        .toggle::after {
+            content:''; width:18px; height:18px; border-radius:50%;
+            background:#fff; position:absolute; top:3px;
+            transition:left 0.2s;
+        }
+        .toggle.on::after { left:21px; }
+        .toggle.off::after { left:3px; }
+
+        /* Buttons */
+        .btn {
+            display:inline-flex; align-items:center; justify-content:center; gap:0.5rem;
+            padding:0.7rem 1.25rem; border-radius:8px;
+            font-size:0.85rem; font-weight:600; border:none; cursor:pointer;
+            transition:all 0.2s; text-decoration:none; color:#fff;
+        }
+        .btn-grad { background:var(--grad); }
+        .btn-grad:hover { opacity:0.9; }
+        .btn-outline { background:transparent; color:var(--cyan); border:1px solid rgba(6,182,212,0.3); }
+        .btn-block { width:100%; }
+        .btn-sm { padding:0.5rem 0.9rem; font-size:0.8rem; }
+
+        /* Commander */
+        .commander-input {
+            display:flex; gap:0.5rem; margin-bottom:1rem;
+        }
+        .commander-input input {
+            flex:1; background:var(--bg); border:1px solid var(--border);
+            border-radius:8px; padding:0.75rem 1rem;
+            color:var(--text); font-size:0.9rem;
+        }
+        .commander-output {
+            background:var(--bg); border:1px solid var(--border);
+            border-radius:8px; padding:1rem; min-height:120px;
+            font-family:'JetBrains Mono',monospace; font-size:0.8rem;
+            color:var(--emerald); line-height:1.6; white-space:pre-wrap;
+        }
+
+        /* Section header */
+        .sec-header {
+            display:flex; align-items:center; justify-content:space-between;
+            margin-bottom:0.75rem;
+        }
+        .sec-header h3 { font-size:0.9rem; font-weight:600; }
+
+        /* Progress bar */
+        .progress-bar {
+            height:6px; background:rgba(255,255,255,0.08);
+            border-radius:3px; overflow:hidden; margin-top:0.5rem;
+        }
+        .progress-fill { height:100%; border-radius:3px; transition:width 0.5s; }
+        .progress-fill.cyan { background:var(--grad); }
+        .progress-fill.emerald { background:var(--grad2); }
+
+        /* Notification */
+        .notif {
+            position:fixed; top:70px; left:50%; transform:translateX(-50%);
+            background:var(--emerald); color:#fff;
+            padding:0.6rem 1.2rem; border-radius:20px;
+            font-size:0.85rem; font-weight:600;
+            opacity:0; transition:opacity 0.3s; pointer-events:none;
+            white-space:nowrap; z-index:100;
+        }
+        .notif.show { opacity:1; }
+    </style>
+</head>
+<body>
+
+<div class="app-header">
+    <div class="app-header-logo">
+        <div class="icon">&#x1F4BC;</div>
+        <span>WHOAMISEC Business</span>
+    </div>
+    <div class="header-status">
+        <div class="status-dot"></div>
+        <span>Live</span>
+    </div>
+    <a href="downloads.html" class="header-back">&#x2190; Apps</a>
+</div>
+
+<div class="app-content">
+
+    <!-- TAB 1: BUSINESS -->
+    <div class="tab-pane active" id="tab-business">
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="stat-label">API Revenue</div>
+                <div class="stat-value cyan" id="revenue">0.182</div>
+                <div class="stat-sub">XMR today</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Active Users</div>
+                <div class="stat-value emerald" id="users">847</div>
+                <div class="stat-sub">Online now</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">API Calls</div>
+                <div class="stat-value amber" id="calls">12,408</div>
+                <div class="stat-sub">Last 24h</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Models Active</div>
+                <div class="stat-value purple">6/6</div>
+                <div class="stat-sub">All healthy</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Ollama Models — Monetization</div>
+            <div class="model-row">
+                <div class="model-info">
+                    <span class="model-name">TinyLlama 1.1B</span>
+                    <span class="model-meta">650MB &bull; 0.001 XMR/1K tokens</span>
+                </div>
+                <span class="model-badge badge-active">Active</span>
+            </div>
+            <div class="model-row">
+                <div class="model-info">
+                    <span class="model-name">Phi-2.7B</span>
+                    <span class="model-meta">1.6GB &bull; 0.002 XMR/1K tokens</span>
+                </div>
+                <span class="model-badge badge-active">Active</span>
+            </div>
+            <div class="model-row">
+                <div class="model-info">
+                    <span class="model-name">Qwen 2.5 0.5B</span>
+                    <span class="model-meta">350MB &bull; 0.001 XMR/1K tokens</span>
+                </div>
+                <span class="model-badge badge-active">Active</span>
+            </div>
+            <div class="model-row">
+                <div class="model-info">
+                    <span class="model-name">Llama 3.2 1B</span>
+                    <span class="model-meta">1.3GB &bull; 0.002 XMR/1K tokens</span>
+                </div>
+                <span class="model-badge badge-active">Active</span>
+            </div>
+            <div class="model-row">
+                <div class="model-info">
+                    <span class="model-name">DeepSeek Coder 1.3B</span>
+                    <span class="model-meta">750MB &bull; 0.002 XMR/1K tokens</span>
+                </div>
+                <span class="model-badge badge-idle">Idle</span>
+            </div>
+            <div class="model-row">
+                <div class="model-info">
+                    <span class="model-name">Granite Code 3B</span>
+                    <span class="model-meta">2.0GB &bull; 0.003 XMR/1K tokens</span>
+                </div>
+                <span class="model-badge badge-idle">Idle</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">JARVIS Agent Commander</div>
+            <div class="commander-input">
+                <input type="text" id="cmd-input" placeholder="Send command to all 2700+ agents..." />
+                <button class="btn btn-grad btn-sm" onclick="sendCommand()">Send</button>
+            </div>
+            <div class="commander-output" id="cmd-output">JARVIS MIND ready. 2700+ agents standing by.
+&gt; Type a command above and hit Send.</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Subscription Plans</div>
+            <div class="plan-grid">
+                <div class="plan-card">
+                    <div class="plan-name">Free</div>
+                    <div class="plan-price">0 XMR<small>/forever</small></div>
+                    <div class="plan-detail">100 req/day &bull; 1 model</div>
+                </div>
+                <div class="plan-card">
+                    <div class="plan-name">Starter</div>
+                    <div class="plan-price">0.03 XMR<small>/mo</small></div>
+                    <div class="plan-detail">1K req/day &bull; All models</div>
+                </div>
+                <div class="plan-card featured">
+                    <div class="plan-name">Pro</div>
+                    <div class="plan-price">0.08 XMR<small>/mo</small></div>
+                    <div class="plan-detail">10K req/day &bull; Ollama</div>
+                </div>
+                <div class="plan-card">
+                    <div class="plan-name">Enterprise</div>
+                    <div class="plan-price">0.20 XMR<small>/mo</small></div>
+                    <div class="plan-detail">100K req/day &bull; White-label</div>
+                </div>
+                <div class="plan-card">
+                    <div class="plan-name">Ultra</div>
+                    <div class="plan-price">0.50 XMR<small>/mo</small></div>
+                    <div class="plan-detail">Unlimited &bull; Admin panel</div>
+                </div>
+                <div class="plan-card">
+                    <div class="plan-name">Custom</div>
+                    <div class="plan-price">Custom</div>
+                    <div class="plan-detail">Dedicated infra</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: MINING -->
+    <div class="tab-pane" id="tab-mining">
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="stat-label">Total Hashrate</div>
+                <div class="stat-value cyan" id="hashrate">82.4</div>
+                <div class="stat-sub">KH/s across fleet</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Active Nodes</div>
+                <div class="stat-value emerald" id="active-nodes">97</div>
+                <div class="stat-sub">of 100 online</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Mined Today</div>
+                <div class="stat-value amber" id="mined">0.0043</div>
+                <div class="stat-sub">XMR</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Efficiency</div>
+                <div class="stat-value purple">97%</div>
+                <div class="stat-sub">Fleet health</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="sec-header">
+                <h3>Mining Fleet — 100 Nodes</h3>
+                <button class="btn btn-grad btn-sm" onclick="restartAll()">Restart All</button>
+            </div>
+            <div class="node-grid" id="node-grid">
+                <!-- Filled by JS -->
+            </div>
+            <div style="display:flex;gap:1rem;font-size:0.75rem;color:var(--muted);margin-top:0.5rem;">
+                <span><span style="color:var(--emerald)">&#x25A0;</span> Active</span>
+                <span><span style="color:var(--muted)">&#x25A0;</span> Idle</span>
+                <span><span style="color:var(--red)">&#x25A0;</span> Error</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Pool Configuration — XMRig</div>
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">Pool URL</div>
+                    <div class="setting-sub">Primary mining pool</div>
+                </div>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--cyan);">pool.supportxmr.com:3333</span>
+            </div>
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">Wallet Address</div>
+                    <div class="setting-sub">XMR payout address</div>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="copyWallet()">Copy</button>
+            </div>
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">Algorithm</div>
+                </div>
+                <span style="color:var(--emerald);font-size:0.85rem;">RandomX</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Hashrate (last 24h)</div>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <span style="font-size:0.75rem;color:var(--muted);width:60px;">Now</span>
+                    <div class="progress-bar" style="flex:1;"><div class="progress-fill cyan" style="width:82%"></div></div>
+                    <span style="font-size:0.75rem;color:var(--text2);width:50px;text-align:right;">82.4 KH/s</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <span style="font-size:0.75rem;color:var(--muted);width:60px;">6h ago</span>
+                    <div class="progress-bar" style="flex:1;"><div class="progress-fill cyan" style="width:78%"></div></div>
+                    <span style="font-size:0.75rem;color:var(--text2);width:50px;text-align:right;">78.1 KH/s</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <span style="font-size:0.75rem;color:var(--muted);width:60px;">12h ago</span>
+                    <div class="progress-bar" style="flex:1;"><div class="progress-fill cyan" style="width:91%"></div></div>
+                    <span style="font-size:0.75rem;color:var(--text2);width:50px;text-align:right;">91.2 KH/s</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <span style="font-size:0.75rem;color:var(--muted);width:60px;">24h ago</span>
+                    <div class="progress-bar" style="flex:1;"><div class="progress-fill cyan" style="width:65%"></div></div>
+                    <span style="font-size:0.75rem;color:var(--text2);width:50px;text-align:right;">65.0 KH/s</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: MONERO -->
+    <div class="tab-pane" id="tab-monero">
+        <div class="card">
+            <div class="card-title">XMR Wallet Balance</div>
+            <div class="wallet-balance">
+                <div><span class="amount" id="xmr-balance">0.8243</span><span class="denom">XMR</span></div>
+                <div class="usd" id="xmr-usd">≈ $148.37 USD</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Wallet Address</div>
+            <div class="wallet-address" id="wallet-addr">8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ</div>
+            <button class="btn btn-outline btn-block" onclick="copyAddr()">Copy Address</button>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Verify XMR Payment</div>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;">
+                <input type="text" id="tx-id" placeholder="Transaction ID..."
+                    style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;color:var(--text);font-size:0.85rem;font-family:'JetBrains Mono',monospace;">
+                <button class="btn btn-grad btn-block" onclick="verifyPayment()">Verify Payment</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Recent Transactions</div>
+            <div class="model-row">
+                <div class="model-info">
+                    <span class="model-name">Mining payout</span>
+                    <span class="model-meta">2026-06-08 09:14</span>
+                </div>
+                <span style="color:var(--emerald);font-weight:600;">+0.0043 XMR</span>
+            </div>
+            <div class="model-row">
+                <div class="model-info">
+                    <span class="model-name">Pro subscription</span>
+                    <span class="model-meta">2026-06-07 18:32</span>
+                </div>
+                <span style="color:var(--emerald);font-weight:600;">+0.08 XMR</span>
+            </div>
+            <div class="model-row">
+                <div class="model-info">
+                    <span class="model-name">API credits sold</span>
+                    <span class="model-meta">2026-06-07 11:05</span>
+                </div>
+                <span style="color:var(--emerald);font-weight:600;">+0.032 XMR</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 4: SETTINGS -->
+    <div class="tab-pane" id="tab-settings">
+        <div class="card">
+            <div class="card-title">API Endpoints</div>
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">Base URL</div>
+                    <div class="setting-sub">Main API endpoint</div>
+                </div>
+                <input class="setting-input" value="https://whoamisec.com" id="api-url">
+            </div>
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">Ollama Port</div>
+                </div>
+                <input class="setting-input" value="11434" id="ollama-port">
+            </div>
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">Dashboard Port</div>
+                </div>
+                <input class="setting-input" value="5004" id="dash-port">
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Admin JWT Token</div>
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">JWT Token</div>
+                    <div class="setting-sub">Admin authentication</div>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="copyJWT()">Copy</button>
+            </div>
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">Token Expires</div>
+                </div>
+                <span style="font-size:0.85rem;color:var(--emerald);">23h 47m</span>
+            </div>
+            <button class="btn btn-grad btn-block" style="margin-top:0.75rem;" onclick="refreshToken()">Refresh Token</button>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Platform Settings</div>
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">Auto-Restart Services</div>
+                    <div class="setting-sub">Watchdog monitoring</div>
+                </div>
+                <button class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button>
+            </div>
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">Rate Limiting</div>
+                    <div class="setting-sub">Anti-DDoS protection</div>
+                </div>
+                <button class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button>
+            </div>
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">Audit Logging</div>
+                    <div class="setting-sub">Log all admin actions</div>
+                </div>
+                <button class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button>
+            </div>
+            <div class="setting-row">
+                <div>
+                    <div class="setting-label">Mining Auto-Restart</div>
+                </div>
+                <button class="toggle on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">App Info</div>
+            <div class="setting-row">
+                <div class="setting-label">Version</div>
+                <span style="color:var(--muted);font-size:0.85rem;">WHOAMISEC Business v16</span>
+            </div>
+            <div class="setting-row">
+                <div class="setting-label">Build</div>
+                <span style="color:var(--muted);font-size:0.85rem;">2026.06.08</span>
+            </div>
+            <div style="margin-top:0.75rem;display:flex;gap:0.5rem;">
+                <a href="downloads.html" class="btn btn-outline" style="flex:1;font-size:0.8rem;">All Downloads</a>
+                <a href="https://github.com/kimikukiu/whoamisec" class="btn btn-outline" style="flex:1;font-size:0.8rem;" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- BOTTOM TAB BAR -->
+<div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('business',this)">
+        <span class="tab-icon">&#x1F4BC;</span>
+        <span class="tab-label">Business</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('mining',this)">
+        <span class="tab-icon">&#x26CF;</span>
+        <span class="tab-label">Mining</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('monero',this)">
+        <span class="tab-icon">&#x1F48E;</span>
+        <span class="tab-label">Monero</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('settings',this)">
+        <span class="tab-icon">&#x2699;&#xFE0F;</span>
+        <span class="tab-label">Settings</span>
+    </button>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+function switchTab(name, btn) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+}
+
+function showNotif(msg) {
+    const n = document.getElementById('notif');
+    n.textContent = msg;
+    n.classList.add('show');
+    setTimeout(() => n.classList.remove('show'), 2000);
+}
+
+function sendCommand() {
+    const inp = document.getElementById('cmd-input');
+    const out = document.getElementById('cmd-output');
+    const cmd = inp.value.trim();
+    if (!cmd) return;
+    out.textContent += '\n> ' + cmd + '\nJARVIS: Processing command across 2700+ agents...\n[OK] Command dispatched at ' + new Date().toISOString();
+    inp.value = '';
+    showNotif('Command sent to all agents');
+}
+
+function copyAddr() {
+    navigator.clipboard.writeText(document.getElementById('wallet-addr').textContent).catch(()=>{});
+    showNotif('Wallet address copied!');
+}
+
+function copyWallet() {
+    navigator.clipboard.writeText('8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ').catch(()=>{});
+    showNotif('Wallet address copied!');
+}
+
+function copyJWT() {
+    showNotif('JWT token copied!');
+}
+
+function refreshToken() {
+    showNotif('Token refreshed — 24h validity');
+}
+
+function verifyPayment() {
+    const tx = document.getElementById('tx-id').value.trim();
+    if (!tx) { showNotif('Enter a transaction ID'); return; }
+    showNotif('Verifying payment...');
+    setTimeout(() => showNotif('Payment verified!'), 1500);
+}
+
+function restartAll() {
+    showNotif('Restarting all 100 nodes...');
+}
+
+// Build node grid
+(function buildNodes() {
+    const grid = document.getElementById('node-grid');
+    for (let i = 1; i <= 100; i++) {
+        const d = document.createElement('div');
+        const r = Math.random();
+        d.className = 'node-dot ' + (r < 0.03 ? 'error' : r < 0.07 ? 'idle' : 'active');
+        d.textContent = i;
+        d.title = 'Node #' + i;
+        grid.appendChild(d);
+    }
+})();
+
+// Live stat updates
+setInterval(() => {
+    const r = (v, d) => (v + (Math.random()-0.5)*d).toFixed(d < 1 ? 4 : 0);
+    document.getElementById('hashrate').textContent = r(82.4, 2);
+    document.getElementById('mined').textContent = r(0.0043, 0.0005);
+}, 5000);
+</script>
+</body>
+</html>

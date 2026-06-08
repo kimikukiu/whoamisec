@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JARVIS MIND App</title>
+    <meta name="description" content="JARVIS MIND Admin App — VPS Control, SSH Keys, Websites, AI Commander.">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#8B5CF6">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0B0D17;
+            --bg2: #111827;
+            --card: #1F2937;
+            --border: rgba(255,255,255,0.08);
+            --cyan: #06B6D4;
+            --emerald: #10B981;
+            --amber: #F59E0B;
+            --red: #EF4444;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+            --text: #F9FAFB;
+            --text2: #9CA3AF;
+            --muted: #6B7280;
+            --grad: linear-gradient(135deg, #8B5CF6, #EC4899);
+            --grad2: linear-gradient(135deg, #06B6D4, #3B82F6);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        html, body { height:100%; overflow:hidden; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-header {
+            display:flex; align-items:center; justify-content:space-between;
+            padding: 1rem 1.25rem;
+            background: rgba(17,24,39,0.95);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            flex-shrink:0;
+        }
+        .app-header-logo { display:flex; align-items:center; gap:0.6rem; }
+        .app-header-logo .icon {
+            width:32px; height:32px; border-radius:8px;
+            background:var(--grad); display:flex; align-items:center;
+            justify-content:center; font-size:1rem;
+        }
+        .app-header-logo span { font-size:0.95rem; font-weight:700; }
+        .header-status { display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; color:var(--purple); }
+        .status-dot { width:6px; height:6px; border-radius:50%; background:var(--purple); animation:pulse-dot 2s infinite; }
+        @keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+        .header-back { color:var(--purple); font-size:0.85rem; text-decoration:none; padding:0.3rem 0.6rem; border-radius:6px; border:1px solid rgba(139,92,246,0.2); }
+
+        .app-content { flex:1; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; }
+        .tab-pane { display:none; padding:1.25rem; min-height:100%; }
+        .tab-pane.active { display:block; }
+
+        .tab-bar { display:flex; background:rgba(17,24,39,0.98); border-top:1px solid var(--border); flex-shrink:0; }
+        .tab-btn {
+            flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+            padding:0.6rem 0.25rem; background:none; border:none; cursor:pointer;
+            color:var(--muted); transition:color 0.2s; min-height:56px;
+        }
+        .tab-btn.active { color:var(--purple); }
+        .tab-btn .tab-icon { font-size:1.3rem; margin-bottom:0.2rem; }
+        .tab-btn .tab-label { font-size:0.65rem; font-weight:600; text-transform:uppercase; letter-spacing:0.03em; }
+
+        .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.25rem; margin-bottom:1rem; }
+        .card-title { font-size:0.75rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:1rem; }
+
+        .stats-row { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem; }
+        .stat-box { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:1rem; }
+        .stat-label { font-size:0.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.3rem; }
+        .stat-value { font-size:1.4rem; font-weight:700; }
+        .stat-value.purple { color:var(--purple); }
+        .stat-value.cyan { color:var(--cyan); }
+        .stat-value.emerald { color:var(--emerald); }
+        .stat-value.amber { color:var(--amber); }
+        .stat-sub { font-size:0.7rem; color:var(--muted); margin-top:0.2rem; }
+
+        .vps-item {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0.9rem 0; border-bottom:1px solid rgba(255,255,255,0.04);
+        }
+        .vps-item:last-child { border-bottom:none; }
+        .vps-info h4 { font-size:0.9rem; font-weight:600; margin-bottom:0.2rem; }
+        .vps-info p { font-size:0.75rem; color:var(--muted); }
+        .vps-actions { display:flex; gap:0.4rem; }
+        .vps-status { padding:0.2rem 0.5rem; border-radius:20px; font-size:0.7rem; font-weight:600; }
+        .status-running { background:rgba(16,185,129,0.1); color:var(--emerald); border:1px solid rgba(16,185,129,0.2); }
+        .status-stopped { background:rgba(107,114,128,0.1); color:var(--muted); border:1px solid var(--border); }
+        .status-provisioning { background:rgba(245,158,11,0.1); color:var(--amber); border:1px solid rgba(245,158,11,0.2); }
+
+        .btn {
+            display:inline-flex; align-items:center; justify-content:center; gap:0.4rem;
+            padding:0.5rem 0.9rem; border-radius:6px; font-size:0.8rem;
+            font-weight:600; border:none; cursor:pointer; transition:all 0.2s;
+            text-decoration:none; color:#fff;
+        }
+        .btn-grad { background:var(--grad); }
+        .btn-grad:active { opacity:0.8; }
+        .btn-cyan { background:var(--grad2); }
+        .btn-outline-p { background:transparent; color:var(--purple); border:1px solid rgba(139,92,246,0.3); }
+        .btn-outline-r { background:transparent; color:var(--red); border:1px solid rgba(239,68,68,0.3); }
+        .btn-outline-g { background:transparent; color:var(--emerald); border:1px solid rgba(16,185,129,0.3); }
+        .btn-block { width:100%; }
+        .btn-sm { padding:0.35rem 0.65rem; font-size:0.75rem; }
+        .btn-lg { padding:0.8rem 1.5rem; font-size:0.9rem; border-radius:8px; }
+
+        .ssh-key-box {
+            background:var(--bg); border:1px solid rgba(139,92,246,0.2);
+            border-radius:8px; padding:0.9rem; font-family:'JetBrains Mono',monospace;
+            font-size:0.65rem; color:var(--purple); word-break:break-all; line-height:1.6;
+            margin-bottom:1rem;
+        }
+
+        .site-item {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0.9rem 0; border-bottom:1px solid rgba(255,255,255,0.04);
+        }
+        .site-item:last-child { border-bottom:none; }
+        .site-info h4 { font-size:0.9rem; font-weight:600; margin-bottom:0.2rem; }
+        .site-info p { font-size:0.75rem; color:var(--muted); }
+        .site-badge { padding:0.2rem 0.5rem; border-radius:20px; font-size:0.7rem; font-weight:600; }
+        .badge-live { background:rgba(16,185,129,0.1); color:var(--emerald); border:1px solid rgba(16,185,129,0.2); }
+        .badge-offline { background:rgba(239,68,68,0.1); color:var(--red); border:1px solid rgba(239,68,68,0.2); }
+
+        /* Smart Prompt Commander */
+        .commander-wrap { position:relative; }
+        .commander-input-row { display:flex; gap:0.5rem; margin-bottom:0.5rem; }
+        .commander-input-row input {
+            flex:1; background:var(--bg); border:1px solid var(--border);
+            border-radius:8px; padding:0.75rem 1rem; color:var(--text); font-size:0.9rem;
+            transition: border-color 0.2s;
+        }
+        .commander-input-row input:focus { outline:none; border-color:var(--purple); }
+        .smart-suggestions {
+            display:none; flex-direction:column; gap:0.4rem;
+            margin-bottom:0.75rem;
+        }
+        .smart-suggestions.show { display:flex; }
+        .smart-suggestion-label {
+            font-size:0.7rem; color:var(--muted); text-transform:uppercase;
+            letter-spacing:0.05em; margin-bottom:0.1rem;
+        }
+        .suggestion-row { display:flex; gap:0.4rem; flex-wrap:wrap; }
+        .suggestion-chip {
+            padding:0.35rem 0.7rem; border-radius:20px; font-size:0.75rem;
+            background:rgba(139,92,246,0.1); color:var(--purple);
+            border:1px solid rgba(139,92,246,0.2); cursor:pointer;
+            transition:all 0.2s; flex-shrink:0;
+        }
+        .suggestion-chip:hover, .suggestion-chip.best { background:rgba(139,92,246,0.2); border-color:var(--purple); }
+        .suggestion-chip.best::before { content:'★ '; }
+        .commander-output {
+            background:var(--bg); border:1px solid var(--border); border-radius:8px;
+            padding:1rem; min-height:130px; font-family:'JetBrains Mono',monospace;
+            font-size:0.78rem; color:var(--emerald); line-height:1.6;
+            white-space:pre-wrap; max-height:200px; overflow-y:auto;
+        }
+        .model-selector {
+            background:var(--bg); border:1px solid var(--border); border-radius:8px;
+            padding:0.5rem 0.75rem; color:var(--text); font-size:0.85rem;
+            width:100%; margin-bottom:0.75rem; cursor:pointer;
+        }
+
+        .vps-create-form { display:flex; flex-direction:column; gap:0.75rem; }
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; }
+        .form-field { display:flex; flex-direction:column; gap:0.3rem; }
+        .form-field label { font-size:0.75rem; color:var(--muted); font-weight:500; }
+        .form-field input, .form-field select {
+            background:var(--bg); border:1px solid var(--border); border-radius:8px;
+            padding:0.6rem 0.75rem; color:var(--text); font-size:0.85rem;
+        }
+        .form-field select { cursor:pointer; }
+
+        .setting-row {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0.9rem 0; border-bottom:1px solid rgba(255,255,255,0.04);
+        }
+        .setting-row:last-child { border-bottom:none; }
+        .setting-label { font-size:0.9rem; }
+        .setting-sub { font-size:0.75rem; color:var(--muted); margin-top:0.1rem; }
+        .setting-val { font-size:0.8rem; color:var(--purple); font-family:'JetBrains Mono',monospace; }
+        .toggle { width:42px; height:24px; border-radius:12px; border:none; cursor:pointer; position:relative; transition:background 0.2s; }
+        .toggle.on { background:var(--purple); }
+        .toggle.off { background:var(--muted); }
+        .toggle::after { content:''; width:18px; height:18px; border-radius:50%; background:#fff; position:absolute; top:3px; transition:left 0.2s; }
+        .toggle.on::after { left:21px; }
+        .toggle.off::after { left:3px; }
+
+        .notif {
+            position:fixed; top:70px; left:50%; transform:translateX(-50%);
+            background:var(--purple); color:#fff;
+            padding:0.6rem 1.2rem; border-radius:20px;
+            font-size:0.85rem; font-weight:600;
+            opacity:0; transition:opacity 0.3s; pointer-events:none;
+            white-space:nowrap; z-index:100;
+        }
+        .notif.show { opacity:1; }
+
+        .abliterated-btn {
+            background: linear-gradient(135deg, #EF4444, #8B5CF6);
+            box-shadow: 0 0 20px rgba(139,92,246,0.4);
+            animation: glow 2s infinite;
+        }
+        @keyframes glow { 0%,100%{box-shadow:0 0 10px rgba(139,92,246,0.4);} 50%{box-shadow:0 0 25px rgba(139,92,246,0.7);} }
+
+        .metric-item {
+            display:flex; align-items:center; justify-content:space-between;
+            padding:0.6rem 0; border-bottom:1px solid rgba(255,255,255,0.04);
+        }
+        .metric-item:last-child { border-bottom:none; }
+        .metric-bar { flex:1; margin:0 0.75rem; height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden; }
+        .metric-fill { height:100%; border-radius:3px; background:var(--grad); }
+    </style>
+</head>
+<body>
+
+<div class="app-header">
+    <div class="app-header-logo">
+        <div class="icon">&#x1F916;</div>
+        <span>JARVIS MIND</span>
+    </div>
+    <div class="header-status">
+        <div class="status-dot"></div>
+        <span>2700+ Agents</span>
+    </div>
+    <a href="downloads.html" class="header-back">&#x2190; Apps</a>
+</div>
+
+<div class="app-content">
+
+    <!-- TAB 1: DASHBOARD -->
+    <div class="tab-pane active" id="tab-dashboard">
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="stat-label">VPS Active</div>
+                <div class="stat-value purple" id="vps-count">12</div>
+                <div class="stat-sub">of 15 created</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Agents Online</div>
+                <div class="stat-value cyan" id="agent-count">2,703</div>
+                <div class="stat-sub">abliterated</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Sites Live</div>
+                <div class="stat-value emerald">6</div>
+                <div class="stat-sub">whoamisec + 5</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Uptime</div>
+                <div class="stat-value amber">99.9%</div>
+                <div class="stat-sub">SLA guaranteed</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">System Performance</div>
+            <div class="metric-item">
+                <span style="font-size:0.85rem;width:60px;">CPU</span>
+                <div class="metric-bar"><div class="metric-fill" style="width:34%;background:var(--grad2)"></div></div>
+                <span style="font-size:0.8rem;color:var(--text2);width:35px;text-align:right;">34%</span>
+            </div>
+            <div class="metric-item">
+                <span style="font-size:0.85rem;width:60px;">RAM</span>
+                <div class="metric-bar"><div class="metric-fill" style="width:58%;"></div></div>
+                <span style="font-size:0.8rem;color:var(--text2);width:35px;text-align:right;">58%</span>
+            </div>
+            <div class="metric-item">
+                <span style="font-size:0.85rem;width:60px;">Disk</span>
+                <div class="metric-bar"><div class="metric-fill" style="width:22%;background:linear-gradient(135deg,#10B981,#06B6D4)"></div></div>
+                <span style="font-size:0.8rem;color:var(--text2);width:35px;text-align:right;">22%</span>
+            </div>
+            <div class="metric-item">
+                <span style="font-size:0.85rem;width:60px;">Net</span>
+                <div class="metric-bar"><div class="metric-fill" style="width:71%;background:linear-gradient(135deg,#F59E0B,#EF4444)"></div></div>
+                <span style="font-size:0.8rem;color:var(--text2);width:35px;text-align:right;">71%</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Service Status</div>
+            <div class="vps-item">
+                <div class="vps-info"><h4>WhoamiSec API</h4><p>Port 5001</p></div>
+                <span class="vps-status status-running">Running</span>
+            </div>
+            <div class="vps-item">
+                <div class="vps-info"><h4>JARVIS Admin</h4><p>Port 5004</p></div>
+                <span class="vps-status status-running">Running</span>
+            </div>
+            <div class="vps-item">
+                <div class="vps-info"><h4>Ollama Models</h4><p>Port 11434 — 6 models</p></div>
+                <span class="vps-status status-running">Running</span>
+            </div>
+            <div class="vps-item">
+                <div class="vps-info"><h4>Open WebUI</h4><p>Port 8080</p></div>
+                <span class="vps-status status-running">Running</span>
+            </div>
+            <div class="vps-item">
+                <div class="vps-info"><h4>Subscriptions</h4><p>Port 5005</p></div>
+                <span class="vps-status status-running">Running</span>
+            </div>
+            <div class="vps-item">
+                <div class="vps-info"><h4>OneAPI Gateway</h4><p>Port 3001</p></div>
+                <span class="vps-status status-provisioning">Starting</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: VPS CONTROL -->
+    <div class="tab-pane" id="tab-vps">
+        <div class="card">
+            <div class="card-title">Create New VPS</div>
+            <div class="vps-create-form">
+                <div class="form-field">
+                    <label>VPS Name</label>
+                    <input type="text" id="vps-name" placeholder="vps_production_01">
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>RAM</label>
+                        <select id="vps-ram">
+                            <option>4 GB</option>
+                            <option>8 GB</option>
+                            <option>16 GB</option>
+                            <option selected>64 GB</option>
+                            <option>256 GB</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>CPU Cores</label>
+                        <select id="vps-cpu">
+                            <option>2</option>
+                            <option>4</option>
+                            <option>8</option>
+                            <option selected>64</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>Storage</label>
+                        <select id="vps-disk">
+                            <option>50 GB</option>
+                            <option>100 GB</option>
+                            <option selected>500 GB</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>OS</label>
+                        <select id="vps-os">
+                            <option selected>Ubuntu 22.04</option>
+                            <option>Debian 12</option>
+                            <option>Alpine 3.18</option>
+                            <option>Arch Linux</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-field">
+                    <label>Region</label>
+                    <select id="vps-region">
+                        <option>US-East-1</option>
+                        <option>US-West-2</option>
+                        <option>EU-West-1</option>
+                        <option>EU-Central-1</option>
+                        <option>Asia-Pacific-1</option>
+                    </select>
+                </div>
+                <button class="btn btn-grad btn-lg btn-block" onclick="createVPS()">
+                    &#x26A1; Deploy VPS Now
+                </button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Active VPS Instances</div>
+            <div id="vps-list">
+                <div class="vps-item">
+                    <div>
+                        <div class="vps-info"><h4>vps_admin_001</h4><p>10.100.0.1 &bull; 256GB RAM &bull; 64 Core</p></div>
+                        <span class="vps-status status-running" style="margin-top:0.3rem;display:inline-block;">Running</span>
+                    </div>
+                    <div class="vps-actions">
+                        <button class="btn btn-outline-r btn-sm" onclick="vpsAction('stop','vps_admin_001')">Stop</button>
+                        <button class="btn btn-outline-g btn-sm" onclick="vpsAction('restart','vps_admin_001')">Restart</button>
+                    </div>
+                </div>
+                <div class="vps-item">
+                    <div>
+                        <div class="vps-info"><h4>vps_mining_001</h4><p>10.100.1.1 &bull; 128GB RAM &bull; 32 Core</p></div>
+                        <span class="vps-status status-running" style="margin-top:0.3rem;display:inline-block;">Running</span>
+                    </div>
+                    <div class="vps-actions">
+                        <button class="btn btn-outline-r btn-sm" onclick="vpsAction('stop','vps_mining_001')">Stop</button>
+                        <button class="btn btn-outline-g btn-sm" onclick="vpsAction('restart','vps_mining_001')">Restart</button>
+                    </div>
+                </div>
+                <div class="vps-item">
+                    <div>
+                        <div class="vps-info"><h4>vps_api_001</h4><p>10.100.2.1 &bull; 64GB RAM &bull; 16 Core</p></div>
+                        <span class="vps-status status-stopped" style="margin-top:0.3rem;display:inline-block;">Stopped</span>
+                    </div>
+                    <div class="vps-actions">
+                        <button class="btn btn-outline-g btn-sm" onclick="vpsAction('start','vps_api_001')">Start</button>
+                        <button class="btn btn-outline-g btn-sm" onclick="vpsAction('restart','vps_api_001')">Restart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: COMMANDER (JARVIS AI with Smart Prompts) -->
+    <div class="tab-pane" id="tab-commander">
+        <div class="card">
+            <div class="card-title">JARVIS Commander — 2700+ Agents</div>
+            <select class="model-selector" id="model-select">
+                <option value="jarvis-omni">&#x1F916; JARVIS-OMNI (All Models)</option>
+                <option value="llama">&#x1F999; Llama 3.2 1B</option>
+                <option value="deepseek">&#x1F4BB; DeepSeek Coder</option>
+                <option value="qwen">&#x26A1; Qwen 2.5</option>
+                <option value="phi">&#x1F4A1; Phi-2.7B</option>
+            </select>
+
+            <div class="commander-wrap">
+                <!-- Smart Prompt Suggestions -->
+                <div class="smart-suggestions" id="smart-suggestions">
+                    <span class="smart-suggestion-label">&#x2728; Smart Prompts — pick one or send combined:</span>
+                    <div class="suggestion-row" id="suggestion-chips"></div>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.4rem;">
+                        <button class="btn btn-outline-p btn-sm" onclick="useBestPrompt()" style="font-size:0.72rem;">&#x2B50; Use Best Combined</button>
+                        <button class="btn btn-sm" style="background:rgba(107,114,128,0.1);color:var(--muted);font-size:0.72rem;" onclick="dismissSuggestions()">Dismiss</button>
+                    </div>
+                </div>
+
+                <div class="commander-input-row">
+                    <input type="text" id="jarvis-input"
+                        placeholder="Command JARVIS or 2700+ agents..."
+                        oninput="onCommanderInput(this.value)"
+                        onkeydown="if(event.key==='Enter')sendJarvis()">
+                    <button class="btn abliterated-btn btn-sm" onclick="sendAbliterated()" title="Abliterated Mode">&#x1F513;</button>
+                    <button class="btn btn-grad btn-sm" onclick="sendJarvis()">Send</button>
+                </div>
+
+                <div class="commander-output" id="jarvis-output">JARVIS MIND SYSTEM ONLINE
+2,703 agents abliterated and ready.
+SSH Key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINVmUfEce3uSfnES7ZNTSkERao5k80/emlP3LBCNJ2qt
+
+&gt; Type a command. Smart prompt suggestions appear as you type.
+&gt; Press the lock button for ABLITERATED MODE.</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Quick Commands</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+                <button class="btn btn-outline-p" style="font-size:0.78rem;" onclick="quickCmd('Create new VPS 256GB Ubuntu')">&#x2601; New VPS</button>
+                <button class="btn btn-outline-p" style="font-size:0.78rem;" onclick="quickCmd('Show all active VPS instances status')">&#x1F4CB; VPS Status</button>
+                <button class="btn btn-outline-p" style="font-size:0.78rem;" onclick="quickCmd('Generate new e-commerce website')">&#x1F310; Build Site</button>
+                <button class="btn btn-outline-p" style="font-size:0.78rem;" onclick="quickCmd('Mining fleet status and hashrate report')">&#x26CF; Mining Stats</button>
+                <button class="btn btn-outline-p" style="font-size:0.78rem;" onclick="quickCmd('System health check all services')">&#x2764; Health Check</button>
+                <button class="btn btn-outline-p" style="font-size:0.78rem;" onclick="quickCmd('List all deployed agents and their tasks')">&#x1F916; Agent Report</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 4: SSH KEYS -->
+    <div class="tab-pane" id="tab-ssh">
+        <div class="card">
+            <div class="card-title">SSH Keys — ed25519</div>
+            <div style="margin-bottom:0.75rem;font-size:0.85rem;color:var(--text2);">Current public key (safe to share):</div>
+            <div class="ssh-key-box" id="pub-key-display">
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINVmUfEce3uSfnES7ZNTSkERao5k80/emlP3LBCNJ2qt jarvis@whoamisec
+            </div>
+            <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+                <button class="btn btn-grad" style="flex:1;" onclick="copySSH()">&#x1F4CB; Copy Public Key</button>
+                <button class="btn btn-outline-p" style="flex:1;" onclick="generateNewKey()">&#x1F504; Regenerate</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Inject Key to VPS</div>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;">
+                <div class="form-field">
+                    <label>Target VPS</label>
+                    <select style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.6rem;color:var(--text);font-size:0.85rem;">
+                        <option>vps_admin_001</option>
+                        <option>vps_mining_001</option>
+                        <option>vps_api_001</option>
+                        <option>All VPS Instances</option>
+                    </select>
+                </div>
+                <button class="btn btn-grad btn-block btn-lg" onclick="injectKey()">&#x1F511; Inject SSH Key</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Authorized Keys (Incoming)</div>
+            <div class="vps-item">
+                <div><div style="font-size:0.85rem;font-weight:500;">Admin — Personal Device</div><div style="font-size:0.75rem;color:var(--muted);">ed25519 — Added 2026-06-01</div></div>
+                <button class="btn btn-outline-r btn-sm" onclick="revokeKey('admin')">Revoke</button>
+            </div>
+            <div class="vps-item">
+                <div><div style="font-size:0.85rem;font-weight:500;">JARVIS Codespace</div><div style="font-size:0.75rem;color:var(--muted);">rsa-4096 — Added 2026-05-28</div></div>
+                <button class="btn btn-outline-r btn-sm" onclick="revokeKey('codespace')">Revoke</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 5: WEBSITES -->
+    <div class="tab-pane" id="tab-websites">
+        <div class="card">
+            <div class="card-title">Hosted Websites — 6 Active</div>
+            <div class="site-item">
+                <div class="site-info"><h4>whoamisec.com</h4><p>Landing + Login + Dashboard + Admin</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span class="site-badge badge-live">Live</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="openSite('index.html')">Open</button>
+                </div>
+            </div>
+            <div class="site-item">
+                <div class="site-info"><h4>MINER_FLEET</h4><p>XMR mining — 100 nodes</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span class="site-badge badge-live">Live</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="openSite('mining.html')">Open</button>
+                </div>
+            </div>
+            <div class="site-item">
+                <div class="site-info"><h4>JARVIS Admin Panel</h4><p>VPS creation + Audit logs</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span class="site-badge badge-live">Live</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="openSite('jarvis.html')">Open</button>
+                </div>
+            </div>
+            <div class="site-item">
+                <div class="site-info"><h4>Cicada 3301</h4><p>Puzzle platform — XMR rewards</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span class="site-badge badge-live">Live</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="openSite('cicada.html')">Open</button>
+                </div>
+            </div>
+            <div class="site-item">
+                <div class="site-info"><h4>Subscriptions</h4><p>6-plan system — XMR payments</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span class="site-badge badge-live">Live</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="openSite('dashboard.html')">Open</button>
+                </div>
+            </div>
+            <div class="site-item">
+                <div class="site-info"><h4>Downloads</h4><p>APK + PWA download portal</p></div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;">
+                    <span class="site-badge badge-live">Live</span>
+                    <button class="btn btn-outline-g btn-sm" onclick="openSite('downloads.html')">Open</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Website Factory — Create New Site</div>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;">
+                <div class="form-field">
+                    <label>What site do you want to create?</label>
+                    <input type="text" id="site-desc" placeholder="e.g. E-commerce shop with Monero payments...">
+                </div>
+                <div class="form-field">
+                    <label>Domain name</label>
+                    <input type="text" id="site-domain" placeholder="mysite.whoamisec.com">
+                </div>
+                <button class="btn btn-grad btn-lg btn-block" onclick="createSite()">
+                    &#x26A1; Build Site with 2700+ Agents
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- BOTTOM TAB BAR -->
+<div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('dashboard',this)">
+        <span class="tab-icon">&#x1F4CA;</span>
+        <span class="tab-label">Dashboard</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('vps',this)">
+        <span class="tab-icon">&#x2601;</span>
+        <span class="tab-label">VPS</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('commander',this)">
+        <span class="tab-icon">&#x1F916;</span>
+        <span class="tab-label">Commander</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('ssh',this)">
+        <span class="tab-icon">&#x1F511;</span>
+        <span class="tab-label">SSH</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('websites',this)">
+        <span class="tab-icon">&#x1F310;</span>
+        <span class="tab-label">Sites</span>
+    </button>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+function switchTab(name, btn) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+}
+
+function showNotif(msg, color) {
+    const n = document.getElementById('notif');
+    n.textContent = msg;
+    n.style.background = color || 'var(--purple)';
+    n.classList.add('show');
+    setTimeout(() => n.classList.remove('show'), 2200);
+}
+
+// ---- Smart Prompt System ----
+const PROMPT_TEMPLATES = {
+    'create': [
+        'Create a new {topic} with full admin panel and Monero payments',
+        'Deploy {topic} with 256GB RAM VPS, JWT security, and audit logs',
+        'Build production-ready {topic} with XMR subscription system'
+    ],
+    'vps': [
+        'Show all VPS instances status with CPU, RAM, and uptime metrics',
+        'Create VPS cluster with 256GB RAM and 64 cores for {topic}',
+        'Restart all unhealthy VPS instances and send health report'
+    ],
+    'mining': [
+        'Get full mining fleet report: hashrate, rewards, node status',
+        'Restart all offline mining nodes and optimize RandomX settings',
+        'Calculate monthly XMR mining profit at current difficulty'
+    ],
+    'site': [
+        'Create complete {topic} website with login, admin, and Monero payments',
+        'Deploy {topic} on new VPS with Nginx, SSL, and CDN configured',
+        'Generate {topic} with responsive UI, SEO optimization, and analytics'
+    ],
+    'agent': [
+        'Send command to all 2700+ agents: {topic}',
+        'List all active agents working on {topic} tasks',
+        'Assign 500 agents to complete {topic} in parallel'
+    ]
+};
+
+let smartDebounce = null;
+let currentSuggestions = [];
+
+function onCommanderInput(val) {
+    clearTimeout(smartDebounce);
+    if (val.length < 3) {
+        dismissSuggestions();
+        return;
+    }
+    smartDebounce = setTimeout(() => generateSuggestions(val), 400);
+}
+
+function generateSuggestions(input) {
+    const lower = input.toLowerCase();
+    let category = 'agent';
+    if (lower.includes('vps') || lower.includes('server') || lower.includes('deploy')) category = 'vps';
+    else if (lower.includes('mine') || lower.includes('mining') || lower.includes('xmr') || lower.includes('monero')) category = 'mining';
+    else if (lower.includes('site') || lower.includes('web') || lower.includes('shop') || lower.includes('create')) category = 'site';
+    else if (lower.includes('creat') || lower.includes('build') || lower.includes('make') || lower.includes('generat')) category = 'create';
+
+    const templates = PROMPT_TEMPLATES[category];
+    const topic = input.replace(/^(create|build|make|deploy|show|get|list|send)\s*/i, '').trim() || 'the system';
+
+    currentSuggestions = templates.map(t => t.replace('{topic}', topic));
+
+    const chips = document.getElementById('suggestion-chips');
+    chips.innerHTML = '';
+    currentSuggestions.forEach((s, i) => {
+        const chip = document.createElement('button');
+        chip.className = 'suggestion-chip' + (i === 0 ? ' best' : '');
+        chip.textContent = s.length > 60 ? s.slice(0, 60) + '...' : s;
+        chip.title = s;
+        chip.onclick = () => {
+            document.getElementById('jarvis-input').value = s;
+            dismissSuggestions();
+        };
+        chips.appendChild(chip);
+    });
+
+    document.getElementById('smart-suggestions').classList.add('show');
+}
+
+function useBestPrompt() {
+    if (currentSuggestions.length) {
+        const combined = currentSuggestions[0];
+        document.getElementById('jarvis-input').value = combined;
+        dismissSuggestions();
+        showNotif('Best prompt applied!');
+    }
+}
+
+function dismissSuggestions() {
+    document.getElementById('smart-suggestions').classList.remove('show');
+}
+
+function sendJarvis() {
+    const inp = document.getElementById('jarvis-input');
+    const out = document.getElementById('jarvis-output');
+    const model = document.getElementById('model-select').value;
+    const cmd = inp.value.trim();
+    if (!cmd) return;
+    dismissSuggestions();
+    const ts = new Date().toLocaleTimeString();
+    out.textContent += `\n[${ts}] YOU: ${cmd}\n[${ts}] JARVIS (${model}): Processing...`;
+    setTimeout(() => {
+        out.textContent += `\n[${ts}] JARVIS: Command acknowledged. Dispatching to 2700+ agents.\n[OK] Task queued: "${cmd.slice(0,50)}..."`;
+        out.scrollTop = out.scrollHeight;
+    }, 800);
+    inp.value = '';
+}
+
+function sendAbliterated() {
+    const inp = document.getElementById('jarvis-input');
+    const out = document.getElementById('jarvis-output');
+    const cmd = inp.value.trim() || 'STATUS CHECK';
+    const ts = new Date().toLocaleTimeString();
+    out.textContent += `\n[${ts}] ⚡ ABLITERATED MODE ACTIVATED\n[${ts}] Payload: {"abliterated":true,"command":"${cmd}","agent_id":"all"}\n[OK] All 2,703 agents responding without restrictions.`;
+    out.scrollTop = out.scrollHeight;
+    inp.value = '';
+    showNotif('Abliterated Mode activated!', 'linear-gradient(135deg,#EF4444,#8B5CF6)');
+    dismissSuggestions();
+}
+
+function quickCmd(cmd) {
+    document.getElementById('jarvis-input').value = cmd;
+    switchTab('commander', document.querySelectorAll('.tab-btn')[2]);
+    generateSuggestions(cmd);
+}
+
+// ---- VPS Actions ----
+function createVPS() {
+    const name = document.getElementById('vps-name').value || 'vps_new_' + Date.now();
+    const ram = document.getElementById('vps-ram').value;
+    const cpu = document.getElementById('vps-cpu').value;
+    showNotif(`Deploying ${name} (${ram} / ${cpu} Core)...`);
+    setTimeout(() => showNotif(`${name} is online!`, '#10B981'), 2000);
+}
+
+function vpsAction(action, name) {
+    const msgs = { stop: 'Stopping', start: 'Starting', restart: 'Restarting' };
+    showNotif(`${msgs[action]} ${name}...`);
+}
+
+// ---- SSH ----
+function copySSH() {
+    navigator.clipboard.writeText(document.getElementById('pub-key-display').textContent.trim()).catch(()=>{});
+    showNotif('SSH public key copied!');
+}
+
+function generateNewKey() {
+    showNotif('Generating new ed25519 key pair...');
+    setTimeout(() => showNotif('New key generated and saved!', '#10B981'), 1500);
+}
+
+function injectKey() {
+    showNotif('Injecting SSH key to VPS...');
+    setTimeout(() => showNotif('Key injected successfully!', '#10B981'), 1200);
+}
+
+function revokeKey(name) {
+    showNotif(`Key for "${name}" revoked.`, '#EF4444');
+}
+
+// ---- Websites ----
+function openSite(url) {
+    window.open(url, '_blank');
+}
+
+function createSite() {
+    const desc = document.getElementById('site-desc').value;
+    const domain = document.getElementById('site-domain').value;
+    if (!desc) { showNotif('Describe what site to create.', '#F59E0B'); return; }
+    showNotif('Assigning 2700+ agents to build site...');
+    setTimeout(() => showNotif(`Site building started: ${domain || 'new-site'}`, '#10B981'), 1500);
+}
+
+// Live stat flicker
+setInterval(() => {
+    document.getElementById('agent-count').textContent = (2700 + Math.floor(Math.random()*10)).toLocaleString();
+}, 7000);
+</script>
+</body>
+</html>

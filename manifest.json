@@ -1,0 +1,60 @@
+{
+  "name": "WhoamiSec",
+  "short_name": "WhoamiSec",
+  "description": "Privacy-first AI infrastructure. Zero KYC. Monero payments.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0B0D17",
+  "theme_color": "#06B6D4",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%230B0D17'/><text x='50%' y='55%' font-size='100' text-anchor='middle' dominant-baseline='middle' font-family='monospace' fill='%2306B6D4'>W</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%230B0D17'/><text x='50%' y='55%' font-size='280' text-anchor='middle' dominant-baseline='middle' font-family='monospace' fill='%2306B6D4'>W</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "JARVIS MIND",
+      "short_name": "JARVIS",
+      "url": "/jarvis-mind-app.html",
+      "description": "Open JARVIS MIND admin app"
+    },
+    {
+      "name": "Business App",
+      "short_name": "Business",
+      "url": "/whoamisec-business-app.html",
+      "description": "Open WHOAMISEC Business app"
+    },
+    {
+      "name": "Mining Fleet",
+      "short_name": "Mining",
+      "url": "/mining.html",
+      "description": "View mining fleet status"
+    },
+    {
+      "name": "Downloads",
+      "short_name": "Downloads",
+      "url": "/downloads.html",
+      "description": "Download APKs"
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://whoamisec.com/manifest.json"
+    }
+  ],
+  "prefer_related_applications": false
+}
