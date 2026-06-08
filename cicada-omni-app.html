@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#000000">
+<title>CICADA 3301</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --red:#ff2020;--green:#39ff14;--cyan:#00ffff;--purple:#bf00ff;
+  --dark:#000;--card:rgba(0,0,0,0.75);
+}
+html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',monospace;color:#fff;}
+
+/* ── MATRIX CANVAS ── */
+#matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:.55;}
+
+/* ── SPLASH SCREEN ── */
+#splash{
+  position:fixed;inset:0;z-index:100;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:#000;
+}
+.splash-title{
+  font-size:2.4rem;font-weight:900;letter-spacing:.18em;
+  color:var(--red);text-shadow:0 0 20px var(--red),0 0 40px rgba(255,32,32,.4);
+  animation:pulse-title 1.4s ease-in-out infinite;
+}
+@keyframes pulse-title{0%,100%{text-shadow:0 0 20px var(--red),0 0 40px rgba(255,32,32,.4);}50%{text-shadow:0 0 40px var(--red),0 0 80px rgba(255,32,32,.7);}}
+.splash-good{
+  font-size:1.5rem;font-weight:700;letter-spacing:.12em;color:var(--red);
+  margin-top:.6rem;text-shadow:0 0 12px var(--red);
+  animation:flicker 2.5s steps(1) infinite;
+}
+@keyframes flicker{0%,90%,100%{opacity:1;}92%,94%{opacity:.2;}93%,95%{opacity:1;}}
+.splash-box{
+  margin-top:.8rem;
+  border:2px solid #fff;padding:.45rem 2.2rem;
+  font-size:1.1rem;font-weight:700;letter-spacing:.22em;color:#fff;
+  text-shadow:0 0 8px rgba(255,255,255,.5);
+}
+.splash-num{
+  margin-top:.6rem;font-size:1.1rem;letter-spacing:.5em;
+  color:var(--red);font-weight:700;
+}
+/* MOTH */
+.splash-moth{
+  margin-top:1.4rem;width:220px;height:auto;
+  filter:drop-shadow(0 0 18px var(--green)) drop-shadow(0 0 40px rgba(57,255,20,.5));
+  animation:moth-float 3s ease-in-out infinite, moth-color 6s linear infinite;
+}
+@keyframes moth-float{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+@keyframes moth-color{
+  0%{filter:drop-shadow(0 0 18px #39ff14) drop-shadow(0 0 40px rgba(57,255,20,.5)) hue-rotate(0deg);}
+  33%{filter:drop-shadow(0 0 18px #00ffff) drop-shadow(0 0 40px rgba(0,255,255,.5)) hue-rotate(120deg);}
+  66%{filter:drop-shadow(0 0 18px #bf00ff) drop-shadow(0 0 40px rgba(191,0,255,.5)) hue-rotate(240deg);}
+  100%{filter:drop-shadow(0 0 18px #39ff14) drop-shadow(0 0 40px rgba(57,255,20,.5)) hue-rotate(360deg);}
+}
+
+.splash-enter{
+  margin-top:2rem;
+  background:rgba(57,255,20,.12);border:1px solid var(--green);
+  color:var(--green);padding:.65rem 2.5rem;border-radius:4px;
+  font-family:'Courier New',monospace;font-size:.9rem;font-weight:700;
+  letter-spacing:.1em;cursor:pointer;text-transform:uppercase;
+  animation:btn-pulse 2s ease-in-out infinite;
+}
+@keyframes btn-pulse{0%,100%{box-shadow:0 0 8px var(--green);}50%{box-shadow:0 0 24px var(--green),0 0 48px rgba(57,255,20,.3);}}
+
+/* ── MAIN APP ── */
+#app{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;overflow:hidden;}
+
+/* Header */
+.app-header{
+  background:rgba(0,0,0,.9);border-bottom:1px solid rgba(255,32,32,.3);
+  padding:.6rem 1rem;display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.app-logo{font-size:1.1rem;font-weight:900;letter-spacing:.15em;color:var(--red);text-shadow:0 0 10px var(--red);}
+.app-logo span{color:#fff;}
+.header-right{display:flex;align-items:center;gap:.5rem;}
+.sound-btn{background:none;border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:4px;padding:.2rem .5rem;font-size:.75rem;cursor:pointer;}
+.sound-btn.on{border-color:var(--green);color:var(--green);}
+
+/* Tab content */
+.tab-body{flex:1;overflow-y:auto;padding:.9rem;overscroll-behavior:contain;}
+.tab-body::-webkit-scrollbar{width:3px;}
+.tab-body::-webkit-scrollbar-thumb{background:rgba(255,32,32,.3);}
+
+/* Tab bar */
+.tab-bar{
+  display:flex;background:rgba(0,0,0,.95);border-top:1px solid rgba(255,32,32,.25);
+  flex-shrink:0;
+}
+.tab-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:.5rem .2rem .4rem;border:none;background:none;color:rgba(255,255,255,.4);
+  font-family:'Courier New',monospace;font-size:.6rem;letter-spacing:.04em;
+  text-transform:uppercase;cursor:pointer;transition:color .2s;
+}
+.tab-btn .ti{font-size:1.2rem;margin-bottom:.15rem;}
+.tab-btn.active{color:var(--red);}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+
+/* Cards */
+.card{background:rgba(0,0,0,.8);border:1px solid rgba(255,32,32,.2);border-radius:8px;padding:.9rem;margin-bottom:.75rem;}
+.card-title{font-size:.7rem;font-weight:700;letter-spacing:.1em;color:var(--red);text-transform:uppercase;margin-bottom:.65rem;}
+
+/* Puzzle levels */
+.level-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.65rem 0;border-bottom:1px solid rgba(255,255,255,.05);
+}
+.level-item:last-child{border-bottom:none;}
+.level-num{font-size:.65rem;color:rgba(255,255,255,.4);width:1.5rem;}
+.level-name{flex:1;font-size:.82rem;font-weight:600;}
+.level-reward{font-size:.7rem;color:var(--green);}
+.level-status{font-size:.65rem;padding:.15rem .4rem;border-radius:3px;margin-left:.5rem;}
+.ls-locked{background:rgba(255,255,255,.06);color:rgba(255,255,255,.3);}
+.ls-open{background:rgba(57,255,20,.1);color:var(--green);border:1px solid rgba(57,255,20,.3);}
+.ls-solved{background:rgba(0,255,255,.1);color:var(--cyan);border:1px solid rgba(0,255,255,.3);}
+
+/* Invite / plans rows */
+.plan-row{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:.65rem .75rem;cursor:pointer;margin-bottom:.4rem;}
+.plan-row:active{background:rgba(255,32,32,.08);}
+.plan-name{font-size:.72rem;font-weight:700;color:var(--red);}
+.plan-price{font-size:.95rem;font-weight:700;}
+.plan-detail{font-size:.62rem;color:rgba(255,255,255,.5);}
+
+/* Leaderboard */
+.lb-row{display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.lb-row:last-child{border-bottom:none;}
+.lb-rank{font-size:.75rem;width:1.4rem;color:var(--red);font-weight:700;}
+.lb-name{flex:1;font-size:.8rem;}
+.lb-pts{font-size:.72rem;color:var(--green);}
+
+/* Chat */
+.chat-msgs{height:180px;overflow-y:auto;margin-bottom:.6rem;display:flex;flex-direction:column;gap:.4rem;}
+.chat-msgs::-webkit-scrollbar{width:2px;}
+.msg-row{display:flex;gap:.4rem;align-items:flex-start;}
+.msg-avatar{width:22px;height:22px;border-radius:50%;background:rgba(255,32,32,.3);border:1px solid rgba(255,32,32,.4);display:flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0;}
+.msg-bubble{background:rgba(255,255,255,.06);border-radius:6px;padding:.35rem .55rem;font-size:.75rem;max-width:85%;}
+.msg-bubble.mine{background:rgba(255,32,32,.15);border:1px solid rgba(255,32,32,.2);margin-left:auto;}
+.chat-input-row{display:flex;gap:.4rem;}
+.chat-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,32,32,.25);color:#fff;border-radius:6px;padding:.45rem .6rem;font-family:'Courier New',monospace;font-size:.8rem;}
+.chat-send{background:rgba(255,32,32,.2);border:1px solid rgba(255,32,32,.4);color:var(--red);border-radius:6px;padding:.45rem .8rem;font-size:.8rem;cursor:pointer;}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;border-radius:6px;font-family:'Courier New',monospace;font-weight:700;cursor:pointer;border:none;letter-spacing:.04em;}
+.btn-red{background:rgba(255,32,32,.15);border:1px solid rgba(255,32,32,.4);color:var(--red);}
+.btn-green{background:rgba(57,255,20,.1);border:1px solid rgba(57,255,20,.3);color:var(--green);}
+.btn-block{width:100%;padding:.6rem;font-size:.82rem;margin-top:.4rem;}
+.btn-sm{padding:.25rem .6rem;font-size:.72rem;}
+
+/* Notif */
+.notif{position:fixed;top:56px;left:50%;transform:translateX(-50%) translateY(-8px);background:rgba(255,32,32,.9);color:#fff;padding:.45rem 1.2rem;border-radius:20px;font-size:.8rem;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.notif.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Color cycle animation for texts */
+@keyframes color-cycle{
+  0%{color:#ff2020;text-shadow:0 0 10px #ff2020;}
+  25%{color:#39ff14;text-shadow:0 0 10px #39ff14;}
+  50%{color:#00ffff;text-shadow:0 0 10px #00ffff;}
+  75%{color:#bf00ff;text-shadow:0 0 10px #bf00ff;}
+  100%{color:#ff2020;text-shadow:0 0 10px #ff2020;}
+}
+.color-cycle{animation:color-cycle 4s linear infinite;}
+
+/* Puzzle input */
+.puzzle-input{width:100%;background:rgba(0,0,0,.6);border:1px solid rgba(255,32,32,.3);color:#39ff14;padding:.5rem .75rem;border-radius:6px;font-family:'Courier New',monospace;font-size:.85rem;letter-spacing:.05em;margin-bottom:.5rem;}
+.puzzle-input:focus{outline:none;border-color:var(--red);box-shadow:0 0 8px rgba(255,32,32,.3);}
+</style>
+</head>
+<body>
+
+<!-- MATRIX CANVAS -->
+<canvas id="matrix-canvas"></canvas>
+
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <div class="splash-title">CICADA 3301</div>
+  <div class="splash-good">GOOD LUCK!</div>
+  <div class="splash-box">EVERYWHERE</div>
+  <div class="splash-num">3 &nbsp; 3 &nbsp; 0 &nbsp; 1</div>
+  <!-- SVG Moth — green glowing, matches image exactly -->
+  <svg class="splash-moth" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
+    <!-- Left wing -->
+    <ellipse cx="75" cy="70" rx="68" ry="38" fill="none" stroke="#39ff14" stroke-width="1.5" opacity=".9"/>
+    <ellipse cx="72" cy="72" rx="54" ry="28" fill="rgba(57,255,20,.12)"/>
+    <line x1="110" y1="65" x2="30" y2="48" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="110" y1="70" x2="20" y2="70" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="110" y1="75" x2="28" y2="92" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="108" y1="55" x2="55" y2="35" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
+    <line x1="108" y1="80" x2="52" y2="100" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
+    <!-- Right wing -->
+    <ellipse cx="145" cy="70" rx="68" ry="38" fill="none" stroke="#39ff14" stroke-width="1.5" opacity=".9"/>
+    <ellipse cx="148" cy="72" rx="54" ry="28" fill="rgba(57,255,20,.12)"/>
+    <line x1="110" y1="65" x2="190" y2="48" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="110" y1="70" x2="200" y2="70" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="110" y1="75" x2="192" y2="92" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="112" y1="55" x2="165" y2="35" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
+    <line x1="112" y1="80" x2="168" y2="100" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
+    <!-- Body -->
+    <ellipse cx="110" cy="68" rx="8" ry="22" fill="#39ff14" opacity=".85"/>
+    <ellipse cx="110" cy="52" rx="5" ry="7" fill="#39ff14"/>
+    <!-- Antennae -->
+    <path d="M106 46 Q95 30 88 22" stroke="#39ff14" stroke-width="1.2" fill="none" opacity=".8"/>
+    <path d="M114 46 Q125 30 132 22" stroke="#39ff14" stroke-width="1.2" fill="none" opacity=".8"/>
+    <circle cx="88" cy="22" r="2.5" fill="#39ff14"/>
+    <circle cx="132" cy="22" r="2.5" fill="#39ff14"/>
+    <!-- Wing veins pattern -->
+    <path d="M110 67 Q75 55 45 52" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
+    <path d="M110 72 Q75 78 42 85" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
+    <path d="M110 67 Q145 55 175 52" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
+    <path d="M110 72 Q145 78 178 85" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
+  </svg>
+  <button class="splash-enter" onclick="enterApp()">▶ ENTER THE PUZZLE</button>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="app-header">
+    <div class="app-logo">CICADA <span>3301</span></div>
+    <div class="header-right">
+      <button class="sound-btn on" id="sound-toggle" onclick="toggleSound()">🔊 Sound</button>
+    </div>
+  </div>
+
+  <div class="tab-body">
+
+    <!-- TAB 1: PUZZLE -->
+    <div class="tab-pane active" id="tab-puzzle">
+      <!-- Hero banner -->
+      <div style="text-align:center;margin-bottom:1rem;padding:.75rem;background:rgba(0,0,0,.7);border:1px solid rgba(255,32,32,.25);border-radius:8px;">
+        <div style="font-size:1.6rem;font-weight:900;letter-spacing:.2em;" class="color-cycle">CICADA 3301</div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.5);margin-top:.2rem;letter-spacing:.1em;">WE ARE LOOKING FOR HIGHLY INTELLIGENT INDIVIDUALS</div>
+        <div style="margin-top:.5rem;">
+          <svg width="80" height="50" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg" style="animation:moth-color 6s linear infinite;">
+            <ellipse cx="75" cy="70" rx="68" ry="38" fill="none" stroke="#39ff14" stroke-width="2"/>
+            <ellipse cx="145" cy="70" rx="68" ry="38" fill="none" stroke="#39ff14" stroke-width="2"/>
+            <ellipse cx="110" cy="68" rx="8" ry="22" fill="#39ff14"/>
+            <ellipse cx="110" cy="52" rx="5" ry="7" fill="#39ff14"/>
+            <path d="M106 46 Q95 30 88 22" stroke="#39ff14" stroke-width="1.5" fill="none"/>
+            <path d="M114 46 Q125 30 132 22" stroke="#39ff14" stroke-width="1.5" fill="none"/>
+            <circle cx="88" cy="22" r="2.5" fill="#39ff14"/>
+            <circle cx="132" cy="22" r="2.5" fill="#39ff14"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Current puzzle -->
+      <div class="card" style="border-color:rgba(255,32,32,.4);">
+        <div class="card-title color-cycle">► Active Puzzle — Level 1</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.7);margin-bottom:.75rem;line-height:1.5;">
+          Decode the following sequence to reveal the next coordinates:<br>
+          <code style="color:#39ff14;font-size:.85rem;letter-spacing:.08em;">3301 · 29 · 57 · 6c · 65 · 61 · 73 · 65</code>
+        </div>
+        <input class="puzzle-input" id="puzzle-answer" placeholder="Enter your answer...">
+        <div style="display:flex;gap:.5rem;">
+          <button class="btn btn-red btn-block" onclick="checkAnswer()" style="flex:1;">▶ SUBMIT ANSWER</button>
+          <button class="btn btn-sm" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);padding:.6rem .8rem;border-radius:6px;" onclick="showHint()">?</button>
+        </div>
+      </div>
+
+      <!-- Levels -->
+      <div class="card">
+        <div class="card-title">Puzzle Levels</div>
+        <div class="level-item">
+          <div class="level-num">01</div>
+          <div class="level-name">The Beginning</div>
+          <div class="level-reward">0.01 XMR</div>
+          <div class="level-status ls-open">OPEN</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">02</div>
+          <div class="level-name">Prime Numbers</div>
+          <div class="level-reward">0.02 XMR</div>
+          <div class="level-status ls-locked">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">03</div>
+          <div class="level-name">Cicada Frequencies</div>
+          <div class="level-reward">0.05 XMR</div>
+          <div class="level-status ls-locked">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">04</div>
+          <div class="level-name">The Liber Primus</div>
+          <div class="level-reward">0.10 XMR</div>
+          <div class="level-status ls-locked">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">05</div>
+          <div class="level-name">Dark Web Coordinates</div>
+          <div class="level-reward">0.25 XMR</div>
+          <div class="level-status ls-locked">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">06</div>
+          <div class="level-name">The Final Gate</div>
+          <div class="level-reward">1.00 XMR</div>
+          <div class="level-status ls-locked">LOCKED</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: LEADERBOARD -->
+    <div class="tab-pane" id="tab-board">
+      <div class="card">
+        <div class="card-title color-cycle">Global Leaderboard</div>
+        <div class="lb-row">
+          <div class="lb-rank" style="color:#ffd700;">1</div>
+          <div class="lb-name">CipherHunter_X</div>
+          <div class="lb-pts">6 solved · 1.43 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank" style="color:#c0c0c0;">2</div>
+          <div class="lb-name">3301_Seeker</div>
+          <div class="lb-pts">5 solved · 0.88 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank" style="color:#cd7f32;">3</div>
+          <div class="lb-name">LiberPrimus</div>
+          <div class="lb-pts">4 solved · 0.43 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank">4</div>
+          <div class="lb-name">PrimeDecoder</div>
+          <div class="lb-pts">3 solved · 0.18 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank">5</div>
+          <div class="lb-name">CryptoCicada</div>
+          <div class="lb-pts">2 solved · 0.07 XMR</div>
+        </div>
+        <div class="lb-row" style="border-top:1px dashed rgba(255,32,32,.3);padding-top:.6rem;margin-top:.2rem;">
+          <div class="lb-rank" style="color:var(--red);">—</div>
+          <div class="lb-name" style="color:var(--red);">You</div>
+          <div class="lb-pts">1 solved · 0.01 XMR</div>
+        </div>
+      </div>
+
+      <!-- Telegram group -->
+      <div class="card" style="border-color:rgba(0,136,204,.35);">
+        <div class="card-title" style="color:#0088cc;">📢 Telegram Community</div>
+        <div style="font-size:.78rem;color:rgba(255,255,255,.6);margin-bottom:.65rem;">
+          Join the Cicada hunters community. Get hints, discuss puzzles, coordinate solutions.
+        </div>
+        <button class="btn btn-block" style="background:rgba(0,136,204,.15);border:1px solid rgba(0,136,204,.4);color:#0088cc;padding:.6rem;" onclick="openTelegram()">
+          ✈️ Join @cicada3301_whoamisec
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 3: COMMUNITY -->
+    <div class="tab-pane" id="tab-chat">
+      <div class="card">
+        <div class="card-title">Solver Chat</div>
+        <div class="chat-msgs" id="chat-msgs">
+          <div class="msg-row">
+            <div class="msg-avatar">C</div>
+            <div class="msg-bubble">Level 1 decoded — hex → ASCII. "3 3 0 1" is the key 🔑</div>
+          </div>
+          <div class="msg-row">
+            <div class="msg-avatar">X</div>
+            <div class="msg-bubble">Check the prime factorization of 3301. Not what you think.</div>
+          </div>
+          <div class="msg-row">
+            <div class="msg-avatar">J</div>
+            <div class="msg-bubble">The moth image has steganography. Use StegSolve.</div>
+          </div>
+          <div class="msg-row">
+            <div class="msg-avatar">?</div>
+            <div class="msg-bubble">JARVIS: 2700+ agents scanning dark web coordinates. Stand by...</div>
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chat-input" placeholder="Send message..." onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" onclick="sendChat()">→</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: PLANS + INVITE -->
+    <div class="tab-pane" id="tab-plans">
+      <!-- Current plan -->
+      <div class="card" style="border-color:rgba(255,32,32,.4);background:linear-gradient(135deg,rgba(255,32,32,.08),rgba(0,0,0,.8));">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
+          <div>
+            <div style="font-size:.6rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.07em;">Active Plan</div>
+            <div style="font-size:1rem;font-weight:700;color:var(--red);">😈 SUPREME</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:1.2rem;font-weight:700;">1.00 XMR<span style="font-size:.65rem;color:rgba(255,255,255,.4);">/mo</span></div>
+            <div style="font-size:.65rem;color:var(--green);">✔ Active</div>
+          </div>
+        </div>
+        <div style="font-size:.7rem;color:rgba(255,255,255,.5);">Unlimited puzzles · XMR rewards · 100K credits · Leaderboard top priority</div>
+      </div>
+
+      <!-- Invite friend -->
+      <div class="card" style="border-color:rgba(57,255,20,.3);">
+        <div class="card-title" style="color:var(--green);">🎁 Invite Friend — Get 1 Month FREE</div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.6);margin-bottom:.65rem;">
+          Invite 3 friends → you get <b style="color:var(--green);">1 month Pro FREE</b>.<br>
+          Friend gets <b style="color:var(--cyan);">500 bonus credits + 3 free puzzle attempts</b>.
+        </div>
+        <div style="background:rgba(0,0,0,.4);border:1px solid rgba(57,255,20,.2);border-radius:8px;padding:.5rem .75rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;">
+          <div>
+            <div style="font-size:.58rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.06em;">Referral code</div>
+            <div style="font-size:.95rem;font-weight:700;letter-spacing:.12em;color:var(--green);" id="ref-code">CICADA-3K9X</div>
+          </div>
+          <button class="btn btn-green btn-sm" onclick="copyRef()">📋 Copy</button>
+        </div>
+        <div style="display:flex;gap:.4rem;margin-bottom:.5rem;">
+          <div style="flex:1;text-align:center;background:rgba(57,255,20,.1);border:1px solid rgba(57,255,20,.2);border-radius:8px;padding:.4rem;font-size:.65rem;color:var(--green);"><b style="font-size:1rem;display:block;">1</b>invited</div>
+          <div style="flex:1;text-align:center;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:.4rem;font-size:.65rem;color:rgba(255,255,255,.4);"><b style="font-size:1rem;display:block;">2</b>more needed</div>
+          <div style="flex:1;text-align:center;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:.4rem;font-size:.65rem;color:rgba(255,255,255,.4);"><b style="font-size:1rem;display:block;">🎁</b>free month</div>
+        </div>
+        <button class="btn btn-green btn-block" onclick="shareInvite()">📲 Share Invite Link</button>
+      </div>
+
+      <!-- Gift -->
+      <div class="card" style="border-color:rgba(245,158,11,.25);">
+        <div class="card-title" style="color:#f59e0b;">🎀 Gift a Plan</div>
+        <div style="display:flex;flex-direction:column;gap:.45rem;">
+          <select id="gift-plan" style="background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);color:#fff;border-radius:6px;padding:.45rem;font-family:'Courier New',monospace;font-size:.78rem;">
+            <option value="starter">Starter — 0.05 XMR/mo (100 credits)</option>
+            <option value="pro" selected>Pro — 0.10 XMR/mo (500 credits)</option>
+            <option value="business">Business — 0.25 XMR/mo (2,000 credits)</option>
+            <option value="enterprise">Enterprise — 0.50 XMR/mo (10,000 credits)</option>
+            <option value="supreme">Supreme — 1.00 XMR/mo (100,000 credits)</option>
+          </select>
+          <input type="text" id="gift-to" placeholder="Email or Telegram @username" style="background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);color:#fff;border-radius:6px;padding:.45rem;font-family:'Courier New',monospace;font-size:.78rem;">
+          <button class="btn btn-block" style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#f59e0b;padding:.6rem;" onclick="sendGift()">🎁 Send Gift via XMR</button>
+        </div>
+      </div>
+
+      <!-- Plans grid -->
+      <div class="card">
+        <div class="card-title">All Plans</div>
+        <div class="plan-row" onclick="selectPlan('free')">
+          <div class="plan-name">😾 Free</div>
+          <div class="plan-price">0 XMR</div>
+          <div class="plan-detail">3 puzzle attempts/day · No rewards</div>
+        </div>
+        <div class="plan-row" onclick="selectPlan('starter')">
+          <div class="plan-name">🐣 Starter</div>
+          <div class="plan-price">0.05 XMR<span style="font-size:.6rem;color:rgba(255,255,255,.4);">/mo</span></div>
+          <div class="plan-detail">20 attempts/day · XMR rewards · Leaderboard</div>
+        </div>
+        <div class="plan-row" style="border-color:rgba(255,32,32,.35);" onclick="selectPlan('pro')">
+          <div class="plan-name" style="color:var(--red);">🚀 Pro ★</div>
+          <div class="plan-price">0.10 XMR<span style="font-size:.6rem;color:rgba(255,255,255,.4);">/mo</span></div>
+          <div class="plan-detail">Unlimited · 2x XMR rewards · Hint system</div>
+        </div>
+        <div class="plan-row" onclick="selectPlan('business')">
+          <div class="plan-name" style="color:var(--cyan);">💼 Business</div>
+          <div class="plan-price">0.25 XMR<span style="font-size:.6rem;color:rgba(255,255,255,.4);">/mo</span></div>
+          <div class="plan-detail">Unlimited · 5x rewards · API access</div>
+        </div>
+        <div class="plan-row" style="border-color:rgba(191,0,255,.35);background:rgba(191,0,255,.04);" onclick="selectPlan('supreme')">
+          <div class="plan-name" style="color:var(--purple);">😈 Supreme</div>
+          <div class="plan-price">1.00 XMR<span style="font-size:.6rem;color:rgba(255,255,255,.4);">/mo</span></div>
+          <div class="plan-detail">Unlimited · 10x rewards · Admin access · 100K credits</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-body -->
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('puzzle',this)">
+      <span class="ti">🧩</span>Puzzle
+    </button>
+    <button class="tab-btn" onclick="switchTab('board',this)">
+      <span class="ti">🏆</span>Board
+    </button>
+    <button class="tab-btn" onclick="switchTab('chat',this)">
+      <span class="ti">💬</span>Chat
+    </button>
+    <button class="tab-btn" onclick="switchTab('plans',this)">
+      <span class="ti">💳</span>Plans
+    </button>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<!-- Hidden audio -->
+<audio id="cicada-audio" loop>
+  <source src="cicada-sound.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+// ── MATRIX RAIN ──────────────────────────────────────────────
+const canvas = document.getElementById('matrix-canvas');
+const ctx = canvas.getContext('2d');
+
+// Katakana + digits, matching the image exactly
+const CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789';
+
+let cols, drops, colorPhase = 0;
+
+function resizeMatrix() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  cols = Math.floor(canvas.width / 14);
+  drops = Array(cols).fill(1);
+}
+resizeMatrix();
+window.addEventListener('resize', resizeMatrix);
+
+// Color cycles: matches the GIF cycling through red→green→cyan→purple
+const colorSets = [
+  {fg:'#ff2020', glow:'rgba(255,32,32,0.03)'},
+  {fg:'#39ff14', glow:'rgba(57,255,20,0.03)'},
+  {fg:'#00ffff', glow:'rgba(0,255,255,0.03)'},
+  {fg:'#bf00ff', glow:'rgba(191,0,255,0.03)'},
+];
+let currentColor = 0;
+setInterval(() => { currentColor = (currentColor + 1) % colorSets.length; }, 2500);
+
+function drawMatrix() {
+  const c = colorSets[currentColor];
+  ctx.fillStyle = 'rgba(0,0,0,0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = c.fg;
+  ctx.font = '13px Courier New';
+  for (let i = 0; i < drops.length; i++) {
+    const ch = CHARS[Math.floor(Math.random() * CHARS.length)];
+    ctx.fillText(ch, i * 14, drops[i] * 14);
+    if (drops[i] * 14 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+}
+setInterval(drawMatrix, 55);
+
+// ── AUDIO ─────────────────────────────────────────────────────
+let soundOn = true;
+const audio = document.getElementById('cicada-audio');
+audio.volume = 0.35;
+
+function enterApp() {
+  document.getElementById('splash').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  if (soundOn) audio.play().catch(() => {});
+}
+
+function toggleSound() {
+  soundOn = !soundOn;
+  const btn = document.getElementById('sound-toggle');
+  if (soundOn) {
+    audio.play().catch(() => {});
+    btn.textContent = '🔊 Sound';
+    btn.classList.add('on');
+  } else {
+    audio.pause();
+    btn.textContent = '🔇 Sound';
+    btn.classList.remove('on');
+  }
+}
+
+// ── TABS ──────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// ── NOTIF ─────────────────────────────────────────────────────
+function showNotif(msg) {
+  const n = document.getElementById('notif');
+  n.textContent = msg;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 2500);
+}
+
+// ── PUZZLE ────────────────────────────────────────────────────
+const ANSWERS = { 1: 'please' }; // hex 70 6c 65 61 73 65
+function checkAnswer() {
+  const val = document.getElementById('puzzle-answer').value.trim().toLowerCase();
+  if (val === ANSWERS[1]) {
+    showNotif('✔ CORRECT! Level 2 unlocked. +0.01 XMR');
+    document.getElementById('puzzle-answer').value = '';
+    document.querySelectorAll('.level-status')[1].textContent = 'OPEN';
+    document.querySelectorAll('.level-status')[1].className = 'level-status ls-open';
+  } else if (val) {
+    showNotif('✗ Incorrect. Keep trying.');
+  }
+}
+function showHint() {
+  showNotif('Hint: hex → ASCII conversion. Each pair = 1 char.');
+}
+
+// ── CHAT ──────────────────────────────────────────────────────
+function sendChat() {
+  const inp = document.getElementById('chat-input');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  const box = document.getElementById('chat-msgs');
+  const row = document.createElement('div');
+  row.className = 'msg-row';
+  row.style.justifyContent = 'flex-end';
+  row.innerHTML = '<div class="msg-bubble mine">' + msg.replace(/</g,'&lt;') + '</div>';
+  box.appendChild(row);
+  box.scrollTop = box.scrollHeight;
+  inp.value = '';
+}
+
+// ── TELEGRAM ──────────────────────────────────────────────────
+function openTelegram() {
+  window.open('https://t.me/cicada3301_whoamisec', '_blank');
+}
+
+// ── PLANS ─────────────────────────────────────────────────────
+function copyRef() {
+  const code = document.getElementById('ref-code').textContent;
+  navigator.clipboard.writeText('https://cicada.omni/?ref=' + code).then(() => showNotif('Referral link copied!'));
+}
+function shareInvite() {
+  const code = document.getElementById('ref-code').textContent;
+  const text = '🔐 CICADA 3301 Puzzle Platform — solve cryptographic puzzles, earn XMR.\nJoin with my code: https://cicada.omni/?ref=' + code;
+  if (navigator.share) navigator.share({ title: 'CICADA 3301', text, url: 'https://cicada.omni/?ref=' + code });
+  else navigator.clipboard.writeText(text).then(() => showNotif('Copied — paste to share!'));
+}
+function sendGift() {
+  const to = document.getElementById('gift-to').value.trim();
+  if (!to) { showNotif('Enter email or Telegram username'); return; }
+  showNotif('🎁 Gift sent to ' + to + ' · Pay XMR to confirm');
+}
+function selectPlan(plan) {
+  const p = {free:'0 XMR',starter:'0.05 XMR/mo',pro:'0.10 XMR/mo',business:'0.25 XMR/mo',supreme:'1.00 XMR/mo'};
+  showNotif(plan.toUpperCase() + ' · ' + p[plan] + ' · Pay via XMR');
+}
+</script>
+</body>
+</html>
