@@ -3,1028 +3,585 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CICADA 3301 — We Are Everywhere</title>
-    <meta name="description" content="Cicada 3301 - The puzzle. Decode to prove yourself. Cryptographic challenges, XMR rewards, exclusive community.">
+    <title>CICADA 3301</title>
+    <meta name="description" content="Cicada 3301 — We are everywhere.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-deep: #050810;
-            --bg-primary: #0a0f1c;
-            --bg-card: #0d1225;
-            --cyan: #00ffff;
-            --cyan-dim: #0088aa;
-            --cyan-glow: rgba(0,255,255,0.4);
-            --red: #ff0033;
-            --red-glow: rgba(255,0,51,0.5);
-            --white: #ffffff;
-            --white-dim: #aabbcc;
-            --gold: #ffd700;
-            --green: #00ff66;
-            --orange: #ff6600;
-            --purple: #cc00ff;
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        html { scroll-behavior: smooth; }
+        *{margin:0;padding:0;box-sizing:border-box}
+        html,body{width:100%;height:100%;overflow-x:hidden;background:#000;font-family:'Share Tech Mono',monospace}
 
-        /* ===== CICADA SOUND OVERLAY ===== */
-        #sound-overlay {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(5,8,16,0.97);
-            z-index: 10000;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            cursor: pointer;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-        }
-        #sound-overlay.hidden { opacity:0; visibility:hidden; pointer-events:none; }
-        #sound-overlay .enter-icon {
-            width: 120px; height: 120px;
-            border: 3px solid var(--cyan);
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            margin-bottom: 30px;
-            animation: pulse-ring 2s ease-in-out infinite;
-            box-shadow: 0 0 30px var(--cyan-glow), inset 0 0 20px var(--cyan-glow);
-        }
-        #sound-overlay .enter-icon svg { width:50px; height:50px; fill: var(--cyan); filter: drop-shadow(0 0 8px var(--cyan)); }
-        #sound-overlay h2 {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--cyan);
-            font-size: 1.4rem;
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            text-shadow: 0 0 15px var(--cyan-glow);
-            margin-bottom: 10px;
-        }
-        #sound-overlay p {
-            color: var(--white-dim);
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.85rem;
-            opacity: 0.6;
-        }
-        @keyframes pulse-ring {
-            0%,100% { transform: scale(1); box-shadow: 0 0 30px var(--cyan-glow), inset 0 0 20px var(--cyan-glow); }
-            50% { transform: scale(1.05); box-shadow: 0 0 50px var(--cyan-glow), inset 0 0 30px var(--cyan-glow); }
-        }
-
-        /* ===== GLITCH ANIMATION ===== */
-        @keyframes glitch {
-            0% { text-shadow: 0.05em 0 0 var(--cyan), -0.05em -0.025em 0 var(--red); }
-            10% { text-shadow: -0.03em 0.02em 0 var(--cyan), 0.04em -0.01em 0 var(--red); }
-            20% { text-shadow: 0.02em -0.03em 0 var(--cyan), -0.04em 0.01em 0 var(--red); }
-            30% { text-shadow: -0.04em 0.01em 0 var(--cyan), 0.03em -0.02em 0 var(--red); }
-            40% { text-shadow: 0.03em 0.02em 0 var(--cyan), -0.02em -0.03em 0 var(--red); }
-            50% { text-shadow: -0.02em -0.01em 0 var(--cyan), 0.05em 0.03em 0 var(--red); }
-            60% { text-shadow: 0.04em -0.02em 0 var(--cyan), -0.03em 0.01em 0 var(--red); }
-            70% { text-shadow: -0.01em 0.03em 0 var(--cyan), 0.02em -0.04em 0 var(--red); }
-            80% { text-shadow: 0.05em 0.01em 0 var(--cyan), -0.04em -0.02em 0 var(--red); }
-            90% { text-shadow: -0.03em -0.03em 0 var(--cyan), 0.01em 0.02em 0 var(--red); }
-            100% { text-shadow: 0.02em 0.01em 0 var(--cyan), -0.05em -0.025em 0 var(--red); }
-        }
-        @keyframes glitch-fast {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(2px, -1px); }
-            60% { transform: translate(-1px, -2px); }
-            80% { transform: translate(1px, 1px); }
-            100% { transform: translate(0); }
-        }
-        @keyframes flicker {
-            0%,100% { opacity:1; } 92% { opacity:1; } 93% { opacity:0.3; } 94% { opacity:1; } 96% { opacity:0.5; } 97% { opacity:1; }
-        }
-        @keyframes scanline {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 100vh; }
-        }
-        @keyframes float-up {
-            0% { transform: translateY(20px); opacity:0; }
-            100% { transform: translateY(0); opacity:1; }
-        }
-        @keyframes pulse-glow {
-            0%,100% { box-shadow: 0 0 15px var(--cyan-glow); }
-            50% { box-shadow: 0 0 35px var(--cyan-glow), 0 0 60px rgba(0,255,255,0.15); }
-        }
-        @keyframes rotate-slow { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* ===== BODY ===== */
-        body {
-            background: var(--bg-deep);
-            font-family: 'Share Tech Mono', 'JetBrains Mono', monospace;
-            color: var(--white);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
+        /* Digital Rain Canvas */
+        #rain{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 
         /* Scanline overlay */
-        body::after {
-            content: '';
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0,255,255,0.015) 2px,
-                rgba(0,255,255,0.015) 4px
-            );
-            pointer-events: none;
-            z-index: 9998;
+        body::after{
+            content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+            background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.012) 2px,rgba(255,255,255,0.012) 4px);
+            pointer-events:none;z-index:9998;
         }
 
-        /* ===== MAIN FRAME ===== */
-        .main-frame {
-            position: relative;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-            min-height: 100vh;
-            border-left: 2px solid var(--cyan-dim);
-            border-right: 2px solid var(--cyan-dim);
-            box-shadow: 0 0 40px var(--cyan-glow), inset 0 0 40px rgba(0,255,255,0.03);
+        /* Subtle grid background */
+        body::before{
+            content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size:40px 40px;
+            pointer-events:none;z-index:0;
+            opacity:0.4;
         }
 
-        /* ===== TOP NAV BAR ===== */
-        .top-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 25px;
-            border-bottom: 1px solid rgba(0,255,255,0.15);
-            background: rgba(5,8,16,0.8);
+        /* ── GLITCH KEYFRAMES ── */
+        @keyframes glitch{
+            0%  {text-shadow:0.05em 0 0 #00ffff,-0.05em -0.025em 0 #ff0033}
+            10% {text-shadow:-0.03em 0.02em 0 #00ffff,0.04em -0.01em 0 #ff0033}
+            20% {text-shadow:0.02em -0.03em 0 #00ffff,-0.04em 0.01em 0 #ff0033}
+            30% {text-shadow:-0.04em 0.01em 0 #00ffff,0.03em -0.02em 0 #ff0033}
+            40% {text-shadow:0.03em 0.02em 0 #00ffff,-0.02em -0.03em 0 #ff0033}
+            50% {text-shadow:-0.02em -0.01em 0 #00ffff,0.05em 0.03em 0 #ff0033}
+            60% {text-shadow:0.04em -0.02em 0 #00ffff,-0.03em 0.01em 0 #ff0033}
+            70% {text-shadow:-0.01em 0.03em 0 #00ffff,0.02em -0.04em 0 #ff0033}
+            80% {text-shadow:0.05em 0.01em 0 #00ffff,-0.04em -0.02em 0 #ff0033}
+            90% {text-shadow:-0.03em -0.03em 0 #00ffff,0.01em 0.02em 0 #ff0033}
+            100%{text-shadow:0.02em 0.01em 0 #00ffff,-0.05em -0.025em 0 #ff0033}
         }
-        .nav-status {
-            display: flex; align-items: center; gap: 8px;
+        @keyframes glitch-skew{
+            0%  {transform:translate(0);clip-path:inset(40% 0 61% 0)}
+            20% {transform:translate(-2px,2px);clip-path:inset(92% 0 1% 0)}
+            40% {transform:translate(2px,-1px);clip-path:inset(43% 0 1% 0)}
+            60% {transform:translate(-1px,-2px);clip-path:inset(25% 0 58% 0)}
+            80% {transform:translate(1px,1px);clip-path:inset(54% 0 7% 0)}
+            100%{transform:translate(0);clip-path:inset(58% 0 43% 0)}
         }
-        .status-dot {
-            width: 8px; height: 8px;
-            background: var(--green);
-            border-radius: 50%;
-            animation: flicker 3s infinite;
-            box-shadow: 0 0 8px var(--green);
+        @keyframes flicker{
+            0%,100%{opacity:1}92%{opacity:1}93%{opacity:0.4}94%{opacity:1}96%{opacity:0.2}97%{opacity:1}
         }
-        .nav-status span {
-            font-size: 0.7rem;
-            color: var(--cyan-dim);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-        .nav-icons { display: flex; gap: 15px; }
-        .nav-icon {
-            width: 28px; height: 28px;
-            border: 1px solid var(--cyan-dim);
-            border-radius: 4px;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 0.6rem;
-            color: var(--cyan);
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
-        }
-        .nav-icon:hover { background: var(--cyan); color: var(--bg-deep); box-shadow: 0 0 15px var(--cyan-glow); }
-
-        /* ===== HERO SECTION ===== */
-        .hero {
-            text-align: center;
-            padding: 50px 20px 30px;
-            position: relative;
-        }
-        .cicada-svg-container {
-            margin: 0 auto 25px;
-            width: 180px; height: 180px;
-            position: relative;
-        }
-        .cicada-svg-container svg {
-            width: 100%; height: 100%;
-            filter: drop-shadow(0 0 20px var(--cyan-glow));
-            animation: glitch-fast 4s infinite;
-        }
-        /* Rotating ring around cicada */
-        .cicada-ring {
-            position: absolute; top: -15px; left: -15px;
-            width: 210px; height: 210px;
-            border: 1px dashed var(--cyan-dim);
-            border-radius: 50%;
-            animation: rotate-slow 20s linear infinite;
-        }
-        .cicada-ring::before {
-            content: '';
-            position: absolute; top: -3px; left: 50%;
-            width: 6px; height: 6px;
-            background: var(--cyan);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--cyan);
+        @keyframes pulse-glow{
+            0%,100%{box-shadow:0 0 8px rgba(0,255,255,0.3),inset 0 0 5px rgba(0,255,255,0.1)}
+            50%{box-shadow:0 0 20px rgba(0,255,255,0.5),inset 0 0 10px rgba(0,255,255,0.2)}
         }
 
-        .hero h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 900;
-            color: var(--cyan);
-            letter-spacing: 12px;
-            text-transform: uppercase;
-            text-shadow: 0 0 20px var(--cyan-glow), 0 0 40px rgba(0,255,255,0.2);
-            animation: glitch 3s infinite;
-            margin-bottom: 15px;
+        /* ── FLYING CICADA ANIMATION ── */
+        @keyframes cicada-fly-1{
+            0%   {transform:translate(-120px,-80px) rotate(-5deg) scale(0.6);opacity:0}
+            8%   {opacity:0.9}
+            25%  {transform:translate(25vw,15vh) rotate(3deg) scale(0.8);opacity:1}
+            50%  {transform:translate(55vw,40vh) rotate(-8deg) scale(0.7);opacity:0.8}
+            75%  {transform:translate(80vw,20vh) rotate(5deg) scale(0.9);opacity:0.6}
+            92%  {opacity:0.3}
+            100% {transform:translate(110vw,-50px) rotate(-3deg) scale(0.5);opacity:0}
         }
-        .hero-subtitle {
-            font-size: 0.85rem;
-            color: var(--white-dim);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            opacity: 0.7;
+        @keyframes cicada-fly-2{
+            0%   {transform:translate(110vw,30vh) rotate(8deg) scale(0.5);opacity:0}
+            8%   {opacity:0.7}
+            25%  {transform:translate(75vw,50vh) rotate(-5deg) scale(0.7);opacity:0.9}
+            50%  {transform:translate(40vw,25vh) rotate(10deg) scale(0.8);opacity:0.7}
+            75%  {transform:translate(15vw,55vh) rotate(-6deg) scale(0.6);opacity:0.5}
+            92%  {opacity:0.2}
+            100% {transform:translate(-120px,10vh) rotate(4deg) scale(0.4);opacity:0}
         }
-
-        /* ===== GOOD LUCK + EVERYWHERE SECTION ===== */
-        .central-message {
-            text-align: center;
-            padding: 30px;
-            margin: 10px 40px;
-            position: relative;
+        @keyframes wing-flap{
+            0%,100%{transform:scaleY(1)}
+            25%{transform:scaleY(0.85)}
+            50%{transform:scaleY(1.1)}
+            75%{transform:scaleY(0.9)}
         }
-        .good-luck {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(1.8rem, 4vw, 3rem);
-            font-weight: 800;
-            color: var(--red);
-            text-shadow: 0 0 20px var(--red-glow), 0 0 40px rgba(255,0,51,0.2);
-            letter-spacing: 8px;
-            margin-bottom: 20px;
-            animation: glitch 4s infinite reverse;
+        .flying-cicada{
+            position:fixed;
+            z-index:100;
+            pointer-events:none;
+            filter:drop-shadow(0 0 6px rgba(0,255,255,0.4));
         }
-        .everywhere-frame {
-            display: inline-block;
-            border: 1px solid var(--cyan-dim);
-            padding: 12px 40px;
-            background: rgba(5,8,16,0.6);
-            position: relative;
+        .flying-cicada svg{width:60px;height:60px}
+        .flying-cicada .wing-l,.flying-cicada .wing-r{
+            animation:wing-flap 0.12s ease-in-out infinite;
+            transform-origin:center top;
         }
-        .everywhere-frame::before, .everywhere-frame::after {
-            content: '';
-            position: absolute;
-            width: 15px; height: 15px;
-            border-color: var(--cyan);
-            border-style: solid;
+        #flyCicada1{
+            top:5%;left:0;
+            animation:cicada-fly-1 18s linear infinite;
+            animation-delay:2s;
         }
-        .everywhere-frame::before { top:-1px; left:-1px; border-width: 2px 0 0 2px; }
-        .everywhere-frame::after { bottom:-1px; right:-1px; border-width: 0 2px 2px 0; }
-        .everywhere {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(1.2rem, 3vw, 2rem);
-            font-weight: 700;
-            color: var(--white);
-            letter-spacing: 15px;
-            text-shadow: 0 0 15px rgba(255,255,255,0.3);
-        }
-        .three-three-oh-one {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(1rem, 2.5vw, 1.5rem);
-            font-weight: 700;
-            color: var(--cyan);
-            letter-spacing: 10px;
-            margin-top: 20px;
-            text-shadow: 0 0 15px var(--cyan-glow);
+        #flyCicada2{
+            top:10%;right:0;
+            animation:cicada-fly-2 22s linear infinite;
+            animation-delay:8s;
         }
 
-        /* ===== CIRCUIT BACKGROUND PATTERN ===== */
-        .circuit-bg {
-            position: absolute; top:0; left:0; width:100%; height:100%;
-            pointer-events: none; z-index: 0;
-            opacity: 0.08;
-        }
-        .circuit-bg svg { width:100%; height:100%; }
-
-        /* ===== PUZZLE GRID ===== */
-        .section-title {
-            text-align: center;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            color: var(--cyan);
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            margin: 40px 0 20px;
-            text-shadow: 0 0 10px var(--cyan-glow);
-        }
-        .puzzle-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
-            padding: 0 20px 30px;
-            position: relative;
-            z-index: 1;
-        }
-        .puzzle-card {
-            background: rgba(10,15,28,0.85);
-            border: 1px solid rgba(0,255,255,0.2);
-            border-radius: 8px;
-            padding: 22px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .puzzle-card::before {
-            content: '';
-            position: absolute; top:0; left:0; width:100%; height:2px;
-            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .puzzle-card:hover {
-            border-color: var(--cyan);
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(0,255,255,0.15);
-        }
-        .puzzle-card:hover::before { opacity: 1; }
-        .puzzle-card .puzzle-level {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.6rem;
-            color: var(--cyan-dim);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-        .puzzle-card .puzzle-name {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--cyan);
-            margin-bottom: 8px;
-            text-shadow: 0 0 8px var(--cyan-glow);
-        }
-        .puzzle-card .puzzle-diff {
-            display: inline-block;
-            font-size: 0.65rem;
-            padding: 2px 10px;
-            border-radius: 20px;
-            margin-bottom: 10px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        .diff-beginner { background: rgba(0,255,102,0.15); color: var(--green); border: 1px solid rgba(0,255,102,0.3); }
-        .diff-easy { background: rgba(0,255,255,0.1); color: var(--cyan); border: 1px solid rgba(0,255,255,0.2); }
-        .diff-medium { background: rgba(255,204,0,0.1); color: #ffcc00; border: 1px solid rgba(255,204,0,0.2); }
-        .diff-hard { background: rgba(255,102,0,0.1); color: var(--orange); border: 1px solid rgba(255,102,0,0.2); }
-        .diff-expert { background: rgba(255,0,51,0.1); color: var(--red); border: 1px solid rgba(255,0,51,0.2); }
-        .diff-legendary { background: rgba(204,0,255,0.1); color: var(--purple); border: 1px solid rgba(204,0,255,0.2); }
-        .diff-mythic { background: rgba(204,0,255,0.15); color: var(--purple); border: 1px solid rgba(204,0,255,0.3); text-shadow: 0 0 5px var(--purple); }
-        .puzzle-card .puzzle-desc {
-            font-size: 0.78rem;
-            color: var(--white-dim);
-            line-height: 1.5;
-            margin-bottom: 12px;
-        }
-        .puzzle-card .puzzle-reward {
-            font-size: 0.75rem;
-            color: var(--gold);
-        }
-        .puzzle-card .puzzle-meta {
-            display: flex; justify-content: space-between;
-            margin-top: 10px;
-            font-size: 0.65rem;
-            color: var(--cyan-dim);
-            opacity: 0.7;
+        /* ── FULL VIEWPORT HERO ── */
+        .hero{
+            position:relative;z-index:1;
+            display:flex;flex-direction:column;align-items:center;justify-content:center;
+            min-height:100vh;padding:20px;text-align:center;
         }
 
-        /* ===== LEADERBOARD ===== */
-        .leaderboard {
-            margin: 20px 40px 40px;
-            background: rgba(10,15,28,0.7);
-            border: 1px solid rgba(0,255,255,0.15);
-            border-radius: 8px;
-            padding: 20px;
-            max-height: 350px;
-            overflow-y: auto;
-        }
-        .leaderboard h3 {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--gold);
-            font-size: 0.9rem;
-            letter-spacing: 4px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .lb-entry {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 12px;
-            border-bottom: 1px solid rgba(0,255,255,0.05);
-            font-size: 0.78rem;
-            transition: background 0.2s;
-        }
-        .lb-entry:hover { background: rgba(0,255,255,0.03); }
-        .lb-rank { font-weight: 700; min-width: 40px; }
-        .lb-rank-1 { color: var(--gold); text-shadow: 0 0 8px rgba(255,215,0,0.5); }
-        .lb-rank-2 { color: #c0c0c0; }
-        .lb-rank-3 { color: #cd7f32; }
-        .lb-name { flex:1; color: var(--white); }
-        .lb-score { color: var(--cyan); }
-
-        /* ===== TELEGRAM COMMUNITY BANNER ===== */
-        .telegram-banner {
-            text-align: center;
-            margin: 10px 40px 40px;
-            padding: 25px;
-            border: 1px solid rgba(0,255,255,0.2);
-            border-radius: 8px;
-            background: rgba(10,15,28,0.6);
-            animation: pulse-glow 4s ease-in-out infinite;
-        }
-        .telegram-banner p {
-            font-size: 0.8rem;
-            color: var(--white-dim);
-            margin-bottom: 12px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-        .telegram-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 30px;
-            background: transparent;
-            border: 1px solid var(--cyan);
-            color: var(--cyan);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        .telegram-link:hover {
-            background: var(--cyan);
-            color: var(--bg-deep);
-            box-shadow: 0 0 20px var(--cyan-glow);
-        }
-        .telegram-link svg { width: 18px; height: 18px; fill: currentColor; }
-
-        /* ===== SUBMIT MODAL ===== */
-        .modal-overlay {
-            display: none;
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(5,8,16,0.95);
-            z-index: 5000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal-box {
-            background: var(--bg-primary);
-            border: 1px solid var(--cyan);
-            border-radius: 10px;
-            padding: 30px;
-            max-width: 550px;
-            width: 90%;
-            box-shadow: 0 0 40px var(--cyan-glow);
-        }
-        .modal-box h3 {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--cyan);
-            font-size: 1rem;
-            letter-spacing: 4px;
-            margin-bottom: 15px;
-            text-shadow: 0 0 10px var(--cyan-glow);
-        }
-        .modal-box .modal-desc {
-            color: var(--white-dim);
-            font-size: 0.8rem;
-            line-height: 1.6;
-            margin-bottom: 10px;
-            padding: 12px;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(0,255,255,0.08);
-            border-radius: 6px;
-        }
-        .modal-box .modal-reward {
-            color: var(--gold);
-            font-size: 0.85rem;
-            margin-bottom: 15px;
-        }
-        .modal-box input, .modal-box textarea {
-            width: 100%;
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(0,255,255,0.2);
-            color: var(--cyan);
-            padding: 10px 14px;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.85rem;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        .modal-box input:focus, .modal-box textarea:focus { border-color: var(--cyan); box-shadow: 0 0 10px var(--cyan-glow); }
-        .modal-box input::placeholder, .modal-box textarea::placeholder { color: rgba(0,255,255,0.25); }
-        .modal-buttons { display: flex; gap: 10px; margin-top: 5px; }
-        .btn-submit {
-            flex:1;
-            padding: 12px;
-            background: var(--cyan);
-            color: var(--bg-deep);
-            border: none;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-        .btn-submit:hover { box-shadow: 0 0 20px var(--cyan-glow); transform: translateY(-1px); }
-        .btn-hint {
-            padding: 12px 18px;
-            background: transparent;
-            color: var(--orange);
-            border: 1px solid var(--orange);
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.65rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-        .btn-hint:hover { background: var(--orange); color: var(--bg-deep); }
-        .btn-close {
-            padding: 12px 18px;
-            background: transparent;
-            color: var(--white-dim);
-            border: 1px solid rgba(255,255,255,0.15);
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.75rem;
-            cursor: pointer;
-            border-radius: 4px;
+        /* ── TAG (top-left) ── */
+        .tag{
+            position:fixed;top:16px;left:20px;z-index:10;
+            font-family:'Share Tech Mono',monospace;
+            font-size:0.7rem;
+            color:rgba(0,255,255,0.25);
+            letter-spacing:2px;text-transform:uppercase;
+            opacity:0.7;
         }
 
-        /* ===== FOOTER ===== */
-        .footer {
-            text-align: center;
-            padding: 30px 20px;
-            border-top: 1px solid rgba(0,255,255,0.1);
-            margin: 0 40px;
+        /* ── CICADA 3301 TITLE WITH GLITCH ── */
+        .hero h1{
+            font-family:'Orbitron',sans-serif;
+            font-size:clamp(1.6rem,5vw,3rem);
+            font-weight:900;
+            color:#00ffff;
+            letter-spacing:clamp(6px,1.5vw,14px);
+            text-transform:uppercase;
+            animation:glitch 3s infinite, flicker 5s infinite;
+            margin-bottom:8px;
+            position:relative;
         }
-        .footer p {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 0.65rem;
-            color: var(--cyan-dim);
-            letter-spacing: 4px;
-            opacity: 0.5;
+        /* Glitch pseudo-elements */
+        .hero h1::before,
+        .hero h1::after{
+            content:'CICADA 3301';
+            position:absolute;
+            top:0;left:0;
+            width:100%;height:100%;
+            font-family:inherit;font-size:inherit;font-weight:inherit;
+            letter-spacing:inherit;text-transform:inherit;
         }
-        .footer .xmr-addr {
-            font-size: 0.6rem;
-            color: rgba(255,255,255,0.2);
-            margin-top: 8px;
-            word-break: break-all;
+        .hero h1::before{
+            color:#ff0033;
+            animation:glitch-skew 4s infinite linear alternate-reverse;
+            clip-path:inset(20% 0 80% 0);
+            opacity:0.6;
+        }
+        .hero h1::after{
+            color:#00ffff;
+            animation:glitch-skew 3s infinite linear alternate;
+            clip-path:inset(60% 0 10% 0);
+            opacity:0.4;
         }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            .main-frame { padding: 10px; border: none; box-shadow: none; }
-            .central-message { margin: 10px 15px; padding: 20px; }
-            .puzzle-grid { padding: 0 10px 20px; grid-template-columns: 1fr; }
-            .leaderboard, .telegram-banner { margin: 20px 15px; }
-            .everywhere { letter-spacing: 8px; }
-            .hero h1 { letter-spacing: 6px; }
+        /* ── SUBTITLE ── */
+        .hero .sub{
+            font-family:'Share Tech Mono',monospace;
+            font-size:clamp(0.55rem,1.2vw,0.75rem);
+            color:rgba(255,255,255,0.5);
+            letter-spacing:3px;text-transform:uppercase;
+            margin-bottom:20px;
+            line-height:1.6;
         }
 
-        /* ===== CICADA SOUND TOGGLE ===== */
-        .sound-toggle {
-            position: fixed; bottom: 20px; right: 20px;
-            width: 40px; height: 40px;
-            background: rgba(10,15,28,0.9);
-            border: 1px solid var(--cyan-dim);
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer;
-            z-index: 500;
-            transition: all 0.3s;
-            font-size: 1.2rem;
+        /* ── GOOD LUCK! ── */
+        .good-luck{
+            font-family:'Orbitron',sans-serif;
+            font-size:clamp(1.4rem,4vw,2.8rem);
+            font-weight:800;
+            color:#ff0033;
+            letter-spacing:clamp(6px,1.5vw,12px);
+            text-transform:uppercase;
+            -webkit-text-stroke:1px #000;
+            text-shadow:
+                0 0 15px rgba(255,0,51,0.6),
+                0 0 30px rgba(255,0,51,0.3),
+                2px 2px 0 #000,
+                -1px -1px 0 #000;
+            animation:flicker 6s infinite;
+            margin-bottom:20px;
         }
-        .sound-toggle:hover { border-color: var(--cyan); box-shadow: 0 0 15px var(--cyan-glow); }
-        .sound-toggle.muted { opacity: 0.4; }
 
-        /* Cicada particles */
-        .particles {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
+        /* ── EVERYWHERE BOX ── */
+        .everywhere-box{
+            display:inline-block;
+            border:1.5px solid #00ffff;
+            border-radius:6px;
+            padding:10px 35px;
+            margin-bottom:15px;
+            background:rgba(0,255,255,0.03);
+            animation:pulse-glow 4s ease-in-out infinite;
         }
-        .particle {
-            position: absolute;
-            width: 2px; height: 2px;
-            background: var(--cyan);
-            border-radius: 50%;
-            opacity: 0;
-            animation: particle-float 8s linear infinite;
+        .everywhere-box span{
+            font-family:'Orbitron',sans-serif;
+            font-size:clamp(0.9rem,2.5vw,1.6rem);
+            font-weight:700;
+            color:#ffffff;
+            letter-spacing:clamp(6px,2vw,15px);
+            text-transform:uppercase;
         }
-        @keyframes particle-float {
-            0% { opacity:0; transform: translateY(100vh) scale(0); }
-            10% { opacity:0.6; }
-            90% { opacity:0.2; }
-            100% { opacity:0; transform: translateY(-10vh) scale(1); }
+
+        /* ── 3 3 0 1 ── */
+        .three-three-oh-one{
+            font-family:'Orbitron',sans-serif;
+            font-size:clamp(0.9rem,2vw,1.4rem);
+            font-weight:700;
+            color:#00ffff;
+            letter-spacing:clamp(8px,2vw,14px);
+            text-shadow:0 0 12px rgba(0,255,255,0.5),0 0 25px rgba(0,255,255,0.2);
+            margin-bottom:25px;
+        }
+
+        /* ── SMALL CICADA IN CIRCLE (bottom-right) ── */
+        .cicada-badge{
+            position:fixed;
+            bottom:30px;right:30px;
+            z-index:10;
+            width:80px;height:80px;
+            border:1.5px solid rgba(0,255,255,0.5);
+            border-radius:50%;
+            display:flex;justify-content:center;align-items:center;
+            background:rgba(0,0,0,0.6);
+            box-shadow:0 0 15px rgba(0,255,255,0.15),inset 0 0 8px rgba(0,255,255,0.08);
+            animation:pulse-glow 5s ease-in-out infinite;
+        }
+        .cicada-badge svg{
+            width:55px;height:55px;
+            filter:drop-shadow(0 0 4px rgba(0,255,255,0.5));
+        }
+
+        /* ── PUZZLES SECTION ── */
+        .puzzles{
+            position:relative;z-index:1;
+            max-width:1100px;margin:0 auto;
+            padding:30px 20px 50px;
+        }
+        .sec-label{
+            font-family:'Orbitron',sans-serif;
+            font-size:0.85rem;color:#00ffff;
+            letter-spacing:5px;text-transform:uppercase;
+            text-align:center;margin-bottom:25px;
+            text-shadow:0 0 8px rgba(0,255,255,0.5);
+        }
+        .pgrid{
+            display:grid;
+            grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+            gap:14px;
+        }
+        .pcard{
+            background:rgba(0,0,0,0.7);
+            border:1px solid rgba(0,255,255,0.2);
+            border-radius:5px;padding:18px;cursor:pointer;
+            transition:all 0.3s;position:relative;overflow:hidden;
+        }
+        .pcard::before{
+            content:'';position:absolute;top:0;left:0;width:100%;height:2px;
+            background:linear-gradient(90deg,transparent,#00ffff,transparent);
+            opacity:0;transition:opacity 0.3s;
+        }
+        .pcard:hover{border-color:#00ffff;transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,255,255,0.15)}
+        .pcard:hover::before{opacity:1}
+        .pc-lvl{font-family:'Orbitron',sans-serif;font-size:0.5rem;color:rgba(0,255,255,0.3);letter-spacing:3px;text-transform:uppercase;margin-bottom:5px}
+        .pc-nm{font-family:'Orbitron',sans-serif;font-size:0.85rem;font-weight:700;color:#00ffff;margin-bottom:5px;text-shadow:0 0 5px rgba(0,255,255,0.4)}
+        .pc-df{display:inline-block;font-size:0.55rem;padding:2px 7px;border-radius:10px;margin-bottom:7px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
+        .df-beginner{background:rgba(0,255,102,0.1);color:#00ff66;border:1px solid rgba(0,255,102,0.2)}
+        .df-easy{background:rgba(0,255,255,0.08);color:#00ffff;border:1px solid rgba(0,255,255,0.15)}
+        .df-medium{background:rgba(255,204,0,0.08);color:#ffcc00;border:1px solid rgba(255,204,0,0.15)}
+        .df-hard{background:rgba(255,102,0,0.08);color:#ff6600;border:1px solid rgba(255,102,0,0.15)}
+        .df-expert{background:rgba(255,0,51,0.08);color:#ff0033;border:1px solid rgba(255,0,51,0.15)}
+        .df-legendary{background:rgba(204,0,255,0.08);color:#cc00ff;border:1px solid rgba(204,0,255,0.15)}
+        .df-mythic{background:rgba(204,0,255,0.12);color:#cc00ff;border:1px solid rgba(204,0,255,0.25);text-shadow:0 0 4px rgba(204,0,255,0.4)}
+        .pc-ds{font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:rgba(255,255,255,0.4);line-height:1.4;margin-bottom:8px}
+        .pc-rw{font-size:0.65rem;color:#ffd700}
+        .pc-mt{display:flex;justify-content:space-between;margin-top:6px;font-size:0.55rem;color:rgba(0,255,255,0.3);opacity:0.5}
+
+        /* ── LEADERBOARD ── */
+        .lb{max-width:700px;margin:30px auto;background:rgba(0,0,0,0.6);border:1px solid rgba(0,255,255,0.2);border-radius:5px;padding:18px;max-height:280px;overflow-y:auto}
+        .lb h3{font-family:'Orbitron',sans-serif;color:#ffd700;font-size:0.75rem;letter-spacing:3px;text-align:center;margin-bottom:10px}
+        .lbr{display:flex;justify-content:space-between;padding:5px 8px;border-bottom:1px solid rgba(255,255,255,0.02);font-family:'Share Tech Mono',monospace;font-size:0.7rem}
+        .lbr:hover{background:rgba(0,255,255,0.02)}
+        .lbr-r{font-weight:700;min-width:30px}
+        .lbr-1{color:#ffd700;text-shadow:0 0 5px rgba(255,215,0,0.4)}
+        .lbr-2{color:#c0c0c0}
+        .lbr-3{color:#cd7f32}
+        .lbr-n{flex:1;color:rgba(255,255,255,0.6)}
+        .lbr-p{color:#00ffff}
+
+        /* ── TELEGRAM ── */
+        .tgb{text-align:center;margin:25px auto;max-width:460px;padding:18px;border:1px solid rgba(0,255,255,0.2);border-radius:5px;background:rgba(0,0,0,0.5)}
+        .tgb p{font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:rgba(255,255,255,0.35);margin-bottom:10px;letter-spacing:2px;text-transform:uppercase}
+        .tgl{display:inline-flex;align-items:center;gap:7px;padding:9px 22px;border:1px solid #00ffff;color:#00ffff;font-family:'Orbitron',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:2px;text-decoration:none;border-radius:3px;transition:all 0.3s}
+        .tgl:hover{background:#00ffff;color:#000;box-shadow:0 0 15px rgba(0,255,255,0.5)}
+
+        /* ── FOOTER ── */
+        .ft{text-align:center;padding:25px 20px;font-family:'Orbitron',sans-serif;font-size:0.5rem;color:rgba(0,255,255,0.3);letter-spacing:2px;opacity:0.4}
+        .ft .xmr{font-size:0.45rem;color:rgba(255,255,255,0.12);margin-top:6px;word-break:break-all;font-family:'Share Tech Mono',monospace}
+
+        /* ── MODAL ── */
+        .mbg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:5000;justify-content:center;align-items:center}
+        .mbg.active{display:flex}
+        .mbox{background:#050505;border:1px solid #00ffff;border-radius:6px;padding:24px;max-width:480px;width:90%;box-shadow:0 0 30px rgba(0,255,255,0.3)}
+        .mbox h3{font-family:'Orbitron',sans-serif;color:#00ffff;font-size:0.8rem;letter-spacing:3px;margin-bottom:10px;text-shadow:0 0 6px rgba(0,255,255,0.5)}
+        .mbox .md{font-family:'Share Tech Mono',monospace;color:rgba(255,255,255,0.45);font-size:0.75rem;line-height:1.5;margin-bottom:6px;padding:8px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.04);border-radius:3px}
+        .mbox .mr{color:#ffd700;font-size:0.75rem;margin-bottom:10px}
+        .mbox input,.mbox textarea{width:100%;background:rgba(0,0,0,0.6);border:1px solid rgba(0,255,255,0.2);color:#00ffff;padding:8px 10px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;border-radius:3px;margin-bottom:6px;outline:none;transition:border-color 0.3s}
+        .mbox input:focus,.mbox textarea:focus{border-color:#00ffff;box-shadow:0 0 6px rgba(0,255,255,0.2)}
+        .mbox input::placeholder,.mbox textarea::placeholder{color:rgba(255,255,255,0.12)}
+        .mbs{display:flex;gap:6px;margin-top:3px}
+        .btn-s{flex:1;padding:9px;background:#00ffff;color:#000;border:none;font-family:'Orbitron',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:2px;cursor:pointer;border-radius:3px;transition:all 0.3s}
+        .btn-s:hover{box-shadow:0 0 12px rgba(0,255,255,0.5);transform:translateY(-1px)}
+        .btn-h{padding:9px 12px;background:transparent;color:#ff6600;border:1px solid #ff6600;font-family:'Orbitron',sans-serif;font-size:0.55rem;font-weight:600;letter-spacing:1px;cursor:pointer;border-radius:3px;transition:all 0.3s}
+        .btn-h:hover{background:#ff6600;color:#000}
+        .btn-c{padding:9px 12px;background:transparent;color:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.08);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;border-radius:3px}
+
+        /* ── SOUND TOGGLE ── */
+        .st{position:fixed;bottom:16px;right:120px;z-index:500;width:34px;height:34px;background:rgba(0,0,0,0.8);border:1px solid rgba(0,255,255,0.3);border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;transition:all 0.3s;font-size:1rem}
+        .st:hover{border-color:#00ffff;box-shadow:0 0 10px rgba(0,255,255,0.3)}
+        .st.muted{opacity:0.3}
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:768px){
+            .pgrid{grid-template-columns:1fr}
+            .lb,.tgb{margin:18px 12px}
+            .cicada-badge{width:60px;height:60px;bottom:15px;right:15px}
+            .cicada-badge svg{width:40px;height:40px}
+            .tag{font-size:0.55rem;top:8px;left:10px}
+            .st{right:90px}
+            .flying-cicada svg{width:40px;height:40px}
         }
     </style>
 </head>
 <body>
 
-<!-- ===== SOUND ENTER OVERLAY ===== -->
-<div id="sound-overlay" onclick="enterSite()">
-    <div class="enter-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
-    </div>
-    <h2>Enter the Hive</h2>
-    <p>Tap anywhere to begin</p>
+<canvas id="rain"></canvas>
+<div class="tag">@proplanwh</div>
+
+<!-- Real cicada sound -->
+<audio id="cicadaAudio" loop preload="auto">
+    <source src="cicada-sound.mp3" type="audio/mpeg">
+</audio>
+
+<div class="st" id="sndBtn" onclick="toggleSound()">&#x1F997;</div>
+
+<!-- ══ FLYING CICADA 1 (left to right) ══ -->
+<div class="flying-cicada" id="flyCicada1">
+    <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Head -->
+        <circle cx="100" cy="55" r="12" stroke="#00ffff" stroke-width="1.5" fill="none" opacity="0.9"/>
+        <!-- Eyes -->
+        <circle cx="94" cy="52" r="3" fill="#00ffff" opacity="0.85"/>
+        <circle cx="106" cy="52" r="3" fill="#00ffff" opacity="0.85"/>
+        <!-- Antennae -->
+        <path d="M94 46 Q80 25 65 15" stroke="#00ffff" stroke-width="1" fill="none" opacity="0.65"/>
+        <path d="M106 46 Q120 25 135 15" stroke="#00ffff" stroke-width="1" fill="none" opacity="0.65"/>
+        <!-- Left Wing -->
+        <g class="wing-l">
+            <path d="M75 80 Q30 50 15 80 Q20 110 75 120" stroke="#00ffff" stroke-width="1.3" fill="none" opacity="0.7"/>
+            <path d="M75 85 Q40 65 30 85" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.4"/>
+            <path d="M75 95 Q35 80 25 100" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.35"/>
+            <line x1="75" y1="90" x2="30" y2="90" stroke="#00ffff" stroke-width="0.5" opacity="0.25"/>
+        </g>
+        <!-- Right Wing -->
+        <g class="wing-r">
+            <path d="M125 80 Q170 50 185 80 Q180 110 125 120" stroke="#00ffff" stroke-width="1.3" fill="none" opacity="0.7"/>
+            <path d="M125 85 Q160 65 170 85" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.4"/>
+            <path d="M125 95 Q165 80 175 100" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.35"/>
+            <line x1="125" y1="90" x2="170" y2="90" stroke="#00ffff" stroke-width="0.5" opacity="0.25"/>
+        </g>
+        <!-- Thorax -->
+        <ellipse cx="100" cy="75" rx="20" ry="9" stroke="#00ffff" stroke-width="1.2" fill="none" opacity="0.7"/>
+        <!-- Abdomen -->
+        <ellipse cx="100" cy="100" rx="24" ry="11" stroke="#00ffff" stroke-width="1.1" fill="none" opacity="0.65"/>
+        <ellipse cx="100" cy="122" rx="22" ry="10" stroke="#00ffff" stroke-width="1.0" fill="none" opacity="0.6"/>
+        <ellipse cx="100" cy="142" rx="18" ry="9" stroke="#00ffff" stroke-width="0.9" fill="none" opacity="0.55"/>
+    </svg>
 </div>
 
-<!-- ===== CICADA SOUND TOGGLE ===== -->
-<div class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle cicada sound">&#x1F997;</div>
+<!-- ══ FLYING CICADA 2 (right to left) ══ -->
+<div class="flying-cicada" id="flyCicada2" style="transform:scaleX(-1)">
+    <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="55" r="12" stroke="#00ffff" stroke-width="1.5" fill="none" opacity="0.9"/>
+        <circle cx="94" cy="52" r="3" fill="#00ffff" opacity="0.85"/>
+        <circle cx="106" cy="52" r="3" fill="#00ffff" opacity="0.85"/>
+        <path d="M94 46 Q80 25 65 15" stroke="#00ffff" stroke-width="1" fill="none" opacity="0.65"/>
+        <path d="M106 46 Q120 25 135 15" stroke="#00ffff" stroke-width="1" fill="none" opacity="0.65"/>
+        <g class="wing-l">
+            <path d="M75 80 Q30 50 15 80 Q20 110 75 120" stroke="#00ffff" stroke-width="1.3" fill="none" opacity="0.7"/>
+            <path d="M75 85 Q40 65 30 85" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.4"/>
+            <path d="M75 95 Q35 80 25 100" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.35"/>
+        </g>
+        <g class="wing-r">
+            <path d="M125 80 Q170 50 185 80 Q180 110 125 120" stroke="#00ffff" stroke-width="1.3" fill="none" opacity="0.7"/>
+            <path d="M125 85 Q160 65 170 85" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.4"/>
+            <path d="M125 95 Q165 80 175 100" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.35"/>
+        </g>
+        <ellipse cx="100" cy="75" rx="20" ry="9" stroke="#00ffff" stroke-width="1.2" fill="none" opacity="0.7"/>
+        <ellipse cx="100" cy="100" rx="24" ry="11" stroke="#00ffff" stroke-width="1.1" fill="none" opacity="0.65"/>
+        <ellipse cx="100" cy="122" rx="22" ry="10" stroke="#00ffff" stroke-width="1.0" fill="none" opacity="0.6"/>
+        <ellipse cx="100" cy="142" rx="18" ry="9" stroke="#00ffff" stroke-width="0.9" fill="none" opacity="0.55"/>
+    </svg>
+</div>
 
-<!-- ===== PARTICLES ===== -->
-<div class="particles" id="particles"></div>
+<!-- ══ SMALL CICADA BADGE (bottom-right circle) ══ -->
+<div class="cicada-badge">
+    <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Head -->
+        <circle cx="100" cy="50" r="14" stroke="#00ffff" stroke-width="1.8" fill="none" opacity="0.9"/>
+        <!-- Eyes -->
+        <circle cx="93" cy="47" r="3.5" fill="#00ffff" opacity="0.9"/>
+        <circle cx="107" cy="47" r="3.5" fill="#00ffff" opacity="0.9"/>
+        <circle cx="93" cy="47" r="1.5" fill="#fff" opacity="0.8"/>
+        <circle cx="107" cy="47" r="1.5" fill="#fff" opacity="0.8"/>
+        <!-- Antennae -->
+        <path d="M92 40 Q78 22 62 10" stroke="#00ffff" stroke-width="1.2" fill="none" opacity="0.6"/>
+        <path d="M108 40 Q122 22 138 10" stroke="#00ffff" stroke-width="1.2" fill="none" opacity="0.6"/>
+        <circle cx="62" cy="10" r="1.5" fill="#00ffff" opacity="0.5"/>
+        <circle cx="138" cy="10" r="1.5" fill="#00ffff" opacity="0.5"/>
+        <!-- Left Wing -->
+        <path d="M72 72 Q25 42 10 72 Q15 105 72 115" stroke="#00ffff" stroke-width="1.5" fill="none" opacity="0.75"/>
+        <path d="M72 78 Q38 58 28 78" stroke="#00ffff" stroke-width="0.8" fill="none" opacity="0.45"/>
+        <path d="M72 88 Q33 72 22 92" stroke="#00ffff" stroke-width="0.8" fill="none" opacity="0.4"/>
+        <path d="M72 98 Q36 86 26 104" stroke="#00ffff" stroke-width="0.6" fill="none" opacity="0.35"/>
+        <line x1="72" y1="82" x2="28" y2="82" stroke="#00ffff" stroke-width="0.5" opacity="0.3"/>
+        <line x1="72" y1="95" x2="30" y2="95" stroke="#00ffff" stroke-width="0.4" opacity="0.25"/>
+        <ellipse cx="48" cy="82" rx="6" ry="10" stroke="#00ffff" stroke-width="0.4" fill="none" opacity="0.15"/>
+        <!-- Right Wing -->
+        <path d="M128 72 Q175 42 190 72 Q185 105 128 115" stroke="#00ffff" stroke-width="1.5" fill="none" opacity="0.75"/>
+        <path d="M128 78 Q162 58 172 78" stroke="#00ffff" stroke-width="0.8" fill="none" opacity="0.45"/>
+        <path d="M128 88 Q167 72 178 92" stroke="#00ffff" stroke-width="0.8" fill="none" opacity="0.4"/>
+        <path d="M128 98 Q164 86 174 104" stroke="#00ffff" stroke-width="0.6" fill="none" opacity="0.35"/>
+        <line x1="128" y1="82" x2="172" y2="82" stroke="#00ffff" stroke-width="0.5" opacity="0.3"/>
+        <line x1="128" y1="95" x2="170" y2="95" stroke="#00ffff" stroke-width="0.4" opacity="0.25"/>
+        <ellipse cx="152" cy="82" rx="6" ry="10" stroke="#00ffff" stroke-width="0.4" fill="none" opacity="0.15"/>
+        <!-- Thorax -->
+        <ellipse cx="100" cy="70" rx="22" ry="10" stroke="#00ffff" stroke-width="1.3" fill="none" opacity="0.7"/>
+        <ellipse cx="100" cy="70" rx="15" ry="6" stroke="#00ffff" stroke-width="0.5" fill="none" opacity="0.2"/>
+        <!-- Abdomen segments -->
+        <ellipse cx="100" cy="95" rx="26" ry="12" stroke="#00ffff" stroke-width="1.2" fill="none" opacity="0.65"/>
+        <ellipse cx="100" cy="118" rx="24" ry="11" stroke="#00ffff" stroke-width="1.1" fill="none" opacity="0.6"/>
+        <ellipse cx="100" cy="138" rx="20" ry="10" stroke="#00ffff" stroke-width="1.0" fill="none" opacity="0.55"/>
+        <ellipse cx="100" cy="155" rx="14" ry="7" stroke="#00ffff" stroke-width="0.8" fill="none" opacity="0.45"/>
+        <line x1="100" y1="80" x2="100" y2="162" stroke="#00ffff" stroke-width="0.4" opacity="0.2"/>
+        <!-- Legs Left -->
+        <path d="M78 75 Q58 95 50 112" stroke="#00ffff" stroke-width="0.9" fill="none" opacity="0.4"/>
+        <path d="M76 92 Q53 112 46 130" stroke="#00ffff" stroke-width="0.9" fill="none" opacity="0.35"/>
+        <path d="M80 108 Q58 128 53 148" stroke="#00ffff" stroke-width="0.8" fill="none" opacity="0.3"/>
+        <!-- Legs Right -->
+        <path d="M122 75 Q142 95 150 112" stroke="#00ffff" stroke-width="0.9" fill="none" opacity="0.4"/>
+        <path d="M124 92 Q147 112 154 130" stroke="#00ffff" stroke-width="0.9" fill="none" opacity="0.35"/>
+        <path d="M120 108 Q142 128 147 148" stroke="#00ffff" stroke-width="0.8" fill="none" opacity="0.3"/>
+        <!-- Leg joints -->
+        <circle cx="60" cy="100" r="1.2" fill="#00ffff" opacity="0.3"/>
+        <circle cx="54" cy="118" r="1.2" fill="#00ffff" opacity="0.25"/>
+        <circle cx="140" cy="100" r="1.2" fill="#00ffff" opacity="0.3"/>
+        <circle cx="146" cy="118" r="1.2" fill="#00ffff" opacity="0.25"/>
+    </svg>
+</div>
 
-<!-- ===== MAIN FRAME ===== -->
-<div class="main-frame">
+<!-- ═══ HERO ═══ -->
+<div class="hero">
+    <h1>CICADA 3301</h1>
+    <p class="sub">We are everywhere.<br>Decode to prove yourself.</p>
+    <div class="good-luck">GOOD LUCK!</div>
+    <div class="everywhere-box">
+        <span>EVERYWHERE</span>
+    </div>
+    <div class="three-three-oh-one">3 3 0 1</div>
+</div>
 
-    <!-- Top Nav -->
-    <div class="top-nav">
-        <div class="nav-status">
-            <div class="status-dot"></div>
-            <span>System Active — <span id="solverCount">2,703</span> solvers online</span>
-        </div>
-        <div class="nav-icons">
-            <div class="nav-icon" title="Leaderboard" onclick="toggleLeaderboard()">&#x1F3C6;</div>
-            <div class="nav-icon" title="Community" onclick="window.open('https://t.me/proplanwh','_blank')">&#x1F310;</div>
-        </div>
+<!-- ═══ PUZZLES ═══ -->
+<div class="puzzles">
+    <div class="sec-label">Available Puzzles</div>
+    <div class="pgrid" id="puzzleGrid"></div>
+
+    <div class="lb">
+        <h3>Top Solvers</h3>
+        <div id="lbList"></div>
     </div>
 
-    <!-- Hero -->
-    <div class="hero">
-        <div class="cicada-svg-container">
-            <div class="cicada-ring"></div>
-            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Cicada insect body -->
-                <ellipse cx="100" cy="100" rx="25" ry="40" fill="none" stroke="#00ffff" stroke-width="1.5" opacity="0.9"/>
-                <!-- Head -->
-                <circle cx="100" cy="55" r="12" fill="none" stroke="#00ffff" stroke-width="1.5"/>
-                <!-- Eyes -->
-                <circle cx="94" cy="52" r="3" fill="#00ffff" opacity="0.8"/>
-                <circle cx="106" cy="52" r="3" fill="#00ffff" opacity="0.8"/>
-                <!-- Antennae -->
-                <path d="M94 46 Q80 25 65 15" fill="none" stroke="#00ffff" stroke-width="1" opacity="0.7"/>
-                <path d="M106 46 Q120 25 135 15" fill="none" stroke="#00ffff" stroke-width="1" opacity="0.7"/>
-                <!-- Left Wing -->
-                <path d="M75 80 Q30 50 15 80 Q20 110 75 120" fill="none" stroke="#00ffff" stroke-width="1.2" opacity="0.6"/>
-                <path d="M75 85 Q40 65 30 85" fill="none" stroke="#00ffff" stroke-width="0.8" opacity="0.4"/>
-                <path d="M75 95 Q35 80 25 100" fill="none" stroke="#00ffff" stroke-width="0.8" opacity="0.4"/>
-                <!-- Right Wing -->
-                <path d="M125 80 Q170 50 185 80 Q180 110 125 120" fill="none" stroke="#00ffff" stroke-width="1.2" opacity="0.6"/>
-                <path d="M125 85 Q160 65 170 85" fill="none" stroke="#00ffff" stroke-width="0.8" opacity="0.4"/>
-                <path d="M125 95 Q165 80 175 100" fill="none" stroke="#00ffff" stroke-width="0.8" opacity="0.4"/>
-                <!-- Wing veins -->
-                <line x1="75" y1="90" x2="30" y2="90" stroke="#00ffff" stroke-width="0.5" opacity="0.3"/>
-                <line x1="125" y1="90" x2="170" y2="90" stroke="#00ffff" stroke-width="0.5" opacity="0.3"/>
-                <!-- Body segments -->
-                <ellipse cx="100" cy="75" rx="18" ry="8" fill="none" stroke="#00ffff" stroke-width="0.8" opacity="0.5"/>
-                <ellipse cx="100" cy="100" rx="22" ry="10" fill="none" stroke="#00ffff" stroke-width="0.8" opacity="0.5"/>
-                <ellipse cx="100" cy="125" rx="18" ry="8" fill="none" stroke="#00ffff" stroke-width="0.8" opacity="0.5"/>
-                <!-- Legs -->
-                <line x1="78" y1="85" x2="55" y2="110" stroke="#00ffff" stroke-width="0.8" opacity="0.4"/>
-                <line x1="78" y1="100" x2="50" y2="125" stroke="#00ffff" stroke-width="0.8" opacity="0.4"/>
-                <line x1="78" y1="115" x2="55" y2="140" stroke="#00ffff" stroke-width="0.8" opacity="0.4"/>
-                <line x1="122" y1="85" x2="145" y2="110" stroke="#00ffff" stroke-width="0.8" opacity="0.4"/>
-                <line x1="122" y1="100" x2="150" y2="125" stroke="#00ffff" stroke-width="0.8" opacity="0.4"/>
-                <line x1="122" y1="115" x2="145" y2="140" stroke="#00ffff" stroke-width="0.8" opacity="0.4"/>
-                <!-- 3301 text -->
-                <text x="100" y="175" text-anchor="middle" fill="#00ffff" font-family="Orbitron, monospace" font-size="18" font-weight="700" opacity="0.6">3301</text>
-            </svg>
-        </div>
-        <h1>CICADA 3301</h1>
-        <p class="hero-subtitle">We are everywhere. Decode to prove yourself.</p>
+    <div class="tgb">
+        <p>Join the Inner Circle</p>
+        <a href="https://t.me/proplanwh" target="_blank" class="tgl">@proplanwh</a>
     </div>
 
-    <!-- Central Message -->
-    <div class="central-message">
-        <div class="good-luck">GOOD LUCK!</div>
-        <div class="everywhere-frame">
-            <div class="everywhere">EVERYWHERE</div>
-        </div>
-        <div class="three-three-oh-one">3 3 0 1</div>
-    </div>
-
-    <!-- Puzzle Section -->
-    <div class="section-title">&#x1F9E9; Available Puzzles</div>
-    <div class="puzzle-grid" id="puzzleGrid"></div>
-
-    <!-- Leaderboard -->
-    <div class="leaderboard" id="leaderboardDiv">
-        <h3>&#x1F3C6; Top Solvers</h3>
-        <div id="leaderboardList"></div>
-    </div>
-
-    <!-- Telegram Community -->
-    <div class="telegram-banner">
-        <p>&#x1F310; Join the Inner Circle</p>
-        <a href="https://t.me/proplanwh" target="_blank" class="telegram-link">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.16 1.37-1.5 1.54-1.72.03-.04.06-.12.01-.17-.04-.04-.11-.03-.15-.02-2.09 1.19-5.43 3.56-5.93 3.96-.09.07-.19.05-.19-.07-.02-.24.48-1.68 2.86-5.04.19-.28.36-.42.61-.42h.16c.25 0 .35.12.42.42.49 1.78 1.89 6.05 2.13 7.27.03.14.05.27.05.37 0 .12-.06.2-.18.27-.12.07-.24.04-.36-.04-.49-.2-3.01-1.54-3.99-2.04-.17-.09-.24-.2-.24-.33 0-.11.07-.23.2-.32.13-.09 3.22-2.14 4.35-2.98.15-.11.3-.17.46-.17.12 0 .23.06.3.2.03.06.05.17.05.33z"/></svg>
-            @proplanwh
-        </a>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer">
+    <div class="ft">
         <p>3301 &bull; Liber Primus &bull; Veritas Odium Parit</p>
-        <p class="xmr-addr">XMR: 8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ</p>
+        <p class="xmr">XMR: 8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ</p>
     </div>
 </div>
 
-<!-- ===== SUBMIT MODAL ===== -->
-<div class="modal-overlay" id="submitModal">
-    <div class="modal-box">
-        <h3 id="modalTitle">&#x1F511; Submit Answer</h3>
-        <div class="modal-desc" id="modalDesc"></div>
-        <div class="modal-reward" id="modalReward"></div>
-        <input type="text" id="username" placeholder="Your username / alias">
-        <input type="text" id="xmrWallet" placeholder="Monero wallet (for XMR reward)">
-        <textarea id="answerInput" rows="3" placeholder="Your decoded answer..."></textarea>
-        <div class="modal-buttons">
-            <button class="btn-submit" onclick="submitAnswer()">&#x1F513; Submit</button>
-            <button class="btn-hint" onclick="buyHint()">&#x1F4A1; Hint</button>
-            <button class="btn-close" onclick="closeModal()">Close</button>
+<!-- ═══ MODAL ═══ -->
+<div class="mbg" id="modal">
+    <div class="mbox">
+        <h3 id="mT">Submit Answer</h3>
+        <div class="md" id="mD"></div>
+        <div class="mr" id="mR"></div>
+        <input type="text" id="iU" placeholder="Your username / alias">
+        <input type="text" id="iW" placeholder="Monero wallet (for XMR reward)">
+        <textarea id="iA" rows="3" placeholder="Your decoded answer..."></textarea>
+        <div class="mbs">
+            <button class="btn-s" onclick="submitAnswer()">Submit</button>
+            <button class="btn-h" onclick="buyHint()">Hint</button>
+            <button class="btn-c" onclick="closeModal()">Close</button>
         </div>
     </div>
 </div>
 
-<!-- ===== CICADA AUDIO (Web Audio API fallback) ===== -->
 <script>
-    // ===== CICADA SOUND ENGINE =====
-    let audioCtx = null;
-    let cicadaNodes = [];
-    let soundPlaying = false;
-    let soundMuted = false;
-
-    function createCicadaSound() {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Create cicada-like buzzing sound using oscillators
-        const now = audioCtx.currentTime;
-        
-        // Main buzz oscillator (high frequency with AM modulation)
-        const osc1 = audioCtx.createOscillator();
-        osc1.type = 'sawtooth';
-        osc1.frequency.setValueAtTime(5500, now);
-        
-        // Frequency modulation for trilling effect
-        const lfo1 = audioCtx.createOscillator();
-        lfo1.frequency.setValueAtTime(35, now);
-        const lfoGain1 = audioCtx.createGain();
-        lfoGain1.gain.setValueAtTime(800, now);
-        lfo1.connect(lfoGain1);
-        lfoGain1.connect(osc1.frequency);
-        
-        // AM modulation for pulsing
-        const lfo2 = audioCtx.createOscillator();
-        lfo2.frequency.setValueAtTime(18, now);
-        const lfoGain2 = audioCtx.createGain();
-        lfoGain2.gain.setValueAtTime(0.3, now);
-        lfo2.connect(lfoGain2);
-        
-        // Second harmonic
-        const osc2 = audioCtx.createOscillator();
-        osc2.type = 'square';
-        osc2.frequency.setValueAtTime(8200, now);
-        
-        const lfo3 = audioCtx.createOscillator();
-        lfo3.frequency.setValueAtTime(28, now);
-        const lfoGain3 = audioCtx.createGain();
-        lfoGain3.gain.setValueAtTime(600, now);
-        lfo3.connect(lfoGain3);
-        lfoGain3.connect(osc2.frequency);
-        
-        // Master gain
-        const masterGain = audioCtx.createGain();
-        masterGain.gain.setValueAtTime(0.06, now);
-        
-        // Filter for more natural sound
-        const filter = audioCtx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(6000, now);
-        filter.Q.setValueAtTime(2, now);
-        
-        osc1.connect(filter);
-        osc2.connect(filter);
-        lfo2.connect(lfoGain2);
-        lfoGain2.connect(masterGain.gain);
-        filter.connect(masterGain);
-        masterGain.connect(audioCtx.destination);
-        
-        osc1.start(now);
-        osc2.start(now);
-        lfo1.start(now);
-        lfo2.start(now);
-        lfo3.start(now);
-        
-        cicadaNodes = [osc1, osc2, lfo1, lfo2, lfo3];
-        soundPlaying = true;
-    }
-
-    function stopCicadaSound() {
-        cicadaNodes.forEach(n => { try { n.stop(); } catch(e) {} });
-        cicadaNodes = [];
-        soundPlaying = false;
-    }
-
-    function toggleSound() {
-        const btn = document.getElementById('soundToggle');
-        if (soundMuted) {
-            if (!soundPlaying) createCicadaSound();
-            else {
-                cicadaNodes.forEach(n => {
-                    try { if (n._gain) n._gain.gain.setValueAtTime(0.06, audioCtx.currentTime); } catch(e) {}
-                });
-            }
-            soundMuted = false;
-            btn.classList.remove('muted');
-        } else {
-            stopCicadaSound();
-            soundMuted = true;
-            btn.classList.add('muted');
+/* ── 1. DIGITAL RAIN ── */
+(function(){
+    const c=document.getElementById('rain'),x=c.getContext('2d');
+    let W,H,cols,dr,fs=14;
+    function rz(){W=c.width=innerWidth;H=c.height=innerHeight;cols=Math.floor(W/fs);dr=Array.from({length:cols},()=>Math.random()*H/fs|0)}
+    rz();addEventListener('resize',rz);
+    function draw(){
+        x.fillStyle='rgba(0,0,0,0.05)';x.fillRect(0,0,W,H);
+        x.font=fs+'px Share Tech Mono,monospace';
+        for(let i=0;i<cols;i++){
+            const ch=String.fromCharCode(0x30A0+Math.random()*96),px=i*fs,py=dr[i]*fs;
+            x.fillStyle='rgba(0,255,255,0.85)';x.fillText(ch,px,py);
+            x.fillStyle='rgba(0,255,255,0.25)';x.fillText(ch,px,py-fs);
+            if(py>H&&Math.random()>0.975)dr[i]=0;
+            dr[i]++;
         }
+        requestAnimationFrame(draw);
     }
+    draw();
+})();
 
-    function enterSite() {
-        document.getElementById('sound-overlay').classList.add('hidden');
-        createCicadaSound();
-    }
+/* ── 2. CICADA SOUND (real MP3) ── */
+const audioEl=document.getElementById('cicadaAudio');
+audioEl.volume=0.3;
+let sndMuted=false;
 
-    // ===== PARTICLES =====
-    function createParticles() {
-        const container = document.getElementById('particles');
-        for (let i = 0; i < 30; i++) {
-            const p = document.createElement('div');
-            p.className = 'particle';
-            p.style.left = Math.random() * 100 + '%';
-            p.style.animationDelay = Math.random() * 8 + 's';
-            p.style.animationDuration = (6 + Math.random() * 6) + 's';
-            p.style.width = (1 + Math.random() * 2) + 'px';
-            p.style.height = p.style.width;
-            container.appendChild(p);
-        }
-    }
-    createParticles();
+function toggleSound(){
+    const b=document.getElementById('sndBtn');
+    if(sndMuted){audioEl.play();sndMuted=false;b.classList.remove('muted')}
+    else{audioEl.pause();sndMuted=true;b.classList.add('muted')}
+}
+document.addEventListener('click',function o(){audioEl.play().catch(()=>{});document.removeEventListener('click',o)},{once:true});
+document.addEventListener('touchstart',function o(){audioEl.play().catch(()=>{});document.removeEventListener('touchstart',o)},{once:true});
 
-    // ===== PUZZLE DATA =====
-    const puzzles = [
-        { id: 'initiation', name: 'Initiation', diff: 'Beginner', reward: '0.01 XMR', points: 100, time: '24h', category: 'Cryptography', desc: 'Decode: "01001101 01101111 01101110 01100101 01110010 01101111"', hint: 'Binary to text' },
-        { id: 'caesar', name: "Caesar's Truth", diff: 'Easy', reward: '0.02 XMR', points: 200, time: '48h', category: 'Classical Cipher', desc: 'L FDPH, L VDZ, L FRQTXHUHG. Cipher: VQREWLVDQD', hint: 'ROT13 is everywhere. 3301.' },
-        { id: 'primus', name: 'Liber Primus', diff: 'Medium', reward: '0.05 XMR', points: 500, time: '72h', category: 'Runes', desc: 'Runestones decoded: F U Th A R Ka G W H N I J P I X S T B E M L Ng D O', hint: 'Elder Futhark runes. The answer is 3 words.' },
-        { id: 'rsa', name: 'RSA Secret', diff: 'Hard', reward: '0.10 XMR', points: 1000, time: '120h', category: 'Modern Crypto', desc: 'n = 3233, e = 17, ciphertext = 2790. Decrypt the message.', hint: 'p = 53, q = 61' },
-        { id: 'stegano', name: 'Hidden Image', diff: 'Expert', reward: '0.25 XMR', points: 2500, time: '168h', category: 'Steganography', desc: 'The image contains a secret. LSB steganography. Extract from blue channel.', hint: 'Least significant bits.' },
-        { id: 'chain', name: 'Blockchain Trail', diff: 'Expert', reward: '0.50 XMR', points: 5000, time: '240h', category: 'Blockchain', desc: 'Follow the Monero trail through the darknet nodes.', hint: 'The answer is in the blockchain comments.' },
-        { id: 'quantum', name: 'Quantum Maze', diff: 'Legendary', reward: '1.00 XMR', points: 10000, time: '336h', category: 'Quantum', desc: 'Qubit states: |0>, |1>, |+>, |->. Circuit: H, CNOT, H. Measure.', hint: 'Bell state. 4-letter word.' },
-        { id: 'prophecy', name: "Cicada's Prophecy", diff: 'Mythic', reward: '2.50 XMR', points: 25000, time: '720h', category: 'Mystery', desc: 'LK2@#8$n!9$#KJ@!$#@L:>{">?<L":{P{">?<L":@!$#KJ@!$#LK@LK@LK@3301', hint: 'XOR with 3301.' }
-    ];
+/* ── 3. PUZZLES ── */
+const puzzles=[
+    {id:'initiation',name:'Initiation',diff:'Beginner',reward:'0.01 XMR',pts:100,time:'24h',cat:'Cryptography',desc:'Decode: "01001101 01101111 01101110 01100101 01110010 01101111"',hint:'Binary to text'},
+    {id:'caesar',name:"Caesar's Truth",diff:'Easy',reward:'0.02 XMR',pts:200,time:'48h',cat:'Classical Cipher',desc:'L FDPH, L VDZ, L FRQTXHUHG. Cipher: VQREWLVDQD',hint:'ROT13 is everywhere. 3301.'},
+    {id:'primus',name:'Liber Primus',diff:'Medium',reward:'0.05 XMR',pts:500,time:'72h',cat:'Runes',desc:'Runestones: F U Th A R Ka G W H N I J P I X S T B E M L Ng D O',hint:'Elder Futhark runes. The answer is 3 words.'},
+    {id:'rsa',name:'RSA Secret',diff:'Hard',reward:'0.10 XMR',pts:1000,time:'120h',cat:'Modern Crypto',desc:'n = 3233, e = 17, ciphertext = 2790. Decrypt the message.',hint:'p = 53, q = 61'},
+    {id:'stegano',name:'Hidden Image',diff:'Expert',reward:'0.25 XMR',pts:2500,time:'168h',cat:'Steganography',desc:'The image contains a secret. LSB steganography. Extract from blue channel.',hint:'Least significant bits.'},
+    {id:'chain',name:'Blockchain Trail',diff:'Expert',reward:'0.50 XMR',pts:5000,time:'240h',cat:'Blockchain',desc:'Follow the Monero trail through the darknet nodes.',hint:'The answer is in the blockchain comments.'},
+    {id:'quantum',name:'Quantum Maze',diff:'Legendary',reward:'1.00 XMR',pts:10000,time:'336h',cat:'Quantum',desc:'Qubit states: |0>, |1>, |+>, |->. Circuit: H, CNOT, H. Measure.',hint:'Bell state. 4-letter word.'},
+    {id:'prophecy',name:"Cicada's Prophecy",diff:'Mythic',reward:'2.50 XMR',pts:25000,time:'720h',cat:'Mystery',desc:'LK2@#8$n!9$#KJ@!$#@L:>{">?<L":{P{">?<L":@!$#KJ@!$#LK@LK@LK@3301',hint:'XOR with 3301.'}
+];
+document.getElementById('puzzleGrid').innerHTML=puzzles.map((p,i)=>`
+    <div class="pcard" onclick="openPuzzle('${p.id}')">
+        <div class="pc-lvl">Level ${i+1}</div>
+        <div class="pc-nm">${p.name}</div>
+        <span class="pc-df df-${p.diff.toLowerCase()}">${p.diff}</span>
+        <div class="pc-ds">${p.desc}</div>
+        <div class="pc-rw">&#x1F4B0; ${p.reward} | &#x1F3AF; ${p.pts} pts</div>
+        <div class="pc-mt"><span>&#x23F1; ${p.time}</span><span>&#x1F517; ${p.cat}</span></div>
+    </div>`).join('');
 
-    // ===== RENDER PUZZLES =====
-    function renderPuzzles() {
-        const grid = document.getElementById('puzzleGrid');
-        grid.innerHTML = puzzles.map(p => `
-            <div class="puzzle-card" onclick="openPuzzle('${p.id}')">
-                <div class="puzzle-level">LEVEL ${puzzles.indexOf(p)+1}</div>
-                <div class="puzzle-name">${p.name}</div>
-                <span class="puzzle-diff diff-${p.diff.toLowerCase()}">${p.diff}</span>
-                <div class="puzzle-desc">${p.desc}</div>
-                <div class="puzzle-reward">&#x1F4B0; ${p.reward} &nbsp; | &nbsp; &#x1F3AF; ${p.points} pts</div>
-                <div class="puzzle-meta">
-                    <span>&#x23F1; ${p.time}</span>
-                    <span>&#x1F517; ${p.category}</span>
-                </div>
-            </div>
-        `).join('');
-    }
-    renderPuzzles();
+/* ── 4. MODAL ── */
+let cur=null;
+function openPuzzle(id){cur=puzzles.find(p=>p.id===id);if(!cur)return;document.getElementById('mT').textContent='\u{1F511} '+cur.name;document.getElementById('mD').textContent=cur.desc;document.getElementById('mR').innerHTML='\u{1F4B0} '+cur.reward+' | \u{1F3AF} '+cur.pts+' pts';document.getElementById('iA').value='';document.getElementById('modal').classList.add('active')}
+function closeModal(){document.getElementById('modal').classList.remove('active')}
+async function sha256(m){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(m));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
+function getH(id){return{'initiation':'money','caesar':'inthissign','primus':'threeswords','rsa':'rsa2026','stegano':'pixeltruth','chain':'monero','quantum':'bell','prophecy':'3301cicada'}[id]||''}
+async function submitAnswer(){if(!cur)return;const a=document.getElementById('iA').value.trim();if(!a){alert('Enter your decoded answer.');return}const h=await sha256(a);if(h===await sha256(getH(cur.id))){alert('\u2705 CORRECT!\n\n'+cur.name+' solved!\n+'+cur.pts+' points\n'+cur.reward);closeModal()}else{alert('\u274C Incorrect. The code awaits decryption.')}}
+function buyHint(){if(!cur)return;alert('\u{1F4A1} HINT: '+cur.hint+'\n\nCost: 0.005 XMR')}
 
-    // ===== PUZZLE MODAL =====
-    let currentPuzzle = null;
-
-    function openPuzzle(id) {
-        currentPuzzle = puzzles.find(p => p.id === id);
-        if (!currentPuzzle) return;
-        document.getElementById('modalTitle').textContent = '\u{1F511} ' + currentPuzzle.name;
-        document.getElementById('modalDesc').textContent = currentPuzzle.desc;
-        document.getElementById('modalReward').innerHTML = '\u{1F4B0} Reward: ' + currentPuzzle.reward + ' | \u{1F3AF} ' + currentPuzzle.points + ' points';
-        document.getElementById('answerInput').value = '';
-        document.getElementById('submitModal').classList.add('active');
-    }
-
-    function closeModal() {
-        document.getElementById('submitModal').classList.remove('active');
-    }
-
-    async function submitAnswer() {
-        if (!currentPuzzle) return;
-        const answer = document.getElementById('answerInput').value.trim();
-        const username = document.getElementById('username').value.trim() || 'anonymous';
-        const wallet = document.getElementById('xmrWallet').value.trim();
-
-        if (!answer) { alert('Enter your decoded answer.'); return; }
-
-        // SHA256 verification
-        const hash = await sha256(answer);
-
-        // Show result
-        if (hash === getExpectedHash(currentPuzzle.id)) {
-            const msg = `\u2705 CORRECT!\n\n${currentPuzzle.name} solved!\n+${currentPuzzle.points} points\n${currentPuzzle.reward} reward will be sent to your wallet.`;
-            alert(msg);
-            closeModal();
-        } else {
-            alert('\u274C Incorrect answer. Try again. The code awaits decryption.');
-        }
-    }
-
-    function buyHint() {
-        if (!currentPuzzle) return;
-        alert('\u{1F4A1} HINT: ' + currentPuzzle.hint + '\n\nCost: 0.005 XMR\nSend to the wallet address in the footer.');
-    }
-
-    async function sha256(message) {
-        const msgBuffer = new TextEncoder().encode(message);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    function getExpectedHash(id) {
-        const answers = {
-            'initiation': 'Monero',
-            'caesar': 'I came, I saw, I conquered',
-            'primus': 'We are everywhere',
-            'rsa': 'rsa',
-            'stegano': 'cicada3301',
-            'chain': 'privacy is freedom',
-            'quantum': 'bell',
-            'prophecy': 'liber primus'
-        };
-        // Pre-computed SHA256 hashes of correct answers
-        const hashes = {};
-        // We'll compute them dynamically
-        return null; // Will be checked via async
-    }
-
-    // Patch submitAnswer to use pre-computed hashes
-    const correctAnswers = {
-        'initiation': '5241b6437fb1c6fdf2c55a76dcc1d4d7a389c1b8a05d9f0c7e1a3a1b2c3d4e5',
-        'caesar': null,
-        'primus': null,
-        'rsa': null,
-        'stegano': null,
-        'chain': null,
-        'quantum': null,
-        'prophecy': null
-    };
-
-    // ===== LEADERBOARD =====
-    const leaders = [
-        { rank: 1, name: 'PhantomSolver', score: 25000, solved: '8/8' },
-        { rank: 2, name: 'CipherGhost', score: 22400, solved: '7/8' },
-        { rank: 3, name: 'NullByte_3301', score: 18500, solved: '6/8' },
-        { rank: 4, name: 'DarkRunes', score: 15000, solved: '5/8' },
-        { rank: 5, name: 'QuantumShift', score: 11500, solved: '5/8' },
-        { rank: 6, name: 'SteganoKing', score: 9200, solved: '4/8' },
-        { rank: 7, name: 'CryptoKnight', score: 7800, solved: '4/8' },
-        { rank: 8, name: 'BlockRunner', score: 5500, solved: '3/8' },
-        { rank: 9, name: 'NightOwl_XMR', score: 3100, solved: '3/8' },
-        { rank: 10, name: 'ShadowKey', score: 2200, solved: '2/8' }
-    ];
-
-    function renderLeaderboard() {
-        const list = document.getElementById('leaderboardList');
-        list.innerHTML = leaders.map(l => `
-            <div class="lb-entry">
-                <span class="lb-rank lb-rank-${l.rank < 4 ? l.rank : ''}">#${l.rank}</span>
-                <span class="lb-name">${l.name}</span>
-                <span class="lb-score">\u{1F3AF} ${l.score.toLocaleString()} pts | \u{1F9E9} ${l.solved}</span>
-            </div>
-        `).join('');
-    }
-    renderLeaderboard();
-
-    function toggleLeaderboard() {
-        const lb = document.getElementById('leaderboardDiv');
-        lb.style.display = lb.style.display === 'none' ? 'block' : 'none';
-    }
-
-    // ===== KEYBOARD SHORTCUT =====
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeModal();
-        if (e.key === 'Enter' && document.getElementById('submitModal').classList.contains('active')) {
-            submitAnswer();
-        }
-    });
+/* ── 5. LEADERBOARD ── */
+const lb=[{r:1,n:'3301_initiate',p:25000},{r:2,n:'cipher_ghost',p:18500},{r:3,n:'runecaster',p:14200},{r:4,n:'darknet_walker',p:10800},{r:5,n:'quantum_obs',p:8500},{r:6,n:'steg_breaker',p:6200},{r:7,n:'xmr_tracer',p:4100},{r:8,n:'null_byte',p:2800},{r:9,n:'freq_analyst',p:1500},{r:10,n:'newcomer_01',p:500}];
+document.getElementById('lbList').innerHTML=lb.map(e=>`<div class="lbr"><span class="lbr-r lbr-${e.r}">#${e.r}</span><span class="lbr-n">${e.n}</span><span class="lbr-p">${e.p.toLocaleString()} pts</span></div>`).join('');
 </script>
 </body>
 </html>

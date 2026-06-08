@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
-        html,body{width:100%;height:100%;overflow-x:hidden;background:#000}
+        html,body{width:100%;height:100%;overflow-x:hidden;background:#000;font-family:'Share Tech Mono',monospace}
 
         /* Digital Rain Canvas */
         #rain{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
@@ -17,16 +17,96 @@
         /* Scanline overlay */
         body::after{
             content:'';position:fixed;top:0;left:0;width:100%;height:100%;
-            background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.01) 2px,rgba(255,255,255,0.01) 4px);
+            background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.012) 2px,rgba(255,255,255,0.012) 4px);
             pointer-events:none;z-index:9998;
         }
 
-        /* Color cycling via JS */
-        :root{
-            --neon:#ff0033;
-            --neon-glow:rgba(255,0,51,0.5);
-            --neon-dim:rgba(255,0,51,0.25);
-            --neon-soft:rgba(255,0,51,0.08);
+        /* Subtle grid background */
+        body::before{
+            content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size:40px 40px;
+            pointer-events:none;z-index:0;
+            opacity:0.4;
+        }
+
+        /* ── GLITCH KEYFRAMES ── */
+        @keyframes glitch{
+            0%  {text-shadow:0.05em 0 0 #00ffff,-0.05em -0.025em 0 #ff0033}
+            10% {text-shadow:-0.03em 0.02em 0 #00ffff,0.04em -0.01em 0 #ff0033}
+            20% {text-shadow:0.02em -0.03em 0 #00ffff,-0.04em 0.01em 0 #ff0033}
+            30% {text-shadow:-0.04em 0.01em 0 #00ffff,0.03em -0.02em 0 #ff0033}
+            40% {text-shadow:0.03em 0.02em 0 #00ffff,-0.02em -0.03em 0 #ff0033}
+            50% {text-shadow:-0.02em -0.01em 0 #00ffff,0.05em 0.03em 0 #ff0033}
+            60% {text-shadow:0.04em -0.02em 0 #00ffff,-0.03em 0.01em 0 #ff0033}
+            70% {text-shadow:-0.01em 0.03em 0 #00ffff,0.02em -0.04em 0 #ff0033}
+            80% {text-shadow:0.05em 0.01em 0 #00ffff,-0.04em -0.02em 0 #ff0033}
+            90% {text-shadow:-0.03em -0.03em 0 #00ffff,0.01em 0.02em 0 #ff0033}
+            100%{text-shadow:0.02em 0.01em 0 #00ffff,-0.05em -0.025em 0 #ff0033}
+        }
+        @keyframes glitch-skew{
+            0%  {transform:translate(0);clip-path:inset(40% 0 61% 0)}
+            20% {transform:translate(-2px,2px);clip-path:inset(92% 0 1% 0)}
+            40% {transform:translate(2px,-1px);clip-path:inset(43% 0 1% 0)}
+            60% {transform:translate(-1px,-2px);clip-path:inset(25% 0 58% 0)}
+            80% {transform:translate(1px,1px);clip-path:inset(54% 0 7% 0)}
+            100%{transform:translate(0);clip-path:inset(58% 0 43% 0)}
+        }
+        @keyframes flicker{
+            0%,100%{opacity:1}92%{opacity:1}93%{opacity:0.4}94%{opacity:1}96%{opacity:0.2}97%{opacity:1}
+        }
+        @keyframes pulse-glow{
+            0%,100%{box-shadow:0 0 8px rgba(0,255,255,0.3),inset 0 0 5px rgba(0,255,255,0.1)}
+            50%{box-shadow:0 0 20px rgba(0,255,255,0.5),inset 0 0 10px rgba(0,255,255,0.2)}
+        }
+
+        /* ── FLYING CICADA ANIMATION ── */
+        @keyframes cicada-fly-1{
+            0%   {transform:translate(-120px,-80px) rotate(-5deg) scale(0.6);opacity:0}
+            8%   {opacity:0.9}
+            25%  {transform:translate(25vw,15vh) rotate(3deg) scale(0.8);opacity:1}
+            50%  {transform:translate(55vw,40vh) rotate(-8deg) scale(0.7);opacity:0.8}
+            75%  {transform:translate(80vw,20vh) rotate(5deg) scale(0.9);opacity:0.6}
+            92%  {opacity:0.3}
+            100% {transform:translate(110vw,-50px) rotate(-3deg) scale(0.5);opacity:0}
+        }
+        @keyframes cicada-fly-2{
+            0%   {transform:translate(110vw,30vh) rotate(8deg) scale(0.5);opacity:0}
+            8%   {opacity:0.7}
+            25%  {transform:translate(75vw,50vh) rotate(-5deg) scale(0.7);opacity:0.9}
+            50%  {transform:translate(40vw,25vh) rotate(10deg) scale(0.8);opacity:0.7}
+            75%  {transform:translate(15vw,55vh) rotate(-6deg) scale(0.6);opacity:0.5}
+            92%  {opacity:0.2}
+            100% {transform:translate(-120px,10vh) rotate(4deg) scale(0.4);opacity:0}
+        }
+        @keyframes wing-flap{
+            0%,100%{transform:scaleY(1)}
+            25%{transform:scaleY(0.85)}
+            50%{transform:scaleY(1.1)}
+            75%{transform:scaleY(0.9)}
+        }
+        .flying-cicada{
+            position:fixed;
+            z-index:100;
+            pointer-events:none;
+            filter:drop-shadow(0 0 6px rgba(0,255,255,0.4));
+        }
+        .flying-cicada svg{width:60px;height:60px}
+        .flying-cicada .wing-l,.flying-cicada .wing-r{
+            animation:wing-flap 0.12s ease-in-out infinite;
+            transform-origin:center top;
+        }
+        #flyCicada1{
+            top:5%;left:0;
+            animation:cicada-fly-1 18s linear infinite;
+            animation-delay:2s;
+        }
+        #flyCicada2{
+            top:10%;right:0;
+            animation:cicada-fly-2 22s linear infinite;
+            animation-delay:8s;
         }
 
         /* ── FULL VIEWPORT HERO ── */
@@ -36,58 +116,126 @@
             min-height:100vh;padding:20px;text-align:center;
         }
 
-        /* ── TAG (top-left, like luiz_33001) ── */
+        /* ── TAG (top-left) ── */
         .tag{
             position:fixed;top:16px;left:20px;z-index:10;
             font-family:'Share Tech Mono',monospace;
             font-size:0.7rem;
-            color:var(--neon-dim);
+            color:rgba(0,255,255,0.25);
             letter-spacing:2px;text-transform:uppercase;
-            opacity:0.7;transition:color 0.6s;
+            opacity:0.7;
         }
 
-        /* ── TITLE ── */
+        /* ── CICADA 3301 TITLE WITH GLITCH ── */
         .hero h1{
             font-family:'Orbitron',sans-serif;
             font-size:clamp(1.6rem,5vw,3rem);
             font-weight:900;
-            color:var(--neon);
+            color:#00ffff;
             letter-spacing:clamp(6px,1.5vw,14px);
             text-transform:uppercase;
-            text-shadow:
-                0 0 8px var(--neon-glow),
-                0 0 20px var(--neon-glow),
-                0 0 40px var(--neon-dim),
-                0 0 80px var(--neon-soft);
-            margin-bottom:12px;
-            transition:color 0.6s,text-shadow 0.6s;
-            animation:flicker 4s infinite;
+            animation:glitch 3s infinite, flicker 5s infinite;
+            margin-bottom:8px;
+            position:relative;
         }
+        /* Glitch pseudo-elements */
+        .hero h1::before,
+        .hero h1::after{
+            content:'CICADA 3301';
+            position:absolute;
+            top:0;left:0;
+            width:100%;height:100%;
+            font-family:inherit;font-size:inherit;font-weight:inherit;
+            letter-spacing:inherit;text-transform:inherit;
+        }
+        .hero h1::before{
+            color:#ff0033;
+            animation:glitch-skew 4s infinite linear alternate-reverse;
+            clip-path:inset(20% 0 80% 0);
+            opacity:0.6;
+        }
+        .hero h1::after{
+            color:#00ffff;
+            animation:glitch-skew 3s infinite linear alternate;
+            clip-path:inset(60% 0 10% 0);
+            opacity:0.4;
+        }
+
+        /* ── SUBTITLE ── */
         .hero .sub{
             font-family:'Share Tech Mono',monospace;
             font-size:clamp(0.55rem,1.2vw,0.75rem);
-            color:var(--neon-dim);
+            color:rgba(255,255,255,0.5);
             letter-spacing:3px;text-transform:uppercase;
-            margin-bottom:25px;
-            transition:color 0.6s;
+            margin-bottom:20px;
+            line-height:1.6;
         }
 
-        @keyframes flicker{
-            0%,100%{opacity:1}92%{opacity:1}93%{opacity:0.5}94%{opacity:1}96%{opacity:0.3}97%{opacity:1}
-        }
-
-        /* ── SMALL CICADA SVG (~200px) ── */
-        .cicada-wrap{
-            width:200px;height:200px;
-            position:relative;
+        /* ── GOOD LUCK! ── */
+        .good-luck{
+            font-family:'Orbitron',sans-serif;
+            font-size:clamp(1.4rem,4vw,2.8rem);
+            font-weight:800;
+            color:#ff0033;
+            letter-spacing:clamp(6px,1.5vw,12px);
+            text-transform:uppercase;
+            -webkit-text-stroke:1px #000;
+            text-shadow:
+                0 0 15px rgba(255,0,51,0.6),
+                0 0 30px rgba(255,0,51,0.3),
+                2px 2px 0 #000,
+                -1px -1px 0 #000;
+            animation:flicker 6s infinite;
             margin-bottom:20px;
         }
-        .cicada-wrap svg{
-            width:100%;height:100%;
-            filter:drop-shadow(0 0 12px var(--neon-glow)) drop-shadow(0 0 30px var(--neon-dim));
-            transition:filter 0.6s;
+
+        /* ── EVERYWHERE BOX ── */
+        .everywhere-box{
+            display:inline-block;
+            border:1.5px solid #00ffff;
+            border-radius:6px;
+            padding:10px 35px;
+            margin-bottom:15px;
+            background:rgba(0,255,255,0.03);
+            animation:pulse-glow 4s ease-in-out infinite;
         }
-        .cicada-wrap svg *{transition:stroke 0.6s,fill 0.6s}
+        .everywhere-box span{
+            font-family:'Orbitron',sans-serif;
+            font-size:clamp(0.9rem,2.5vw,1.6rem);
+            font-weight:700;
+            color:#ffffff;
+            letter-spacing:clamp(6px,2vw,15px);
+            text-transform:uppercase;
+        }
+
+        /* ── 3 3 0 1 ── */
+        .three-three-oh-one{
+            font-family:'Orbitron',sans-serif;
+            font-size:clamp(0.9rem,2vw,1.4rem);
+            font-weight:700;
+            color:#00ffff;
+            letter-spacing:clamp(8px,2vw,14px);
+            text-shadow:0 0 12px rgba(0,255,255,0.5),0 0 25px rgba(0,255,255,0.2);
+            margin-bottom:25px;
+        }
+
+        /* ── SMALL CICADA IN CIRCLE (bottom-right) ── */
+        .cicada-badge{
+            position:fixed;
+            bottom:30px;right:30px;
+            z-index:10;
+            width:80px;height:80px;
+            border:1.5px solid rgba(0,255,255,0.5);
+            border-radius:50%;
+            display:flex;justify-content:center;align-items:center;
+            background:rgba(0,0,0,0.6);
+            box-shadow:0 0 15px rgba(0,255,255,0.15),inset 0 0 8px rgba(0,255,255,0.08);
+            animation:pulse-glow 5s ease-in-out infinite;
+        }
+        .cicada-badge svg{
+            width:55px;height:55px;
+            filter:drop-shadow(0 0 4px rgba(0,255,255,0.5));
+        }
 
         /* ── PUZZLES SECTION ── */
         .puzzles{
@@ -97,11 +245,10 @@
         }
         .sec-label{
             font-family:'Orbitron',sans-serif;
-            font-size:0.85rem;color:var(--neon);
+            font-size:0.85rem;color:#00ffff;
             letter-spacing:5px;text-transform:uppercase;
             text-align:center;margin-bottom:25px;
-            text-shadow:0 0 8px var(--neon-glow);
-            transition:color 0.6s;
+            text-shadow:0 0 8px rgba(0,255,255,0.5);
         }
         .pgrid{
             display:grid;
@@ -110,19 +257,19 @@
         }
         .pcard{
             background:rgba(0,0,0,0.7);
-            border:1px solid var(--neon-dim);
+            border:1px solid rgba(0,255,255,0.2);
             border-radius:5px;padding:18px;cursor:pointer;
             transition:all 0.3s;position:relative;overflow:hidden;
         }
         .pcard::before{
             content:'';position:absolute;top:0;left:0;width:100%;height:2px;
-            background:linear-gradient(90deg,transparent,var(--neon),transparent);
+            background:linear-gradient(90deg,transparent,#00ffff,transparent);
             opacity:0;transition:opacity 0.3s;
         }
-        .pcard:hover{border-color:var(--neon);transform:translateY(-2px);box-shadow:0 4px 20px var(--neon-soft)}
+        .pcard:hover{border-color:#00ffff;transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,255,255,0.15)}
         .pcard:hover::before{opacity:1}
-        .pc-lvl{font-family:'Orbitron',sans-serif;font-size:0.5rem;color:var(--neon-dim);letter-spacing:3px;text-transform:uppercase;margin-bottom:5px}
-        .pc-nm{font-family:'Orbitron',sans-serif;font-size:0.85rem;font-weight:700;color:var(--neon);margin-bottom:5px;text-shadow:0 0 5px var(--neon-glow);transition:color 0.6s}
+        .pc-lvl{font-family:'Orbitron',sans-serif;font-size:0.5rem;color:rgba(0,255,255,0.3);letter-spacing:3px;text-transform:uppercase;margin-bottom:5px}
+        .pc-nm{font-family:'Orbitron',sans-serif;font-size:0.85rem;font-weight:700;color:#00ffff;margin-bottom:5px;text-shadow:0 0 5px rgba(0,255,255,0.4)}
         .pc-df{display:inline-block;font-size:0.55rem;padding:2px 7px;border-radius:10px;margin-bottom:7px;font-weight:600;letter-spacing:1px;text-transform:uppercase}
         .df-beginner{background:rgba(0,255,102,0.1);color:#00ff66;border:1px solid rgba(0,255,102,0.2)}
         .df-easy{background:rgba(0,255,255,0.08);color:#00ffff;border:1px solid rgba(0,255,255,0.15)}
@@ -133,58 +280,61 @@
         .df-mythic{background:rgba(204,0,255,0.12);color:#cc00ff;border:1px solid rgba(204,0,255,0.25);text-shadow:0 0 4px rgba(204,0,255,0.4)}
         .pc-ds{font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:rgba(255,255,255,0.4);line-height:1.4;margin-bottom:8px}
         .pc-rw{font-size:0.65rem;color:#ffd700}
-        .pc-mt{display:flex;justify-content:space-between;margin-top:6px;font-size:0.55rem;color:var(--neon-dim);opacity:0.5}
+        .pc-mt{display:flex;justify-content:space-between;margin-top:6px;font-size:0.55rem;color:rgba(0,255,255,0.3);opacity:0.5}
 
         /* ── LEADERBOARD ── */
-        .lb{max-width:700px;margin:30px auto;background:rgba(0,0,0,0.6);border:1px solid var(--neon-dim);border-radius:5px;padding:18px;max-height:280px;overflow-y:auto}
+        .lb{max-width:700px;margin:30px auto;background:rgba(0,0,0,0.6);border:1px solid rgba(0,255,255,0.2);border-radius:5px;padding:18px;max-height:280px;overflow-y:auto}
         .lb h3{font-family:'Orbitron',sans-serif;color:#ffd700;font-size:0.75rem;letter-spacing:3px;text-align:center;margin-bottom:10px}
         .lbr{display:flex;justify-content:space-between;padding:5px 8px;border-bottom:1px solid rgba(255,255,255,0.02);font-family:'Share Tech Mono',monospace;font-size:0.7rem}
-        .lbr:hover{background:rgba(255,255,255,0.02)}
+        .lbr:hover{background:rgba(0,255,255,0.02)}
         .lbr-r{font-weight:700;min-width:30px}
         .lbr-1{color:#ffd700;text-shadow:0 0 5px rgba(255,215,0,0.4)}
         .lbr-2{color:#c0c0c0}
         .lbr-3{color:#cd7f32}
         .lbr-n{flex:1;color:rgba(255,255,255,0.6)}
-        .lbr-p{color:var(--neon);transition:color 0.6s}
+        .lbr-p{color:#00ffff}
 
         /* ── TELEGRAM ── */
-        .tgb{text-align:center;margin:25px auto;max-width:460px;padding:18px;border:1px solid var(--neon-dim);border-radius:5px;background:rgba(0,0,0,0.5)}
+        .tgb{text-align:center;margin:25px auto;max-width:460px;padding:18px;border:1px solid rgba(0,255,255,0.2);border-radius:5px;background:rgba(0,0,0,0.5)}
         .tgb p{font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:rgba(255,255,255,0.35);margin-bottom:10px;letter-spacing:2px;text-transform:uppercase}
-        .tgl{display:inline-flex;align-items:center;gap:7px;padding:9px 22px;border:1px solid var(--neon);color:var(--neon);font-family:'Orbitron',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:2px;text-decoration:none;border-radius:3px;transition:all 0.3s}
-        .tgl:hover{background:var(--neon);color:#000;box-shadow:0 0 15px var(--neon-glow)}
+        .tgl{display:inline-flex;align-items:center;gap:7px;padding:9px 22px;border:1px solid #00ffff;color:#00ffff;font-family:'Orbitron',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:2px;text-decoration:none;border-radius:3px;transition:all 0.3s}
+        .tgl:hover{background:#00ffff;color:#000;box-shadow:0 0 15px rgba(0,255,255,0.5)}
 
         /* ── FOOTER ── */
-        .ft{text-align:center;padding:25px 20px;font-family:'Orbitron',sans-serif;font-size:0.5rem;color:var(--neon-dim);letter-spacing:2px;opacity:0.4}
+        .ft{text-align:center;padding:25px 20px;font-family:'Orbitron',sans-serif;font-size:0.5rem;color:rgba(0,255,255,0.3);letter-spacing:2px;opacity:0.4}
         .ft .xmr{font-size:0.45rem;color:rgba(255,255,255,0.12);margin-top:6px;word-break:break-all;font-family:'Share Tech Mono',monospace}
 
         /* ── MODAL ── */
         .mbg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:5000;justify-content:center;align-items:center}
         .mbg.active{display:flex}
-        .mbox{background:#050505;border:1px solid var(--neon);border-radius:6px;padding:24px;max-width:480px;width:90%;box-shadow:0 0 30px var(--neon-dim)}
-        .mbox h3{font-family:'Orbitron',sans-serif;color:var(--neon);font-size:0.8rem;letter-spacing:3px;margin-bottom:10px;text-shadow:0 0 6px var(--neon-glow)}
+        .mbox{background:#050505;border:1px solid #00ffff;border-radius:6px;padding:24px;max-width:480px;width:90%;box-shadow:0 0 30px rgba(0,255,255,0.3)}
+        .mbox h3{font-family:'Orbitron',sans-serif;color:#00ffff;font-size:0.8rem;letter-spacing:3px;margin-bottom:10px;text-shadow:0 0 6px rgba(0,255,255,0.5)}
         .mbox .md{font-family:'Share Tech Mono',monospace;color:rgba(255,255,255,0.45);font-size:0.75rem;line-height:1.5;margin-bottom:6px;padding:8px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.04);border-radius:3px}
         .mbox .mr{color:#ffd700;font-size:0.75rem;margin-bottom:10px}
-        .mbox input,.mbox textarea{width:100%;background:rgba(0,0,0,0.6);border:1px solid var(--neon-dim);color:var(--neon);padding:8px 10px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;border-radius:3px;margin-bottom:6px;outline:none;transition:border-color 0.3s}
-        .mbox input:focus,.mbox textarea:focus{border-color:var(--neon);box-shadow:0 0 6px var(--neon-soft)}
+        .mbox input,.mbox textarea{width:100%;background:rgba(0,0,0,0.6);border:1px solid rgba(0,255,255,0.2);color:#00ffff;padding:8px 10px;font-family:'Share Tech Mono',monospace;font-size:0.78rem;border-radius:3px;margin-bottom:6px;outline:none;transition:border-color 0.3s}
+        .mbox input:focus,.mbox textarea:focus{border-color:#00ffff;box-shadow:0 0 6px rgba(0,255,255,0.2)}
         .mbox input::placeholder,.mbox textarea::placeholder{color:rgba(255,255,255,0.12)}
         .mbs{display:flex;gap:6px;margin-top:3px}
-        .btn-s{flex:1;padding:9px;background:var(--neon);color:#000;border:none;font-family:'Orbitron',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:2px;cursor:pointer;border-radius:3px;transition:all 0.3s}
-        .btn-s:hover{box-shadow:0 0 12px var(--neon-glow);transform:translateY(-1px)}
+        .btn-s{flex:1;padding:9px;background:#00ffff;color:#000;border:none;font-family:'Orbitron',sans-serif;font-size:0.65rem;font-weight:700;letter-spacing:2px;cursor:pointer;border-radius:3px;transition:all 0.3s}
+        .btn-s:hover{box-shadow:0 0 12px rgba(0,255,255,0.5);transform:translateY(-1px)}
         .btn-h{padding:9px 12px;background:transparent;color:#ff6600;border:1px solid #ff6600;font-family:'Orbitron',sans-serif;font-size:0.55rem;font-weight:600;letter-spacing:1px;cursor:pointer;border-radius:3px;transition:all 0.3s}
         .btn-h:hover{background:#ff6600;color:#000}
         .btn-c{padding:9px 12px;background:transparent;color:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.08);font-family:'Share Tech Mono',monospace;font-size:0.65rem;cursor:pointer;border-radius:3px}
 
         /* ── SOUND TOGGLE ── */
-        .st{position:fixed;bottom:16px;right:16px;z-index:500;width:34px;height:34px;background:rgba(0,0,0,0.8);border:1px solid var(--neon-dim);border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;transition:all 0.3s;font-size:1rem}
-        .st:hover{border-color:var(--neon);box-shadow:0 0 10px var(--neon-dim)}
+        .st{position:fixed;bottom:16px;right:120px;z-index:500;width:34px;height:34px;background:rgba(0,0,0,0.8);border:1px solid rgba(0,255,255,0.3);border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;transition:all 0.3s;font-size:1rem}
+        .st:hover{border-color:#00ffff;box-shadow:0 0 10px rgba(0,255,255,0.3)}
         .st.muted{opacity:0.3}
 
         /* ── RESPONSIVE ── */
         @media(max-width:768px){
             .pgrid{grid-template-columns:1fr}
             .lb,.tgb{margin:18px 12px}
-            .cicada-wrap{width:150px;height:150px}
+            .cicada-badge{width:60px;height:60px;bottom:15px;right:15px}
+            .cicada-badge svg{width:40px;height:40px}
             .tag{font-size:0.55rem;top:8px;left:10px}
+            .st{right:90px}
+            .flying-cicada svg{width:40px;height:40px}
         }
     </style>
 </head>
@@ -200,69 +350,130 @@
 
 <div class="st" id="sndBtn" onclick="toggleSound()">&#x1F997;</div>
 
+<!-- ══ FLYING CICADA 1 (left to right) ══ -->
+<div class="flying-cicada" id="flyCicada1">
+    <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Head -->
+        <circle cx="100" cy="55" r="12" stroke="#00ffff" stroke-width="1.5" fill="none" opacity="0.9"/>
+        <!-- Eyes -->
+        <circle cx="94" cy="52" r="3" fill="#00ffff" opacity="0.85"/>
+        <circle cx="106" cy="52" r="3" fill="#00ffff" opacity="0.85"/>
+        <!-- Antennae -->
+        <path d="M94 46 Q80 25 65 15" stroke="#00ffff" stroke-width="1" fill="none" opacity="0.65"/>
+        <path d="M106 46 Q120 25 135 15" stroke="#00ffff" stroke-width="1" fill="none" opacity="0.65"/>
+        <!-- Left Wing -->
+        <g class="wing-l">
+            <path d="M75 80 Q30 50 15 80 Q20 110 75 120" stroke="#00ffff" stroke-width="1.3" fill="none" opacity="0.7"/>
+            <path d="M75 85 Q40 65 30 85" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.4"/>
+            <path d="M75 95 Q35 80 25 100" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.35"/>
+            <line x1="75" y1="90" x2="30" y2="90" stroke="#00ffff" stroke-width="0.5" opacity="0.25"/>
+        </g>
+        <!-- Right Wing -->
+        <g class="wing-r">
+            <path d="M125 80 Q170 50 185 80 Q180 110 125 120" stroke="#00ffff" stroke-width="1.3" fill="none" opacity="0.7"/>
+            <path d="M125 85 Q160 65 170 85" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.4"/>
+            <path d="M125 95 Q165 80 175 100" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.35"/>
+            <line x1="125" y1="90" x2="170" y2="90" stroke="#00ffff" stroke-width="0.5" opacity="0.25"/>
+        </g>
+        <!-- Thorax -->
+        <ellipse cx="100" cy="75" rx="20" ry="9" stroke="#00ffff" stroke-width="1.2" fill="none" opacity="0.7"/>
+        <!-- Abdomen -->
+        <ellipse cx="100" cy="100" rx="24" ry="11" stroke="#00ffff" stroke-width="1.1" fill="none" opacity="0.65"/>
+        <ellipse cx="100" cy="122" rx="22" ry="10" stroke="#00ffff" stroke-width="1.0" fill="none" opacity="0.6"/>
+        <ellipse cx="100" cy="142" rx="18" ry="9" stroke="#00ffff" stroke-width="0.9" fill="none" opacity="0.55"/>
+    </svg>
+</div>
+
+<!-- ══ FLYING CICADA 2 (right to left) ══ -->
+<div class="flying-cicada" id="flyCicada2" style="transform:scaleX(-1)">
+    <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="55" r="12" stroke="#00ffff" stroke-width="1.5" fill="none" opacity="0.9"/>
+        <circle cx="94" cy="52" r="3" fill="#00ffff" opacity="0.85"/>
+        <circle cx="106" cy="52" r="3" fill="#00ffff" opacity="0.85"/>
+        <path d="M94 46 Q80 25 65 15" stroke="#00ffff" stroke-width="1" fill="none" opacity="0.65"/>
+        <path d="M106 46 Q120 25 135 15" stroke="#00ffff" stroke-width="1" fill="none" opacity="0.65"/>
+        <g class="wing-l">
+            <path d="M75 80 Q30 50 15 80 Q20 110 75 120" stroke="#00ffff" stroke-width="1.3" fill="none" opacity="0.7"/>
+            <path d="M75 85 Q40 65 30 85" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.4"/>
+            <path d="M75 95 Q35 80 25 100" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.35"/>
+        </g>
+        <g class="wing-r">
+            <path d="M125 80 Q170 50 185 80 Q180 110 125 120" stroke="#00ffff" stroke-width="1.3" fill="none" opacity="0.7"/>
+            <path d="M125 85 Q160 65 170 85" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.4"/>
+            <path d="M125 95 Q165 80 175 100" stroke="#00ffff" stroke-width="0.7" fill="none" opacity="0.35"/>
+        </g>
+        <ellipse cx="100" cy="75" rx="20" ry="9" stroke="#00ffff" stroke-width="1.2" fill="none" opacity="0.7"/>
+        <ellipse cx="100" cy="100" rx="24" ry="11" stroke="#00ffff" stroke-width="1.1" fill="none" opacity="0.65"/>
+        <ellipse cx="100" cy="122" rx="22" ry="10" stroke="#00ffff" stroke-width="1.0" fill="none" opacity="0.6"/>
+        <ellipse cx="100" cy="142" rx="18" ry="9" stroke="#00ffff" stroke-width="0.9" fill="none" opacity="0.55"/>
+    </svg>
+</div>
+
+<!-- ══ SMALL CICADA BADGE (bottom-right circle) ══ -->
+<div class="cicada-badge">
+    <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Head -->
+        <circle cx="100" cy="50" r="14" stroke="#00ffff" stroke-width="1.8" fill="none" opacity="0.9"/>
+        <!-- Eyes -->
+        <circle cx="93" cy="47" r="3.5" fill="#00ffff" opacity="0.9"/>
+        <circle cx="107" cy="47" r="3.5" fill="#00ffff" opacity="0.9"/>
+        <circle cx="93" cy="47" r="1.5" fill="#fff" opacity="0.8"/>
+        <circle cx="107" cy="47" r="1.5" fill="#fff" opacity="0.8"/>
+        <!-- Antennae -->
+        <path d="M92 40 Q78 22 62 10" stroke="#00ffff" stroke-width="1.2" fill="none" opacity="0.6"/>
+        <path d="M108 40 Q122 22 138 10" stroke="#00ffff" stroke-width="1.2" fill="none" opacity="0.6"/>
+        <circle cx="62" cy="10" r="1.5" fill="#00ffff" opacity="0.5"/>
+        <circle cx="138" cy="10" r="1.5" fill="#00ffff" opacity="0.5"/>
+        <!-- Left Wing -->
+        <path d="M72 72 Q25 42 10 72 Q15 105 72 115" stroke="#00ffff" stroke-width="1.5" fill="none" opacity="0.75"/>
+        <path d="M72 78 Q38 58 28 78" stroke="#00ffff" stroke-width="0.8" fill="none" opacity="0.45"/>
+        <path d="M72 88 Q33 72 22 92" stroke="#00ffff" stroke-width="0.8" fill="none" opacity="0.4"/>
+        <path d="M72 98 Q36 86 26 104" stroke="#00ffff" stroke-width="0.6" fill="none" opacity="0.35"/>
+        <line x1="72" y1="82" x2="28" y2="82" stroke="#00ffff" stroke-width="0.5" opacity="0.3"/>
+        <line x1="72" y1="95" x2="30" y2="95" stroke="#00ffff" stroke-width="0.4" opacity="0.25"/>
+        <ellipse cx="48" cy="82" rx="6" ry="10" stroke="#00ffff" stroke-width="0.4" fill="none" opacity="0.15"/>
+        <!-- Right Wing -->
+        <path d="M128 72 Q175 42 190 72 Q185 105 128 115" stroke="#00ffff" stroke-width="1.5" fill="none" opacity="0.75"/>
+        <path d="M128 78 Q162 58 172 78" stroke="#00ffff" stroke-width="0.8" fill="none" opacity="0.45"/>
+        <path d="M128 88 Q167 72 178 92" stroke="#00ffff" stroke-width="0.8" fill="none" opacity="0.4"/>
+        <path d="M128 98 Q164 86 174 104" stroke="#00ffff" stroke-width="0.6" fill="none" opacity="0.35"/>
+        <line x1="128" y1="82" x2="172" y2="82" stroke="#00ffff" stroke-width="0.5" opacity="0.3"/>
+        <line x1="128" y1="95" x2="170" y2="95" stroke="#00ffff" stroke-width="0.4" opacity="0.25"/>
+        <ellipse cx="152" cy="82" rx="6" ry="10" stroke="#00ffff" stroke-width="0.4" fill="none" opacity="0.15"/>
+        <!-- Thorax -->
+        <ellipse cx="100" cy="70" rx="22" ry="10" stroke="#00ffff" stroke-width="1.3" fill="none" opacity="0.7"/>
+        <ellipse cx="100" cy="70" rx="15" ry="6" stroke="#00ffff" stroke-width="0.5" fill="none" opacity="0.2"/>
+        <!-- Abdomen segments -->
+        <ellipse cx="100" cy="95" rx="26" ry="12" stroke="#00ffff" stroke-width="1.2" fill="none" opacity="0.65"/>
+        <ellipse cx="100" cy="118" rx="24" ry="11" stroke="#00ffff" stroke-width="1.1" fill="none" opacity="0.6"/>
+        <ellipse cx="100" cy="138" rx="20" ry="10" stroke="#00ffff" stroke-width="1.0" fill="none" opacity="0.55"/>
+        <ellipse cx="100" cy="155" rx="14" ry="7" stroke="#00ffff" stroke-width="0.8" fill="none" opacity="0.45"/>
+        <line x1="100" y1="80" x2="100" y2="162" stroke="#00ffff" stroke-width="0.4" opacity="0.2"/>
+        <!-- Legs Left -->
+        <path d="M78 75 Q58 95 50 112" stroke="#00ffff" stroke-width="0.9" fill="none" opacity="0.4"/>
+        <path d="M76 92 Q53 112 46 130" stroke="#00ffff" stroke-width="0.9" fill="none" opacity="0.35"/>
+        <path d="M80 108 Q58 128 53 148" stroke="#00ffff" stroke-width="0.8" fill="none" opacity="0.3"/>
+        <!-- Legs Right -->
+        <path d="M122 75 Q142 95 150 112" stroke="#00ffff" stroke-width="0.9" fill="none" opacity="0.4"/>
+        <path d="M124 92 Q147 112 154 130" stroke="#00ffff" stroke-width="0.9" fill="none" opacity="0.35"/>
+        <path d="M120 108 Q142 128 147 148" stroke="#00ffff" stroke-width="0.8" fill="none" opacity="0.3"/>
+        <!-- Leg joints -->
+        <circle cx="60" cy="100" r="1.2" fill="#00ffff" opacity="0.3"/>
+        <circle cx="54" cy="118" r="1.2" fill="#00ffff" opacity="0.25"/>
+        <circle cx="140" cy="100" r="1.2" fill="#00ffff" opacity="0.3"/>
+        <circle cx="146" cy="118" r="1.2" fill="#00ffff" opacity="0.25"/>
+    </svg>
+</div>
+
 <!-- ═══ HERO ═══ -->
 <div class="hero">
     <h1>CICADA 3301</h1>
-    <p class="sub">We are everywhere. Decode to prove yourself.</p>
-
-    <div class="cicada-wrap">
-        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Head -->
-            <circle cx="100" cy="55" r="12" stroke="var(--neon)" stroke-width="1.5" fill="none" opacity="0.9"/>
-            <!-- Eyes -->
-            <circle cx="94" cy="52" r="3" fill="var(--neon)" opacity="0.85"/>
-            <circle cx="106" cy="52" r="3" fill="var(--neon)" opacity="0.85"/>
-            <circle cx="94" cy="52" r="1.2" fill="var(--neon)" opacity="1"/>
-            <circle cx="106" cy="52" r="1.2" fill="var(--neon)" opacity="1"/>
-            <!-- Antennae -->
-            <path d="M94 46 Q80 25 65 15" stroke="var(--neon)" stroke-width="1" fill="none" opacity="0.65"/>
-            <path d="M106 46 Q120 25 135 15" stroke="var(--neon)" stroke-width="1" fill="none" opacity="0.65"/>
-            <circle cx="80" cy="27" r="1" fill="var(--neon)" opacity="0.4"/>
-            <circle cx="120" cy="27" r="1" fill="var(--neon)" opacity="0.4"/>
-
-            <!-- Left Wing -->
-            <path d="M75 80 Q30 50 15 80 Q20 110 75 120" stroke="var(--neon)" stroke-width="1.3" fill="none" opacity="0.8"/>
-            <path d="M75 85 Q40 65 30 85" stroke="var(--neon)" stroke-width="0.7" fill="none" opacity="0.4"/>
-            <path d="M75 95 Q35 80 25 100" stroke="var(--neon)" stroke-width="0.7" fill="none" opacity="0.35"/>
-            <path d="M75 105 Q38 95 28 112" stroke="var(--neon)" stroke-width="0.5" fill="none" opacity="0.3"/>
-            <line x1="75" y1="90" x2="30" y2="90" stroke="var(--neon)" stroke-width="0.5" opacity="0.25"/>
-            <line x1="75" y1="100" x2="32" y2="100" stroke="var(--neon)" stroke-width="0.4" opacity="0.2"/>
-            <ellipse cx="50" cy="88" rx="6" ry="10" stroke="var(--neon)" stroke-width="0.3" fill="none" opacity="0.12"/>
-
-            <!-- Right Wing -->
-            <path d="M125 80 Q170 50 185 80 Q180 110 125 120" stroke="var(--neon)" stroke-width="1.3" fill="none" opacity="0.8"/>
-            <path d="M125 85 Q160 65 170 85" stroke="var(--neon)" stroke-width="0.7" fill="none" opacity="0.4"/>
-            <path d="M125 95 Q165 80 175 100" stroke="var(--neon)" stroke-width="0.7" fill="none" opacity="0.35"/>
-            <path d="M125 105 Q162 95 172 112" stroke="var(--neon)" stroke-width="0.5" fill="none" opacity="0.3"/>
-            <line x1="125" y1="90" x2="170" y2="90" stroke="var(--neon)" stroke-width="0.5" opacity="0.25"/>
-            <line x1="125" y1="100" x2="168" y2="100" stroke="var(--neon)" stroke-width="0.4" opacity="0.2"/>
-            <ellipse cx="150" cy="88" rx="6" ry="10" stroke="var(--neon)" stroke-width="0.3" fill="none" opacity="0.12"/>
-
-            <!-- Thorax -->
-            <ellipse cx="100" cy="75" rx="20" ry="9" stroke="var(--neon)" stroke-width="1.2" fill="none" opacity="0.7"/>
-            <ellipse cx="100" cy="75" rx="14" ry="6" stroke="var(--neon)" stroke-width="0.5" fill="none" opacity="0.2"/>
-
-            <!-- Abdomen segments -->
-            <ellipse cx="100" cy="100" rx="24" ry="11" stroke="var(--neon)" stroke-width="1.1" fill="none" opacity="0.65"/>
-            <ellipse cx="100" cy="122" rx="22" ry="10" stroke="var(--neon)" stroke-width="1.0" fill="none" opacity="0.6"/>
-            <ellipse cx="100" cy="142" rx="18" ry="9" stroke="var(--neon)" stroke-width="0.9" fill="none" opacity="0.55"/>
-            <line x1="100" y1="85" x2="100" y2="150" stroke="var(--neon)" stroke-width="0.4" opacity="0.2"/>
-
-            <!-- Legs — Left -->
-            <path d="M80 78 Q60 100 52 118" stroke="var(--neon)" stroke-width="0.8" fill="none" opacity="0.4"/>
-            <path d="M78 95 Q55 115 48 132" stroke="var(--neon)" stroke-width="0.8" fill="none" opacity="0.35"/>
-            <path d="M82 112 Q60 132 55 150" stroke="var(--neon)" stroke-width="0.7" fill="none" opacity="0.3"/>
-            <!-- Legs — Right -->
-            <path d="M120 78 Q140 100 148 118" stroke="var(--neon)" stroke-width="0.8" fill="none" opacity="0.4"/>
-            <path d="M122 95 Q145 115 152 132" stroke="var(--neon)" stroke-width="0.8" fill="none" opacity="0.35"/>
-            <path d="M118 112 Q140 132 145 150" stroke="var(--neon)" stroke-width="0.7" fill="none" opacity="0.3"/>
-            <!-- Leg joints -->
-            <circle cx="62" cy="105" r="1" fill="var(--neon)" opacity="0.25"/>
-            <circle cx="56" cy="120" r="1" fill="var(--neon)" opacity="0.2"/>
-            <circle cx="138" cy="105" r="1" fill="var(--neon)" opacity="0.25"/>
-            <circle cx="144" cy="120" r="1" fill="var(--neon)" opacity="0.2"/>
-        </svg>
+    <p class="sub">We are everywhere.<br>Decode to prove yourself.</p>
+    <div class="good-luck">GOOD LUCK!</div>
+    <div class="everywhere-box">
+        <span>EVERYWHERE</span>
     </div>
+    <div class="three-three-oh-one">3 3 0 1</div>
 </div>
 
 <!-- ═══ PUZZLES ═══ -->
@@ -310,14 +521,13 @@
     let W,H,cols,dr,fs=14;
     function rz(){W=c.width=innerWidth;H=c.height=innerHeight;cols=Math.floor(W/fs);dr=Array.from({length:cols},()=>Math.random()*H/fs|0)}
     rz();addEventListener('resize',rz);
-    function rc(a){const n=getComputedStyle(document.documentElement).getPropertyValue('--neon').trim();return n+Math.round(a*255).toString(16).padStart(2,'0')}
     function draw(){
         x.fillStyle='rgba(0,0,0,0.05)';x.fillRect(0,0,W,H);
         x.font=fs+'px Share Tech Mono,monospace';
         for(let i=0;i<cols;i++){
             const ch=String.fromCharCode(0x30A0+Math.random()*96),px=i*fs,py=dr[i]*fs;
-            x.fillStyle=rc(0.85);x.fillText(ch,px,py);
-            x.fillStyle=rc(0.25);x.fillText(ch,px,py-fs);
+            x.fillStyle='rgba(0,255,255,0.85)';x.fillText(ch,px,py);
+            x.fillStyle='rgba(0,255,255,0.25)';x.fillText(ch,px,py-fs);
             if(py>H&&Math.random()>0.975)dr[i]=0;
             dr[i]++;
         }
@@ -326,20 +536,7 @@
     draw();
 })();
 
-/* ── 2. COLOR CYCLING: red → green → lime → purple → red ── */
-(function(){
-    const C=[
-        {n:'#ff0033',g:'rgba(255,0,51,',d:'rgba(255,0,51,0.25)',s:'rgba(255,0,51,0.08)'},
-        {n:'#00ff41',g:'rgba(0,255,65,',d:'rgba(0,255,65,0.25)',s:'rgba(0,255,65,0.08)'},
-        {n:'#39ff14',g:'rgba(57,255,20,',d:'rgba(57,255,20,0.25)',s:'rgba(57,255,20,0.08)'},
-        {n:'#bf00ff',g:'rgba(191,0,255,',d:'rgba(191,0,255,0.25)',s:'rgba(191,0,255,0.08)'},
-    ];
-    let i=0;const r=document.documentElement.style;
-    function sc(i){const c=C[i%C.length];r.setProperty('--neon',c.n);r.setProperty('--neon-glow',c.g+'0.5)');r.setProperty('--neon-dim',c.d);r.setProperty('--neon-soft',c.s)}
-    sc(0);setInterval(()=>{i++;sc(i%C.length)},2000);
-})();
-
-/* ── 3. CICADA SOUND (real MP3) ── */
+/* ── 2. CICADA SOUND (real MP3) ── */
 const audioEl=document.getElementById('cicadaAudio');
 audioEl.volume=0.3;
 let sndMuted=false;
@@ -349,11 +546,10 @@ function toggleSound(){
     if(sndMuted){audioEl.play();sndMuted=false;b.classList.remove('muted')}
     else{audioEl.pause();sndMuted=true;b.classList.add('muted')}
 }
-// Auto-play on first interaction
 document.addEventListener('click',function o(){audioEl.play().catch(()=>{});document.removeEventListener('click',o)},{once:true});
 document.addEventListener('touchstart',function o(){audioEl.play().catch(()=>{});document.removeEventListener('touchstart',o)},{once:true});
 
-/* ── 4. PUZZLES ── */
+/* ── 3. PUZZLES ── */
 const puzzles=[
     {id:'initiation',name:'Initiation',diff:'Beginner',reward:'0.01 XMR',pts:100,time:'24h',cat:'Cryptography',desc:'Decode: "01001101 01101111 01101110 01100101 01110010 01101111"',hint:'Binary to text'},
     {id:'caesar',name:"Caesar's Truth",diff:'Easy',reward:'0.02 XMR',pts:200,time:'48h',cat:'Classical Cipher',desc:'L FDPH, L VDZ, L FRQTXHUHG. Cipher: VQREWLVDQD',hint:'ROT13 is everywhere. 3301.'},
@@ -374,7 +570,7 @@ document.getElementById('puzzleGrid').innerHTML=puzzles.map((p,i)=>`
         <div class="pc-mt"><span>&#x23F1; ${p.time}</span><span>&#x1F517; ${p.cat}</span></div>
     </div>`).join('');
 
-/* ── 5. MODAL ── */
+/* ── 4. MODAL ── */
 let cur=null;
 function openPuzzle(id){cur=puzzles.find(p=>p.id===id);if(!cur)return;document.getElementById('mT').textContent='\u{1F511} '+cur.name;document.getElementById('mD').textContent=cur.desc;document.getElementById('mR').innerHTML='\u{1F4B0} '+cur.reward+' | \u{1F3AF} '+cur.pts+' pts';document.getElementById('iA').value='';document.getElementById('modal').classList.add('active')}
 function closeModal(){document.getElementById('modal').classList.remove('active')}
@@ -383,7 +579,7 @@ function getH(id){return{'initiation':'money','caesar':'inthissign','primus':'th
 async function submitAnswer(){if(!cur)return;const a=document.getElementById('iA').value.trim();if(!a){alert('Enter your decoded answer.');return}const h=await sha256(a);if(h===await sha256(getH(cur.id))){alert('\u2705 CORRECT!\n\n'+cur.name+' solved!\n+'+cur.pts+' points\n'+cur.reward);closeModal()}else{alert('\u274C Incorrect. The code awaits decryption.')}}
 function buyHint(){if(!cur)return;alert('\u{1F4A1} HINT: '+cur.hint+'\n\nCost: 0.005 XMR')}
 
-/* ── 6. LEADERBOARD ── */
+/* ── 5. LEADERBOARD ── */
 const lb=[{r:1,n:'3301_initiate',p:25000},{r:2,n:'cipher_ghost',p:18500},{r:3,n:'runecaster',p:14200},{r:4,n:'darknet_walker',p:10800},{r:5,n:'quantum_obs',p:8500},{r:6,n:'steg_breaker',p:6200},{r:7,n:'xmr_tracer',p:4100},{r:8,n:'null_byte',p:2800},{r:9,n:'freq_analyst',p:1500},{r:10,n:'newcomer_01',p:500}];
 document.getElementById('lbList').innerHTML=lb.map(e=>`<div class="lbr"><span class="lbr-r lbr-${e.r}">#${e.r}</span><span class="lbr-n">${e.n}</span><span class="lbr-p">${e.p.toLocaleString()} pts</span></div>`).join('');
 </script>
