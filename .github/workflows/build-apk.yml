@@ -81,66 +81,68 @@ jobs:
       - name: Configure Gradle signing — JARVIS MIND
         run: |
           GRADLE_FILE="apk-build/android/app/build.gradle"
-          # Inject signing config before the android { block closes
-          SIGNING_BLOCK="
-          signingConfigs {
-              release {
-                  storeFile file('${GITHUB_WORKSPACE}/whoamisec.keystore')
-                  storePassword System.getenv('KS_PASS') ?: 'WhoamiSec2026'
-                  keyAlias '${KS_ALIAS}'
-                  keyPassword System.getenv('KS_PASS') ?: 'WhoamiSec2026'
-              }
-          }
-          buildTypes {
-              release {
-                  signingConfig signingConfigs.release
-                  minifyEnabled false
-              }
-          }"
-
           python3 -c "
-          import sys
-          f = sys.argv[1]
-          c = open(f).read()
-          # Ensure release build type has signing
-          if 'signingConfigs' not in c:
-              c = c.replace('buildTypes {', 'signingConfigs {\n    release {\n        storeFile file(\"\\$GITHUB_WORKSPACE/whoamisec.keystore\")\n        storePassword \"\\$KS_PASS\"\n        keyAlias \"whoamisec\"\n        keyPassword \"\\$KS_PASS\"\n    }\n}\nbuildTypes {')
-              if 'signingConfig signingConfigs.release' not in c:
-                  c = c.replace('release {', 'release {\n            signingConfig signingConfigs.release')
-          # Fix SDK versions
-          import re
-          c = re.sub(r'minSdkVersion\s+\d+', 'minSdkVersion 23', c)
-          c = re.sub(r'targetSdkVersion\s+\d+', 'targetSdkVersion 34', c)
-          c = re.sub(r'compileSdkVersion\s+\d+', 'compileSdkVersion 34', c)
-          open(f, 'w').write(c)
-          print('Gradle patched')
-          " "$GRADLE_FILE"
+import sys, re
+f = sys.argv[1]
+c = open(f).read()
+if 'signingConfigs' not in c:
+    c = c.replace('buildTypes {', 'signingConfigs {\n    release {\n        storeFile file(\"\\$GITHUB_WORKSPACE/whoamisec.keystore\")\n        storePassword \"\\$KS_PASS\"\n        keyAlias \"whoamisec\"\n        keyPassword \"\\$KS_PASS\"\n    }\n}\nbuildTypes {')
+    if 'signingConfig signingConfigs.release' not in c:
+        c = c.replace('release {', 'release {\n            signingConfig signingConfigs.release')
+c = re.sub(r'minSdkVersion\s+\d+', 'minSdkVersion 23', c)
+c = re.sub(r'targetSdkVersion\s+\d+', 'targetSdkVersion 34', c)
+c = re.sub(r'compileSdkVersion\s+\d+', 'compileSdkVersion 34', c)
+open(f, 'w').write(c)
+print('Gradle patched')
+" "$GRADLE_FILE"
 
       - name: Build JARVIS MIND APK
         working-directory: apk-build/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon 2>&1 | tail -40
-          echo "=== Build output structure ==="
-          find . -name "*.apk" -type f 2>/dev/null || echo "No APK found in build"
-          find app/build/outputs -type f 2>/dev/null | head -20 || echo "No outputs"
+          set -o pipefail
+          ./gradlew assembleRelease --no-daemon 2>&1 | tee /tmp/gradle-jm.log | tail -40
+          echo "=== Gradle exit code: ${PIPESTATUS[0]} ==="
 
-      - name: Verify JARVIS MIND APK
+      - name: Collect JARVIS MIND APK
         run: |
-          echo "Searching for APK..."
-          find apk-build/android/ -name "*.apk" -type f 2>/dev/null
-          APK=$(find apk-build/android/ -name "*.apk" -type f | head -1)
-          if [ -z "$APK" ]; then
-            echo "ERROR: No APK found anywhere!"
-            echo "Build output structure:"
-            find apk-build/android/app/build/outputs/ -type f 2>/dev/null || echo "No outputs dir"
-            find apk-build/android/app/build/ -name "*.apk" 2>/dev/null || echo "No APK in build dir"
+          echo "=== Searching entire workspace for APK ==="
+          find "$GITHUB_WORKSPACE/apk-build" -name "*.apk" -type f 2>/dev/null
+          echo "=== Outputs dir ==="
+          ls -laR "$GITHUB_WORKSPACE/apk-build/android/app/build/outputs/" 2>/dev/null || echo "No outputs dir"
+          echo "=== Build dir contents ==="
+          find "$GITHUB_WORKSPACE/apk-build/android/app/build/" -type f 2>/dev/null | head -30 || echo "Empty build dir"
+
+          FOUND=""
+          for p in \
+            "$GITHUB_WORKSPACE/apk-build/android/app/build/outputs/apk/release" \
+            "$GITHUB_WORKSPACE/apk-build/android/app/build/outputs/apk/debug" \
+            "$GITHUB_WORKSPACE/apk-build/android/app/build/outputs/apk" \
+            "$GITHUB_WORKSPACE/apk-build/android/app/build"; do
+            APK=$(find "$p" -name "*.apk" -type f 2>/dev/null | head -1)
+            if [ -n "$APK" ]; then
+              echo "Found at: $APK"
+              cp "$APK" "$GITHUB_WORKSPACE/JARVIS-MIND-v3.apk"
+              FOUND=yes
+              break
+            fi
+          done
+
+          if [ -z "$FOUND" ]; then
+            APK=$(find "$GITHUB_WORKSPACE" -maxdepth 10 -name "*.apk" -type f 2>/dev/null | grep -v keystore | head -1)
+            if [ -n "$APK" ]; then
+              cp "$APK" "$GITHUB_WORKSPACE/JARVIS-MIND-v3.apk"
+              FOUND=yes
+            fi
+          fi
+
+          if [ "$FOUND" = "yes" ] && [ -f "$GITHUB_WORKSPACE/JARVIS-MIND-v3.apk" ]; then
+            echo "APK ready: $(du -sh $GITHUB_WORKSPACE/JARVIS-MIND-v3.apk)"
+          else
+            echo "FAIL: No APK produced by Gradle build"
+            cat /tmp/gradle-jm.log 2>/dev/null | tail -60
             exit 1
           fi
-          echo "Found APK: $APK"
-          echo "Size: $(du -sh $APK)"
-          cp "$APK" JARVIS-MIND-v3.apk
-          echo "Copied to JARVIS-MIND-v3.apk"
 
       # ════════════════════════════════════════════════════════
       # APK 2 — WHOAMISEC Business v16
@@ -166,45 +168,59 @@ jobs:
         run: |
           GRADLE_FILE="apk-build/android/app/build.gradle"
           python3 -c "
-          import sys, re
-          f = sys.argv[1]
-          c = open(f).read()
-          if 'signingConfigs' not in c:
-              c = c.replace('buildTypes {', 'signingConfigs {\n    release {\n        storeFile file(\"\\$GITHUB_WORKSPACE/whoamisec.keystore\")\n        storePassword \"\\$KS_PASS\"\n        keyAlias \"whoamisec\"\n        keyPassword \"\\$KS_PASS\"\n    }\n}\nbuildTypes {')
-              if 'signingConfig signingConfigs.release' not in c:
-                  c = c.replace('release {', 'release {\n            signingConfig signingConfigs.release')
-          c = re.sub(r'minSdkVersion\s+\d+', 'minSdkVersion 23', c)
-          c = re.sub(r'targetSdkVersion\s+\d+', 'targetSdkVersion 34', c)
-          c = re.sub(r'compileSdkVersion\s+\d+', 'compileSdkVersion 34', c)
-          open(f, 'w').write(c)
-          print('Gradle patched')
-          " "$GRADLE_FILE"
+import sys, re
+f = sys.argv[1]
+c = open(f).read()
+if 'signingConfigs' not in c:
+    c = c.replace('buildTypes {', 'signingConfigs {\n    release {\n        storeFile file(\"\\$GITHUB_WORKSPACE/whoamisec.keystore\")\n        storePassword \"\\$KS_PASS\"\n        keyAlias \"whoamisec\"\n        keyPassword \"\\$KS_PASS\"\n    }\n}\nbuildTypes {')
+    if 'signingConfig signingConfigs.release' not in c:
+        c = c.replace('release {', 'release {\n            signingConfig signingConfigs.release')
+c = re.sub(r'minSdkVersion\s+\d+', 'minSdkVersion 23', c)
+c = re.sub(r'targetSdkVersion\s+\d+', 'targetSdkVersion 34', c)
+c = re.sub(r'compileSdkVersion\s+\d+', 'compileSdkVersion 34', c)
+open(f, 'w').write(c)
+print('Gradle patched')
+" "$GRADLE_FILE"
 
       - name: Build WHOAMISEC Business APK
         working-directory: apk-build/android
         run: |
           chmod +x gradlew
-          # Try release build, fallback to debug
-          ./gradlew assembleRelease --no-daemon 2>&1 | tail -40 ||           ./gradlew assembleDebug --no-daemon 2>&1 | tail -40
-          echo "=== Searching for APK ==="
-          find . -name "*.apk" -type f 2>/dev/null || echo "No APK found"
-          FOUND_APK=$(find . -name "*.apk" -type f | head -1)
-          if [ -n "$FOUND_APK" ]; then
-            cp "$FOUND_APK" "$GITHUB_WORKSPACE/WHOAMISEC-Business-v16.apk"
-            echo "APK copied: $(du -sh $GITHUB_WORKSPACE/WHOAMISEC-Business-v16.apk)"
-          else
-            echo "Listing build directory:"
-            ls -laR app/build/ 2>/dev/null || echo "No build dir"
-            exit 1
+          set -o pipefail
+          ./gradlew assembleRelease --no-daemon 2>&1 | tee /tmp/gradle-ws.log | tail -40
+          echo "=== Gradle exit code: ${PIPESTATUS[0]} ==="
+
+      - name: Collect WHOAMISEC Business APK
+        run: |
+          find "$GITHUB_WORKSPACE/apk-build" -name "*.apk" -type f 2>/dev/null
+
+          FOUND=""
+          for p in \
+            "$GITHUB_WORKSPACE/apk-build/android/app/build/outputs/apk/release" \
+            "$GITHUB_WORKSPACE/apk-build/android/app/build/outputs/apk/debug" \
+            "$GITHUB_WORKSPACE/apk-build/android/app/build/outputs/apk" \
+            "$GITHUB_WORKSPACE/apk-build/android/app/build"; do
+            APK=$(find "$p" -name "*.apk" -type f 2>/dev/null | head -1)
+            if [ -n "$APK" ]; then
+              cp "$APK" "$GITHUB_WORKSPACE/WHOAMISEC-Business-v16.apk"
+              FOUND=yes
+              break
+            fi
+          done
+
+          if [ -z "$FOUND" ]; then
+            APK=$(find "$GITHUB_WORKSPACE" -maxdepth 10 -name "*.apk" -type f 2>/dev/null | grep -v keystore | head -1)
+            if [ -n "$APK" ]; then
+              cp "$APK" "$GITHUB_WORKSPACE/WHOAMISEC-Business-v16.apk"
+              FOUND=yes
+            fi
           fi
 
-      - name: Verify WHOAMISEC Business APK
-        run: |
-          if [ -f "WHOAMISEC-Business-v16.apk" ]; then
-            echo "✅ APK verified: $(du -sh WHOAMISEC-Business-v16.apk)"
-            file WHOAMISEC-Business-v16.apk
+          if [ "$FOUND" = "yes" ] && [ -f "$GITHUB_WORKSPACE/WHOAMISEC-Business-v16.apk" ]; then
+            echo "APK ready: $(du -sh $GITHUB_WORKSPACE/WHOAMISEC-Business-v16.apk)"
           else
-            echo "❌ APK not found at workspace root!"
+            echo "FAIL: No APK produced"
+            cat /tmp/gradle-ws.log 2>/dev/null | tail -60
             exit 1
           fi
 
