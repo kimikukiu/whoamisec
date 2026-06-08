@@ -356,6 +356,16 @@ with app.app_context():
         db.session.commit()
         print('[+] Admin user created: admin@whoamisec.com')
 
+
+@app.route('/cicada')
+def serve_cicada():
+    """Serve the Cicada 3301 puzzle page."""
+    try:
+        with open(os.path.join(HTML_DIR, 'cicada.html'), 'r') as f:
+            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
+    except FileNotFoundError:
+        return '<h1>Cicada page not found</h1>', 404
+
 if __name__ == '__main__':
     print(f'[+] WhoamiSec API v2.0 starting on http://0.0.0.0:5001')
     print(f'[+] Domain: whoamisec.com')
