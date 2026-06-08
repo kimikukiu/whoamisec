@@ -1,165 +1,95 @@
-<p align="center">
-  <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMTAwIj48dGV4dCB4PSIxMCIgeT0iNzAiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iNjAiIGZpbGw9IiMwMGZmNDEiPldIT0FNSS5TRUM8L3RleHQ+PHRleHQgeD0iMTAiIHk9IjkwIiBmb250LWZhbWlseT0ibW9ub3NwYWNlIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMzM5OTU1Ij5KQVJWSVMgT01OSSBBQkxJVEVSQVRFRAwKPC90ZXh0Pjwvc3ZnPg==" alt="WHOAMI.SEC">
-</p>
+# WhoamiSec
 
-<h1 align="center">WHOAMI<span style="color:#ff0040">.SEC</span></h1>
+**Privacy-first AI Infrastructure.** Run powerful open-source models through a scalable API. Zero KYC. Pay with Monero.
 
-<p align="center">
-  <strong>Next-Gen AI Security Platform</strong><br>
-  <em>JARVIS OMNI ABLITERATED</em>
-</p>
-
-<p align="center">
-  <a href="#features">Features</a> &bull;
-  <a href="#setup">Setup</a> &bull;
-  <a href="#api">API</a> &bull;
-  <a href="#monero">Monero</a>
-</p>
+**Live at:** [whoamisec.com](https://whoamisec.com)
 
 ---
 
 ## Features
 
-| Feature | Description |
-|---------|-------------|
-| **VPS Creation** | Ephemeral VPS instances, Tor-routable, auto-burned |
-| **Monero Payments** | Zero-KYC XMR payments, automated verification |
-| **AI Agents** | Local LLMs: Llama 3.2, Phi, TinyLlama, DeepSeek-Coder |
-| **Auto-Scale** | Dynamic resource allocation, GPU passthrough |
-| **Zero-KYC** | No identity verification, anonymous JWT sessions |
-| **JARVIS Core** | Multi-model AI orchestrator, self-healing infra |
+- **6 AI Models** — LLaMA, Phi, Qwen, DeepSeek, Granite — all running on isolated infrastructure
+- **Zero-KYC Payments** — Monero (XMR) only. No identity verification required
+- **OpenAI-Compatible API** — Drop-in replacement for OpenAI endpoints
+- **Open WebUI** — Built-in ChatGPT-like interface
+- **Self-Healing Infrastructure** — Watchdog monitoring, auto-restart, 99.9% uptime
+- **Enterprise Security** — Rate limiting, auto-ban, audit logging, anti-DDoS
 
-## Setup
+## Quick Start
 
-### Quick Start (Docker)
+### 1. Create Account
 
 ```bash
-git clone https://github.com/kimikukiu/whoamisec.git
-cd whoamisec
-docker-compose up -d
+curl -X POST https://whoamisec.com/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"myuser","email":"my@email.com","password":"securepass123"}'
 ```
 
-### Manual Setup
-
-**Backend:**
-```bash
-cd backend
-pip install -r requirements.txt
-python app.py
-# Server runs on http://0.0.0.0:5001
-```
-
-**Frontend:**
-Serve the HTML files with any static server, or open `index.html` directly.
-
-### Ollama (AI Backend)
+### 2. Query AI Models
 
 ```bash
-# Install Ollama
-curl -fsSL https://ollama.com/install.sh | sh
-
-# Pull models
-ollama pull llama3.2:1b
-ollama pull phi:2.7b
-ollama pull tinyllama
-ollama pull deepseek-coder:6.7b
-```
-
-### Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DATABASE_URL` | `sqlite:///whoamisec.db` | Database connection string |
-| `SECRET_KEY` | `whoamisec-super-secret-2026` | Flask secret key |
-| `JWT_SECRET_KEY` | `jwt-whoamisec-secret` | JWT signing key |
-| `OLLAMA_URL` | `http://127.0.0.1:11434` | Ollama API URL |
-| `XMR_WALLET_RPC` | `http://127.0.0.1:18083/json_rpc` | Monero wallet RPC |
-| `XMR_WALLET_ADDRESS` | *(see env)* | Platform XMR deposit address |
-| `XMR_CREDITS_PER_XMR` | `1000` | Credits awarded per XMR |
-
-## API Endpoints
-
-### Authentication
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/auth/register` | Register new user |
-| `POST` | `/api/auth/login` | Login, get JWT token |
-| `GET` | `/api/auth/me` | Get current user info |
-
-### AI
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/ai/chat` | Send message to AI model |
-| `GET` | `/api/models` | List available models |
-
-### Payments
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/payments/monero` | Get XMR deposit address |
-| `GET` | `/api/payments/check` | Check for new payments |
-
-### Admin (Requires admin JWT)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/admin/users` | List all users |
-| `PUT` | `/api/admin/user/<id>/credits` | Update user credits |
-
-### Health
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/health` | Service health check |
-
-## Example API Usage
-
-```bash
-# Register
-curl -X POST http://localhost:5001/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","email":"test@example.com","password":"secure123"}'
-
-# Login
-curl -X POST http://localhost:5001/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"secure123"}'
-
-# Chat with AI
-curl -X POST http://localhost:5001/api/ai/chat \
-  -H "Content-Type: application/json" \
+curl -X POST https://whoamisec.com/api/v1/chat \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  -d '{"message":"Write a Python hello world","model":"deepseek-coder:6.7b"}'
+  -H "Content-Type: application/json" \
+  -d '{"model":"llama3.2:1b","messages":[{"role":"user","content":"Hello!"}]}'
 ```
 
-## Default Admin
+## API Reference
 
-- **Username:** `admin`
-- **Password:** `WhoamiSecAdmin2026!`
-- Auto-created on first startup
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/auth/register` | Create account |
+| POST | `/api/v1/auth/login` | Login |
+| GET | `/api/v1/auth/me` | Get user info |
+| POST | `/api/v1/chat` | Chat with AI |
+| GET | `/api/v1/models` | List models |
+| GET | `/api/v1/payments/info` | Payment info |
+| POST | `/api/v1/payments/verify` | Verify XMR payment |
+| GET | `/api/v1/health` | System health |
 
-## Monero
+## Available Models
 
-Send XMR to fund your account:
+| Model | Size | Speed |
+|-------|------|-------|
+| TinyLlama 1.1B | 650MB | Fast |
+| Phi-2.7B | 1.6GB | Medium |
+| Qwen 2.5 0.5B | 350MB | Fast |
+| Llama 3.2 1B | 1.3GB | Medium |
+| DeepSeek Coder 1.3B | 750MB | Medium |
+| Granite Code 3B | 2.0GB | Slow |
+
+## Pricing
+
+| Plan | Price | Requests/Day | Models |
+|------|-------|-------------|--------|
+| Starter | Free | 100 | 1 |
+| Pro | 0.05 XMR/month | 10,000 | All 6 |
+| Enterprise | 0.15 XMR/month | Unlimited | All + Custom |
+
+## Monero Payment
+
+Send XMR to:
 ```
-46BeJeHmQQ6czjXH2vKSe8V7PbaEtfM3ekuJMFc9BBYhMZym43VWLqPhKYsVfkBB1Jc3RYpUK1jhCcxvFKMn3uTDQzmzDfk
+8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ
 ```
-- 1 XMR = 1,000 credits
-- Payments are verified on-chain
-- Zero-KYC, anonymous
+
+Then verify your payment via the API with your transaction ID.
+
+## Deploy with Docker
+
+```bash
+docker compose up -d
+```
 
 ## Tech Stack
 
-- **Backend:** Python / Flask / SQLAlchemy / SQLite
-- **Frontend:** HTML / CSS / Vanilla JS
-- **AI:** Ollama (local LLM inference)
-- **Auth:** JWT (flask-jwt-extended)
+- **Backend:** Flask + SQLAlchemy + JWT
+- **AI:** Ollama (6 models)
 - **Payments:** Monero (XMR)
-- **Deploy:** Docker / Nginx / GitHub Pages
-
-## Credits
-
-Powered by **JARVIS OMNI** — ABLITERATED MODE: ACTIVE
+- **Frontend:** HTML/CSS/JS
+- **Proxy:** Nginx
+- **Infrastructure:** Docker
 
 ---
 
-<p align="center">
-  <code style="color:#ff0040">ABLITERATED MODE: ACTIVE</code>
-</p>
+*WhoamiSec.com — Privacy-first AI infrastructure. Built by JARVIS OMNI.*
