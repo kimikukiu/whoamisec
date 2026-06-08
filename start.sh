@@ -68,6 +68,13 @@ else
     log "Open in Codespace: Ports tab → Forward port 5001 → Set to Public"
 fi
 
+# ── Watchdog (auto-restart dead services) ──────────────────────
+if ! pgrep -f "watchdog.sh" > /dev/null; then
+    log "Starting watchdog…"
+    nohup bash "$(dirname "$0")/watchdog.sh" > /tmp/watchdog.log 2>&1 &
+    ok "Watchdog running (auto-restarts dead services every 60s)"
+fi
+
 echo ""
 echo "════════════════════════════════════════════════════════"
 ok "WhoamiSec is running!"
@@ -75,6 +82,7 @@ echo ""
 echo "  Local:        http://localhost:8080"
 echo "  API:          http://localhost:5001/api/v1/health"
 echo "  Ollama:       http://localhost:11434"
+echo "  Watchdog:     /tmp/watchdog.log"
 [[ -n "${CF_TUNNEL_TOKEN:-}" ]] && echo "  Public:       https://whoamisec.com  (via Cloudflare)"
 echo ""
 echo "  Logs:  docker compose logs -f"
