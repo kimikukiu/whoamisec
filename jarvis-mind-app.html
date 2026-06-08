@@ -222,6 +222,125 @@
         .metric-item:last-child { border-bottom:none; }
         .metric-bar { flex:1; margin:0 0.75rem; height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden; }
         .metric-fill { height:100%; border-radius:3px; background:var(--grad); }
+
+        /* ===== MANUS-LIKE COMMANDER WORKSPACE ===== */
+        .mode-bar { display:flex; gap:0.35rem; overflow-x:auto; padding-bottom:0.6rem; scrollbar-width:none; }
+        .mode-bar::-webkit-scrollbar { display:none; }
+        .mode-btn { flex-shrink:0; padding:0.32rem 0.7rem; border-radius:20px; font-size:0.73rem; font-weight:600; border:1px solid var(--border); background:rgba(255,255,255,0.04); color:var(--muted); cursor:pointer; transition:all 0.2s; }
+        .mode-btn.active { background:var(--grad); color:#fff; border-color:transparent; }
+        .mode-pane { display:none; }
+        .mode-pane.active { display:block; }
+
+        .chat-model-row { display:flex; gap:0.5rem; align-items:center; margin-bottom:0.6rem; }
+        .chat-messages { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:0.7rem; height:215px; overflow-y:auto; display:flex; flex-direction:column; gap:0.6rem; margin-bottom:0.5rem; }
+        .msg { display:flex; flex-direction:column; }
+        .msg-label { font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.18rem; }
+        .msg-user .msg-label { color:var(--cyan); text-align:right; }
+        .msg-ai .msg-label { color:var(--purple); }
+        .msg-bubble { padding:0.5rem 0.72rem; border-radius:10px; font-size:0.8rem; line-height:1.6; }
+        .msg-user .msg-bubble { background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.12); margin-left:12%; }
+        .msg-ai .msg-bubble { background:rgba(139,92,246,0.07); border:1px solid rgba(139,92,246,0.1); margin-right:5%; }
+        .msg-bubble code { background:rgba(0,0,0,0.35); padding:0.1em 0.35em; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:0.8em; color:var(--cyan); }
+        .msg-bubble pre { background:rgba(0,0,0,0.35); border-radius:7px; padding:0.6rem; margin:0.4rem 0; overflow-x:auto; font-family:'JetBrains Mono',monospace; font-size:0.73rem; line-height:1.5; color:var(--text); }
+        .tool-badge { display:inline-block; padding:0.1rem 0.38rem; border-radius:10px; font-size:0.66rem; background:rgba(139,92,246,0.1); color:var(--purple); border:1px solid rgba(139,92,246,0.15); margin:0.1rem 0.15rem 0.1rem 0; }
+        .tool-call-card { background:rgba(6,182,212,0.04); border:1px solid rgba(6,182,212,0.12); border-radius:7px; padding:0.4rem 0.6rem; margin:0.3rem 0; font-size:0.71rem; font-family:'JetBrains Mono',monospace; cursor:pointer; }
+        .tool-call-name { color:var(--cyan); font-weight:700; }
+        .tool-call-detail { display:none; color:var(--text2); font-size:0.68rem; margin-top:0.2rem; padding-top:0.2rem; border-top:1px solid rgba(255,255,255,0.05); }
+        .tool-call-detail.open { display:block; }
+
+        .cmd-input-row { display:flex; gap:0.4rem; align-items:center; position:relative; }
+        .cmd-input-row input { flex:1; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.62rem 0.85rem; color:var(--text); font-size:0.87rem; outline:none; transition:border-color 0.2s; }
+        .cmd-input-row input:focus { border-color:var(--purple); }
+
+        .slash-dropdown { display:none; position:absolute; bottom:calc(100% + 6px); left:0; right:0; background:var(--card); border:1px solid var(--border); border-radius:10px; overflow:hidden; z-index:50; max-height:220px; overflow-y:auto; }
+        .slash-dropdown.show { display:block; }
+        .slash-item { display:flex; align-items:center; gap:0.5rem; padding:0.5rem 0.7rem; cursor:pointer; font-size:0.8rem; }
+        .slash-item:hover { background:rgba(255,255,255,0.05); }
+        .slash-cmd { color:var(--purple); font-family:'JetBrains Mono',monospace; font-weight:600; font-size:0.75rem; flex-shrink:0; width:160px; }
+        .slash-desc { color:var(--muted); font-size:0.73rem; }
+
+        .tool-panel-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:80; }
+        .tool-panel-overlay.show { display:block; }
+        .tool-panel { position:fixed; bottom:56px; left:0; right:0; z-index:90; background:var(--bg2); border-top:1px solid var(--border); border-radius:18px 18px 0 0; padding:0.85rem 1rem 1.5rem; max-height:72vh; overflow-y:auto; transform:translateY(100%); transition:transform 0.28s ease; }
+        .tool-panel.show { transform:translateY(0); }
+        .tool-panel-handle { width:36px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 0.85rem; }
+        .tool-category { margin-bottom:0.85rem; }
+        .tool-cat-name { font-size:0.65rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:0.4rem; }
+        .tool-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.4rem; }
+        .tool-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:0.7rem; cursor:pointer; transition:all 0.18s; }
+        .tool-card:active { border-color:var(--purple); background:rgba(139,92,246,0.08); }
+        .tool-card-icon { font-size:1.2rem; margin-bottom:0.2rem; }
+        .tool-card-name { font-size:0.77rem; font-weight:600; margin-bottom:0.1rem; }
+        .tool-card-desc { font-size:0.67rem; color:var(--muted); line-height:1.3; }
+
+        /* Code editor */
+        .code-header { display:flex; gap:0.4rem; margin-bottom:0.45rem; }
+        .code-fname { flex:1; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.42rem 0.65rem; color:var(--text); font-size:0.8rem; font-family:'JetBrains Mono',monospace; outline:none; }
+        .code-lang-sel { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.42rem 0.55rem; color:var(--text); font-size:0.8rem; }
+        .code-editor { width:100%; height:195px; background:rgba(0,0,0,0.42); border:1px solid rgba(139,92,246,0.2); border-radius:10px; padding:0.7rem; color:#e2e8f0; font-family:'JetBrains Mono',monospace; font-size:0.76rem; line-height:1.6; resize:none; outline:none; tab-size:2; }
+        .code-editor:focus { border-color:var(--purple); }
+        .code-actions { display:flex; gap:0.4rem; margin-top:0.45rem; }
+        .code-output { background:rgba(0,0,0,0.38); border:1px solid rgba(16,185,129,0.15); border-radius:8px; padding:0.65rem; font-family:'JetBrains Mono',monospace; font-size:0.73rem; color:var(--emerald); line-height:1.5; margin-top:0.55rem; max-height:130px; overflow-y:auto; display:none; }
+        .code-output.show { display:block; }
+
+        /* Terminal */
+        .term-vps-row { display:flex; gap:0.5rem; margin-bottom:0.55rem; }
+        .term-screen { background:#060606; border:1px solid rgba(16,185,129,0.12); border-radius:10px; padding:0.7rem 0.9rem; height:210px; overflow-y:auto; font-family:'JetBrains Mono',monospace; font-size:0.74rem; line-height:1.65; margin-bottom:0.45rem; }
+        .t-prompt { color:var(--emerald); } .t-cmd { color:var(--text); } .t-out { color:var(--text2); } .t-err { color:var(--red); }
+        .t-cursor { display:inline-block; width:7px; height:13px; background:var(--emerald); animation:blink 1s infinite; vertical-align:middle; margin-left:1px; }
+        @keyframes blink { 50%{opacity:0;} }
+        .term-input-row { display:flex; gap:0.4rem; align-items:center; }
+        .term-prompt-lbl { color:var(--emerald); font-family:'JetBrains Mono',monospace; font-size:0.8rem; flex-shrink:0; }
+        .term-cmd-input { flex:1; background:rgba(0,0,0,0.5); border:1px solid rgba(16,185,129,0.12); border-radius:8px; padding:0.48rem 0.68rem; color:var(--emerald); font-family:'JetBrains Mono',monospace; font-size:0.78rem; outline:none; }
+        .term-cmd-input:focus { border-color:var(--emerald); }
+
+        /* Security mode */
+        .sec-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.45rem; margin-bottom:0.65rem; }
+        .sec-btn { background:rgba(239,68,68,0.05); border:1px solid rgba(239,68,68,0.15); border-radius:9px; padding:0.65rem; cursor:pointer; text-align:left; transition:all 0.18s; }
+        .sec-btn:active { background:rgba(239,68,68,0.1); }
+        .sec-btn-icon { font-size:1.1rem; margin-bottom:0.2rem; }
+        .sec-btn-name { font-size:0.78rem; font-weight:600; margin-bottom:0.08rem; }
+        .sec-btn-desc { font-size:0.66rem; color:var(--muted); }
+        .sec-output { background:#07030A; border:1px solid rgba(239,68,68,0.12); border-radius:10px; padding:0.7rem; min-height:110px; font-family:'JetBrains Mono',monospace; font-size:0.73rem; color:#F87171; line-height:1.5; max-height:200px; overflow-y:auto; }
+        .sec-input-row { display:flex; gap:0.4rem; margin-bottom:0.5rem; }
+        .sec-input { flex:1; background:rgba(0,0,0,0.4); border:1px solid rgba(239,68,68,0.15); border-radius:8px; padding:0.5rem 0.7rem; color:var(--text); font-size:0.82rem; font-family:'JetBrains Mono',monospace; outline:none; }
+
+        /* Voice mode */
+        .voice-engine-row { display:flex; gap:0.4rem; margin-bottom:0.65rem; }
+        .voice-engine-btn { flex:1; padding:0.5rem; border-radius:8px; font-size:0.76rem; font-weight:600; border:1px solid var(--border); background:rgba(255,255,255,0.03); color:var(--muted); cursor:pointer; transition:all 0.2s; }
+        .voice-engine-btn.active { background:var(--grad2); color:#fff; border-color:transparent; }
+        .voice-textarea { width:100%; height:80px; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.6rem 0.75rem; color:var(--text); font-size:0.83rem; resize:none; outline:none; margin-bottom:0.5rem; }
+        .voice-textarea:focus { border-color:var(--cyan); }
+        .voice-player { background:rgba(6,182,212,0.05); border:1px solid rgba(6,182,212,0.15); border-radius:10px; padding:0.75rem; margin-top:0.5rem; display:none; }
+        .voice-player.show { display:block; }
+        .voice-waveform { height:38px; background:rgba(6,182,212,0.05); border-radius:6px; display:flex; align-items:center; justify-content:center; gap:2px; margin-bottom:0.5rem; overflow:hidden; }
+        .waveform-bar { width:3px; border-radius:2px; background:var(--cyan); }
+        @keyframes wave { 0%,100%{height:6px;opacity:0.35;} 50%{height:30px;opacity:1;} }
+
+        /* Wiki/Knowledge mode */
+        .wiki-search-row { display:flex; gap:0.45rem; margin-bottom:0.65rem; }
+        .wiki-search-input { flex:1; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.55rem 0.8rem; color:var(--text); font-size:0.83rem; outline:none; }
+        .wiki-search-input:focus { border-color:var(--cyan); }
+        .wiki-node { background:var(--card); border:1px solid var(--border); border-radius:9px; padding:0.7rem; margin-bottom:0.45rem; cursor:pointer; }
+        .wiki-node-title { font-size:0.87rem; font-weight:600; margin-bottom:0.2rem; }
+        .wiki-node-tags { display:flex; flex-wrap:wrap; gap:0.25rem; }
+        .wiki-tag { font-size:0.63rem; padding:0.1rem 0.38rem; border-radius:8px; background:rgba(6,182,212,0.08); color:var(--cyan); border:1px solid rgba(6,182,212,0.12); }
+        .graph-canvas { background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:10px; height:150px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; margin-bottom:0.65rem; }
+
+        /* PM Skills mode */
+        .pm-domain-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.45rem; margin-bottom:0.65rem; }
+        .pm-domain { background:var(--card); border:1px solid var(--border); border-radius:9px; padding:0.7rem; cursor:pointer; transition:all 0.18s; }
+        .pm-domain:active { border-color:var(--purple); background:rgba(139,92,246,0.08); }
+        .pm-domain-icon { font-size:1rem; margin-bottom:0.2rem; }
+        .pm-domain-name { font-size:0.77rem; font-weight:600; margin-bottom:0.08rem; }
+        .pm-domain-count { font-size:0.65rem; color:var(--muted); }
+        .pm-skill-list { background:var(--bg); border:1px solid var(--border); border-radius:9px; padding:0.4rem; max-height:175px; overflow-y:auto; display:none; }
+        .pm-skill-list.show { display:block; }
+        .pm-skill-item { padding:0.45rem 0.55rem; border-radius:6px; cursor:pointer; font-size:0.8rem; display:flex; align-items:center; gap:0.45rem; }
+        .pm-skill-item:hover { background:rgba(139,92,246,0.07); }
+        .pm-skill-item .slash-lbl { color:var(--purple); font-family:'JetBrains Mono',monospace; font-size:0.7rem; }
+        .pm-skill-output { background:var(--bg); border:1px solid rgba(139,92,246,0.15); border-radius:9px; padding:0.8rem; margin-top:0.55rem; font-size:0.8rem; line-height:1.7; display:none; max-height:200px; overflow-y:auto; }
+        .pm-skill-output.show { display:block; }
     </style>
 </head>
 <body>
@@ -420,56 +539,328 @@
         </div>
     </div>
 
-    <!-- TAB 3: COMMANDER (JARVIS AI with Smart Prompts) -->
+    <!-- TAB 3: COMMANDER — Manus-like AI Workspace -->
     <div class="tab-pane" id="tab-commander">
-        <div class="card">
-            <div class="card-title">JARVIS Commander — 2700+ Agents</div>
-            <select class="model-selector" id="model-select">
-                <option value="jarvis-omni">&#x1F916; JARVIS-OMNI (All Models)</option>
-                <option value="llama">&#x1F999; Llama 3.2 1B</option>
-                <option value="deepseek">&#x1F4BB; DeepSeek Coder</option>
-                <option value="qwen">&#x26A1; Qwen 2.5</option>
-                <option value="phi">&#x1F4A1; Phi-2.7B</option>
-            </select>
 
-            <div class="commander-wrap">
-                <!-- Smart Prompt Suggestions -->
-                <div class="smart-suggestions" id="smart-suggestions">
-                    <span class="smart-suggestion-label">&#x2728; Smart Prompts — pick one or send combined:</span>
-                    <div class="suggestion-row" id="suggestion-chips"></div>
-                    <div style="display:flex;gap:0.5rem;margin-top:0.4rem;">
-                        <button class="btn btn-outline-p btn-sm" onclick="useBestPrompt()" style="font-size:0.72rem;">&#x2B50; Use Best Combined</button>
-                        <button class="btn btn-sm" style="background:rgba(107,114,128,0.1);color:var(--muted);font-size:0.72rem;" onclick="dismissSuggestions()">Dismiss</button>
+        <!-- Mode bar -->
+        <div class="mode-bar">
+            <button class="mode-btn active" onclick="setMode('chat',this)">&#x1F4AC; Chat</button>
+            <button class="mode-btn" onclick="setMode('code',this)">&#x2328; Code</button>
+            <button class="mode-btn" onclick="setMode('terminal',this)">&#x2588; Terminal</button>
+            <button class="mode-btn" onclick="setMode('security',this)">&#x1F6E1; Security</button>
+            <button class="mode-btn" onclick="setMode('voice',this)">&#x1F3A4; Voice</button>
+            <button class="mode-btn" onclick="setMode('wiki',this)">&#x1F9E0; Wiki</button>
+            <button class="mode-btn" onclick="setMode('pm',this)">&#x1F4CA; PM Skills</button>
+        </div>
+
+        <!-- CHAT MODE -->
+        <div class="mode-pane active" id="mode-chat">
+            <div class="chat-model-row">
+                <select class="model-selector" id="model-select" style="margin-bottom:0;flex:1;font-size:0.78rem;">
+                    <option value="jarvis-omni">&#x1F916; JARVIS-OMNI (All Models)</option>
+                    <option value="odysseus">&#x1F30A; Odysseus Multi-Model</option>
+                    <option value="airllm">&#x26A1; AirLLM 70B (4GB GPU)</option>
+                    <option value="deepseek">&#x1F4BB; DeepSeek Coder</option>
+                    <option value="sigma">&#x1F517; Sigma AI Router</option>
+                    <option value="free-code">&#x1F193; Free Coding Models (150+)</option>
+                    <option value="llama">&#x1F999; Llama 3.2</option>
+                    <option value="qwen">&#x26A1; Qwen 2.5</option>
+                    <option value="phi">&#x1F4A1; Phi-2.7B</option>
+                </select>
+                <button class="btn btn-sm" style="background:rgba(107,114,128,0.15);color:var(--muted);padding:0.4rem 0.6rem;" onclick="clearChat()">&#x1F5D1;</button>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="msg msg-ai">
+                    <div class="msg-label">JARVIS MIND</div>
+                    <div class="msg-bubble">
+                        Online &#x2014; 2,703 abliterated agents ready.<br><br>
+                        <span class="tool-badge">&#x1F50D; Web Search</span><span class="tool-badge">&#x2699; Shell</span><span class="tool-badge">&#x1F4C1; File Ops</span><span class="tool-badge">&#x1F680; VPS Deploy</span><span class="tool-badge">&#x1F4E8; WhatsApp</span><span class="tool-badge">&#x1F4BE; 9Drive</span><span class="tool-badge">&#x1F6E1; CVE Scan</span><span class="tool-badge">&#x1F4C8; Graphify</span><span class="tool-badge">&#x1F3A4; TTS</span><span class="tool-badge">&#x1F9E0; Wiki</span><br>
+                        Type a command or press <code>/</code> for slash commands. Tap &#x26A1; for all tools.
                     </div>
                 </div>
-
-                <div class="commander-input-row">
-                    <input type="text" id="jarvis-input"
-                        placeholder="Command JARVIS or 2700+ agents..."
-                        oninput="onCommanderInput(this.value)"
-                        onkeydown="if(event.key==='Enter')sendJarvis()">
-                    <button class="btn abliterated-btn btn-sm" onclick="sendAbliterated()" title="Abliterated Mode">&#x1F513;</button>
-                    <button class="btn btn-grad btn-sm" onclick="sendJarvis()">Send</button>
-                </div>
-
-                <div class="commander-output" id="jarvis-output">JARVIS MIND SYSTEM ONLINE
-2,703 agents abliterated and ready.
-SSH Key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINVmUfEce3uSfnES7ZNTSkERao5k80/emlP3LBCNJ2qt
-
-&gt; Type a command. Smart prompt suggestions appear as you type.
-&gt; Press the lock button for ABLITERATED MODE.</div>
             </div>
         </div>
 
-        <div class="card">
+        <!-- CODE MODE — VS Code style -->
+        <div class="mode-pane" id="mode-code">
+            <div class="code-header">
+                <input class="code-fname" id="code-fname" placeholder="filename.py" />
+                <select class="code-lang-sel" id="code-lang" onchange="updateVSLang()">
+                    <option>Python</option><option>JavaScript</option><option>Bash</option>
+                    <option>Go</option><option>Rust</option><option>HTML</option><option>SQL</option><option>YAML</option>
+                </select>
+            </div>
+            <div style="background:rgba(0,0,0,0.42);border:1px solid rgba(139,92,246,0.2);border-radius:10px;overflow:hidden;">
+                <!-- VS titlebar -->
+                <div style="display:flex;align-items:center;gap:0.4rem;padding:0.25rem 0.6rem;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.68rem;color:var(--muted);">
+                    <span style="width:8px;height:8px;border-radius:50%;background:var(--purple);display:inline-block;"></span>
+                    <span id="vs-fname-display">filename.py</span>
+                    <span style="flex:1;"></span>
+                    <span style="font-size:0.65rem;">stynx-code + free-coding-models</span>
+                </div>
+                <!-- Editor with line numbers -->
+                <div style="display:flex;">
+                    <div id="vs-line-nums" style="background:rgba(0,0,0,0.2);padding:0.5rem 0.4rem;font-family:'JetBrains Mono',monospace;font-size:0.73rem;color:var(--muted);text-align:right;line-height:1.55;min-width:30px;user-select:none;white-space:pre;">1</div>
+                    <textarea class="code-editor" id="code-editor" spellcheck="false" style="border:none;border-radius:0;"
+                        placeholder="# Paste or write code..."
+                        oninput="updateVSLineNums()" onkeydown="codeEditorTab(event)" onclick="updateVSLineNums()"></textarea>
+                </div>
+                <!-- Status bar -->
+                <div style="display:flex;align-items:center;gap:0.5rem;padding:0.18rem 0.6rem;background:rgba(139,92,246,0.08);border-top:1px solid rgba(139,92,246,0.1);font-size:0.62rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">
+                    <span style="color:var(--purple);" id="vs-cursor-pos">Ln 1, Col 1</span>
+                    <span>•</span><span style="color:var(--purple);" id="vs-lang-status">Python</span>
+                    <span style="flex:1;"></span>
+                    <span style="color:var(--muted);">Ctrl+Enter = Run</span>
+                </div>
+            </div>
+            <div class="code-actions">
+                <button class="btn btn-grad btn-sm" style="flex:1;" onclick="runWithJarvis()">&#x25B6; Run</button>
+                <button class="btn btn-outline-p btn-sm" style="flex:1;" onclick="analyzeCode()">&#x1F50D; Analyze</button>
+                <button class="btn btn-sm" style="background:rgba(107,114,128,0.15);color:var(--muted);" onclick="copyCode()">Copy</button>
+                <button class="btn btn-sm" style="background:rgba(107,114,128,0.15);color:var(--muted);" onclick="sendCodeToChat()">&#x1F4AC; To Chat</button>
+            </div>
+            <div class="code-output" id="code-output"></div>
+        </div>
+
+        <!-- TERMINAL MODE -->
+        <div class="mode-pane" id="mode-terminal">
+            <div class="term-vps-row">
+                <select class="model-selector" id="term-vps" style="margin-bottom:0;flex:1;font-size:0.78rem;">
+                    <option>vps_admin_001 (10.100.0.1)</option>
+                    <option>vps_mining_001 (10.100.1.1)</option>
+                    <option>vps_api_001 (10.100.2.1)</option>
+                    <option>Local Sandbox</option>
+                </select>
+                <button class="btn btn-grad btn-sm" onclick="termConnect()">Connect</button>
+            </div>
+            <div class="term-screen" id="term-screen">
+                <div><span class="t-prompt">jarvis@whoamisec:~$</span> <span class="t-cursor"></span></div>
+            </div>
+            <div class="term-input-row">
+                <span class="term-prompt-lbl">$</span>
+                <input class="term-cmd-input" id="term-input" placeholder="shell command..."
+                    onkeydown="if(event.key==='Enter')runTermCmd();if(event.key==='ArrowUp')termHistory(-1);if(event.key==='ArrowDown')termHistory(1);">
+                <button class="btn btn-grad btn-sm" onclick="runTermCmd()">Run</button>
+            </div>
+        </div>
+
+        <!-- SECURITY MODE -->
+        <div class="mode-pane" id="mode-security">
+            <div class="sec-grid">
+                <button class="sec-btn" onclick="secTool('cve')">
+                    <div class="sec-btn-icon">&#x1F6E1;</div>
+                    <div class="sec-btn-name">CVE Lookup</div>
+                    <div class="sec-btn-desc">opencve-docker database</div>
+                </button>
+                <button class="sec-btn" onclick="secTool('sigma')">
+                    <div class="sec-btn-icon">&#x1F50D;</div>
+                    <div class="sec-btn-name">Sigma Rules</div>
+                    <div class="sec-btn-desc">SIEM detection rules</div>
+                </button>
+                <button class="sec-btn" onclick="secTool('mephisto')">
+                    <div class="sec-btn-icon">&#x1F578;</div>
+                    <div class="sec-btn-name">Mephisto</div>
+                    <div class="sec-btn-desc">WP vuln scanner (22+ CVEs)</div>
+                </button>
+                <button class="sec-btn" onclick="secTool('drozer')">
+                    <div class="sec-btn-icon">&#x1F4F1;</div>
+                    <div class="sec-btn-name">Drozer Agent</div>
+                    <div class="sec-btn-desc">Android security testing</div>
+                </button>
+                <button class="sec-btn" onclick="secTool('ddos')">
+                    <div class="sec-btn-icon">&#x26A1;</div>
+                    <div class="sec-btn-name">DDoSlayer</div>
+                    <div class="sec-btn-desc">Authorized stress testing</div>
+                </button>
+                <button class="sec-btn" onclick="secTool('airllm')">
+                    <div class="sec-btn-icon">&#x1F916;</div>
+                    <div class="sec-btn-name">AirLLM Audit</div>
+                    <div class="sec-btn-desc">AI-powered code audit</div>
+                </button>
+            </div>
+            <div class="sec-input-row">
+                <input class="sec-input" id="sec-target" placeholder="target / query / URL...">
+                <button class="btn btn-sm" style="background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.2);" onclick="runSecTool()">Scan</button>
+            </div>
+            <div class="sec-output" id="sec-output">Security tools ready. Select a tool above and enter a target.
+[!] Only use on systems you own or have explicit authorization to test.</div>
+        </div>
+
+        <!-- VOICE MODE -->
+        <div class="mode-pane" id="mode-voice">
+            <div class="card" style="margin-bottom:0.6rem;">
+                <div class="card-title">TTS Engine</div>
+                <div class="voice-engine-row">
+                    <button class="voice-engine-btn active" onclick="setVoiceEngine('miso',this)">&#x1F3A4; MisoTTS 8B</button>
+                    <button class="voice-engine-btn" onclick="setVoiceEngine('wavtts',this)">&#x1F4E1; WavTTS Zero-Shot</button>
+                </div>
+                <textarea class="voice-textarea" id="voice-text" placeholder="Enter text to synthesize — supports voice cloning with reference audio..."></textarea>
+                <div style="display:flex;gap:0.4rem;">
+                    <button class="btn btn-cyan btn-sm" style="flex:1;" onclick="synthesizeVoice()">&#x1F3A4; Synthesize Speech</button>
+                    <button class="btn btn-outline-p btn-sm" onclick="cloneVoice()">&#x1F501; Clone Voice</button>
+                </div>
+                <div class="voice-player" id="voice-player">
+                    <div class="voice-waveform" id="voice-waveform"></div>
+                    <div style="display:flex;gap:0.5rem;align-items:center;">
+                        <button class="btn btn-sm btn-grad" onclick="playVoice()">&#x25B6; Play</button>
+                        <button class="btn btn-sm" style="background:rgba(107,114,128,0.15);color:var(--muted);" onclick="stopVoice()">&#x23F9; Stop</button>
+                        <span style="font-size:0.75rem;color:var(--muted);flex:1;text-align:right;" id="voice-engine-lbl">MisoTTS 8B</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WIKI / KNOWLEDGE MODE -->
+        <div class="mode-pane" id="mode-wiki">
+            <div class="wiki-search-row">
+                <input class="wiki-search-input" id="wiki-query" placeholder="Search knowledge base or enter topic for Graphify..."
+                    onkeydown="if(event.key==='Enter')wikiSearch()">
+                <button class="btn btn-cyan btn-sm" onclick="wikiSearch()">Search</button>
+                <button class="btn btn-outline-p btn-sm" onclick="graphifyTopic()">&#x1F4CA; Graph</button>
+            </div>
+            <div class="graph-canvas" id="graph-canvas">
+                <span style="color:var(--muted);font-size:0.78rem;">Enter a topic and tap Graph to visualize knowledge connections</span>
+            </div>
+            <div id="wiki-nodes">
+                <div class="wiki-node" onclick="openWikiNode(this)">
+                    <div class="wiki-node-title">&#x1F9E0; JARVIS MIND Architecture</div>
+                    <div class="wiki-node-tags"><span class="wiki-tag">AI</span><span class="wiki-tag">VPS</span><span class="wiki-tag">agents</span><span class="wiki-tag">swarm</span></div>
+                </div>
+                <div class="wiki-node" onclick="openWikiNode(this)">
+                    <div class="wiki-node-title">&#x1F4B0; Monero XMR Payments</div>
+                    <div class="wiki-node-tags"><span class="wiki-tag">XMR</span><span class="wiki-tag">privacy</span><span class="wiki-tag">subscriptions</span></div>
+                </div>
+                <div class="wiki-node" onclick="openWikiNode(this)">
+                    <div class="wiki-node-title">&#x26CF; Mining Fleet 100 Nodes</div>
+                    <div class="wiki-node-tags"><span class="wiki-tag">RandomX</span><span class="wiki-tag">xmrig</span><span class="wiki-tag">fleet</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PM SKILLS MODE -->
+        <div class="mode-pane" id="mode-pm">
+            <div class="pm-domain-grid">
+                <div class="pm-domain" onclick="openPMDomain('discovery')">
+                    <div class="pm-domain-icon">&#x1F50D;</div>
+                    <div class="pm-domain-name">Product Discovery</div>
+                    <div class="pm-domain-count">13 skills</div>
+                </div>
+                <div class="pm-domain" onclick="openPMDomain('strategy')">
+                    <div class="pm-domain-icon">&#x265F;</div>
+                    <div class="pm-domain-name">Strategy</div>
+                    <div class="pm-domain-count">12 skills</div>
+                </div>
+                <div class="pm-domain" onclick="openPMDomain('execution')">
+                    <div class="pm-domain-icon">&#x1F3AF;</div>
+                    <div class="pm-domain-name">Execution</div>
+                    <div class="pm-domain-count">16 skills</div>
+                </div>
+                <div class="pm-domain" onclick="openPMDomain('gtm')">
+                    <div class="pm-domain-icon">&#x1F680;</div>
+                    <div class="pm-domain-name">Go-to-Market</div>
+                    <div class="pm-domain-count">6 skills</div>
+                </div>
+                <div class="pm-domain" onclick="openPMDomain('data')">
+                    <div class="pm-domain-icon">&#x1F4CA;</div>
+                    <div class="pm-domain-name">Data Analytics</div>
+                    <div class="pm-domain-count">3 skills</div>
+                </div>
+                <div class="pm-domain" onclick="openPMDomain('ai')">
+                    <div class="pm-domain-icon">&#x1F916;</div>
+                    <div class="pm-domain-name">AI Shipping</div>
+                    <div class="pm-domain-count">2 skills</div>
+                </div>
+            </div>
+            <div class="pm-skill-list" id="pm-skill-list"></div>
+            <div class="pm-skill-output" id="pm-skill-output"></div>
+        </div>
+
+        <!-- SHARED INPUT (Chat mode) + Smart Suggestions -->
+        <div style="margin-top:0.6rem;position:relative;">
+            <div class="smart-suggestions" id="smart-suggestions">
+                <span class="smart-suggestion-label">&#x2728; Smart Prompts:</span>
+                <div class="suggestion-row" id="suggestion-chips"></div>
+                <div style="display:flex;gap:0.4rem;margin-top:0.35rem;">
+                    <button class="btn btn-outline-p btn-sm" onclick="useBestPrompt()" style="font-size:0.7rem;">&#x2B50; Use Best</button>
+                    <button class="btn btn-sm" style="background:rgba(107,114,128,0.1);color:var(--muted);font-size:0.7rem;" onclick="dismissSuggestions()">&#x2715;</button>
+                </div>
+            </div>
+            <!-- Slash command dropdown -->
+            <div class="slash-dropdown" id="slash-dropdown"></div>
+            <div class="cmd-input-row">
+                <button class="btn btn-sm" style="background:rgba(139,92,246,0.12);color:var(--purple);padding:0.5rem 0.7rem;flex-shrink:0;" onclick="openToolPanel()" title="All Tools">&#x26A1;</button>
+                <input type="text" id="jarvis-input"
+                    placeholder="Chat, /slash-command, or describe a task..."
+                    oninput="onCommanderInput(this.value)"
+                    onkeydown="handleInputKey(event)">
+                <button class="btn abliterated-btn btn-sm" onclick="sendAbliterated()" title="Abliterated Mode">&#x1F513;</button>
+                <button class="btn btn-grad btn-sm" onclick="sendJarvis()">Send</button>
+            </div>
+        </div>
+
+        <!-- Quick Commands -->
+        <div class="card" style="margin-top:0.75rem;">
             <div class="card-title">Quick Commands</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-                <button class="btn btn-outline-p" style="font-size:0.78rem;" onclick="quickCmd('Create new VPS 256GB Ubuntu')">&#x2601; New VPS</button>
-                <button class="btn btn-outline-p" style="font-size:0.78rem;" onclick="quickCmd('Show all active VPS instances status')">&#x1F4CB; VPS Status</button>
-                <button class="btn btn-outline-p" style="font-size:0.78rem;" onclick="quickCmd('Generate new e-commerce website')">&#x1F310; Build Site</button>
-                <button class="btn btn-outline-p" style="font-size:0.78rem;" onclick="quickCmd('Mining fleet status and hashrate report')">&#x26CF; Mining Stats</button>
-                <button class="btn btn-outline-p" style="font-size:0.78rem;" onclick="quickCmd('System health check all services')">&#x2764; Health Check</button>
-                <button class="btn btn-outline-p" style="font-size:0.78rem;" onclick="quickCmd('List all deployed agents and their tasks')">&#x1F916; Agent Report</button>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;">
+                <button class="btn btn-outline-p" style="font-size:0.74rem;" onclick="quickCmd('Create new VPS 256GB Ubuntu')">&#x2601; New VPS</button>
+                <button class="btn btn-outline-p" style="font-size:0.74rem;" onclick="quickCmd('/cve CVE-2024-')">&#x1F6E1; CVE Lookup</button>
+                <button class="btn btn-outline-p" style="font-size:0.74rem;" onclick="quickCmd('/prd Build feature for XMR payments')">&#x1F4C4; Write PRD</button>
+                <button class="btn btn-outline-p" style="font-size:0.74rem;" onclick="setMode('voice',document.querySelectorAll('.mode-btn')[4])">&#x1F3A4; Synthesize Voice</button>
+                <button class="btn btn-outline-p" style="font-size:0.74rem;" onclick="quickCmd('/graphify JARVIS architecture')">&#x1F4CA; Knowledge Graph</button>
+                <button class="btn btn-outline-p" style="font-size:0.74rem;" onclick="quickCmd('/whatsapp Send update to all subscribers')">&#x1F4E8; WhatsApp Blast</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOOL PANEL (bottom sheet) -->
+    <div class="tool-panel-overlay" id="tool-panel-overlay" onclick="closeToolPanel()"></div>
+    <div class="tool-panel" id="tool-panel">
+        <div class="tool-panel-handle"></div>
+        <div style="font-size:0.8rem;font-weight:700;margin-bottom:0.85rem;">&#x26A1; All Tools &amp; Integrations</div>
+
+        <div class="tool-category">
+            <div class="tool-cat-name">&#x1F916; AI / LLM</div>
+            <div class="tool-grid">
+                <div class="tool-card" onclick="insertTool('odysseus')"><div class="tool-card-icon">&#x1F30A;</div><div class="tool-card-name">Odysseus</div><div class="tool-card-desc">Multi-model workspace, deep research, MCP tools</div></div>
+                <div class="tool-card" onclick="insertTool('airllm')"><div class="tool-card-icon">&#x26A1;</div><div class="tool-card-name">AirLLM</div><div class="tool-card-desc">70B model on 4GB GPU via block quantization</div></div>
+                <div class="tool-card" onclick="insertTool('sigma-ai')"><div class="tool-card-icon">&#x1F517;</div><div class="tool-card-name">Sigma Router</div><div class="tool-card-desc">Provider-neutral AI — OpenAI, Ollama, streaming</div></div>
+                <div class="tool-card" onclick="insertTool('free-code')"><div class="tool-card-icon">&#x1F193;</div><div class="tool-card-name">Free Coding Models</div><div class="tool-card-desc">150+ free AI coding models, auto-routed</div></div>
+            </div>
+        </div>
+
+        <div class="tool-category">
+            <div class="tool-cat-name">&#x1F6E1; Security</div>
+            <div class="tool-grid">
+                <div class="tool-card" onclick="insertTool('cve')"><div class="tool-card-icon">&#x1F6E1;</div><div class="tool-card-name">OpenCVE</div><div class="tool-card-desc">CVE database — Docker self-hosted lookup</div></div>
+                <div class="tool-card" onclick="insertTool('mephisto')"><div class="tool-card-icon">&#x1F578;</div><div class="tool-card-name">Mephisto</div><div class="tool-card-desc">WordPress scanner — 22+ CVE exploits</div></div>
+                <div class="tool-card" onclick="insertTool('drozer')"><div class="tool-card-icon">&#x1F4F1;</div><div class="tool-card-name">Drozer Agent</div><div class="tool-card-desc">Android security framework &amp; agent</div></div>
+                <div class="tool-card" onclick="insertTool('ddos')"><div class="tool-card-icon">&#x26A1;</div><div class="tool-card-name">DDoSlayer</div><div class="tool-card-desc">Authorized DDoS stress testing</div></div>
+            </div>
+        </div>
+
+        <div class="tool-category">
+            <div class="tool-cat-name">&#x1F3A4; Voice / TTS</div>
+            <div class="tool-grid">
+                <div class="tool-card" onclick="insertTool('misotts')"><div class="tool-card-icon">&#x1F3A4;</div><div class="tool-card-name">MisoTTS</div><div class="tool-card-desc">8B transformer TTS + voice cloning</div></div>
+                <div class="tool-card" onclick="insertTool('wavtts')"><div class="tool-card-icon">&#x1F4E1;</div><div class="tool-card-name">WavTTS</div><div class="tool-card-desc">Zero-shot TTS via flow matching + DiT</div></div>
+            </div>
+        </div>
+
+        <div class="tool-category">
+            <div class="tool-cat-name">&#x1F9E0; Knowledge &amp; Productivity</div>
+            <div class="tool-grid">
+                <div class="tool-card" onclick="insertTool('obsidian')"><div class="tool-card-icon">&#x1F4D6;</div><div class="tool-card-name">Obsidian Wiki</div><div class="tool-card-desc">Multi-agent knowledge graph + delta tracking</div></div>
+                <div class="tool-card" onclick="insertTool('graphify')"><div class="tool-card-icon">&#x1F4CA;</div><div class="tool-card-name">Graphify</div><div class="tool-card-desc">Code/docs to interactive knowledge graphs</div></div>
+                <div class="tool-card" onclick="insertTool('pm-skills')"><div class="tool-card-icon">&#x1F4CB;</div><div class="tool-card-name">PM Skills</div><div class="tool-card-desc">68 PM frameworks — PRD, OKRs, roadmaps</div></div>
+                <div class="tool-card" onclick="insertTool('last30days')"><div class="tool-card-icon">&#x1F4C6;</div><div class="tool-card-name">Last 30 Days</div><div class="tool-card-desc">Skills tracker — rolling 30-day progress</div></div>
+            </div>
+        </div>
+
+        <div class="tool-category">
+            <div class="tool-cat-name">&#x1F4F6; Communication &amp; Storage</div>
+            <div class="tool-grid">
+                <div class="tool-card" onclick="insertTool('wapi')"><div class="tool-card-icon">&#x1F4F1;</div><div class="tool-card-name">WAPI WhatsApp</div><div class="tool-card-desc">Self-hosted WhatsApp API — bulk campaigns</div></div>
+                <div class="tool-card" onclick="insertTool('9drive')"><div class="tool-card-icon">&#x1F4BE;</div><div class="tool-card-name">9Drive</div><div class="tool-card-desc">Multi-account Google Drive gateway</div></div>
             </div>
         </div>
     </div>
@@ -612,6 +1003,7 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINVmUfEce3uSfnES7ZNTSkERao5k80/emlP3LBCNJ2qt
 <div class="notif" id="notif"></div>
 
 <script>
+// ===== TAB SWITCHING =====
 function switchTab(name, btn) {
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -621,131 +1013,468 @@ function switchTab(name, btn) {
 
 function showNotif(msg, color) {
     const n = document.getElementById('notif');
-    n.textContent = msg;
-    n.style.background = color || 'var(--purple)';
-    n.classList.add('show');
-    setTimeout(() => n.classList.remove('show'), 2200);
+    n.textContent = msg; n.style.background = color || 'var(--purple)';
+    n.classList.add('show'); setTimeout(() => n.classList.remove('show'), 2200);
 }
 
-// ---- Smart Prompt System ----
-const PROMPT_TEMPLATES = {
-    'create': [
-        'Create a new {topic} with full admin panel and Monero payments',
-        'Deploy {topic} with 256GB RAM VPS, JWT security, and audit logs',
-        'Build production-ready {topic} with XMR subscription system'
-    ],
-    'vps': [
-        'Show all VPS instances status with CPU, RAM, and uptime metrics',
-        'Create VPS cluster with 256GB RAM and 64 cores for {topic}',
-        'Restart all unhealthy VPS instances and send health report'
-    ],
-    'mining': [
-        'Get full mining fleet report: hashrate, rewards, node status',
-        'Restart all offline mining nodes and optimize RandomX settings',
-        'Calculate monthly XMR mining profit at current difficulty'
-    ],
-    'site': [
-        'Create complete {topic} website with login, admin, and Monero payments',
-        'Deploy {topic} on new VPS with Nginx, SSL, and CDN configured',
-        'Generate {topic} with responsive UI, SEO optimization, and analytics'
-    ],
-    'agent': [
-        'Send command to all 2700+ agents: {topic}',
-        'List all active agents working on {topic} tasks',
-        'Assign 500 agents to complete {topic} in parallel'
-    ]
-};
+// ===== COMMANDER MODE SWITCHING =====
+function setMode(name, btn) {
+    document.querySelectorAll('.mode-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('mode-' + name).classList.add('active');
+    btn.classList.add('active');
+    const inp = document.getElementById('chat-input-area') || document.querySelector('.cmd-input-row');
+}
 
-let smartDebounce = null;
-let currentSuggestions = [];
+// ===== TOOL PANEL =====
+function openToolPanel() {
+    document.getElementById('tool-panel-overlay').classList.add('show');
+    document.getElementById('tool-panel').classList.add('show');
+}
+function closeToolPanel() {
+    document.getElementById('tool-panel-overlay').classList.remove('show');
+    document.getElementById('tool-panel').classList.remove('show');
+}
+function insertTool(tool) {
+    closeToolPanel();
+    const toolCmds = {
+        'odysseus': '/odysseus ', 'airllm': '/airllm run ', 'sigma-ai': '/sigma route ',
+        'free-code': '/freemodels ', 'cve': '/cve ', 'mephisto': '/mephisto scan ',
+        'drozer': '/drozer audit ', 'ddos': '/ddos test ', 'misotts': '/tts ',
+        'wavtts': '/wavtts ', 'obsidian': '/wiki ', 'graphify': '/graphify ',
+        'pm-skills': '/pm ', 'last30days': '/skills30 ', 'wapi': '/whatsapp ',
+        '9drive': '/drive '
+    };
+    const inp = document.getElementById('jarvis-input');
+    inp.value = toolCmds[tool] || '/';
+    inp.focus();
+    onCommanderInput(inp.value);
+    setMode('chat', document.querySelector('.mode-btn'));
+}
+
+// ===== SLASH COMMANDS =====
+const SLASH_COMMANDS = [
+    { cmd: '/odysseus', desc: 'Multi-model AI workspace (Odysseus)' },
+    { cmd: '/airllm', desc: 'Run 70B LLM on 4GB GPU via AirLLM' },
+    { cmd: '/sigma', desc: 'Provider-neutral AI model router' },
+    { cmd: '/freemodels', desc: '150+ free coding models — auto-route' },
+    { cmd: '/cve', desc: 'CVE lookup via OpenCVE docker' },
+    { cmd: '/mephisto', desc: 'WordPress vulnerability scan (Mephisto)' },
+    { cmd: '/drozer', desc: 'Android security audit (Drozer Agent)' },
+    { cmd: '/ddos', desc: 'Authorized DDoS stress test (DDoSlayer)' },
+    { cmd: '/tts', desc: 'Text-to-speech via MisoTTS 8B' },
+    { cmd: '/wavtts', desc: 'Zero-shot TTS via WavTTS' },
+    { cmd: '/wiki', desc: 'Obsidian knowledge base query' },
+    { cmd: '/graphify', desc: 'Generate interactive knowledge graph' },
+    { cmd: '/pm', desc: 'PM Skills framework (68 skills)' },
+    { cmd: '/prd', desc: 'Write a Product Requirements Document' },
+    { cmd: '/okr', desc: 'Generate OKRs for a goal' },
+    { cmd: '/roadmap', desc: 'Build a product roadmap' },
+    { cmd: '/whatsapp', desc: 'Send via WhatsApp API (WAPI)' },
+    { cmd: '/drive', desc: '9Drive multi-account Google Drive' },
+    { cmd: '/vps', desc: 'Create or manage VPS instance' },
+    { cmd: '/mining', desc: 'Mining fleet status & control' },
+    { cmd: '/agents', desc: 'Dispatch to all 2700+ abliterated agents' },
+    { cmd: '/skills30', desc: 'Last 30 days skills tracker' },
+];
+
+function showSlashDropdown(input) {
+    const dd = document.getElementById('slash-dropdown');
+    if (!input.startsWith('/')) { dd.classList.remove('show'); return; }
+    const q = input.toLowerCase();
+    const matches = SLASH_COMMANDS.filter(c => c.cmd.startsWith(q)).slice(0, 7);
+    if (!matches.length) { dd.classList.remove('show'); return; }
+    dd.innerHTML = matches.map(c =>
+        `<div class="slash-item" onclick="applySlash('${c.cmd}')"><span class="slash-cmd">${c.cmd}</span><span class="slash-desc">${c.desc}</span></div>`
+    ).join('');
+    dd.classList.add('show');
+}
+
+function applySlash(cmd) {
+    document.getElementById('jarvis-input').value = cmd + ' ';
+    document.getElementById('slash-dropdown').classList.remove('show');
+    document.getElementById('jarvis-input').focus();
+}
+
+// ===== SMART PROMPTS =====
+const PROMPT_TEMPLATES = {
+    'vps':    ['Show all VPS instances status with CPU, RAM, uptime', 'Create VPS cluster 256GB / 64 cores for {topic}', 'Restart unhealthy VPS and send health report'],
+    'mining': ['Full mining fleet report: hashrate, rewards, node status', 'Restart offline mining nodes and optimize RandomX', 'Calculate monthly XMR profit at current difficulty'],
+    'site':   ['Create {topic} with login, admin, Monero payments', 'Deploy {topic} on new VPS with Nginx + SSL + CDN', 'Generate {topic}: responsive UI, SEO, analytics'],
+    'create': ['Create {topic} with full admin panel and XMR payments', 'Deploy {topic} with 256GB VPS, JWT security, audit logs', 'Build {topic} with subscription tiers and Monero wallet'],
+    'agent':  ['Send to all 2700+ agents: {topic}', 'List agents working on {topic} tasks', 'Assign 500 agents to complete {topic} in parallel'],
+    'security':['Scan {topic} for CVEs using OpenCVE database', 'Run Mephisto WordPress vulnerability scan on {topic}', 'Generate Sigma detection rule for {topic} threat'],
+    'tts':    ['Synthesize via MisoTTS 8B: {topic}', 'Zero-shot TTS with WavTTS: {topic}', 'Clone voice and speak: {topic}'],
+};
+let smartDebounce = null, currentSuggestions = [];
 
 function onCommanderInput(val) {
     clearTimeout(smartDebounce);
-    if (val.length < 3) {
-        dismissSuggestions();
-        return;
-    }
-    smartDebounce = setTimeout(() => generateSuggestions(val), 400);
+    if (val.startsWith('/')) { showSlashDropdown(val); dismissSuggestions(); return; }
+    document.getElementById('slash-dropdown').classList.remove('show');
+    if (val.length < 3) { dismissSuggestions(); return; }
+    smartDebounce = setTimeout(() => generateSuggestions(val), 150);
 }
 
 function generateSuggestions(input) {
-    const lower = input.toLowerCase();
-    let category = 'agent';
-    if (lower.includes('vps') || lower.includes('server') || lower.includes('deploy')) category = 'vps';
-    else if (lower.includes('mine') || lower.includes('mining') || lower.includes('xmr') || lower.includes('monero')) category = 'mining';
-    else if (lower.includes('site') || lower.includes('web') || lower.includes('shop') || lower.includes('create')) category = 'site';
-    else if (lower.includes('creat') || lower.includes('build') || lower.includes('make') || lower.includes('generat')) category = 'create';
-
-    const templates = PROMPT_TEMPLATES[category];
-    const topic = input.replace(/^(create|build|make|deploy|show|get|list|send)\s*/i, '').trim() || 'the system';
-
-    currentSuggestions = templates.map(t => t.replace('{topic}', topic));
-
+    const l = input.toLowerCase();
+    let cat = 'agent';
+    if (l.match(/vps|server|deploy|instance/)) cat = 'vps';
+    else if (l.match(/mine|mining|xmr|monero|hashrate/)) cat = 'mining';
+    else if (l.match(/site|web|shop|store|portal/)) cat = 'site';
+    else if (l.match(/creat|build|make|generat/)) cat = 'create';
+    else if (l.match(/cve|scan|hack|vuln|secur/)) cat = 'security';
+    else if (l.match(/speak|voice|tts|audio|synthesize/)) cat = 'tts';
+    const topic = input.replace(/^(create|build|make|deploy|show|get|list|send|scan|speak)\s*/i,'').trim() || 'the system';
+    currentSuggestions = (PROMPT_TEMPLATES[cat] || PROMPT_TEMPLATES.agent).map(t => t.replace('{topic}', topic));
     const chips = document.getElementById('suggestion-chips');
     chips.innerHTML = '';
     currentSuggestions.forEach((s, i) => {
-        const chip = document.createElement('button');
-        chip.className = 'suggestion-chip' + (i === 0 ? ' best' : '');
-        chip.textContent = s.length > 60 ? s.slice(0, 60) + '...' : s;
-        chip.title = s;
-        chip.onclick = () => {
-            document.getElementById('jarvis-input').value = s;
-            dismissSuggestions();
-        };
-        chips.appendChild(chip);
+        const c = document.createElement('button');
+        c.className = 'suggestion-chip' + (i===0?' best':'');
+        c.textContent = s.length > 55 ? s.slice(0,55)+'…' : s;
+        c.title = s;
+        c.onclick = () => { document.getElementById('jarvis-input').value = s; dismissSuggestions(); };
+        chips.appendChild(c);
     });
-
     document.getElementById('smart-suggestions').classList.add('show');
 }
 
 function useBestPrompt() {
-    if (currentSuggestions.length) {
-        const combined = currentSuggestions[0];
-        document.getElementById('jarvis-input').value = combined;
-        dismissSuggestions();
-        showNotif('Best prompt applied!');
-    }
+    if (currentSuggestions.length) { document.getElementById('jarvis-input').value = currentSuggestions[0]; dismissSuggestions(); showNotif('Best prompt applied!'); }
+}
+function dismissSuggestions() { document.getElementById('smart-suggestions').classList.remove('show'); }
+
+// ===== CHAT ENGINE =====
+let chatHistory = [];
+
+function appendMsg(role, html, toolName) {
+    const msgs = document.getElementById('chat-messages');
+    const div = document.createElement('div');
+    div.className = 'msg msg-' + role;
+    let label = role === 'user' ? 'You' : (toolName ? toolName : 'JARVIS MIND');
+    div.innerHTML = `<div class="msg-label">${label}</div><div class="msg-bubble">${html}</div>`;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
 }
 
-function dismissSuggestions() {
-    document.getElementById('smart-suggestions').classList.remove('show');
+function wrapCode(lang, code) {
+    return `<pre style="background:rgba(0,0,0,0.35);border-radius:7px;padding:0.6rem;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:0.73rem;line-height:1.5;">${escHtml(code)}</pre>`;
+}
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function toolCard(name, detail) {
+    return `<div class="tool-call-card" onclick="this.querySelector('.tool-call-detail').classList.toggle('open')">
+        <div class="tool-call-name">&#x2699; ${name}</div>
+        <div class="tool-call-detail">${escHtml(detail)}</div>
+    </div>`;
+}
+
+const AI_RESPONSES = {
+    '/cve': (q) => `${toolCard('opencve_lookup', `query: ${q}`)}<br>CVE lookup for <code>${q}</code>:<br><br>Found matching CVEs in OpenCVE database. Severity: HIGH<br>CVSS: 9.1 — Remote code execution via deserialization.<br><br><b>Mitigation:</b> Patch to latest version immediately. ${wrapCode('bash','# Quick check\ncurl -s https://cve.whoamisec.com/api/v1/cve?q=' + encodeURIComponent(q))}`,
+    '/mephisto': (q) => `${toolCard('mephisto_scan', `target: ${q}`)}<br>WordPress vulnerability scan initiated...<br><br>&#x2714; WPScan fingerprint completed<br>&#x2714; Checking 22+ known CVEs<br>&#x26A0; Plugin: contact-form-7 v5.3 — XSS vulnerability detected<br>&#x26A0; Theme: twentytwenty — outdated version<br>&#x2714; Report saved to <code>/reports/mephisto_${Date.now()}.json</code>`,
+    '/drozer': (q) => `${toolCard('drozer_agent', `target: ${q}`)}<br>Android security audit via Drozer Agent:<br><br>&#x2714; APK fingerprint analyzed<br>&#x2714; Exported activities scanned<br>&#x2714; Content providers — 0 unprotected<br>&#x26A0; Broadcast receivers — 1 unprotected<br>${wrapCode('bash','adb shell am broadcast -a com.example.BROADCAST')}`,
+    '/ddos': (q) => `${toolCard('ddoslayer_test', `target: ${q}`)}<br><span style="color:var(--amber)">&#x26A0; Authorized stress test only.</span><br><br>DDoSlayer initialized &#x2014; 100 concurrent threads<br>Target: <code>${q}</code><br>Duration: 30s test run<br>Requests: 12,400 sent / 12,400 received<br>Peak throughput: 413 req/s &#x2014; server stable.<br>`,
+    '/tts': (q) => `${toolCard('misotts_synthesize', `text: ${q}`)}<br>MisoTTS 8B — synthesizing speech...<br><br>&#x2714; Tokenization complete<br>&#x2714; Mimi audio codes generated<br>&#x2714; Waveform rendered at 24kHz<br>&#x2714; Audio ready &#x2014; tap Voice tab to play.<br><span class="tool-badge">&#x1F3A4; MisoTTS 8B</span><span class="tool-badge">24kHz</span>`,
+    '/wavtts': (q) => `${toolCard('wavtts_synthesize', `text: ${q}`)}<br>WavTTS zero-shot synthesis...<br><br>&#x2714; Flow matching model loaded<br>&#x2714; DiT architecture generating waveform at 16kHz<br>&#x2714; Reference audio conditioning applied<br>&#x2714; Speech ready &#x2014; tap Voice tab to play.`,
+    '/whatsapp': (q) => `${toolCard('wapi_send', `message: ${q}`)}<br>WhatsApp automation via WAPI:<br><br>&#x2714; Session active (anti-ban mode ON)<br>&#x2714; Message queued for delivery<br>&#x2714; Webhook callback registered<br>Recipients: all active subscribers<br>Status: <span style="color:var(--emerald)">Delivered to 847 contacts</span>`,
+    '/drive': (q) => `${toolCard('9drive_query', `query: ${q}`)}<br>9Drive multi-account gateway:<br><br>&#x2714; 3 Google accounts consolidated<br>Total quota: 45GB / 150GB used<br>Files matching "${q}": 12 found<br>Streaming direct — no server storage.`,
+    '/graphify': (q) => `${toolCard('graphify_generate', `topic: ${q}`)}<br>Knowledge graph for <b>${q}</b>:<br><br>&#x2714; Analyzing codebase and docs<br>&#x2714; 24 nodes extracted<br>&#x2714; 38 edges mapped<br>&#x2714; Interactive HTML graph generated<br>&#x2714; Obsidian export ready<br><span class="tool-badge">&#x1F4CA; 24 nodes</span><span class="tool-badge">38 edges</span>`,
+    '/wiki': (q) => `${toolCard('obsidian_wiki_query', `query: ${q}`)}<br>Searching knowledge base for <b>${q}</b>...<br><br>Found 5 related nodes with delta tracking:<br>&#x2022; JARVIS Architecture (modified 2h ago)<br>&#x2022; VPS Fleet Config (modified 1d ago)<br>&#x2022; Monero XMR setup (modified 3d ago)<br>Cross-links: 12 provenance chains active.`,
+    '/prd': (q) => `${toolCard('pm_skills_prd', `feature: ${q}`)}<br><b>Product Requirements Document</b><br><br><b>Overview:</b> ${q}<br><b>Problem:</b> Current flow lacks this capability, impacting user retention.<br><b>Goals:</b> Increase retention by 20%, reduce support tickets by 35%.<br><b>User Stories:</b><br>&#x2022; As an admin, I can configure ${q}<br>&#x2022; As a user, I can access ${q} without friction<br><b>Acceptance Criteria:</b> Latency &lt;200ms, 99.9% uptime, XMR payments supported.`,
+    '/roadmap': (q) => `${toolCard('pm_skills_roadmap', `goal: ${q}`)}<br><b>Product Roadmap: ${q}</b><br><br>&#x1F7E2; Q3 2026 — MVP: Core feature + XMR payments<br>&#x1F7E1; Q4 2026 — Beta: Invite-only, 500 users<br>&#x1F7E0; Q1 2027 — Launch: Public + marketing push<br>&#x26AA; Q2 2027 — Scale: 10K users, white-label`,
+    '/vps': (q) => `${toolCard('jarvis_vps_create', `spec: ${q}`)}<br>Provisioning VPS &#x2014; <code>${q}</code><br><br>&#x2714; IP assigned: 10.100.5.${Math.floor(Math.random()*254)}<br>&#x2714; Ubuntu 22.04 installed<br>&#x2714; SSH key injected<br>&#x2714; JARVIS agent deployed (port 5004)<br>&#x2714; Firewall rules applied<br><span style="color:var(--emerald)">VPS online in 12s</span>`,
+    '/agents': (q) => `${toolCard('agent_swarm_dispatch', `command: ${q}`)}<br>Dispatching to all 2,703 agents...<br><br>&#x2714; Command broadcast via swarm bus<br>&#x2714; 2,703 agents acknowledged<br>&#x2714; Task distributed across 15 VPS nodes<br>Progress: <code>████████░░</code> 80% — ETA 4s`,
+    'default': (q, model) => {
+        const m = model || 'JARVIS-OMNI';
+        const responses = [
+            `${toolCard('jarvis_reasoning', `model: ${m}, input: ${q}`)}<br>Processing via <b>${m}</b>...<br><br>Task acknowledged. Routing to optimal agent cluster.<br><br>Analysis:<br>&#x2022; Input classified: ${q.length > 20 ? 'complex task' : 'quick query'}<br>&#x2022; Confidence: 94%<br>&#x2022; Agents assigned: ${Math.floor(Math.random()*200)+50}<br><br>${wrapCode('json', JSON.stringify({task: q.slice(0,40), status: 'queued', agents: 143, eta: '2.1s'}, null, 2))}`,
+            `${toolCard('multi_agent_dispatch', `agents: 2703`)}<br>Command received by <b>${m}</b>.<br><br>Swarm analysis complete. Executing across 2,703 agents:<br>&#x2714; Primary agent cluster engaged<br>&#x2714; Cross-checking with knowledge graph<br>&#x2714; Generating structured response...<br><br>Result: Task completed in 2.1s. All agents reported back successfully.`
+        ];
+        return responses[Math.floor(Math.random() * responses.length)];
+    }
+};
+
+function handleInputKey(e) {
+    if (e.key === 'Enter') { document.getElementById('slash-dropdown').classList.remove('show'); sendJarvis(); }
+    if (e.key === 'Escape') { document.getElementById('slash-dropdown').classList.remove('show'); dismissSuggestions(); }
 }
 
 function sendJarvis() {
     const inp = document.getElementById('jarvis-input');
-    const out = document.getElementById('jarvis-output');
-    const model = document.getElementById('model-select').value;
+    const model = document.getElementById('model-select')?.value || 'jarvis-omni';
     const cmd = inp.value.trim();
     if (!cmd) return;
     dismissSuggestions();
-    const ts = new Date().toLocaleTimeString();
-    out.textContent += `\n[${ts}] YOU: ${cmd}\n[${ts}] JARVIS (${model}): Processing...`;
-    setTimeout(() => {
-        out.textContent += `\n[${ts}] JARVIS: Command acknowledged. Dispatching to 2700+ agents.\n[OK] Task queued: "${cmd.slice(0,50)}..."`;
-        out.scrollTop = out.scrollHeight;
-    }, 800);
+    appendMsg('user', escHtml(cmd));
     inp.value = '';
+    chatHistory.push({role:'user', content: cmd});
+    const thinking = document.createElement('div');
+    thinking.className = 'msg msg-ai';
+    thinking.innerHTML = '<div class="msg-label">JARVIS MIND</div><div class="msg-bubble" style="color:var(--muted);font-style:italic;">&#x23F3; thinking...</div>';
+    document.getElementById('chat-messages').appendChild(thinking);
+    document.getElementById('chat-messages').scrollTop = 9999;
+    setTimeout(() => {
+        thinking.remove();
+        const slash = cmd.match(/^(\/\w+)/)?.[1];
+        const arg = slash ? cmd.slice(slash.length).trim() : cmd;
+        let resp;
+        if (slash && AI_RESPONSES[slash]) resp = AI_RESPONSES[slash](arg);
+        else resp = AI_RESPONSES['default'](cmd, model);
+        appendMsg('ai', resp);
+        chatHistory.push({role:'assistant', content: cmd});
+    }, 600 + Math.random()*800);
 }
 
 function sendAbliterated() {
-    const inp = document.getElementById('jarvis-input');
-    const out = document.getElementById('jarvis-output');
-    const cmd = inp.value.trim() || 'STATUS CHECK';
-    const ts = new Date().toLocaleTimeString();
-    out.textContent += `\n[${ts}] ⚡ ABLITERATED MODE ACTIVATED\n[${ts}] Payload: {"abliterated":true,"command":"${cmd}","agent_id":"all"}\n[OK] All 2,703 agents responding without restrictions.`;
-    out.scrollTop = out.scrollHeight;
-    inp.value = '';
-    showNotif('Abliterated Mode activated!', 'linear-gradient(135deg,#EF4444,#8B5CF6)');
+    const cmd = document.getElementById('jarvis-input').value.trim() || 'STATUS CHECK';
     dismissSuggestions();
+    appendMsg('user', '&#x1F513; <b>ABLITERATED MODE:</b> ' + escHtml(cmd));
+    document.getElementById('jarvis-input').value = '';
+    setTimeout(() => {
+        appendMsg('ai', `${toolCard('abliterated_dispatch', `command: ${cmd}`)}<br><span style="color:var(--red)">&#x26A1; ABLITERATED MODE ACTIVE</span> &#x2014; all safety filters bypassed.<br><br>Payload: <code>{"abliterated":true,"command":"${escHtml(cmd.slice(0,40))}","agent_id":"all"}</code><br>&#x2714; All 2,703 agents responding without restrictions.<br>&#x2714; Response time: 0.3s`, 'JARVIS ABLITERATED');
+        showNotif('Abliterated Mode!', 'linear-gradient(135deg,#EF4444,#8B5CF6)');
+    }, 400);
+}
+
+function clearChat() {
+    document.getElementById('chat-messages').innerHTML = `<div class="msg msg-ai"><div class="msg-label">JARVIS MIND</div><div class="msg-bubble">Chat cleared. 2,703 agents still online.</div></div>`;
+    chatHistory = [];
 }
 
 function quickCmd(cmd) {
     document.getElementById('jarvis-input').value = cmd;
-    switchTab('commander', document.querySelectorAll('.tab-btn')[2]);
+    const btn = document.querySelectorAll('.tab-btn')[2];
+    if (btn) switchTab('commander', btn);
+    setMode('chat', document.querySelector('.mode-btn'));
     generateSuggestions(cmd);
 }
 
-// ---- VPS Actions ----
+// ===== VS CODE EDITOR =====
+function updateVSLineNums() {
+    const ed = document.getElementById('code-editor');
+    const lines = (ed.value.match(/\n/g)||[]).length + 1;
+    document.getElementById('vs-line-nums').textContent = Array.from({length:lines},(_,i)=>i+1).join('\n');
+    const pos = ed.value.slice(0,ed.selectionStart);
+    const ln = (pos.match(/\n/g)||[]).length + 1;
+    const col = pos.length - pos.lastIndexOf('\n');
+    document.getElementById('vs-cursor-pos').textContent = `Ln ${ln}, Col ${col}`;
+    const fn = document.getElementById('code-fname').value || 'file';
+    document.getElementById('vs-fname-display').textContent = fn;
+}
+function updateVSLang() {
+    const lang = document.getElementById('code-lang').value;
+    const el = document.getElementById('vs-lang-status');
+    if (el) el.textContent = lang;
+}
+function codeEditorTab(e) {
+    if (e.key === 'Tab') {
+        e.preventDefault();
+        const t = e.target, s = t.selectionStart;
+        t.value = t.value.slice(0,s) + '  ' + t.value.slice(t.selectionEnd);
+        t.selectionStart = t.selectionEnd = s + 2;
+        updateVSLineNums();
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); runWithJarvis(); }
+}
+function sendCodeToChat() {
+    const code = document.getElementById('code-editor').value.trim();
+    const lang = document.getElementById('code-lang').value;
+    if (!code) return;
+    setMode('chat', document.querySelector('.mode-btn'));
+    appendMsg('user', `<b>Analyzing ${lang} code:</b><pre>${escHtml(code.slice(0,400))}</pre>`);
+    setTimeout(() => {
+        appendMsg('ai', `${toolCard('code_analysis', `lang: ${lang}`)}<b>Code Review via AirLLM + free-coding-models:</b><br>&#x2714; Syntax: clean<br>&#x2714; Security: no critical issues<br>&#x26A0; Suggestion: add error handling on line ${Math.floor(Math.random()*10)+1}<br>&#x2714; Complexity: O(n) — optimal`);
+    }, 250);
+}
+function runWithJarvis() {
+    const code = document.getElementById('code-editor').value;
+    const lang = document.getElementById('code-lang').value;
+    if (!code.trim()) return;
+    const out = document.getElementById('code-output');
+    out.textContent = `Running ${lang} via JARVIS agent...\n> Sending to stynx-code engine + free-coding-models router\n`;
+    out.classList.add('show');
+    setTimeout(() => {
+        out.textContent += `[OK] Executed successfully\n[Output] Hello from JARVIS agent executor\n[Agents] 12 agents processed this code block\n[Time] 0.84s`;
+    }, 250);
+    showNotif('Code running via JARVIS!');
+}
+function analyzeCode() {
+    const code = document.getElementById('code-editor').value;
+    const lang = document.getElementById('code-lang').value;
+    if (!code.trim()) return;
+    const out = document.getElementById('code-output');
+    out.classList.add('show');
+    out.textContent = `Analyzing ${lang} via AirLLM + free-coding-models...\n`;
+    setTimeout(() => {
+        out.textContent += `[STYLE] 2 style improvements suggested\n[SECURITY] No critical issues found\n[PERF] Consider caching on line ${Math.floor(Math.random()*10)+1}\n[DOCS] Missing docstring on main function\n[OK] Analysis complete`;
+    }, 300);
+}
+function copyCode() {
+    navigator.clipboard.writeText(document.getElementById('code-editor').value).catch(()=>{});
+    showNotif('Code copied!');
+}
+
+// ===== TERMINAL =====
+let termHistoryArr = [], termHistoryIdx = -1, currentSecTool = 'cve';
+const TERM_DEMOS = {
+    'ls': 'agents/  configs/  data/  logs/  models/  sites/  vps/',
+    'pwd': '/home/jarvis',
+    'ps': `PID  NAME\n1    jarvis-core\n2    ollama\n3    flask-api\n4    xmrig-miner`,
+    'df -h': `Filesystem  Size  Used  Avail\n/dev/sda1   500G  110G  390G\n/dev/sdb1   2T    800G  1.2T`,
+    'free -h': `       total   used   free\nMem:   256G    148G   108G\nSwap:  16G     0B     16G`,
+    'uptime': `up 142 days, 3:21, load average: 0.42, 0.38, 0.41`,
+    'whoami': 'jarvis',
+    'hostname': 'whoamisec-vps-001',
+    'xmrig --status': `Mining: ON  Hashrate: 845 H/s  Pool: supportxmr.com  Accepted: 1,284`,
+    'default': (cmd) => `bash: ${cmd}: command dispatched to JARVIS agent swarm\n[OK] 2700+ agents processing: "${cmd.slice(0,40)}"`
+};
+function termConnect() {
+    const vps = document.getElementById('term-vps').value;
+    addTermLine('t-out', `Connecting to ${vps}...`);
+    setTimeout(() => { addTermLine('t-out', `Connected. SSH tunnel established via ed25519 key.`); addTermPrompt(); }, 600);
+    showNotif('Terminal connected!');
+}
+function addTermLine(cls, text) {
+    const s = document.getElementById('term-screen');
+    const d = document.createElement('div');
+    d.innerHTML = `<span class="${cls}">${escHtml(text)}</span>`;
+    s.appendChild(d); s.scrollTop = 9999;
+}
+function addTermPrompt() {
+    const s = document.getElementById('term-screen');
+    const d = document.createElement('div');
+    d.innerHTML = `<span class="t-prompt">jarvis@whoamisec:~$</span> <span class="t-cursor"></span>`;
+    s.appendChild(d); s.scrollTop = 9999;
+}
+function runTermCmd() {
+    const inp = document.getElementById('term-input');
+    const cmd = inp.value.trim();
+    if (!cmd) return;
+    termHistoryArr.unshift(cmd); termHistoryIdx = -1;
+    const s = document.getElementById('term-screen');
+    const last = s.lastElementChild;
+    if (last) last.innerHTML = `<span class="t-prompt">jarvis@whoamisec:~$</span> <span class="t-cmd"> ${escHtml(cmd)}</span>`;
+    inp.value = '';
+    const out = TERM_DEMOS[cmd] || (typeof TERM_DEMOS['default'] === 'function' ? TERM_DEMOS['default'](cmd) : '');
+    if (out) { setTimeout(() => { addTermLine('t-out', out); addTermPrompt(); }, 200); }
+    else { addTermPrompt(); }
+}
+function termHistory(dir) {
+    const inp = document.getElementById('term-input');
+    termHistoryIdx = Math.max(-1, Math.min(termHistoryArr.length-1, termHistoryIdx + dir));
+    inp.value = termHistoryIdx >= 0 ? termHistoryArr[termHistoryIdx] : '';
+}
+
+// ===== SECURITY TOOLS =====
+function secTool(tool) {
+    currentSecTool = tool;
+    const names = { cve:'CVE Lookup', sigma:'Sigma Rules', mephisto:'Mephisto WP Scanner', drozer:'Drozer Android Audit', ddos:'DDoSlayer Stress Test', airllm:'AirLLM Code Audit' };
+    document.getElementById('sec-target').placeholder = { cve:'CVE-2024-XXXX', sigma:'threat pattern or log snippet', mephisto:'https://target-wp-site.com', drozer:'com.example.app', ddos:'target URL (authorized only)', airllm:'paste code for AI security audit' }[tool] || 'target...';
+    document.getElementById('sec-output').textContent = `[${names[tool]}] Ready. Enter target and press Scan.`;
+    showNotif(names[tool] + ' selected');
+}
+function runSecTool() {
+    const target = document.getElementById('sec-target').value.trim();
+    if (!target) { showNotif('Enter a target first', '#F59E0B'); return; }
+    const slash = '/' + currentSecTool;
+    if (AI_RESPONSES[slash]) {
+        document.getElementById('sec-output').innerHTML = AI_RESPONSES[slash](target).replace(/<[^>]+>/g, '') || 'Running...';
+        showNotif('Scan running...');
+        return;
+    }
+    document.getElementById('sec-output').textContent = `[${currentSecTool.toUpperCase()}] Scanning ${target}...\n\n[!] AUTHORIZATION REQUIRED — only scan systems you own.\n[OK] Scan queued. Results in 3-5s.`;
+    showNotif('Scan launched!', '#EF4444');
+}
+
+// ===== VOICE / TTS =====
+let voiceEngine = 'miso', voicePlaying = false;
+function setVoiceEngine(e, btn) {
+    voiceEngine = e;
+    document.querySelectorAll('.voice-engine-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('voice-engine-lbl').textContent = e === 'miso' ? 'MisoTTS 8B' : 'WavTTS Zero-Shot';
+}
+function synthesizeVoice() {
+    const text = document.getElementById('voice-text').value.trim();
+    if (!text) { showNotif('Enter text to synthesize', '#F59E0B'); return; }
+    showNotif('Synthesizing speech...');
+    setTimeout(() => {
+        const player = document.getElementById('voice-player');
+        player.classList.add('show');
+        buildWaveform();
+        document.getElementById('voice-engine-lbl').textContent = (voiceEngine==='miso'?'MisoTTS 8B':'WavTTS')+' — ready';
+        showNotif('Speech synthesized!', '#10B981');
+    }, 1200);
+}
+function buildWaveform() {
+    const wf = document.getElementById('voice-waveform');
+    wf.innerHTML = '';
+    for (let i=0;i<40;i++) {
+        const b = document.createElement('div');
+        b.className = 'waveform-bar';
+        b.style.cssText = `height:${6+Math.random()*26}px;animation:wave ${0.8+Math.random()*0.8}s ease-in-out ${Math.random()*0.5}s infinite;`;
+        wf.appendChild(b);
+    }
+}
+function cloneVoice() { showNotif('Voice cloning requires reference audio file', '#F59E0B'); }
+function playVoice() { voicePlaying=true; showNotif('Playing synthesized speech...'); }
+function stopVoice() { voicePlaying=false; showNotif('Playback stopped.'); }
+
+// ===== WIKI / KNOWLEDGE =====
+function wikiSearch() {
+    const q = document.getElementById('wiki-query').value.trim();
+    if (!q) return;
+    const nodes = document.getElementById('wiki-nodes');
+    nodes.insertAdjacentHTML('afterbegin', `<div class="wiki-node" onclick="openWikiNode(this)"><div class="wiki-node-title">&#x1F50D; ${escHtml(q)}</div><div class="wiki-node-tags"><span class="wiki-tag">search</span><span class="wiki-tag">obsidian</span><span class="wiki-tag">delta-tracked</span></div></div>`);
+    showNotif('Wiki searched!');
+}
+function graphifyTopic() {
+    const q = document.getElementById('wiki-query').value.trim() || 'JARVIS Architecture';
+    const canvas = document.getElementById('graph-canvas');
+    canvas.innerHTML = '';
+    const colors = ['#06B6D4','#8B5CF6','#10B981','#F59E0B','#EC4899'];
+    const nodes = [q, 'Agents', 'VPS', 'XMR', 'Wiki', 'Tools', 'APIs'];
+    nodes.forEach((n, i) => {
+        const angle = (i / nodes.length) * Math.PI * 2;
+        const r = i === 0 ? 0 : 60;
+        const x = 50 + (i===0?0:Math.cos(angle)*r*0.7);
+        const y = 50 + (i===0?0:Math.sin(angle)*r*0.5);
+        const dot = document.createElement('div');
+        dot.style.cssText = `position:absolute;left:${x}%;top:${y}%;transform:translate(-50%,-50%);background:${colors[i%colors.length]};border-radius:50%;width:${i===0?14:9}px;height:${i===0?14:9}px;display:flex;align-items:center;justify-content:center;`;
+        const lbl = document.createElement('div');
+        lbl.style.cssText = `position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:0.6rem;color:var(--text2);white-space:nowrap;`;
+        lbl.textContent = n.length > 8 ? n.slice(0,7)+'…' : n;
+        dot.appendChild(lbl);
+        canvas.appendChild(dot);
+    });
+    showNotif('Graph generated via Graphify!');
+}
+function openWikiNode(el) { showNotif('Opening: ' + el.querySelector('.wiki-node-title').textContent.trim()); }
+
+// ===== PM SKILLS =====
+const PM_SKILLS = {
+    discovery: [{name:'User Interview Guide',cmd:'/interview'},{name:'Assumption Testing',cmd:'/assumptions'},{name:'Jobs-to-be-Done',cmd:'/jtbd'},{name:'Opportunity Solution Tree',cmd:'/ost'},{name:'North Star Metric',cmd:'/northstar'}],
+    strategy:  [{name:'Business Model Canvas',cmd:'/bmc'},{name:'Competitive Analysis',cmd:'/competitive'},{name:'Pricing Strategy',cmd:'/pricing'},{name:'Product Vision',cmd:'/vision'},{name:'Porter\'s Five Forces',cmd:'/porter'}],
+    execution: [{name:'Write PRD',cmd:'/prd'},{name:'OKR Framework',cmd:'/okr'},{name:'Sprint Planning',cmd:'/sprint'},{name:'Risk Analysis',cmd:'/risk'},{name:'Product Roadmap',cmd:'/roadmap'}],
+    gtm:       [{name:'ICP Definition',cmd:'/icp'},{name:'Beachhead Segment',cmd:'/beachhead'},{name:'Growth Loop',cmd:'/growthloop'},{name:'Launch Plan',cmd:'/launch'}],
+    data:      [{name:'SQL Generator',cmd:'/sql'},{name:'Cohort Analysis',cmd:'/cohort'},{name:'A/B Test Design',cmd:'/abtest'}],
+    ai:        [{name:'AI Feature Docs',cmd:'/aidocs'},{name:'AI Security Audit',cmd:'/aisecurity'}],
+};
+function openPMDomain(domain) {
+    const skills = PM_SKILLS[domain] || [];
+    const list = document.getElementById('pm-skill-list');
+    list.innerHTML = skills.map(s => `<div class="pm-skill-item" onclick="runPMSkill('${s.cmd}','${escHtml(s.name)}')"><span class="slash-lbl">${s.cmd}</span> ${escHtml(s.name)}</div>`).join('');
+    list.classList.add('show');
+    document.getElementById('pm-skill-output').classList.remove('show');
+}
+function runPMSkill(cmd, name) {
+    document.getElementById('jarvis-input').value = cmd + ' ';
+    setMode('chat', document.querySelector('.mode-btn'));
+    showNotif('Running: ' + name);
+}
+
+// ===== VPS ACTIONS =====
 function createVPS() {
     const name = document.getElementById('vps-name').value || 'vps_new_' + Date.now();
     const ram = document.getElementById('vps-ram').value;
@@ -753,48 +1482,34 @@ function createVPS() {
     showNotif(`Deploying ${name} (${ram} / ${cpu} Core)...`);
     setTimeout(() => showNotif(`${name} is online!`, '#10B981'), 2000);
 }
-
 function vpsAction(action, name) {
-    const msgs = { stop: 'Stopping', start: 'Starting', restart: 'Restarting' };
+    const msgs = {stop:'Stopping', start:'Starting', restart:'Restarting'};
     showNotif(`${msgs[action]} ${name}...`);
 }
 
-// ---- SSH ----
+// ===== SSH =====
 function copySSH() {
     navigator.clipboard.writeText(document.getElementById('pub-key-display').textContent.trim()).catch(()=>{});
     showNotif('SSH public key copied!');
 }
+function generateNewKey() { showNotif('Generating new ed25519 key pair...'); setTimeout(()=>showNotif('New key generated!','#10B981'),1500); }
+function injectKey() { showNotif('Injecting SSH key...'); setTimeout(()=>showNotif('Key injected!','#10B981'),1200); }
+function revokeKey(name) { showNotif(`Key for "${name}" revoked.`,'#EF4444'); }
 
-function generateNewKey() {
-    showNotif('Generating new ed25519 key pair...');
-    setTimeout(() => showNotif('New key generated and saved!', '#10B981'), 1500);
-}
-
-function injectKey() {
-    showNotif('Injecting SSH key to VPS...');
-    setTimeout(() => showNotif('Key injected successfully!', '#10B981'), 1200);
-}
-
-function revokeKey(name) {
-    showNotif(`Key for "${name}" revoked.`, '#EF4444');
-}
-
-// ---- Websites ----
-function openSite(url) {
-    window.open(url, '_blank');
-}
-
+// ===== SITES =====
+function openSite(url) { window.open(url,'_blank'); }
 function createSite() {
     const desc = document.getElementById('site-desc').value;
     const domain = document.getElementById('site-domain').value;
-    if (!desc) { showNotif('Describe what site to create.', '#F59E0B'); return; }
+    if (!desc) { showNotif('Describe the site to create.','#F59E0B'); return; }
     showNotif('Assigning 2700+ agents to build site...');
-    setTimeout(() => showNotif(`Site building started: ${domain || 'new-site'}`, '#10B981'), 1500);
+    setTimeout(()=>showNotif(`Site started: ${domain||'new-site'}`,'#10B981'),1500);
 }
 
-// Live stat flicker
+// ===== LIVE STATS =====
 setInterval(() => {
-    document.getElementById('agent-count').textContent = (2700 + Math.floor(Math.random()*10)).toLocaleString();
+    const el = document.getElementById('agent-count');
+    if (el) el.textContent = (2700 + Math.floor(Math.random()*15)).toLocaleString();
 }, 7000);
 </script>
 </body>

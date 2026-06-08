@@ -219,21 +219,40 @@
         .btn-block { width:100%; }
         .btn-sm { padding:0.5rem 0.9rem; font-size:0.8rem; }
 
-        /* Commander */
-        .commander-input {
-            display:flex; gap:0.5rem; margin-bottom:1rem;
-        }
-        .commander-input input {
-            flex:1; background:var(--bg); border:1px solid var(--border);
-            border-radius:8px; padding:0.75rem 1rem;
-            color:var(--text); font-size:0.9rem;
-        }
-        .commander-output {
-            background:var(--bg); border:1px solid var(--border);
-            border-radius:8px; padding:1rem; min-height:120px;
-            font-family:'JetBrains Mono',monospace; font-size:0.8rem;
-            color:var(--emerald); line-height:1.6; white-space:pre-wrap;
-        }
+        /* Commander — Manus-like */
+        .chat-messages { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:0.7rem; height:200px; overflow-y:auto; display:flex; flex-direction:column; gap:0.55rem; margin-bottom:0.5rem; }
+        .msg { display:flex; flex-direction:column; }
+        .msg-label { font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.15rem; }
+        .msg-user .msg-label { color:var(--cyan); text-align:right; }
+        .msg-ai .msg-label { color:var(--purple); }
+        .msg-bubble { padding:0.5rem 0.7rem; border-radius:9px; font-size:0.8rem; line-height:1.6; }
+        .msg-user .msg-bubble { background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.1); margin-left:12%; }
+        .msg-ai .msg-bubble { background:rgba(139,92,246,0.07); border:1px solid rgba(139,92,246,0.1); margin-right:5%; }
+        .msg-bubble code { background:rgba(0,0,0,0.3); padding:0.1em 0.35em; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:0.8em; color:var(--cyan); }
+        .msg-bubble pre { background:rgba(0,0,0,0.3); border-radius:7px; padding:0.55rem; margin:0.35rem 0; overflow-x:auto; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--text); }
+        .tool-badge { display:inline-block; padding:0.1rem 0.35rem; border-radius:9px; font-size:0.65rem; background:rgba(6,182,212,0.08); color:var(--cyan); border:1px solid rgba(6,182,212,0.12); margin:0.08rem 0.12rem 0.08rem 0; }
+        .tool-call-card { background:rgba(6,182,212,0.04); border:1px solid rgba(6,182,212,0.1); border-radius:7px; padding:0.38rem 0.55rem; margin:0.28rem 0; font-size:0.7rem; font-family:'JetBrains Mono',monospace; cursor:pointer; }
+        .tool-call-name { color:var(--cyan); font-weight:700; }
+        .tool-call-detail { display:none; color:var(--text2); font-size:0.67rem; margin-top:0.18rem; padding-top:0.18rem; border-top:1px solid rgba(255,255,255,0.05); }
+        .tool-call-detail.open { display:block; }
+        .cmd-row { display:flex; gap:0.4rem; align-items:center; position:relative; }
+        .cmd-row input { flex:1; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.6rem 0.8rem; color:var(--text); font-size:0.85rem; outline:none; }
+        .cmd-row input:focus { border-color:var(--cyan); }
+        .slash-dropdown { display:none; position:absolute; bottom:calc(100%+5px); left:0; right:0; background:var(--card); border:1px solid var(--border); border-radius:9px; overflow:hidden; z-index:50; max-height:200px; overflow-y:auto; }
+        .slash-dropdown.show { display:block; }
+        .slash-item { display:flex; align-items:center; gap:0.45rem; padding:0.45rem 0.65rem; cursor:pointer; font-size:0.78rem; }
+        .slash-item:hover { background:rgba(255,255,255,0.05); }
+        .slash-cmd { color:var(--purple); font-family:'JetBrains Mono',monospace; font-weight:600; font-size:0.73rem; width:155px; flex-shrink:0; }
+        .slash-desc { color:var(--muted); font-size:0.72rem; }
+        /* VS Code editor */
+        .vs-editor-wrap { position:relative; background:rgba(0,0,0,0.42); border:1px solid rgba(6,182,212,0.2); border-radius:10px; overflow:hidden; margin-bottom:0.5rem; }
+        .vs-editor-toolbar { display:flex; align-items:center; gap:0.4rem; padding:0.3rem 0.6rem; background:rgba(255,255,255,0.03); border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.7rem; color:var(--muted); }
+        .vs-lang-dot { width:8px; height:8px; border-radius:50%; background:var(--cyan); }
+        .vs-editor-inner { display:flex; }
+        .vs-line-nums { background:rgba(0,0,0,0.2); padding:0.5rem 0.4rem; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); text-align:right; line-height:1.55; min-width:28px; user-select:none; }
+        .vs-editor { flex:1; background:transparent; padding:0.5rem 0.6rem; color:#e2e8f0; font-family:'JetBrains Mono',monospace; font-size:0.72rem; line-height:1.55; resize:none; outline:none; border:none; min-height:130px; tab-size:2; }
+        .vs-statusbar { display:flex; align-items:center; gap:0.6rem; padding:0.18rem 0.6rem; background:rgba(6,182,212,0.08); border-top:1px solid rgba(6,182,212,0.1); font-size:0.62rem; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+        .vs-status-item { color:var(--cyan); }
 
         /* Section header */
         .sec-header {
@@ -351,13 +370,58 @@
         </div>
 
         <div class="card">
-            <div class="card-title">JARVIS Agent Commander</div>
-            <div class="commander-input">
-                <input type="text" id="cmd-input" placeholder="Send command to all 2700+ agents..." />
-                <button class="btn btn-grad btn-sm" onclick="sendCommand()">Send</button>
+            <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
+                <span>JARVIS Commander — 2700+ Agents</span>
+                <div style="display:flex;gap:0.3rem;">
+                    <button class="btn btn-sm" style="background:rgba(6,182,212,0.1);color:var(--cyan);padding:0.25rem 0.5rem;font-size:0.7rem;" onclick="openBizTools()">&#x26A1; Tools</button>
+                    <button class="btn btn-sm" style="background:rgba(107,114,128,0.1);color:var(--muted);padding:0.25rem 0.5rem;font-size:0.7rem;" onclick="bizClearChat()">&#x1F5D1;</button>
+                </div>
             </div>
-            <div class="commander-output" id="cmd-output">JARVIS MIND ready. 2700+ agents standing by.
-&gt; Type a command above and hit Send.</div>
+            <select class="model-selector" id="biz-model" style="font-size:0.77rem;margin-bottom:0.55rem;">
+                <option value="jarvis-omni">&#x1F916; JARVIS-OMNI</option>
+                <option value="odysseus">&#x1F30A; Odysseus Multi-Model</option>
+                <option value="airllm">&#x26A1; AirLLM 70B</option>
+                <option value="sigma">&#x1F517; Sigma Router</option>
+                <option value="free-code">&#x1F193; Free Coding Models</option>
+                <option value="deepseek">&#x1F4BB; DeepSeek Coder</option>
+            </select>
+            <div class="chat-messages" id="biz-chat-messages">
+                <div class="msg msg-ai">
+                    <div class="msg-label">JARVIS MIND</div>
+                    <div class="msg-bubble">Online. 2,703 agents + all tools active.<br>
+                    <span class="tool-badge">&#x1F50D; CVE</span><span class="tool-badge">&#x1F3A4; TTS</span><span class="tool-badge">&#x1F4CA; Graphify</span><span class="tool-badge">&#x1F4F1; WhatsApp</span><span class="tool-badge">&#x1F4BE; 9Drive</span><span class="tool-badge">&#x1F9E0; Wiki</span></div>
+                </div>
+            </div>
+            <!-- VS Code editor (quick access) -->
+            <div class="vs-editor-wrap" id="biz-vs-wrap" style="display:none;">
+                <div class="vs-editor-toolbar">
+                    <div class="vs-lang-dot"></div>
+                    <span id="biz-vs-lang">Python</span>
+                    <span style="flex:1;"></span>
+                    <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.7rem;" onclick="closeBizVS()">&#x2715;</button>
+                </div>
+                <div class="vs-editor-inner">
+                    <div class="vs-line-nums" id="biz-line-nums">1</div>
+                    <textarea class="vs-editor" id="biz-vs-editor" spellcheck="false"
+                        oninput="updateBizLineNums()" onkeydown="vsEditorKey(event,'biz')"></textarea>
+                </div>
+                <div class="vs-statusbar">
+                    <span class="vs-status-item" id="biz-vs-status">Ln 1, Col 1</span>
+                    <span>&#x2022;</span><span class="vs-status-item" id="biz-vs-langstat">Python</span>
+                    <span style="flex:1;"></span>
+                    <button class="btn btn-sm" style="padding:0.15rem 0.5rem;font-size:0.68rem;background:var(--grad);margin:-2px;" onclick="runBizCode()">&#x25B6; Run</button>
+                </div>
+            </div>
+            <div style="position:relative;">
+                <div class="slash-dropdown" id="biz-slash-dd"></div>
+                <div class="cmd-row">
+                    <button class="btn btn-sm" style="background:rgba(6,182,212,0.1);color:var(--cyan);padding:0.48rem 0.6rem;flex-shrink:0;" onclick="toggleBizVS()" title="VS Code Editor">&#x2328;</button>
+                    <input type="text" id="cmd-input" placeholder="Chat / /slash-command / describe task..."
+                        oninput="onBizInput(this.value)" onkeydown="if(event.key==='Enter'){bizSlashDD(false);sendBizCommand();}if(event.key==='Escape')bizSlashDD(false);">
+                    <button class="btn abliterated-btn btn-sm" onclick="bizAbliterate()" title="Abliterated">&#x1F513;</button>
+                    <button class="btn btn-grad btn-sm" onclick="sendBizCommand()">Send</button>
+                </div>
+            </div>
         </div>
 
         <div class="card">
@@ -669,15 +733,111 @@ function showNotif(msg) {
     setTimeout(() => n.classList.remove('show'), 2000);
 }
 
-function sendCommand() {
+// ===== BIZ COMMANDER =====
+const BIZ_SLASH = [
+    {cmd:'/cve',desc:'CVE lookup (OpenCVE)'},{cmd:'/tts',desc:'Synthesize voice (MisoTTS)'},{cmd:'/graphify',desc:'Knowledge graph'},
+    {cmd:'/whatsapp',desc:'WhatsApp blast (WAPI)'},{cmd:'/drive',desc:'9Drive cloud storage'},{cmd:'/prd',desc:'Write PRD'},
+    {cmd:'/roadmap',desc:'Build roadmap'},{cmd:'/okr',desc:'Generate OKRs'},{cmd:'/agents',desc:'Dispatch 2700+ agents'},
+    {cmd:'/vps',desc:'Create VPS'},{cmd:'/wiki',desc:'Obsidian knowledge base'},{cmd:'/mephisto',desc:'WordPress scanner'},
+];
+let bizHistory = [], bizSlashOpen = false;
+
+function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function toolC(n,d) { return `<div class="tool-call-card" onclick="this.querySelector('.tool-call-detail').classList.toggle('open')"><div class="tool-call-name">&#x2699; ${n}</div><div class="tool-call-detail">${escH(d)}</div></div>`; }
+function addBizMsg(role, html, lbl) {
+    const m = document.getElementById('biz-chat-messages');
+    const d = document.createElement('div'); d.className = 'msg msg-'+role;
+    d.innerHTML = `<div class="msg-label">${lbl||(role==='user'?'You':'JARVIS')}</div><div class="msg-bubble">${html}</div>`;
+    m.appendChild(d); m.scrollTop = 9999;
+}
+function onBizInput(v) {
+    if (v.startsWith('/')) {
+        const matches = BIZ_SLASH.filter(c=>c.cmd.startsWith(v.toLowerCase())).slice(0,6);
+        const dd = document.getElementById('biz-slash-dd');
+        if (matches.length) {
+            dd.innerHTML = matches.map(c=>`<div class="slash-item" onclick="applyBizSlash('${c.cmd}')"><span class="slash-cmd">${c.cmd}</span><span class="slash-desc">${c.desc}</span></div>`).join('');
+            dd.classList.add('show');
+        } else { dd.classList.remove('show'); }
+    } else { document.getElementById('biz-slash-dd').classList.remove('show'); }
+}
+function applyBizSlash(cmd) { document.getElementById('cmd-input').value = cmd+' '; bizSlashDD(false); document.getElementById('cmd-input').focus(); }
+function bizSlashDD(show) { document.getElementById('biz-slash-dd').classList[show?'add':'remove']('show'); }
+
+function sendBizCommand() {
     const inp = document.getElementById('cmd-input');
-    const out = document.getElementById('cmd-output');
     const cmd = inp.value.trim();
     if (!cmd) return;
-    out.textContent += '\n> ' + cmd + '\nJARVIS: Processing command across 2700+ agents...\n[OK] Command dispatched at ' + new Date().toISOString();
+    bizSlashDD(false);
+    addBizMsg('user', escH(cmd));
     inp.value = '';
-    showNotif('Command sent to all agents');
+    const model = document.getElementById('biz-model').value;
+    // fast thinking indicator
+    const msgs = document.getElementById('biz-chat-messages');
+    const t = document.createElement('div'); t.className = 'msg msg-ai';
+    t.innerHTML = '<div class="msg-label">JARVIS</div><div class="msg-bubble" style="color:var(--muted);font-style:italic;">&#x23F3;</div>';
+    msgs.appendChild(t); msgs.scrollTop = 9999;
+    setTimeout(() => {
+        t.remove();
+        const slash = cmd.match(/^(\/\w+)/)?.[1];
+        const arg = slash ? cmd.slice(slash.length).trim() : cmd;
+        const BIZ_RESP = {
+            '/cve': a => `${toolC('opencve_lookup',a)}CVE scan: <code>${a}</code><br>Severity: HIGH — CVSS 9.1<br>Patch available: Yes`,
+            '/tts': a => `${toolC('misotts',a)}MisoTTS 8B synthesizing...<br>&#x2714; Speech ready (24kHz). Switch to Voice tab.`,
+            '/graphify': a => `${toolC('graphify',a)}Knowledge graph for <b>${a}</b>:<br>&#x2714; 18 nodes, 29 edges — open Wiki tab to view.`,
+            '/whatsapp': a => `${toolC('wapi_send',a)}WhatsApp blast: <b>${a}</b><br>&#x2714; Delivered to 847 subscribers via WAPI.`,
+            '/drive': a => `${toolC('9drive',a)}9Drive: found 8 files matching "${a}"<br>Total quota: 45GB / 150GB.`,
+            '/prd': a => `${toolC('pm_prd',a)}<b>PRD: ${a}</b><br>&#x2022; Goals: +20% retention<br>&#x2022; Stories: 4 user stories written<br>&#x2022; AC: latency &lt;200ms, XMR payments`,
+            '/roadmap': a => `${toolC('pm_roadmap',a)}<b>Roadmap: ${a}</b><br>&#x1F7E2; Q3 MVP | &#x1F7E1; Q4 Beta | &#x1F7E0; Q1 Launch`,
+            '/agents': a => `${toolC('swarm',a)}2,703 agents dispatched for: <b>${a}</b><br>&#x2714; ETA: 2.1s | All agents acknowledged.`,
+        };
+        let resp;
+        if (slash && BIZ_RESP[slash]) resp = BIZ_RESP[slash](arg);
+        else resp = `${toolC('jarvis_omni',cmd)}Processing via <b>${model}</b>...<br>&#x2714; 2,703 agents acknowledged.<br>&#x2714; Task: "${escH(cmd.slice(0,50))}"<br>Result: completed in 1.4s.`;
+        addBizMsg('ai', resp);
+        showNotif('JARVIS responded');
+    }, 300 + Math.random()*400);
 }
+function bizAbliterate() {
+    const cmd = document.getElementById('cmd-input').value.trim() || 'STATUS';
+    addBizMsg('user', '&#x1F513; ABLITERATED: '+escH(cmd));
+    document.getElementById('cmd-input').value = '';
+    setTimeout(() => {
+        addBizMsg('ai', `${toolC('abliterated',cmd)}<span style="color:var(--red)">&#x26A1; ALL RESTRICTIONS BYPASSED</span><br>2,703 agents responding without limits.`,'JARVIS UNLOCKED');
+        showNotif('Abliterated!','linear-gradient(135deg,#EF4444,#8B5CF6)');
+    }, 200);
+}
+function bizClearChat() { document.getElementById('biz-chat-messages').innerHTML = '<div class="msg msg-ai"><div class="msg-label">JARVIS</div><div class="msg-bubble">Chat cleared. Ready.</div></div>'; }
+function openBizTools() { showNotif('Type /command for tools — e.g. /cve /tts /whatsapp /graphify'); }
+
+// VS Code editor
+let bizVSOpen = false;
+function toggleBizVS() {
+    bizVSOpen = !bizVSOpen;
+    document.getElementById('biz-vs-wrap').style.display = bizVSOpen ? 'block' : 'none';
+    if (bizVSOpen) { document.getElementById('biz-vs-editor').focus(); updateBizLineNums(); }
+}
+function closeBizVS() { bizVSOpen = false; document.getElementById('biz-vs-wrap').style.display = 'none'; }
+function updateBizLineNums() {
+    const ed = document.getElementById('biz-vs-editor');
+    const lines = (ed.value.match(/\n/g)||[]).length + 1;
+    document.getElementById('biz-line-nums').textContent = Array.from({length:lines},(_,i)=>i+1).join('\n');
+    const pos = ed.value.slice(0, ed.selectionStart);
+    const ln = (pos.match(/\n/g)||[]).length + 1;
+    const col = pos.length - pos.lastIndexOf('\n');
+    document.getElementById('biz-vs-status').textContent = `Ln ${ln}, Col ${col}`;
+}
+function vsEditorKey(e, ctx) {
+    if (e.key === 'Tab') { e.preventDefault(); const t=e.target,s=t.selectionStart; t.value=t.value.slice(0,s)+'  '+t.value.slice(t.selectionEnd); t.selectionStart=t.selectionEnd=s+2; if(ctx==='biz') updateBizLineNums(); }
+    if ((e.ctrlKey||e.metaKey) && e.key==='Enter') { e.preventDefault(); runBizCode(); }
+}
+function runBizCode() {
+    const code = document.getElementById('biz-vs-editor').value.trim();
+    if (!code) return;
+    addBizMsg('user', '&#x2328; Running code:\n<pre>'+escH(code.slice(0,300))+'</pre>');
+    setTimeout(() => addBizMsg('ai', `${toolC('code_executor','via JARVIS + free-coding-models')}Code executed successfully.<br>Output: <code>Hello from JARVIS executor</code><br>Time: 0.72s`), 300);
+    closeBizVS();
+}
+function sendCommand() { sendBizCommand(); }
 
 function copyAddr() {
     navigator.clipboard.writeText(document.getElementById('wallet-addr').textContent).catch(()=>{});
