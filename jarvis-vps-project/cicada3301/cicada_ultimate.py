@@ -199,7 +199,7 @@ TOURNAMENTS = {
 
 def init_db():
     import sqlite3
-    conn = sqlite3.connect('/var/lib/jarvis/cicada.db')
+    conn = sqlite3.connect('/var/lib/jarvis/cicada_3301.db')
     c = conn.cursor()
     
     c.execute('''CREATE TABLE IF NOT EXISTS cicada_users (
@@ -254,7 +254,7 @@ def submit_puzzle():
     if answer_hash == puzzle['answer_hash']:
         # Răspuns corect
         import sqlite3
-        conn = sqlite3.connect('/var/lib/jarvis/cicada.db')
+        conn = sqlite3.connect('/var/lib/jarvis/cicada_3301.db')
         c = conn.cursor()
         
         # Verifică dacă userul există
@@ -319,7 +319,7 @@ def get_hint():
 @app.route('/api/leaderboard', methods=['GET'])
 def leaderboard():
     import sqlite3
-    conn = sqlite3.connect('/var/lib/jarvis/cicada.db')
+    conn = sqlite3.connect('/var/lib/jarvis/cicada_3301.db')
     c = conn.cursor()
     
     c.execute("""

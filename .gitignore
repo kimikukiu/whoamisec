@@ -20,6 +20,11 @@ android/
 node_modules/
 *.apk
 
+# Databases — live runtime data, never commit
+*.db
+*.sqlite
+*.sqlite3
+
 # OS
 .DS_Store
 Thumbs.db
