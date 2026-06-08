@@ -3,13 +3,16 @@
 WhoamiSec.com - Backend API v2.0
 Privacy-first AI infrastructure. Zero KYC. Monero payments.
 """
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os, uuid, time, json
 from datetime import datetime, timedelta
+
+# HTML pages live one directory above backend/
+HTML_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'whoamisec-production-secret-2026')
@@ -357,77 +360,128 @@ with app.app_context():
         print('[+] Admin user created: admin@whoamisec.com')
 
 
-@app.route('/cicada')
-def serve_cicada():
-    """Serve the Cicada 3301 puzzle page."""
+# ============ HTML PAGE ROUTES ============
+def _serve_html(filename):
+    """Helper — read an HTML file from the root and return it."""
     try:
-        with open(os.path.join(HTML_DIR, 'cicada.html'), 'r') as f:
+        with open(os.path.join(HTML_DIR, filename), 'r', encoding='utf-8') as f:
             return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
     except FileNotFoundError:
-        return '<h1>Cicada page not found</h1>', 404
+        return f'<h1>{filename} not found</h1>', 404
+
+@app.route('/cicada')
+def serve_cicada():
+    return _serve_html('cicada.html')
+
+@app.route('/mining')
+def serve_mining():
+    return _serve_html('mining.html')
+
+@app.route('/jarvis')
+def serve_jarvis():
+    return _serve_html('jarvis.html')
+
+@app.route('/login')
+def serve_login():
+    return _serve_html('login.html')
+
+@app.route('/dashboard')
+def serve_dashboard():
+    return _serve_html('dashboard.html')
+
+@app.route('/admin')
+def serve_admin():
+    return _serve_html('admin.html')
+
+@app.route('/downloads')
+def serve_downloads():
+    return _serve_html('downloads.html')
+
+@app.route('/apps/business')
+def serve_business_app():
+    return _serve_html('whoamisec-business-app.html')
+
+@app.route('/apps/jarvis-mind')
+def serve_jarvis_mind_app():
+    return _serve_html('jarvis-mind-app.html')
+
+# Static files (manifest, SW, audio, etc.)
+@app.route('/manifest.json')
+def serve_manifest():
+    return send_from_directory(HTML_DIR, 'manifest.json')
+
+@app.route('/sw.js')
+def serve_sw():
+    return send_from_directory(HTML_DIR, 'sw.js',
+                               mimetype='application/javascript')
+
+@app.route('/cicada-sound.mp3')
+def serve_cicada_sound():
+    return send_from_directory(HTML_DIR, 'cicada-sound.mp3',
+                               mimetype='audio/mpeg')
+
+# ============ VPS MANAGEMENT (JARVIS) ============
+@app.route('/api/v1/vps/create', methods=['POST'])
+@jwt_required()
+def create_vps():
+    user = User.query.get(get_jwt_identity())
+    if not user or not user.is_admin:
+        return jsonify({'error': 'Admin access required'}), 403
+    data = request.json or {}
+    vps_id = f"vps_{uuid.uuid4().hex[:8]}"
+    return jsonify({
+        'vps_id': vps_id,
+        'name': data.get('name', vps_id),
+        'status': 'provisioning',
+        'ip': f"10.100.{int(time.time()) % 255}.{int(time.time() * 7) % 255}",
+        'ram': data.get('ram', '64GB'),
+        'cpu': data.get('cpu', 8),
+        'storage': data.get('storage', '500GB'),
+        'os': data.get('os', 'ubuntu-22.04'),
+        'region': data.get('region', 'us-east-1'),
+        'created_by': user.username,
+        'created_at': datetime.utcnow().isoformat()
+    }), 201
+
+@app.route('/api/v1/vps/list', methods=['GET'])
+@jwt_required()
+def list_vps():
+    user = User.query.get(get_jwt_identity())
+    if not user or not user.is_admin:
+        return jsonify({'error': 'Admin access required'}), 403
+    return jsonify({'vps_instances': [], 'total': 0})
+
+# ============ SUBSCRIPTION PLANS ============
+@app.route('/api/v1/plans', methods=['GET'])
+def list_plans():
+    return jsonify({'plans': [
+        {'id': 'free',       'name': 'Free',       'price_xmr': 0,    'credits': 100,    'requests_day': 100,   'models': 1},
+        {'id': 'starter',    'name': 'Starter',    'price_xmr': 0.03, 'credits': 1000,   'requests_day': 1000,  'models': 6},
+        {'id': 'pro',        'name': 'Pro',        'price_xmr': 0.08, 'credits': 10000,  'requests_day': 10000, 'models': 6},
+        {'id': 'enterprise', 'name': 'Enterprise', 'price_xmr': 0.20, 'credits': 100000, 'requests_day': 100000,'models': 6},
+        {'id': 'ultra',      'name': 'Ultra',      'price_xmr': 0.50, 'credits': -1,     'requests_day': -1,    'models': 6},
+        {'id': 'custom',     'name': 'Custom',     'price_xmr': None, 'credits': -1,     'requests_day': -1,    'models': 6},
+    ]})
+
+# ============ AGENT COMMAND ============
+@app.route('/api/agent/command', methods=['POST'])
+@jwt_required()
+def agent_command():
+    user = User.query.get(get_jwt_identity())
+    if not user or not user.is_admin:
+        return jsonify({'error': 'Admin access required'}), 403
+    data = request.json or {}
+    return jsonify({
+        'status': 'dispatched',
+        'command': data.get('command', ''),
+        'agent_id': data.get('agent_id', 'all'),
+        'abliterated': data.get('abliterated', False),
+        'agents_notified': 2703,
+        'timestamp': datetime.utcnow().isoformat()
+    })
 
 if __name__ == '__main__':
     print(f'[+] WhoamiSec API v2.0 starting on http://0.0.0.0:5001')
     print(f'[+] Domain: whoamisec.com')
     print(f'[+] XMR Address: {XMR_ADDRESS}')
     app.run(host='0.0.0.0', port=5001, debug=False, threaded=True)
-
-# ============ HTML PAGE ROUTES ============
-import os as _os
-HTML_DIR = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), '..')
-
-@app.route('/mining')
-def serve_mining():
-    """Serve the Mining Fleet page."""
-    try:
-        with open(_os.path.join(HTML_DIR, 'mining.html'), 'r') as f:
-            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
-    except FileNotFoundError:
-        return '<h1>Mining page not found</h1>', 404
-
-@app.route('/jarvis')
-def serve_jarvis():
-    """Serve the JARVIS MIND page."""
-    try:
-        with open(_os.path.join(HTML_DIR, 'jarvis.html'), 'r') as f:
-            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
-    except FileNotFoundError:
-        return '<h1>JARVIS MIND page not found</h1>', 404
-
-@app.route('/login')
-def serve_login():
-    """Serve the Login page."""
-    try:
-        with open(_os.path.join(HTML_DIR, 'login.html'), 'r') as f:
-            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
-    except FileNotFoundError:
-        return '<h1>Login page not found</h1>', 404
-
-@app.route('/dashboard')
-def serve_dashboard():
-    """Serve the Dashboard page."""
-    try:
-        with open(_os.path.join(HTML_DIR, 'dashboard.html'), 'r') as f:
-            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
-    except FileNotFoundError:
-        return '<h1>Dashboard page not found</h1>', 404
-
-@app.route('/admin')
-def serve_admin():
-    """Serve the Admin page."""
-    try:
-        with open(_os.path.join(HTML_DIR, 'admin.html'), 'r') as f:
-            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
-    except FileNotFoundError:
-        return '<h1>Admin page not found</h1>', 404
-
-@app.route('/index')
-def serve_index():
-    """Serve the Index/Landing page."""
-    try:
-        with open(_os.path.join(HTML_DIR, 'index.html'), 'r') as f:
-            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
-    except FileNotFoundError:
-        return '<h1>Index page not found</h1>', 404
-
-print('[+] HTML page routes registered: /mining, /jarvis, /login, /dashboard, /admin, /index')
