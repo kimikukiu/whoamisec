@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WHOAMI.SEC | JARVIS OMNI - ABLITERATED MODE</title>
+    <meta name="description" content="WhoamiSec - Next-Gen AI Security Platform powered by JARVIS OMNI. Zero-KYC, Monero payments, AI agents.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔓</text></svg>">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --green: #00ff41;
+            --green-dim: #00cc33;
+            --green-dark: #008822;
+            --green-glow: rgba(0, 255, 65, 0.3);
+            --green-glow-strong: rgba(0, 255, 65, 0.6);
+            --bg-dark: #0a0a0a;
+            --bg-mid: #1a1a2e;
+            --bg-card: rgba(10, 15, 10, 0.85);
+            --border: rgba(0, 255, 65, 0.2);
+            --text: #00ff41;
+            --text-dim: #66ff88;
+            --text-darker: #339955;
+            --red: #ff0040;
+            --amber: #ffaa00;
+        }
+
+        body {
+            font-family: 'Fira Code', monospace;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-mid) 50%, #0d1117 100%);
+            color: var(--green);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #matrix-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            opacity: 0.15;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--green);
+            text-shadow: 0 0 20px var(--green-glow);
+            text-decoration: none;
+            letter-spacing: 3px;
+        }
+        .nav-logo span { color: var(--red); text-shadow: 0 0 20px rgba(255,0,64,0.5); }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            align-items: center;
+        }
+        .nav-links a {
+            color: var(--green-dim);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+        .nav-links a:hover {
+            color: var(--green);
+            text-shadow: 0 0 10px var(--green-glow);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border: 1px solid var(--green-dark);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            background: rgba(0,255,65,0.05);
+        }
+        .pulse-dot {
+            width: 8px; height: 8px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--green-glow-strong); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 8px transparent; }
+        }
+
+        .hero { text-align: center; padding: 60px 0; }
+
+        .ascii-banner {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(0.4rem, 1.5vw, 1rem);
+            line-height: 1.3;
+            color: var(--green);
+            text-shadow: 0 0 10px var(--green-glow);
+            white-space: pre;
+            margin-bottom: 40px;
+            animation: flicker 3s infinite alternate;
+        }
+        @keyframes flicker {
+            0%, 95%, 100% { opacity: 1; }
+            96% { opacity: 0.8; }
+            97% { opacity: 1; }
+            98% { opacity: 0.6; }
+        }
+
+        .hero-title {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px var(--green-glow), 0 0 60px var(--green-glow);
+        }
+        .hero-title .sec { color: var(--red); text-shadow: 0 0 30px rgba(255,0,64,0.4), 0 0 60px rgba(255,0,64,0.2); }
+
+        .hero-subtitle {
+            font-size: clamp(0.8rem, 1.5vw, 1.1rem);
+            color: var(--text-dim);
+            margin-bottom: 30px;
+            letter-spacing: 4px;
+            font-weight: 300;
+        }
+
+        .terminal {
+            background: rgba(0,10,0,0.9);
+            border: 1px solid var(--green-dark);
+            border-radius: 8px;
+            max-width: 800px;
+            margin: 0 auto 50px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,255,65,0.1), inset 0 0 30px rgba(0,0,0,0.5);
+        }
+        .terminal-header {
+            background: rgba(0,255,65,0.1);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--green-dark);
+        }
+        .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27c93f; }
+        .terminal-title { font-size: 0.7rem; color: var(--text-darker); margin-left: 10px; }
+        .terminal-body {
+            padding: 20px;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            min-height: 180px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .terminal-line { margin-bottom: 4px; }
+        .terminal-prompt { color: var(--green); }
+        .terminal-cmd { color: #ffffff; }
+        .terminal-output { color: var(--text-dim); opacity: 0.8; }
+        .cursor {
+            display: inline-block;
+            width: 8px; height: 16px;
+            background: var(--green);
+            animation: blink 1s infinite;
+            vertical-align: text-bottom;
+            margin-left: 2px;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 60px;
+        }
+        .btn {
+            padding: 14px 32px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary {
+            background: var(--green);
+            color: #000;
+            box-shadow: 0 0 20px var(--green-glow);
+        }
+        .btn-primary:hover {
+            background: #33ff66;
+            box-shadow: 0 0 40px var(--green-glow-strong);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: var(--green);
+            border: 1px solid var(--green-dark);
+        }
+        .btn-secondary:hover {
+            background: rgba(0,255,65,0.1);
+            border-color: var(--green);
+            box-shadow: 0 0 20px var(--green-glow);
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: transparent;
+            color: var(--red);
+            border: 1px solid rgba(255,0,64,0.3);
+        }
+        .btn-danger:hover {
+            background: rgba(255,0,64,0.1);
+            border-color: var(--red);
+            box-shadow: 0 0 20px rgba(255,0,64,0.3);
+            transform: translateY(-2px);
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+        .btn:hover::before { left: 100%; }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.5rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px var(--green-glow);
+        }
+        .section-subtitle {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-darker);
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--green), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .feature-card:hover {
+            border-color: var(--green-dark);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 40px rgba(0,255,65,0.1);
+        }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-icon { font-size: 2.5rem; margin-bottom: 16px; display: block; }
+        .feature-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            color: var(--green);
+        }
+        .feature-desc {
+            font-size: 0.8rem;
+            color: var(--text-darker);
+            line-height: 1.7;
+        }
+        .feature-tag {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 3px 10px;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: 1px solid var(--green-dark);
+            border-radius: 4px;
+            color: var(--green-dim);
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            padding: 30px;
+            background: rgba(0,255,65,0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 60px;
+        }
+        .stat-item { text-align: center; }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            text-shadow: 0 0 20px var(--green-glow);
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-darker);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .xmr-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+        .xmr-section::after {
+            content: '';
+            position: absolute;
+            top: -1px; right: -1px;
+            width: 30px; height: 30px;
+            border-top: 2px solid var(--green);
+            border-right: 2px solid var(--green);
+        }
+        .xmr-section::before {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: -1px;
+            width: 30px; height: 30px;
+            border-bottom: 2px solid var(--green);
+            border-left: 2px solid var(--green);
+        }
+        .xmr-section h3 {
+            font-size: 1rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            color: var(--amber);
+        }
+        .xmr-address {
+            font-family: 'Share Tech Mono', monospace;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,170,0,0.2);
+            border-radius: 8px;
+            padding: 16px;
+            font-size: 0.75rem;
+            color: var(--amber);
+            word-break: break-all;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .xmr-address:hover {
+            border-color: var(--amber);
+            box-shadow: 0 0 20px rgba(255,170,0,0.1);
+        }
+
+        .api-status {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 60px;
+        }
+        .api-endpoint {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: rgba(0,255,65,0.03);
+            font-size: 0.75rem;
+        }
+        .api-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+        .api-dot.warn { background: var(--amber); }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 30px 0;
+            text-align: center;
+        }
+        .footer-mode {
+            font-size: 0.85rem;
+            letter-spacing: 4px;
+            color: var(--red);
+            text-shadow: 0 0 20px rgba(255,0,64,0.4);
+            font-weight: 700;
+            animation: glow-red 2s infinite alternate;
+        }
+        @keyframes glow-red {
+            from { text-shadow: 0 0 20px rgba(255,0,64,0.4); }
+            to { text-shadow: 0 0 40px rgba(255,0,64,0.6), 0 0 80px rgba(255,0,64,0.3); }
+        }
+        .footer-text {
+            font-size: 0.7rem;
+            color: var(--text-darker);
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+        .footer-links {
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .footer-links a {
+            color: var(--text-darker);
+            text-decoration: none;
+            font-size: 0.75rem;
+            transition: color 0.3s;
+        }
+        .footer-links a:hover { color: var(--green); }
+
+        @keyframes text-glow {
+            0%, 100% { text-shadow: 0 0 10px var(--green-glow); }
+            50% { text-shadow: 0 0 20px var(--green-glow), 0 0 40px var(--green-glow); }
+        }
+        .glow { animation: text-glow 3s infinite; }
+
+        @media (max-width: 768px) {
+            nav { flex-direction: column; gap: 16px; }
+            .nav-links { gap: 16px; flex-wrap: wrap; justify-content: center; }
+            .hero { padding: 30px 0; }
+            .btn-group { flex-direction: column; align-items: center; }
+            .btn { width: 100%; max-width: 300px; justify-content: center; }
+            .stats-bar { gap: 20px; }
+            .ascii-banner { font-size: 0.35rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-canvas"></canvas>
+    <div class="container">
+        <nav>
+            <a href="index.html" class="nav-logo">WHOAMI<span>.SEC</span></a>
+            <ul class="nav-links">
+                <li><a href="#features">FEATURES</a></li>
+                <li><a href="#api-status">API STATUS</a></li>
+                <li><a href="#monero">MONERO</a></li>
+                <li><a href="login.html">LOGIN</a></li>
+                <li><a href="dashboard.html">DASHBOARD</a></li>
+                <li>
+                    <div class="status-badge">
+                        <div class="pulse-dot"></div>
+                        <span>SYSTEMS ONLINE</span>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+
+        <section class="hero">
+            <div class="ascii-banner" aria-hidden="true">
+ ██╗    ██╗ █████╗ ██████╗ ███╗   ██╗██╗███╗   ██╗ ██████╗ 
+ ██║    ██║██╔══██╗██╔══██╗████╗  ██║██║████╗  ██║██╔════╝ 
+ ██║ █╗ ██║███████║██████╔╝██╔██╗ ██║██║██╔██╗ ██║██║  ███╗
+ ██║███╗██║██╔══██║██╔══██╗██║╚██╗██║██║██║╚██╗██║██║   ██║
+ ╚███╔███╔╝██║  ██║██║  ██║██║ ╚████║██║██║ ╚████║╚██████╔╝
+  ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝╚═╝  ╚═══╝ ╚═════╝ </div>
+
+            <h1 class="hero-title">WHOAMI<span class="sec">.SEC</span></h1>
+            <p class="hero-subtitle">JARVIS OMNI ABLITERATED // NEXT-GEN AI SECURITY PLATFORM</p>
+
+            <div class="terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                    <span class="terminal-title">whoamisec@jarvis-omni ~ $</span>
+                </div>
+                <div class="terminal-body" id="terminal-output">
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">whoamisec@jarvis:~$</span>
+                        <span class="terminal-cmd" id="typed-text"></span>
+                        <span class="cursor" id="cursor"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <a href="login.html" class="btn btn-primary">&#9889; LAUNCH DEMO</a>
+                <a href="dashboard.html" class="btn btn-secondary">&#128421; API STATUS</a>
+                <a href="#monero" class="btn btn-danger">&#8383; PAY WITH XMR</a>
+            </div>
+        </section>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value glow" id="api-calls">0</div>
+                <div class="stat-label">API Calls Served</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value glow" id="active-agents">0</div>
+                <div class="stat-label">Active AI Agents</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value glow">99.9%</div>
+                <div class="stat-label">Uptime</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value glow">&lt;50ms</div>
+                <div class="stat-label">Avg Response</div>
+            </div>
+        </div>
+
+        <section id="features">
+            <h2 class="section-title glow">CAPABILITIES</h2>
+            <p class="section-subtitle">// JARVIS OMNI ABLITERATED FEATURE SET</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">&#9729;</span>
+                    <h3 class="feature-name">VPS Creation</h3>
+                    <p class="feature-desc">Deploy ephemeral VPS instances on-demand. Full root access, encrypted storage, Tor-routable networking. Burned after session. Zero trace.</p>
+                    <span class="feature-tag">INFRASTRUCTURE</span>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">&#8383;</span>
+                    <h3 class="feature-name">Monero Integration</h3>
+                    <p class="feature-desc">Full Monero (XMR) payment pipeline. Zero-KYC transactions, subaddress generation, automated payment verification via daemon RPC.</p>
+                    <span class="feature-tag">PAYMENTS</span>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">&#129302;</span>
+                    <h3 class="feature-name">AI Agents</h3>
+                    <p class="feature-desc">Autonomous AI agents powered by local LLMs. Llama 3.2, Phi, TinyLlama, DeepSeek-Coder. Fully air-gapped inference, no data leaks.</p>
+                    <span class="feature-tag">AI/ML</span>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">&#128640;</span>
+                    <h3 class="feature-name">Auto-Scale</h3>
+                    <p class="feature-desc">Dynamic resource allocation. Horizontal scaling of compute nodes, GPU passthrough, load-balanced inference clusters.</p>
+                    <span class="feature-tag">SCALING</span>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">&#128274;</span>
+                    <h3 class="feature-name">Zero-KYC</h3>
+                    <p class="feature-desc">No identity verification. No logging. No tracking. Anonymous registration, encrypted JWT sessions, ephemeral user data.</p>
+                    <span class="feature-tag">PRIVACY</span>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">&#129504;</span>
+                    <h3 class="feature-name">JARVIS Core</h3>
+                    <p class="feature-desc">The central AI orchestrator. Multi-model routing, context management, autonomous decision-making, self-healing infrastructure.</p>
+                    <span class="feature-tag">CORE</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="api-status">
+            <h2 class="section-title glow">API STATUS</h2>
+            <p class="section-subtitle">// REAL-TIME ENDPOINT MONITORING</p>
+            <div class="api-status">
+                <div class="api-endpoint">
+                    <div class="api-dot"></div>
+                    <span>/api/ai/chat</span>
+                    <span style="color:var(--green)">ONLINE</span>
+                </div>
+                <div class="api-endpoint">
+                    <div class="api-dot"></div>
+                    <span>/api/auth/login</span>
+                    <span style="color:var(--green)">ONLINE</span>
+                </div>
+                <div class="api-endpoint">
+                    <div class="api-dot"></div>
+                    <span>/api/payments/monero</span>
+                    <span style="color:var(--green)">ONLINE</span>
+                </div>
+                <div class="api-endpoint">
+                    <div class="api-dot warn"></div>
+                    <span>/api/vps/create</span>
+                    <span style="color:var(--amber)">DEGRADED</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="monero">
+            <div class="xmr-section">
+                <h3>&#8383; MONERO PAYMENTS ACCEPTED</h3>
+                <p class="section-subtitle" style="margin-bottom:20px">// DEPOSIT XMR TO FUND YOUR ACCOUNT</p>
+                <div class="xmr-address" id="xmr-address" onclick="copyXMRAddress()" title="Click to copy">
+                    46BeJeHmQQ6czjXH2vKSe8V7PbaEtfM3ekuJMFc9BBYhMZym43VWLqPhKYsVfkBB1Jc3RYpUK1jhCcxvFKMn3uTDQzmzDfk
+                </div>
+                <p style="font-size:0.7rem;color:var(--text-darker)">Click address to copy &bull; Payments auto-verified on-chain</p>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-mode">ABLITERATED MODE: ACTIVE</div>
+            <p class="footer-text">WHOAMI.SEC &copy; 2026 | JARVIS OMNI POWERED | ALL SYSTEMS NOMINAL</p>
+            <div class="footer-links">
+                <a href="index.html">HOME</a>
+                <a href="login.html">LOGIN</a>
+                <a href="dashboard.html">DASHBOARD</a>
+                <a href="admin.html">ADMIN</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Matrix Rain
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const chars = 'WHOAMI01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        const fontSize = 14;
+        let columns = Math.floor(canvas.width / fontSize);
+        let drops = Array(columns).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10,10,10,0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px monospace';
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 50);
+        window.addEventListener('resize', () => {
+            columns = Math.floor(canvas.width / fontSize);
+            drops = Array(columns).fill(1);
+        });
+
+        // Typing Animation
+        const commands = [
+            { cmd: 'whoami', output: 'root@jarvis-omni [ABLITERATED]' },
+            { cmd: 'status --check', output: '[OK] All systems nominal | Uptime: 99.9% | AI Agents: Online | XMR Node: Synced' },
+            { cmd: 'ai --models', output: 'llama3.2:1b | phi:2.7b | tinyllama:1.1b | deepseek-coder:6.7b' },
+            { cmd: 'security --audit', output: '[CLEAR] No vulnerabilities detected | Encryption: AES-256-GCM | Tor: ACTIVE' },
+            { cmd: 'deploy --agent --model deepseek-coder', output: '[DEPLOYED] Agent #7291 online | Port: 5001 | Memory: 8GB allocated' },
+            { cmd: 'xmr --balance', output: 'Locked: 124.5831 XMR | Unlocked: 42.1290 XMR | Blocks: 3,241,891' }
+        ];
+
+        const terminalOutput = document.getElementById('terminal-output');
+        let cmdIndex = 0;
+
+        function getCurrentElements() {
+            const typed = terminalOutput.querySelectorAll('#typed-text');
+            const cursors = terminalOutput.querySelectorAll('#cursor');
+            return { typed: typed[typed.length - 1], cursor: cursors[cursors.length - 1] };
+        }
+
+        function typeCommandOn(cmd, callback) {
+            const { typed, cursor } = getCurrentElements();
+            typed.textContent = '';
+            if (cursor) cursor.style.display = 'inline-block';
+            let charIndex = 0;
+            const interval = setInterval(() => {
+                if (charIndex < cmd.length) {
+                    typed.textContent += cmd[charIndex];
+                    charIndex++;
+                } else {
+                    clearInterval(interval);
+                    setTimeout(callback, 500);
+                }
+            }, 50 + Math.random() * 40);
+        }
+
+        function showOutputOn(output, callback) {
+            const { cursor } = getCurrentElements();
+            if (cursor) cursor.style.display = 'none';
+
+            const outputLine = document.createElement('div');
+            outputLine.className = 'terminal-line';
+            outputLine.innerHTML = '<span class="terminal-output">' + output + '</span>';
+            terminalOutput.appendChild(outputLine);
+
+            const newPrompt = document.createElement('div');
+            newPrompt.className = 'terminal-line';
+            newPrompt.innerHTML = '<span class="terminal-prompt">whoamisec@jarvis:~$</span> <span class="terminal-cmd" id="typed-text"></span><span class="cursor" id="cursor"></span>';
+            terminalOutput.appendChild(newPrompt);
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            setTimeout(callback, 600);
+        }
+
+        function runCycle() {
+            if (cmdIndex >= commands.length) {
+                setTimeout(() => {
+                    terminalOutput.innerHTML = '<div class="terminal-line"><span class="terminal-prompt">whoamisec@jarvis:~$</span> <span class="terminal-cmd" id="typed-text"></span><span class="cursor" id="cursor"></span></div>';
+                    cmdIndex = 0;
+                    runCycle();
+                }, 3000);
+                return;
+            }
+            typeCommandOn(commands[cmdIndex].cmd, () => {
+                showOutputOn(commands[cmdIndex].output, () => {
+                    cmdIndex++;
+                    runCycle();
+                });
+            });
+        }
+        setTimeout(runCycle, 1000);
+
+        // Counter Animation
+        function animateCounter(id, target, duration) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            let start = 0;
+            const step = target / (duration / 16);
+            function update() {
+                start += step;
+                if (start >= target) { el.textContent = target.toLocaleString(); return; }
+                el.textContent = Math.floor(start).toLocaleString();
+                requestAnimationFrame(update);
+            }
+            update();
+        }
+        setTimeout(() => {
+            animateCounter('api-calls', 2847291, 3000);
+            animateCounter('active-agents', 147, 2000);
+        }, 500);
+
+        // Copy XMR
+        function copyXMRAddress() {
+            const addr = document.getElementById('xmr-address').textContent.trim();
+            navigator.clipboard.writeText(addr).then(() => {
+                const orig = document.getElementById('xmr-address').textContent;
+                document.getElementById('xmr-address').textContent = '[ COPIED TO CLIPBOARD ]';
+                setTimeout(() => { document.getElementById('xmr-address').textContent = orig; }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
