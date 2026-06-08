@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Downloads | WhoamiSec Apps</title>
+    <meta name="description" content="Download WHOAMISEC Business and JARVIS MIND apps for Android and web. Privacy-first AI infrastructure in your pocket.">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#06B6D4">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0B0D17;
+            --bg-secondary: #111827;
+            --bg-card: #1F2937;
+            --bg-card-hover: #283548;
+            --border: rgba(255,255,255,0.08);
+            --border-glow: rgba(6,182,212,0.3);
+            --border-purple: rgba(139,92,246,0.3);
+            --text-primary: #F9FAFB;
+            --text-secondary: #9CA3AF;
+            --text-muted: #6B7280;
+            --cyan: #06B6D4;
+            --blue: #3B82F6;
+            --emerald: #10B981;
+            --amber: #F59E0B;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+            --gradient: linear-gradient(135deg, #06B6D4, #3B82F6);
+            --gradient-text: linear-gradient(135deg, #06B6D4, #8B5CF6);
+            --gradient-purple: linear-gradient(135deg, #8B5CF6, #EC4899);
+            --glass: rgba(17,24,39,0.7);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --shadow: 0 4px 30px rgba(0,0,0,0.3);
+            --shadow-glow: 0 0 40px rgba(6,182,212,0.15);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .navbar {
+            position: fixed; top:0; left:0; right:0; z-index:1000;
+            background: var(--glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+        }
+        .navbar-inner {
+            max-width: 1200px; margin:0 auto;
+            display: flex; align-items:center; justify-content:space-between;
+            height: 64px;
+        }
+        .logo {
+            font-size: 1.3rem; font-weight: 700;
+            background: var(--gradient-text);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        .logo span { color: var(--text-primary); -webkit-text-fill-color: var(--text-primary); }
+        .nav-links { display:flex; gap:2rem; align-items:center; }
+        .nav-links a { color: var(--text-secondary); text-decoration:none; font-size:0.9rem; font-weight:500; transition:color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--cyan); }
+        .btn {
+            display: inline-flex; align-items:center; gap:0.5rem;
+            padding: 0.6rem 1.4rem; border-radius:8px;
+            font-size: 0.9rem; font-weight:600;
+            text-decoration:none; border:none; cursor:pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--gradient); color:#fff; box-shadow: 0 2px 15px rgba(6,182,212,0.3); }
+        .btn-primary:hover { transform:translateY(-1px); box-shadow: 0 4px 20px rgba(6,182,212,0.4); }
+        .btn-purple { background: var(--gradient-purple); color:#fff; box-shadow: 0 2px 15px rgba(139,92,246,0.3); }
+        .btn-purple:hover { transform:translateY(-1px); box-shadow: 0 4px 20px rgba(139,92,246,0.4); }
+        .btn-outline { background:transparent; color:var(--cyan); border:1px solid var(--border-glow); }
+        .btn-outline:hover { background:rgba(6,182,212,0.1); }
+        .btn-outline-purple { background:transparent; color:var(--purple); border:1px solid var(--border-purple); }
+        .btn-outline-purple:hover { background:rgba(139,92,246,0.1); }
+        .btn-lg { padding:0.9rem 2rem; font-size:1rem; border-radius:10px; }
+        .btn-block { width:100%; justify-content:center; }
+        .mobile-toggle { display:none; background:none; border:none; color:var(--text-primary); cursor:pointer; }
+
+        /* Hero */
+        .hero {
+            padding: 120px 2rem 80px;
+            text-align:center;
+            position:relative; overflow:hidden;
+        }
+        .hero-bg {
+            position:absolute; inset:0; z-index:0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(6,182,212,0.12) 0%, transparent 60%),
+                        radial-gradient(ellipse at 20% 80%, rgba(139,92,246,0.08) 0%, transparent 50%);
+        }
+        .hero-grid {
+            position:absolute; inset:0; z-index:0;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+        .hero-inner { position:relative; z-index:1; max-width:800px; margin:0 auto; }
+        .hero-badge {
+            display:inline-flex; align-items:center; gap:0.5rem;
+            padding:0.4rem 1rem; border-radius:20px;
+            background:rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.2);
+            font-size:0.8rem; color:var(--cyan); font-weight:500; margin-bottom:1.5rem;
+        }
+        .hero-badge::before {
+            content:''; width:6px; height:6px; border-radius:50%;
+            background:var(--cyan); animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+        .hero h1 {
+            font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-weight:800; line-height:1.1; margin-bottom:1.5rem;
+        }
+        .hero h1 .gradient { background:var(--gradient-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .hero p { font-size:1.1rem; color:var(--text-secondary); max-width:600px; margin:0 auto 2.5rem; }
+        .hero-actions { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+
+        /* Download Cards */
+        .section { padding:6rem 2rem; max-width:1200px; margin:0 auto; }
+        .section-label {
+            display:inline-flex; align-items:center; gap:0.5rem;
+            font-size:0.8rem; font-weight:600; color:var(--cyan);
+            text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem;
+        }
+        .section-title { font-size:clamp(1.8rem, 3.5vw, 2.8rem); font-weight:700; margin-bottom:1rem; }
+        .section-subtitle { color:var(--text-secondary); font-size:1.1rem; max-width:600px; margin-bottom:3rem; }
+
+        .apps-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; }
+
+        .app-card {
+            background:var(--bg-card); border:1px solid var(--border);
+            border-radius:var(--radius-lg); overflow:hidden;
+            transition:all 0.3s;
+        }
+        .app-card:hover { transform:translateY(-4px); box-shadow:var(--shadow); }
+        .app-card.cyan-glow:hover { border-color:var(--border-glow); box-shadow:var(--shadow-glow); }
+        .app-card.purple-glow:hover { border-color:var(--border-purple); box-shadow:0 0 40px rgba(139,92,246,0.15); }
+
+        .app-card-header {
+            padding:2rem 2rem 0;
+        }
+        .app-icon {
+            width:72px; height:72px; border-radius:20px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:2rem; margin-bottom:1.25rem;
+        }
+        .app-icon.cyan { background:linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.2)); border:1px solid rgba(6,182,212,0.3); }
+        .app-icon.purple { background:linear-gradient(135deg, rgba(139,92,246,0.2), rgba(236,72,153,0.2)); border:1px solid rgba(139,92,246,0.3); }
+        .app-name { font-size:1.4rem; font-weight:700; margin-bottom:0.4rem; }
+        .app-version {
+            display:inline-flex; align-items:center; gap:0.4rem;
+            padding:0.2rem 0.7rem; border-radius:20px;
+            font-size:0.75rem; font-weight:600; margin-bottom:1rem;
+        }
+        .app-version.cyan { background:rgba(6,182,212,0.1); color:var(--cyan); border:1px solid rgba(6,182,212,0.2); }
+        .app-version.purple { background:rgba(139,92,246,0.1); color:var(--purple); border:1px solid rgba(139,92,246,0.2); }
+        .app-desc { color:var(--text-secondary); font-size:0.95rem; line-height:1.6; margin-bottom:1.5rem; }
+
+        .app-tabs-preview {
+            display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1.5rem;
+        }
+        .tab-chip {
+            padding:0.3rem 0.7rem; border-radius:6px;
+            font-size:0.75rem; font-weight:500;
+        }
+        .tab-chip.cyan { background:rgba(6,182,212,0.1); color:var(--cyan); border:1px solid rgba(6,182,212,0.15); }
+        .tab-chip.purple { background:rgba(139,92,246,0.1); color:var(--purple); border:1px solid rgba(139,92,246,0.15); }
+        .tab-chip.emerald { background:rgba(16,185,129,0.1); color:var(--emerald); border:1px solid rgba(16,185,129,0.15); }
+        .tab-chip.amber { background:rgba(245,158,11,0.1); color:var(--amber); border:1px solid rgba(245,158,11,0.15); }
+        .tab-chip.pink { background:rgba(236,72,153,0.1); color:var(--pink); border:1px solid rgba(236,72,153,0.15); }
+
+        .app-meta {
+            display:grid; grid-template-columns:1fr 1fr;
+            gap:0.75rem; padding:1.25rem 2rem;
+            border-top:1px solid var(--border);
+            background:rgba(0,0,0,0.15);
+        }
+        .app-meta-item { display:flex; flex-direction:column; gap:0.2rem; }
+        .app-meta-label { font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; }
+        .app-meta-value { font-size:0.85rem; font-weight:600; color:var(--text-secondary); }
+
+        .app-actions {
+            padding:1.5rem 2rem;
+            display:flex; flex-direction:column; gap:0.75rem;
+            border-top:1px solid var(--border);
+        }
+        .app-actions .btn-row { display:flex; gap:0.75rem; }
+
+        /* PWA Section */
+        .pwa-section {
+            background:var(--bg-secondary); border-radius:var(--radius-lg);
+            border:1px solid var(--border);
+            padding:3rem; margin-top:4rem;
+            display:grid; grid-template-columns:1fr 1fr; gap:3rem;
+            align-items:center;
+        }
+        .pwa-title { font-size:1.6rem; font-weight:700; margin-bottom:0.75rem; }
+        .pwa-desc { color:var(--text-secondary); margin-bottom:1.5rem; }
+        .pwa-steps { display:flex; flex-direction:column; gap:1rem; }
+        .pwa-step {
+            display:flex; gap:1rem; align-items:flex-start;
+        }
+        .pwa-step-num {
+            width:28px; height:28px; border-radius:50%; flex-shrink:0;
+            background:var(--gradient); display:flex; align-items:center;
+            justify-content:center; font-size:0.8rem; font-weight:700; color:#fff;
+        }
+        .pwa-step-text h4 { font-size:0.9rem; font-weight:600; margin-bottom:0.2rem; }
+        .pwa-step-text p { font-size:0.85rem; color:var(--text-secondary); }
+        .pwa-visual {
+            background:var(--bg-card); border-radius:var(--radius-lg);
+            border:1px solid var(--border); padding:2rem;
+            display:flex; flex-direction:column; gap:0.75rem;
+        }
+        .pwa-browser-bar {
+            display:flex; align-items:center; gap:0.5rem;
+            padding:0.6rem 0.75rem;
+            background:var(--bg-primary); border-radius:8px;
+            font-size:0.75rem; color:var(--text-muted);
+        }
+        .pwa-browser-dot { width:6px; height:6px; border-radius:50%; }
+        .pwa-url { color:var(--cyan); flex:1; text-align:center; }
+        .pwa-install-prompt {
+            background:var(--bg-secondary); border:1px solid var(--border);
+            border-radius:10px; padding:1rem;
+        }
+        .pwa-install-prompt h4 { font-size:0.9rem; margin-bottom:0.5rem; }
+        .pwa-install-prompt p { font-size:0.8rem; color:var(--text-muted); margin-bottom:0.75rem; }
+        .pwa-install-btn {
+            padding:0.5rem 1rem; background:var(--gradient);
+            border:none; border-radius:6px; color:#fff;
+            font-size:0.8rem; font-weight:600; cursor:pointer;
+        }
+
+        /* Feature Comparison */
+        .compare-table {
+            width:100%; border-collapse:collapse; margin-top:2rem;
+        }
+        .compare-table th {
+            padding:1rem 1.5rem; text-align:left;
+            font-size:0.85rem; font-weight:600;
+            border-bottom:1px solid var(--border);
+            color:var(--text-muted); text-transform:uppercase;
+            letter-spacing:0.05em;
+        }
+        .compare-table td {
+            padding:1rem 1.5rem;
+            font-size:0.9rem; color:var(--text-secondary);
+            border-bottom:1px solid rgba(255,255,255,0.04);
+        }
+        .compare-table tr:hover td { background:rgba(255,255,255,0.02); }
+        .check-cyan { color:var(--cyan); }
+        .check-purple { color:var(--purple); }
+        .check-muted { color:var(--text-muted); opacity:0.4; }
+        .compare-table .feature-col { color:var(--text-primary); font-weight:500; }
+
+        /* Requirements */
+        .req-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:2rem; }
+        .req-card {
+            background:var(--bg-card); border:1px solid var(--border);
+            border-radius:var(--radius); padding:1.5rem;
+        }
+        .req-icon { font-size:1.5rem; margin-bottom:0.75rem; }
+        .req-card h4 { font-size:0.95rem; font-weight:600; margin-bottom:0.5rem; }
+        .req-card p { font-size:0.85rem; color:var(--text-secondary); }
+
+        /* Footer */
+        .footer { border-top:1px solid var(--border); padding:3rem 2rem; }
+        .footer-inner {
+            max-width:1200px; margin:0 auto;
+            display:flex; justify-content:space-between; align-items:center;
+            flex-wrap:wrap; gap:1rem;
+        }
+        .footer-logo { font-size:1.1rem; font-weight:700; color:var(--text-secondary); }
+        .footer-links { display:flex; gap:2rem; }
+        .footer-links a { color:var(--text-muted); text-decoration:none; font-size:0.85rem; }
+        .footer-links a:hover { color:var(--text-primary); }
+        .footer-copy { color:var(--text-muted); font-size:0.8rem; }
+
+        .fade-in { opacity:0; transform:translateY(20px); transition:all 0.6s ease; }
+        .fade-in.visible { opacity:1; transform:translateY(0); }
+
+        @media(max-width:768px) {
+            .apps-grid, .pwa-section, .req-grid { grid-template-columns:1fr; }
+            .nav-links { display:none; }
+            .mobile-toggle { display:block; }
+            .btn-row { flex-direction:column; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="navbar-inner">
+        <a href="index.html" class="logo">WHOAMI<span>.SEC</span></a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="jarvis.html">JARVIS MIND</a>
+            <a href="mining.html">Mining</a>
+            <a href="downloads.html" class="active">Downloads</a>
+            <a href="login.html" class="btn btn-primary">Get Started</a>
+        </div>
+        <button class="mobile-toggle" onclick="document.querySelector('.nav-links').classList.toggle('show')">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+        <div class="hero-badge">Mobile & Web Apps &mdash; Free Download</div>
+        <h1>WhoamiSec <span class="gradient">in Your Pocket</span></h1>
+        <p>Download the official apps to manage your AI infrastructure, mining fleet, Monero wallet, and VPS control panel from anywhere — no tracking, full privacy.</p>
+        <div class="hero-actions">
+            <a href="#apps" class="btn btn-primary btn-lg">Download Apps &darr;</a>
+            <a href="#pwa" class="btn btn-outline btn-lg">Install as Web App</a>
+        </div>
+    </div>
+</section>
+
+<!-- MAIN APPS -->
+<section class="section" id="apps">
+    <div class="section-label">Official Apps</div>
+    <h2 class="section-title">Two apps, one platform</h2>
+    <p class="section-subtitle">Choose the app that fits your role — business management or technical infrastructure control.</p>
+
+    <div class="apps-grid">
+
+        <!-- App 1: WHOAMISEC Business -->
+        <div class="app-card cyan-glow fade-in">
+            <div class="app-card-header">
+                <div class="app-icon cyan">&#x1F4BC;</div>
+                <div class="app-name">WHOAMISEC Business</div>
+                <div class="app-version cyan">v16 &mdash; Latest</div>
+                <p class="app-desc">Full business management app. Monetize AI models via Ollama, manage your Monero mining fleet, track XMR wallet, and configure platform settings — all from your phone.</p>
+                <div class="app-tabs-preview">
+                    <span class="tab-chip cyan">&#x1F9E0; Business</span>
+                    <span class="tab-chip emerald">&#x26CF; Mining Fleet</span>
+                    <span class="tab-chip amber">&#x1F48E; Monero</span>
+                    <span class="tab-chip pink">&#x2699;&#xFE0F; Settings</span>
+                </div>
+            </div>
+            <div class="app-meta">
+                <div class="app-meta-item">
+                    <span class="app-meta-label">Size</span>
+                    <span class="app-meta-value">~29 KB</span>
+                </div>
+                <div class="app-meta-item">
+                    <span class="app-meta-label">Platform</span>
+                    <span class="app-meta-value">Android + Web</span>
+                </div>
+                <div class="app-meta-item">
+                    <span class="app-meta-label">Min Android</span>
+                    <span class="app-meta-value">7.0 (API 24)</span>
+                </div>
+                <div class="app-meta-item">
+                    <span class="app-meta-label">License</span>
+                    <span class="app-meta-value">Free / Open</span>
+                </div>
+            </div>
+            <div class="app-actions">
+                <a href="https://github.com/kimikukiu/JARVIS-Android-Ollama-Server/releases/download/v3.0/WHOAMISEC-Business-v16.apk"
+                   class="btn btn-primary btn-block" download>
+                    &#x2B07; Download APK (Android)
+                </a>
+                <div class="btn-row">
+                    <a href="whoamisec-business-app.html" class="btn btn-outline" style="flex:1;justify-content:center;">
+                        &#x1F310; Open Web App
+                    </a>
+                    <a href="https://github.com/kimikukiu/JARVIS-Android-Ollama-Server/releases" class="btn btn-outline" style="flex:1;justify-content:center;" target="_blank" rel="noopener">
+                        &#x1F4E6; All Releases
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- App 2: JARVIS MIND -->
+        <div class="app-card purple-glow fade-in">
+            <div class="app-card-header">
+                <div class="app-icon purple">&#x1F916;</div>
+                <div class="app-name">JARVIS MIND</div>
+                <div class="app-version purple">v3 &mdash; Latest</div>
+                <p class="app-desc">Technical admin & infrastructure control. Create VPS instances, manage SSH keys, control hosted websites, and connect to all JARVIS endpoints from your command center.</p>
+                <div class="app-tabs-preview">
+                    <span class="tab-chip purple">&#x1F4CA; Dashboard</span>
+                    <span class="tab-chip cyan">&#x2601; VPS Control</span>
+                    <span class="tab-chip emerald">&#x1F511; SSH Keys</span>
+                    <span class="tab-chip amber">&#x1F310; Websites</span>
+                    <span class="tab-chip pink">&#x2699;&#xFE0F; Settings</span>
+                </div>
+            </div>
+            <div class="app-meta">
+                <div class="app-meta-item">
+                    <span class="app-meta-label">Size</span>
+                    <span class="app-meta-value">~28 KB</span>
+                </div>
+                <div class="app-meta-item">
+                    <span class="app-meta-label">Platform</span>
+                    <span class="app-meta-value">Android + Web</span>
+                </div>
+                <div class="app-meta-item">
+                    <span class="app-meta-label">Min Android</span>
+                    <span class="app-meta-value">7.0 (API 24)</span>
+                </div>
+                <div class="app-meta-item">
+                    <span class="app-meta-label">License</span>
+                    <span class="app-meta-value">Admin Only</span>
+                </div>
+            </div>
+            <div class="app-actions">
+                <a href="https://github.com/kimikukiu/JARVIS-Android-Ollama-Server/releases/download/v3.0/JARVIS-MIND-v3.apk"
+                   class="btn btn-purple btn-block" download>
+                    &#x2B07; Download APK (Android)
+                </a>
+                <div class="btn-row">
+                    <a href="jarvis-mind-app.html" class="btn btn-outline-purple" style="flex:1;justify-content:center;">
+                        &#x1F310; Open Web App
+                    </a>
+                    <a href="https://github.com/kimikukiu/JARVIS-Android-Ollama-Server/releases" class="btn btn-outline-purple" style="flex:1;justify-content:center;" target="_blank" rel="noopener">
+                        &#x1F4E6; All Releases
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- PWA Install Section -->
+    <div class="pwa-section fade-in" id="pwa">
+        <div>
+            <div class="section-label">PWA Install</div>
+            <h3 class="pwa-title">Install directly<br>from your browser</h3>
+            <p class="pwa-desc">No APK needed. Add WhoamiSec to your Android home screen as a Progressive Web App — works offline, loads instantly, and feels native.</p>
+            <div class="pwa-steps">
+                <div class="pwa-step">
+                    <div class="pwa-step-num">1</div>
+                    <div class="pwa-step-text">
+                        <h4>Open in Chrome/Firefox</h4>
+                        <p>Visit whoamisec.com on your Android device browser.</p>
+                    </div>
+                </div>
+                <div class="pwa-step">
+                    <div class="pwa-step-num">2</div>
+                    <div class="pwa-step-text">
+                        <h4>Tap the menu (&#8942;)</h4>
+                        <p>Open browser menu &rarr; "Add to Home Screen" or "Install App".</p>
+                    </div>
+                </div>
+                <div class="pwa-step">
+                    <div class="pwa-step-num">3</div>
+                    <div class="pwa-step-text">
+                        <h4>Confirm installation</h4>
+                        <p>WhoamiSec installs like a native app. No store required.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pwa-visual">
+            <div class="pwa-browser-bar">
+                <div class="pwa-browser-dot" style="background:#EF4444"></div>
+                <div class="pwa-browser-dot" style="background:#F59E0B"></div>
+                <div class="pwa-browser-dot" style="background:#10B981"></div>
+                <span class="pwa-url">whoamisec.com</span>
+                <span style="color:var(--emerald);font-size:0.7rem;">&#x1F512; Secure</span>
+            </div>
+            <div style="background:var(--bg-primary);border-radius:10px;padding:1.5rem;flex:1;">
+                <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+                    <div style="width:40px;height:40px;border-radius:10px;background:var(--gradient);display:flex;align-items:center;justify-content:center;font-size:1.2rem;">&#x1F9E0;</div>
+                    <div>
+                        <div style="font-size:0.85rem;font-weight:600;">WhoamiSec</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">whoamisec.com</div>
+                    </div>
+                </div>
+                <div class="pwa-install-prompt">
+                    <h4>Install WhoamiSec?</h4>
+                    <p>This app will be installed on your device and can be accessed from your home screen.</p>
+                    <button class="pwa-install-btn" onclick="installPWA()">Install App</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FEATURE COMPARISON -->
+<section class="section" id="compare">
+    <div class="section-label">Comparison</div>
+    <h2 class="section-title">Feature overview</h2>
+    <p class="section-subtitle">See which app has the features you need.</p>
+
+    <table class="compare-table fade-in">
+        <thead>
+            <tr>
+                <th>Feature</th>
+                <th>WHOAMISEC Business</th>
+                <th>JARVIS MIND</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td class="feature-col">Ollama AI Model Management</td><td><span class="check-cyan">&#x2713; Full control</span></td><td><span class="check-purple">&#x2713; View only</span></td></tr>
+            <tr><td class="feature-col">Subscription Plans (6 tiers)</td><td><span class="check-cyan">&#x2713;</span></td><td><span class="check-muted">&#x2014;</span></td></tr>
+            <tr><td class="feature-col">XMR Mining Fleet (100 nodes)</td><td><span class="check-cyan">&#x2713; Monitor + control</span></td><td><span class="check-purple">&#x2713; View stats</span></td></tr>
+            <tr><td class="feature-col">Monero Wallet Integration</td><td><span class="check-cyan">&#x2713;</span></td><td><span class="check-muted">&#x2014;</span></td></tr>
+            <tr><td class="feature-col">VPS Creation (256GB/64 Core)</td><td><span class="check-muted">&#x2014;</span></td><td><span class="check-purple">&#x2713; Full CRUD</span></td></tr>
+            <tr><td class="feature-col">SSH Key Management</td><td><span class="check-muted">&#x2014;</span></td><td><span class="check-purple">&#x2713;</span></td></tr>
+            <tr><td class="feature-col">Hosted Websites Control</td><td><span class="check-muted">&#x2014;</span></td><td><span class="check-purple">&#x2713; 6 sites</span></td></tr>
+            <tr><td class="feature-col">JARVIS Agent Commander</td><td><span class="check-cyan">&#x2713;</span></td><td><span class="check-purple">&#x2713; Full abliterated mode</span></td></tr>
+            <tr><td class="feature-col">Admin JWT Settings</td><td><span class="check-cyan">&#x2713;</span></td><td><span class="check-purple">&#x2713;</span></td></tr>
+            <tr><td class="feature-col">API Endpoint Config</td><td><span class="check-cyan">&#x2713;</span></td><td><span class="check-purple">&#x2713;</span></td></tr>
+        </tbody>
+    </table>
+</section>
+
+<!-- REQUIREMENTS -->
+<section class="section" id="requirements">
+    <div class="section-label">System Requirements</div>
+    <h2 class="section-title">Supported platforms</h2>
+    <p class="section-subtitle">Both apps run on Android and as web apps in any modern browser.</p>
+
+    <div class="req-grid fade-in">
+        <div class="req-card">
+            <div class="req-icon">&#x1F4F1;</div>
+            <h4>Android (APK)</h4>
+            <p>Android 7.0+ (API level 24). Enable "Install unknown apps" in settings. 50MB free storage. Internet connection required.</p>
+        </div>
+        <div class="req-card">
+            <div class="req-icon">&#x1F310;</div>
+            <h4>Web App (PWA)</h4>
+            <p>Chrome 80+, Firefox 75+, Safari 14+, Edge 80+. Works on any device. Install from browser for offline capability.</p>
+        </div>
+        <div class="req-card">
+            <div class="req-icon">&#x1F5A5;</div>
+            <h4>Desktop</h4>
+            <p>Web apps work on Windows, macOS, Linux via any modern browser. Chrome allows PWA install on desktop too.</p>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-logo">WHOAMI.SEC &mdash; Apps</div>
+        <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="jarvis.html">JARVIS MIND</a>
+            <a href="mining.html">Mining</a>
+            <a href="https://github.com/kimikukiu/whoamisec" target="_blank" rel="noopener">GitHub</a>
+        </div>
+        <div class="footer-copy">&copy; 2026 whoamisec.com &mdash; Privacy-first AI infrastructure.</div>
+    </div>
+</footer>
+
+<script>
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+});
+
+function installPWA() {
+    if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        deferredInstallPrompt.userChoice.then(() => { deferredInstallPrompt = null; });
+    } else {
+        alert('To install: open this site in Chrome on Android, tap the menu (⋮), then "Add to Home Screen".');
+    }
+}
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

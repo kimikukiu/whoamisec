@@ -1,5 +1,5 @@
 {
-  "name": "WhoamiSec - Live VPS Deployment",
+  "name": "WhoamiSec — JARVIS MIND Live",
   "image": "mcr.microsoft.com/devcontainers/python:3.11",
   "features": {
     "ghcr.io/devcontainers/features/sshd": {
@@ -7,15 +7,44 @@
       "sshUser": "codespace"
     },
     "ghcr.io/devcontainers/features/git": "latest",
-    "ghcr.io/devcontainers/features/node": "lts"
+    "ghcr.io/devcontainers/features/node": "lts",
+    "ghcr.io/devcontainers/features/docker-in-docker": {
+      "version": "latest",
+      "dockerDashComposeVersion": "v2"
+    }
   },
-  "forwardPorts": [8080, 5001, 22, 5004, 5005],
+  "forwardPorts": [8080, 5001, 22, 5004, 5005, 11434],
   "portsAttributes": {
-    "8080": { "label": "Nginx Web Server", "onAutoForward": "notify" },
-    "5001": { "label": "Flask API Backend", "onAutoForward": "notify" },
-    "22": { "label": "SSH Server", "onAutoForward": "notify" },
-    "5004": { "label": "JARVIS Admin Panel", "onAutoForward": "notify" },
-    "5005": { "label": "Subscriptions Service", "onAutoForward": "notify" }
+    "8080": {
+      "label": "whoamisec.com (Web)",
+      "onAutoForward": "openPreview",
+      "visibility": "public"
+    },
+    "5001": {
+      "label": "Flask API",
+      "onAutoForward": "silent",
+      "visibility": "public"
+    },
+    "5004": {
+      "label": "JARVIS Admin",
+      "onAutoForward": "silent",
+      "visibility": "public"
+    },
+    "5005": {
+      "label": "Subscriptions",
+      "onAutoForward": "silent",
+      "visibility": "public"
+    },
+    "22": {
+      "label": "SSH",
+      "onAutoForward": "silent",
+      "visibility": "private"
+    },
+    "11434": {
+      "label": "Ollama AI",
+      "onAutoForward": "silent",
+      "visibility": "private"
+    }
   },
   "postCreateCommand": "bash /workspace/.devcontainer/setup.sh",
   "postStartCommand": "bash /workspace/.devcontainer/start-services.sh",

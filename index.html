@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WhoamiSec | Anonymous AI Infrastructure</title>
     <meta name="description" content="Privacy-first AI platform. Run LLaMA, Phi, Qwen, DeepSeek on isolated infrastructure. Zero KYC. Monero payments.">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#06B6D4">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -390,7 +394,9 @@
         <div class="nav-links">
             <a href="#features">Features</a>
             <a href="#pricing">Pricing</a>
-            <a href="#api">API Docs</a>
+            <a href="mining.html">Mining</a>
+            <a href="jarvis.html">JARVIS</a>
+            <a href="downloads.html">Apps</a>
             <a href="/login.html" class="btn btn-primary">Get Started</a>
         </div>
         <button class="mobile-toggle" onclick="document.querySelector('.nav-links').classList.toggle('show')">
@@ -592,11 +598,11 @@
     <div class="footer-inner">
         <div class="footer-logo">WHOAMI.SEC</div>
         <div class="footer-links">
-            <a href="#">Documentation</a>
-            <a href="#">Status</a>
+            <a href="mining.html">Mining</a>
+            <a href="jarvis.html">JARVIS</a>
+            <a href="cicada.html">Cicada</a>
+            <a href="downloads.html">Apps</a>
             <a href="https://github.com/kimikukiu/whoamisec">GitHub</a>
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
         </div>
         <div class="footer-copy">&copy; 2026 whoamisec.com &mdash; Privacy-first AI infrastructure.</div>
     </div>
@@ -608,6 +614,7 @@ const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
 }, { threshold: 0.1 });
 document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
 </script>
 </body>
 </html>

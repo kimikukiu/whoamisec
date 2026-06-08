@@ -1,16 +1,25 @@
 version: '3.8'
+
 services:
+
+  # ── Nginx — serves all HTML + proxies to API ──────────────
   web:
     image: nginx:alpine
     ports:
-      - "80:80"
+      - "8080:8080"
     volumes:
-      - .:/usr/share/nginx/html
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - .:/var/www/whoamisec:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - apk_data:/var/apk:ro
     depends_on:
       - api
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 30s
+      retries: 3
 
+  # ── Flask API — auth, subscriptions, VPS mgmt, AI ─────────
   api:
     build: .
     ports:
@@ -19,9 +28,45 @@ services:
       - ./backend:/app
       - api_data:/app/data
     environment:
-      - SECRET_KEY=whoamisec-production-secret-2026
-      - JWT_SECRET_KEY=whoamisec-jwt-production-key
+      - SECRET_KEY=${SECRET_KEY:-whoamisec-secret-change-me}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-whoamisec-jwt-change-me}
+      - OLLAMA_HOST=http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/api/v1/health"]
+      interval: 30s
+      retries: 3
+
+  # ── Cloudflare Tunnel — whoamisec.com → this Codespace ────
+  # FREE — no VPS rental, no server costs, no paid hosting
+  # Setup: see tunnel-setup.sh
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run --token ${CF_TUNNEL_TOKEN}
+    environment:
+      - TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}
+    depends_on:
+      - web
+    restart: unless-stopped
+    profiles:
+      - tunnel   # only starts with: docker compose --profile tunnel up
+
+  # ── APK watchdog — auto-downloads new APK releases ────────
+  apk-watchdog:
+    image: alpine:3.19
+    volumes:
+      - apk_data:/var/apk
+      - ./apk-watchdog.sh:/watchdog.sh:ro
+    environment:
+      - GH_APK_WATCHDOG_TOKEN=${GH_APK_WATCHDOG_TOKEN:-}
+      - APK_DIR=/var/apk
+    command: sh /watchdog.sh
+    restart: unless-stopped
+    profiles:
+      - apk    # only starts with: docker compose --profile apk up
 
 volumes:
   api_data:
+  apk_data:
