@@ -92,6 +92,8 @@
             padding:0.9rem 0; border-bottom:1px solid rgba(255,255,255,0.04);
         }
         .vps-item:last-child { border-bottom:none; }
+        .plan-row { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:0.65rem 0.75rem; cursor:pointer; transition:border-color 0.2s,background 0.2s; }
+        .plan-row:hover { border-color:rgba(139,92,246,0.4); background:rgba(139,92,246,0.06); }
         .vps-info h4 { font-size:0.9rem; font-weight:600; margin-bottom:0.2rem; }
         .vps-info p { font-size:0.75rem; color:var(--muted); }
         .vps-actions { display:flex; gap:0.4rem; }
@@ -1335,6 +1337,146 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINVmUfEce3uSfnES7ZNTSkERao5k80/emlP3LBCNJ2qt
         </div>
     </div>
 
+    <!-- TAB 6: PLANS & ACCOUNT -->
+    <div class="tab-pane" id="tab-plans">
+
+        <!-- Current Plan Banner -->
+        <div class="card" style="background:linear-gradient(135deg,rgba(139,92,246,0.18),rgba(6,182,212,0.12));border-color:rgba(139,92,246,0.4);margin-bottom:0.75rem;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+                <div>
+                    <div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Current Plan</div>
+                    <div style="font-size:1.1rem;font-weight:700;color:var(--purple);">😈 SUPREME</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:1.3rem;font-weight:700;">1.00 XMR<span style="font-size:0.7rem;font-weight:400;color:var(--muted);">/mo</span></div>
+                    <div style="font-size:0.68rem;color:var(--emerald);">✔ Active — renews 2026-07-08</div>
+                </div>
+            </div>
+            <div style="display:flex;gap:1rem;font-size:0.72rem;color:var(--text2);">
+                <span>100,000 credits/mo</span>
+                <span>•</span>
+                <span>1,000 VPS</span>
+                <span>•</span>
+                <span>Unlimited apps</span>
+            </div>
+            <!-- Usage bar -->
+            <div style="margin-top:0.75rem;">
+                <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--muted);margin-bottom:0.25rem;">
+                    <span>Credits used this month</span><span id="credits-used-pct">12,340 / 100,000</span>
+                </div>
+                <div style="height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;">
+                    <div style="height:100%;width:12.3%;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:3px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invite Friend -->
+        <div class="card" style="border-color:rgba(16,185,129,0.35);margin-bottom:0.75rem;">
+            <div class="card-title" style="color:var(--emerald);">🎁 Invite Friend — Get 1 Month FREE</div>
+            <div style="font-size:0.78rem;color:var(--text2);margin-bottom:0.75rem;">
+                Invite 3 friends → you get <b style="color:var(--emerald);">1 month Pro FREE</b>.<br>
+                Your friend gets <b style="color:var(--cyan);">500 bonus credits</b> on signup.
+            </div>
+            <!-- Referral code -->
+            <div style="background:rgba(0,0,0,0.25);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:0.6rem 0.8rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+                <div>
+                    <div style="font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;">Your referral code</div>
+                    <div style="font-size:1rem;font-weight:700;letter-spacing:0.12em;color:var(--emerald);" id="ref-code">JARVIS-X7K9</div>
+                </div>
+                <button class="btn btn-outline-g btn-sm" onclick="copyRef()">📋 Copy</button>
+            </div>
+            <!-- Referral link -->
+            <div style="font-size:0.7rem;color:var(--muted);margin-bottom:0.6rem;">
+                Link: <span style="color:var(--cyan);">https://whoamisec.com/?ref=JARVIS-X7K9</span>
+            </div>
+            <!-- Progress -->
+            <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;">
+                <div style="flex:1;text-align:center;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:0.5rem;">
+                    <div style="font-size:1.2rem;font-weight:700;color:var(--emerald);">1</div>
+                    <div style="font-size:0.6rem;color:var(--muted);">Invited</div>
+                </div>
+                <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:0.5rem;">
+                    <div style="font-size:1.2rem;font-weight:700;color:var(--muted);">2</div>
+                    <div style="font-size:0.6rem;color:var(--muted);">needed</div>
+                </div>
+                <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:0.5rem;">
+                    <div style="font-size:1.2rem;font-weight:700;color:var(--muted);">🎁</div>
+                    <div style="font-size:0.6rem;color:var(--muted);">Free month</div>
+                </div>
+            </div>
+            <button class="btn btn-outline-g btn-block" onclick="shareInvite()">📲 Share Invite Link</button>
+        </div>
+
+        <!-- Gift a Plan -->
+        <div class="card" style="border-color:rgba(245,158,11,0.3);margin-bottom:0.75rem;">
+            <div class="card-title" style="color:#f59e0b;">🎀 Gift a Subscription</div>
+            <div style="font-size:0.75rem;color:var(--text2);margin-bottom:0.6rem;">Send any plan as a gift to a friend's email or Telegram.</div>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                <select id="gift-plan" style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);color:var(--text);border-radius:8px;padding:0.5rem;font-size:0.8rem;">
+                    <option value="starter">🐣 Starter — 0.05 XMR/mo (100 credits)</option>
+                    <option value="pro" selected>🚀 Pro — 0.10 XMR/mo (500 credits)</option>
+                    <option value="business">💼 Business — 0.25 XMR/mo (2,000 credits)</option>
+                    <option value="enterprise">👑 Enterprise — 0.50 XMR/mo (10,000 credits)</option>
+                    <option value="supreme">😈 Supreme — 1.00 XMR/mo (100,000 credits)</option>
+                </select>
+                <input type="text" id="gift-to" placeholder="Email or Telegram @username" style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);color:var(--text);border-radius:8px;padding:0.5rem;font-size:0.8rem;">
+                <button class="btn btn-grad btn-block" onclick="sendGift()">🎁 Send Gift</button>
+            </div>
+        </div>
+
+        <!-- All Plans -->
+        <div class="card" style="margin-bottom:0.75rem;">
+            <div class="card-title">All Plans</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+                <div class="plan-row" onclick="selectPlan('free')">
+                    <div style="font-size:0.7rem;font-weight:700;color:var(--muted);">😾 Free</div>
+                    <div style="font-size:0.95rem;font-weight:700;">0 XMR</div>
+                    <div style="font-size:0.62rem;color:var(--text2);">10 credits · 1 app · 0 VPS</div>
+                </div>
+                <div class="plan-row" onclick="selectPlan('starter')">
+                    <div style="font-size:0.7rem;font-weight:700;color:var(--cyan);">🐣 Starter</div>
+                    <div style="font-size:0.95rem;font-weight:700;">0.05 XMR<span style="font-size:0.6rem;color:var(--muted);">/mo</span></div>
+                    <div style="font-size:0.62rem;color:var(--text2);">100 credits · 3 apps · 1 VPS</div>
+                </div>
+                <div class="plan-row" onclick="selectPlan('pro')" style="border-color:rgba(139,92,246,0.4);">
+                    <div style="font-size:0.7rem;font-weight:700;color:var(--purple);">🚀 Pro ★</div>
+                    <div style="font-size:0.95rem;font-weight:700;">0.10 XMR<span style="font-size:0.6rem;color:var(--muted);">/mo</span></div>
+                    <div style="font-size:0.62rem;color:var(--text2);">500 credits · 10 apps · 5 VPS</div>
+                </div>
+                <div class="plan-row" onclick="selectPlan('business')">
+                    <div style="font-size:0.7rem;font-weight:700;color:var(--cyan);">💼 Business</div>
+                    <div style="font-size:0.95rem;font-weight:700;">0.25 XMR<span style="font-size:0.6rem;color:var(--muted);">/mo</span></div>
+                    <div style="font-size:0.62rem;color:var(--text2);">2,000 credits · 50 apps · 20 VPS</div>
+                </div>
+                <div class="plan-row" onclick="selectPlan('enterprise')">
+                    <div style="font-size:0.7rem;font-weight:700;color:#f59e0b;">👑 Enterprise</div>
+                    <div style="font-size:0.95rem;font-weight:700;">0.50 XMR<span style="font-size:0.6rem;color:var(--muted);">/mo</span></div>
+                    <div style="font-size:0.62rem;color:var(--text2);">10,000 credits · 999 apps · 100 VPS</div>
+                </div>
+                <div class="plan-row" onclick="selectPlan('supreme')" style="border-color:rgba(139,92,246,0.5);background:rgba(139,92,246,0.06);">
+                    <div style="font-size:0.7rem;font-weight:700;color:var(--purple);">😈 Supreme</div>
+                    <div style="font-size:0.95rem;font-weight:700;">1.00 XMR<span style="font-size:0.6rem;color:var(--muted);">/mo</span></div>
+                    <div style="font-size:0.62rem;color:var(--text2);">100K credits · ∞ apps · 1000 VPS</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buy Credits -->
+        <div class="card">
+            <div class="card-title">Buy Extra Credits</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;margin-bottom:0.6rem;">
+                <button class="btn btn-outline-g btn-sm" onclick="buyCredits(100)">100<br><span style="font-size:0.6rem;">0.01 XMR</span></button>
+                <button class="btn btn-outline-g btn-sm" onclick="buyCredits(500)">500<br><span style="font-size:0.6rem;">0.04 XMR</span></button>
+                <button class="btn btn-outline-g btn-sm" onclick="buyCredits(1000)">1,000<br><span style="font-size:0.6rem;">0.07 XMR</span></button>
+                <button class="btn btn-outline-g btn-sm" onclick="buyCredits(5000)">5,000<br><span style="font-size:0.6rem;">0.30 XMR</span></button>
+                <button class="btn btn-outline-g btn-sm" onclick="buyCredits(10000)">10,000<br><span style="font-size:0.6rem;">0.50 XMR</span></button>
+                <button class="btn btn-outline-g btn-sm" onclick="buyCredits(50000)">50,000<br><span style="font-size:0.6rem;">2.00 XMR</span></button>
+            </div>
+            <div style="font-size:0.68rem;color:var(--muted);text-align:center;">All payments via Monero (XMR) — private, instant</div>
+        </div>
+
+    </div>
+
 </div>
 
 <!-- BOTTOM TAB BAR -->
@@ -1358,6 +1500,10 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINVmUfEce3uSfnES7ZNTSkERao5k80/emlP3LBCNJ2qt
     <button class="tab-btn" onclick="switchTab('websites',this)">
         <span class="tab-icon">&#x1F310;</span>
         <span class="tab-label">Sites</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('plans',this)">
+        <span class="tab-icon">&#x1F4B3;</span>
+        <span class="tab-label">Plans</span>
     </button>
 </div>
 
@@ -2143,6 +2289,33 @@ setInterval(() => {
     const el = document.getElementById('agent-count');
     if (el) el.textContent = (2700 + Math.floor(Math.random()*15)).toLocaleString();
 }, 7000);
+
+// ===== PLANS & INVITE =====
+function copyRef() {
+    const code = document.getElementById('ref-code').textContent;
+    navigator.clipboard.writeText('https://whoamisec.com/?ref=' + code).then(() => showNotif('Referral link copied!'));
+}
+function shareInvite() {
+    const code = document.getElementById('ref-code').textContent;
+    const text = 'Join WhoamiSec — JARVIS OMNI AI platform 😈🚀\nGet 500 free credits with my invite: https://whoamisec.com/?ref=' + code;
+    if (navigator.share) { navigator.share({title:'WhoamiSec Invite', text, url:'https://whoamisec.com/?ref='+code}); }
+    else { navigator.clipboard.writeText(text).then(() => showNotif('Invite text copied — paste anywhere!')); }
+}
+function sendGift() {
+    const plan = document.getElementById('gift-plan').value;
+    const to = document.getElementById('gift-to').value.trim();
+    if (!to) { showNotif('Enter email or Telegram username'); return; }
+    showNotif('🎁 Gift queued — pay via XMR to confirm');
+    setTimeout(() => showNotif('Payment address sent to JARVIS wallet'), 2000);
+}
+function selectPlan(plan) {
+    const prices = {free:'0 XMR',starter:'0.05 XMR/mo',pro:'0.10 XMR/mo',business:'0.25 XMR/mo',enterprise:'0.50 XMR/mo',supreme:'1.00 XMR/mo'};
+    showNotif('Selected: ' + plan.toUpperCase() + ' — ' + (prices[plan]||'') + ' · Pay via XMR');
+}
+function buyCredits(amount) {
+    const prices = {100:'0.01',500:'0.04',1000:'0.07',5000:'0.30',10000:'0.50',50000:'2.00'};
+    showNotif('Buy ' + amount.toLocaleString() + ' credits — ' + prices[amount] + ' XMR · Send to wallet');
+}
 </script>
 </body>
 </html>

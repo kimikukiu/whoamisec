@@ -427,36 +427,73 @@
         <div class="card">
             <div class="card-title">Subscription Plans</div>
             <div class="plan-grid">
-                <div class="plan-card">
-                    <div class="plan-name">Free</div>
+                <div class="plan-card" onclick="bsPlan('free')">
+                    <div class="plan-name">😾 Free</div>
                     <div class="plan-price">0 XMR<small>/forever</small></div>
-                    <div class="plan-detail">100 req/day &bull; 1 model</div>
+                    <div class="plan-detail">10 credits · 1 app · 0 VPS</div>
                 </div>
-                <div class="plan-card">
-                    <div class="plan-name">Starter</div>
-                    <div class="plan-price">0.03 XMR<small>/mo</small></div>
-                    <div class="plan-detail">1K req/day &bull; All models</div>
+                <div class="plan-card" onclick="bsPlan('starter')">
+                    <div class="plan-name">🐣 Starter</div>
+                    <div class="plan-price">0.05 XMR<small>/mo</small></div>
+                    <div class="plan-detail">100 credits · 3 apps · 1 VPS</div>
                 </div>
-                <div class="plan-card featured">
-                    <div class="plan-name">Pro</div>
-                    <div class="plan-price">0.08 XMR<small>/mo</small></div>
-                    <div class="plan-detail">10K req/day &bull; Ollama</div>
+                <div class="plan-card featured" onclick="bsPlan('pro')">
+                    <div class="plan-name">🚀 Pro ★</div>
+                    <div class="plan-price">0.10 XMR<small>/mo</small></div>
+                    <div class="plan-detail">500 credits · 10 apps · 5 VPS</div>
                 </div>
-                <div class="plan-card">
-                    <div class="plan-name">Enterprise</div>
-                    <div class="plan-price">0.20 XMR<small>/mo</small></div>
-                    <div class="plan-detail">100K req/day &bull; White-label</div>
+                <div class="plan-card" onclick="bsPlan('business')">
+                    <div class="plan-name">💼 Business</div>
+                    <div class="plan-price">0.25 XMR<small>/mo</small></div>
+                    <div class="plan-detail">2,000 credits · 50 apps · 20 VPS</div>
                 </div>
-                <div class="plan-card">
-                    <div class="plan-name">Ultra</div>
+                <div class="plan-card" onclick="bsPlan('enterprise')">
+                    <div class="plan-name">👑 Enterprise</div>
                     <div class="plan-price">0.50 XMR<small>/mo</small></div>
-                    <div class="plan-detail">Unlimited &bull; Admin panel</div>
+                    <div class="plan-detail">10,000 credits · 999 apps · 100 VPS</div>
                 </div>
-                <div class="plan-card">
-                    <div class="plan-name">Custom</div>
-                    <div class="plan-price">Custom</div>
-                    <div class="plan-detail">Dedicated infra</div>
+                <div class="plan-card featured" onclick="bsPlan('supreme')">
+                    <div class="plan-name">😈 Supreme</div>
+                    <div class="plan-price">1.00 XMR<small>/mo</small></div>
+                    <div class="plan-detail">100K credits · ∞ apps · 1000 VPS</div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Invite Friend -->
+        <div class="card" style="border-color:rgba(16,185,129,0.3);margin-top:0.75rem;">
+            <div class="card-title" style="color:#10b981;">🎁 Invite Friend — Get 1 Month FREE</div>
+            <div style="font-size:0.78rem;color:var(--text2);margin-bottom:0.6rem;">
+                Invite 3 friends → <b style="color:#10b981;">1 month Pro FREE</b> for you.<br>Friend gets <b style="color:var(--cyan);">500 bonus credits</b>.
+            </div>
+            <div style="background:rgba(0,0,0,0.2);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:0.5rem 0.75rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+                <div>
+                    <div style="font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;">Referral code</div>
+                    <div style="font-size:0.95rem;font-weight:700;letter-spacing:0.1em;color:#10b981;" id="bs-ref-code">WSEC-B4K2</div>
+                </div>
+                <button class="btn-sm" style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#10b981;border-radius:6px;padding:0.3rem 0.6rem;font-size:0.72rem;cursor:pointer;" onclick="bsCopyRef()">📋 Copy</button>
+            </div>
+            <div style="display:flex;gap:0.5rem;">
+                <div style="flex:1;text-align:center;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:0.4rem;font-size:0.65rem;color:#10b981;"><b style="font-size:1rem;">1</b><br>invited</div>
+                <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:0.4rem;font-size:0.65rem;color:var(--muted);"><b style="font-size:1rem;">2</b><br>more needed</div>
+                <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:0.4rem;font-size:0.65rem;color:var(--muted);"><b style="font-size:1rem;">🎁</b><br>free month</div>
+            </div>
+            <button style="width:100%;margin-top:0.5rem;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:#10b981;border-radius:8px;padding:0.55rem;font-size:0.8rem;cursor:pointer;font-weight:600;" onclick="bsShareInvite()">📲 Share Invite Link</button>
+        </div>
+
+        <!-- Gift -->
+        <div class="card" style="border-color:rgba(245,158,11,0.25);margin-top:0.75rem;">
+            <div class="card-title" style="color:#f59e0b;">🎀 Gift a Plan</div>
+            <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                <select id="bs-gift-plan" style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);color:#e2e8f0;border-radius:8px;padding:0.45rem;font-size:0.78rem;">
+                    <option value="starter">🐣 Starter — 0.05 XMR/mo</option>
+                    <option value="pro" selected>🚀 Pro — 0.10 XMR/mo</option>
+                    <option value="business">💼 Business — 0.25 XMR/mo</option>
+                    <option value="enterprise">👑 Enterprise — 0.50 XMR/mo</option>
+                    <option value="supreme">😈 Supreme — 1.00 XMR/mo</option>
+                </select>
+                <input type="text" id="bs-gift-to" placeholder="Email or Telegram @username" style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);color:#e2e8f0;border-radius:8px;padding:0.45rem;font-size:0.78rem;">
+                <button style="background:linear-gradient(135deg,#f59e0b,#d97706);border:none;color:#000;border-radius:8px;padding:0.55rem;font-size:0.82rem;font-weight:700;cursor:pointer;" onclick="bsSendGift()">🎁 Send Gift via XMR</button>
             </div>
         </div>
     </div>
@@ -887,6 +924,28 @@ setInterval(() => {
     document.getElementById('hashrate').textContent = r(82.4, 2);
     document.getElementById('mined').textContent = r(0.0043, 0.0005);
 }, 5000);
+
+// Plans + Invite
+function bsPlan(plan) {
+    const p = {free:'0 XMR',starter:'0.05 XMR/mo',pro:'0.10 XMR/mo',business:'0.25 XMR/mo',enterprise:'0.50 XMR/mo',supreme:'1.00 XMR/mo'};
+    showNotif('Plan: ' + plan.toUpperCase() + ' · ' + p[plan] + ' · Pay via XMR');
+}
+function bsCopyRef() {
+    const code = document.getElementById('bs-ref-code').textContent;
+    navigator.clipboard.writeText('https://whoamisec.com/?ref=' + code).then(() => showNotif('Referral link copied!'));
+}
+function bsShareInvite() {
+    const code = document.getElementById('bs-ref-code').textContent;
+    const text = '😈 WhoamiSec Business — JARVIS AI platform\nGet 500 free credits: https://whoamisec.com/?ref=' + code;
+    if (navigator.share) navigator.share({title:'WhoamiSec Invite', text, url:'https://whoamisec.com/?ref='+code});
+    else navigator.clipboard.writeText(text).then(() => showNotif('Copied — paste to share!'));
+}
+function bsSendGift() {
+    const to = document.getElementById('bs-gift-to').value.trim();
+    const plan = document.getElementById('bs-gift-plan').value;
+    if (!to) { showNotif('Enter email or Telegram username'); return; }
+    showNotif('🎁 Gift ' + plan.toUpperCase() + ' → ' + to + ' · Pay XMR to confirm');
+}
 </script>
 </body>
 </html>

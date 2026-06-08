@@ -1,0 +1,257 @@
+name: Build APKs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'jarvis-mind-app.html'
+      - 'whoamisec-business-app.html'
+      - 'manifest.json'
+      - 'sw.js'
+      - '.github/workflows/build-apk.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    env:
+      KS_PASS: WhoamiSecAdmin2026
+      KS_ALIAS: whoamisec
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: '11076708'
+
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses 2>/dev/null || true
+
+      # ── Keystore (one-time, reused for both APKs) ─────────────
+      - name: Generate signing keystore
+        run: |
+          keytool -genkeypair -v \
+            -keystore whoamisec.keystore \
+            -alias $KS_ALIAS \
+            -keyalg RSA -keysize 2048 \
+            -validity 10000 \
+            -storepass "$KS_PASS" \
+            -keypass "$KS_PASS" \
+            -dname "CN=WhoamiSec, OU=JARVIS, O=WhoamiSec, L=Online, ST=Online, C=US"
+
+      # ── Helper: patch Gradle for universal multi-ABI APK ──────
+      # Runs inside the android/ dir. Patches app/build.gradle to:
+      #   - minSdk 23  (Android 6.0 — covers 99%+ active devices)
+      #   - targetSdk 34
+      #   - ABI splits disabled → one fat APK with all ABIs
+      #   - armeabi-v7a, arm64-v8a, x86, x86_64 all included
+      - name: Patch build.gradle function (shared)
+        run: |
+          cat > patch_gradle.sh << 'PATCH'
+          #!/bin/bash
+          set -e
+          GRADLE=android/app/build.gradle
+          # minSdk
+          sed -i 's/minSdkVersion [0-9]*/minSdkVersion 23/' "$GRADLE"
+          sed -i 's/minSdk [0-9]*/minSdk 23/' "$GRADLE"
+          # targetSdk
+          sed -i 's/targetSdkVersion [0-9]*/targetSdkVersion 34/' "$GRADLE"
+          sed -i 's/targetSdk [0-9]*/targetSdk 34/' "$GRADLE"
+          # compileSdk
+          sed -i 's/compileSdkVersion [0-9]*/compileSdkVersion 34/' "$GRADLE"
+          sed -i 's/compileSdk [0-9]*/compileSdk 34/' "$GRADLE"
+          # Remove any existing splits block to avoid conflicts
+          python3 - << 'PY'
+          import re, sys
+          content = open('android/app/build.gradle').read()
+          content = re.sub(r'splits\s*\{[^}]*(?:\{[^}]*\}[^}]*)?\}', '', content, flags=re.DOTALL)
+          open('android/app/build.gradle', 'w').write(content)
+          PY
+          # Inject universal APK config into defaultConfig block
+          python3 - << 'PY'
+          content = open('android/app/build.gradle').read()
+          universal = """
+              splits {
+                  abi {
+                      enable true
+                      reset()
+                      include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+                      universalApk true
+                  }
+              }
+          """
+          # Insert after last } of android { block
+          idx = content.rfind('android {')
+          if idx >= 0:
+              # find the closing } of the android block
+              depth = 0
+              for i in range(idx, len(content)):
+                  if content[i] == '{': depth += 1
+                  elif content[i] == '}':
+                      depth -= 1
+                      if depth == 0:
+                          content = content[:i] + universal + content[i:]
+                          break
+          open('android/app/build.gradle', 'w').write(content)
+          PY
+          PATCH
+          chmod +x patch_gradle.sh
+
+      # ════════════════════════════════════════════════════════
+      # APK 1 — JARVIS MIND v3
+      # ════════════════════════════════════════════════════════
+      - name: Prepare www — JARVIS MIND
+        run: |
+          mkdir -p apk-build/www
+          cp jarvis-mind-app.html apk-build/www/index.html
+          cp manifest.json        apk-build/www/ 2>/dev/null || true
+          cp sw.js                apk-build/www/ 2>/dev/null || true
+
+      - name: Capacitor init — JARVIS MIND
+        working-directory: apk-build
+        run: |
+          cat > package.json << 'EOF'
+          {"name":"jarvis-mind","version":"3.0.0","scripts":{"build":"echo ok"}}
+          EOF
+          npm install --save @capacitor/core@latest @capacitor/android@latest
+          cat > capacitor.config.json << 'EOF'
+          {
+            "appId": "com.whoamisec.jarvis",
+            "appName": "JARVIS MIND",
+            "webDir": "www",
+            "server": {"androidScheme": "https"},
+            "android": {"minWebViewVersion": 79}
+          }
+          EOF
+          npx cap add android
+          npx cap sync android
+
+      - name: Patch Gradle — JARVIS MIND
+        working-directory: apk-build
+        run: bash ../patch_gradle.sh
+
+      - name: Build JARVIS MIND APK
+        working-directory: apk-build/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon -q 2>&1 | tail -20
+
+      - name: Sign JARVIS MIND APK
+        run: |
+          # The universal APK has -universal in the name
+          APK_IN=$(find apk-build/android/app/build/outputs/apk/release/ \
+                   -name "*universal*.apk" -o -name "*unsigned*.apk" | head -1)
+          echo "Signing: $APK_IN"
+          $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)/zipalign \
+            -v 4 "$APK_IN" JARVIS-MIND-v3-aligned.apk
+          $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)/apksigner sign \
+            --ks whoamisec.keystore \
+            --ks-pass pass:"$KS_PASS" \
+            --key-pass pass:"$KS_PASS" \
+            --ks-key-alias "$KS_ALIAS" \
+            --out JARVIS-MIND-v3.apk \
+            JARVIS-MIND-v3-aligned.apk
+          echo "APK size: $(du -sh JARVIS-MIND-v3.apk)"
+
+      # ════════════════════════════════════════════════════════
+      # APK 2 — WHOAMISEC Business v16
+      # ════════════════════════════════════════════════════════
+      - name: Prepare www — WHOAMISEC Business
+        run: cp whoamisec-business-app.html apk-build/www/index.html
+
+      - name: Capacitor reinit — WHOAMISEC Business
+        working-directory: apk-build
+        run: |
+          rm -rf android node_modules
+          npm install --save @capacitor/core@latest @capacitor/android@latest
+          cat > capacitor.config.json << 'EOF'
+          {
+            "appId": "com.whoamisec.business",
+            "appName": "WHOAMISEC Business",
+            "webDir": "www",
+            "server": {"androidScheme": "https"},
+            "android": {"minWebViewVersion": 79}
+          }
+          EOF
+          npx cap add android
+          npx cap sync android
+
+      - name: Patch Gradle — WHOAMISEC Business
+        working-directory: apk-build
+        run: bash ../patch_gradle.sh
+
+      - name: Build WHOAMISEC Business APK
+        working-directory: apk-build/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon -q 2>&1 | tail -20
+
+      - name: Sign WHOAMISEC Business APK
+        run: |
+          APK_IN=$(find apk-build/android/app/build/outputs/apk/release/ \
+                   -name "*universal*.apk" -o -name "*unsigned*.apk" | head -1)
+          echo "Signing: $APK_IN"
+          $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)/zipalign \
+            -v 4 "$APK_IN" WHOAMISEC-Business-v16-aligned.apk
+          $ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | sort -V | tail -1)/apksigner sign \
+            --ks whoamisec.keystore \
+            --ks-pass pass:"$KS_PASS" \
+            --key-pass pass:"$KS_PASS" \
+            --ks-key-alias "$KS_ALIAS" \
+            --out WHOAMISEC-Business-v16.apk \
+            WHOAMISEC-Business-v16-aligned.apk
+          echo "APK size: $(du -sh WHOAMISEC-Business-v16.apk)"
+
+      # ════════════════════════════════════════════════════════
+      # Upload to GitHub Releases
+      # ════════════════════════════════════════════════════════
+      - name: Get version tag
+        id: ver
+        run: echo "tag=apk-$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
+
+      - name: Release APKs
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: "WhoamiSec APKs — ${{ steps.ver.outputs.tag }}"
+          body: |
+            ## WhoamiSec APK Build
+
+            | File | Description |
+            |------|-------------|
+            | `JARVIS-MIND-v3.apk` | JARVIS MIND Commander — VPS control, 2700 agents, AI Commander, SSH |
+            | `WHOAMISEC-Business-v16.apk` | Business Commander — XMR Mining, Monero, Agent swarm |
+
+            ### Compatibility
+            - Android 6.0+ (API 23+)
+            - All ARM devices: **armeabi-v7a** (32-bit) + **arm64-v8a** (64-bit)
+            - Emulators: **x86** + **x86_64**
+            - Universal APK — one file installs on any Android device
+
+            ### Install
+            1. Download APK to phone
+            2. Settings → Security → **Allow install from unknown sources**
+            3. Tap APK → Install
+
+            > Source code, SDK, swarm tools and agent configs are **NOT included** in the APK.
+          files: |
+            JARVIS-MIND-v3.apk
+            WHOAMISEC-Business-v16.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

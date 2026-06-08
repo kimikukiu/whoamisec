@@ -84,8 +84,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
-    env_file:
-      - ../mining/.env
+    environment:
+      - XMR_ADDRESS=${XMR_ADDRESS:-8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ}
+      - POOL_URL=${POOL_URL:-pool.supportxmr.com:3333}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - FLASK_PORT=5000
     volumes:
       - jarvis-data:/var/lib/jarvis
       - ../logs:/var/log/jarvis
