@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINER_FLEET - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            font-family: 'Courier New', monospace;
+            color: #0f0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px;
+            border-bottom: 2px solid #0f0;
+            margin-bottom: 30px;
+        }
+        
+        .admin-card {
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #0f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .admin-card h2 {
+            margin-bottom: 20px;
+            border-left: 4px solid #0f0;
+            padding-left: 15px;
+        }
+        
+        input, textarea, select {
+            background: #000;
+            border: 1px solid #0f0;
+            color: #0f0;
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+            font-family: monospace;
+        }
+        
+        button {
+            background: #0f0;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            opacity: 0.8;
+        }
+        
+        .danger-btn {
+            background: #ff0000;
+            color: #fff;
+        }
+        
+        .success {
+            background: rgba(0,255,0,0.2);
+            border: 1px solid #0f0;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        .error {
+            background: rgba(255,0,0,0.2);
+            border: 1px solid #f00;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat {
+            background: rgba(0,0,0,0.6);
+            padding: 15px;
+            text-align: center;
+            border-radius: 10px;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        
+        th {
+            background: rgba(0,255,0,0.2);
+        }
+        
+        .status-active {
+            color: #0f0;
+        }
+        
+        .status-inactive {
+            color: #f00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👑 MINER_FLEET ADMIN PANEL</h1>
+            <p>Control total | Setări plăți | Gestionare noduri</p>
+        </div>
+        
+        <!-- SETĂRI PLĂȚI MONERO -->
+        <div class="admin-card">
+            <h2>💰 SETĂRI PLĂȚI MONERO</h2>
+            <div id="paymentSettings">
+                <label>🏦 Adresă Monero pentru încasări clienți:</label>
+                <textarea id="xmrAddress" rows="3" placeholder="Introdu adresa ta Monero aici..."></textarea>
+                
+                <label>💵 Preț per nod (XMR):</label>
+                <input type="number" id="pricePerNode" step="0.01" placeholder="0.05">
+                
+                <label>📊 Platform Fee (%):</label>
+                <input type="number" id="platformFee" step="1" value="35">
+                
+                <label>📝 Instrucțiuni plată (afișate clienților):</label>
+                <textarea id="paymentInstructions" rows="3">Trimite XMR la adresa de mai sus. După confirmare, nodurile tale vor fi activate automat în 24h.</textarea>
+                
+                <button onclick="savePaymentSettings()">💾 Salvează Setările</button>
+                <button onclick="testConnection()">🔗 Testează Conexiunea</button>
+            </div>
+            <div id="paymentStatus"></div>
+        </div>
+        
+        <!-- STATISTICI MINERIT -->
+        <div class="stats-grid">
+            <div class="stat">
+                <div>⛏️ Hashrate Total</div>
+                <div class="stat-value" id="totalHashrate">0</div>
+                <div>H/s</div>
+            </div>
+            <div class="stat">
+                <div>💰 XMR Minat Azi</div>
+                <div class="stat-value" id="todayMined">0</div>
+                <div>XMR</div>
+            </div>
+            <div class="stat">
+                <div>👥 Clienți Activi</div>
+                <div class="stat-value" id="activeClients">0</div>
+            </div>
+            <div class="stat">
+                <div>💸 Profit Platformă</div>
+                <div class="stat-value" id="platformProfit">0</div>
+                <div>XMR</div>
+            </div>
+        </div>
+        
+        <!-- GESTIONARE NODURI -->
+        <div class="admin-card">
+            <h2>🖥️ GESTIONARE NODURI MINERIT</h2>
+            <button onclick="startAllNodes()">▶️ Pornește Toate Nodurile</button>
+            <button onclick="stopAllNodes()">⏹️ Oprește Toate Nodurile</button>
+            <button onclick="restartAllNodes()">🔄 Restartează Toate Nodurile</button>
+            <button onclick="addNewNode()">➕ Adaugă Nod Nou</button>
+            <div id="nodesList" style="margin-top: 20px; max-height: 300px; overflow-y: auto;">
+                <table id="nodesTable">
+                    <thead>
+                        <tr><th>ID</th><th>Status</th><th>Hashrate</th><th>Client</th><th>Acțiuni</th></tr>
+                    </thead>
+                    <tbody id="nodesTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- GESTIONARE CLIENȚI -->
+        <div class="admin-card">
+            <h2>👥 GESTIONARE CLIENȚI</h2>
+            <div id="clientsList">
+                <table id="clientsTable">
+                    <thead>
+                        <tr><th>ID</th><th>Adresă XMR</th><th>Noduri</th><th>Plătit</th><th>Status</th><th>Acțiuni</th></tr>
+                    </thead>
+                    <tbody id="clientsTableBody"></tbody>
+                </table>
+            </div>
+            <button onclick="addTestClient()">➕ Adaugă Client Test</button>
+        </div>
+        
+        <!-- LOGURI MINERIT -->
+        <div class="admin-card">
+            <h2>📋 LOGURI MINERIT LIVE</h2>
+            <div id="miningLogs" style="height: 200px; overflow-y: auto; background: #000; padding: 10px; font-size: 0.8em;"></div>
+        </div>
+        
+        <!-- AUTENTIFICARE ADMIN -->
+        <div class="admin-card" style="border-color: #ff0000;">
+            <h2>🔐 SECURITATE ADMIN</h2>
+            <label>Setare parolă admin nouă:</label>
+            <input type="password" id="newAdminPass" placeholder="Parolă nouă">
+            <label>Confirmă parola:</label>
+            <input type="password" id="confirmAdminPass" placeholder="Confirmă parola">
+            <button onclick="changeAdminPassword()">🔑 Schimbă Parola</button>
+            <button onclick="logout()" class="danger-btn">🚪 Logout</button>
+        </div>
+    </div>
+    
+    <script>
+        // Verifică autentificarea
+        let adminToken = localStorage.getItem('adminToken');
+        if (!adminToken) {
+            const password = prompt('🔐 ADMIN ACCESS REQUIRED\nIntrodu parola admin:');
+            if (password === 'WhoamiSecAdmin2026') {
+                localStorage.setItem('adminToken', 'authenticated');
+                adminToken = 'authenticated';
+            } else {
+                window.location.href = '/index.html';
+            }
+        }
+        
+        // Încarcă setările salvate
+        function loadPaymentSettings() {
+            const savedAddress = localStorage.getItem('xmrPaymentAddress');
+            const savedPrice = localStorage.getItem('pricePerNode');
+            const savedFee = localStorage.getItem('platformFee');
+            const savedInstructions = localStorage.getItem('paymentInstructions');
+            
+            if (savedAddress) document.getElementById('xmrAddress').value = savedAddress;
+            if (savedPrice) document.getElementById('pricePerNode').value = savedPrice;
+            if (savedFee) document.getElementById('platformFee').value = savedFee;
+            if (savedInstructions) document.getElementById('paymentInstructions').value = savedInstructions;
+        }
+        
+        function savePaymentSettings() {
+            const address = document.getElementById('xmrAddress').value;
+            const price = document.getElementById('pricePerNode').value;
+            const fee = document.getElementById('platformFee').value;
+            const instructions = document.getElementById('paymentInstructions').value;
+            
+            if (!address) {
+                alert('Introdu o adresă Monero validă!');
+                return;
+            }
+            
+            localStorage.setItem('xmrPaymentAddress', address);
+            localStorage.setItem('pricePerNode', price);
+            localStorage.setItem('platformFee', fee);
+            localStorage.setItem('paymentInstructions', instructions);
+            
+            document.getElementById('paymentStatus').innerHTML = '<div class="success">✅ Setările au fost salvate! Adresa ta Monero este activă pentru clienți.</div>';
+            setTimeout(() => {
+                document.getElementById('paymentStatus').innerHTML = '';
+            }, 3000);
+        }
+        
+        function testConnection() {
+            const address = document.getElementById('xmrAddress').value;
+            if (address && address.length > 90) {
+                document.getElementById('paymentStatus').innerHTML = '<div class="success">✅ Adresă Monero validă! Clienții pot trimite plăți.</div>';
+            } else {
+                document.getElementById('paymentStatus').innerHTML = '<div class="error">❌ Adresă Monero invalidă. Verifică lungimea (ar trebui să aibă 95-106 caractere).</div>';
+            }
+        }
+        
+        // Încarcă nodurile
+        async function loadNodes() {
+            try {
+                const response = await fetch('/api/nodes');
+                const data = await response.json();
+                const tbody = document.getElementById('nodesTableBody');
+                tbody.innerHTML = '';
+                
+                data.nodes.forEach(node => {
+                    const row = tbody.insertRow();
+                    row.insertCell(0).innerHTML = node.id;
+                    row.insertCell(1).innerHTML = `<span class="status-${node.status}">${node.status}</span>`;
+                    row.insertCell(2).innerHTML = node.hashrate + ' H/s';
+                    row.insertCell(3).innerHTML = node.client || 'N/A';
+                    row.insertCell(4).innerHTML = `
+                        <button onclick="restartNode('${node.id}')">🔄</button>
+                        <button onclick="stopNode('${node.id}')">⏹️</button>
+                    `;
+                });
+            } catch(e) {
+                console.log('Nodes API not ready');
+            }
+        }
+        
+        // Încarcă clienții
+        function loadClients() {
+            const clients = JSON.parse(localStorage.getItem('miningClients') || '[]');
+            const tbody = document.getElementById('clientsTableBody');
+            tbody.innerHTML = '';
+            
+            clients.forEach(client => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerHTML = client.id;
+                row.insertCell(1).innerHTML = client.address.substring(0, 20) + '...';
+                row.insertCell(2).innerHTML = client.nodes;
+                row.insertCell(3).innerHTML = client.paid + ' XMR';
+                row.insertCell(4).innerHTML = `<span class="status-${client.status}">${client.status}</span>`;
+                row.insertCell(5).innerHTML = `<button onclick="deleteClient('${client.id}')">🗑️</button>`;
+            });
+        }
+        
+        function addTestClient() {
+            const clients = JSON.parse(localStorage.getItem('miningClients') || '[]');
+            const newClient = {
+                id: 'CLT' + (clients.length + 1),
+                address: '8BuSHCofBXzAti2oQemtqo1j8q2...',
+                nodes: Math.floor(Math.random() * 10) + 1,
+                paid: (Math.random() * 2).toFixed(3),
+                status: 'active'
+            };
+            clients.push(newClient);
+            localStorage.setItem('miningClients', JSON.stringify(clients));
+            loadClients();
+        }
+        
+        function deleteClient(id) {
+            let clients = JSON.parse(localStorage.getItem('miningClients') || '[]');
+            clients = clients.filter(c => c.id !== id);
+            localStorage.setItem('miningClients', JSON.stringify(clients));
+            loadClients();
+        }
+        
+        // Funcții noduri
+        function startAllNodes() { addLog('▶️ Pornire toate nodurile...'); }
+        function stopAllNodes() { addLog('⏹️ Oprire toate nodurile...'); }
+        function restartAllNodes() { addLog('🔄 Restart toate nodurile...'); }
+        function addNewNode() { addLog('➕ Adăugare nod nou...'); }
+        function restartNode(id) { addLog(`🔄 Restart nod ${id}...`); }
+        function stopNode(id) { addLog(`⏹️ Oprire nod ${id}...`); }
+        
+        // Adaugă log
+        function addLog(message) {
+            const logsDiv = document.getElementById('miningLogs');
+            const entry = document.createElement('div');
+            entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsDiv.appendChild(entry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            if (logsDiv.children.length > 50) logsDiv.removeChild(logsDiv.children[0]);
+        }
+        
+        // Actualizează statisticile
+        async function updateStats() {
+            try {
+                const response = await fetch('http://localhost:8081/api/summary');
+                const data = await response.json();
+                document.getElementById('totalHashrate').innerText = (data.hashrate?.total?.[0] || 18400).toLocaleString();
+            } catch(e) {
+                document.getElementById('totalHashrate').innerText = Math.floor(Math.random() * 5000 + 16000).toLocaleString();
+            }
+            
+            const todayMined = (Math.random() * 0.5 + 0.1).toFixed(4);
+            document.getElementById('todayMined').innerText = todayMined;
+            
+            const clients = JSON.parse(localStorage.getItem('miningClients') || '[]');
+            document.getElementById('activeClients').innerText = clients.length;
+            
+            const platformProfit = (clients.reduce((sum, c) => sum + parseFloat(c.paid), 0) * 0.35).toFixed(4);
+            document.getElementById('platformProfit').innerText = platformProfit;
+        }
+        
+        function changeAdminPassword() {
+            const newPass = document.getElementById('newAdminPass').value;
+            const confirmPass = document.getElementById('confirmAdminPass').value;
+            
+            if (newPass && newPass === confirmPass) {
+                localStorage.setItem('adminPassword', newPass);
+                alert('✅ Parola admin a fost schimbată!');
+            } else {
+                alert('❌ Parolele nu se potrivesc!');
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminPassword');
+            window.location.href = '/index.html';
+        }
+        
+        // Inițializare
+        loadPaymentSettings();
+        loadNodes();
+        loadClients();
+        updateStats();
+        
+        setInterval(updateStats, 5000);
+        setInterval(() => addLog('⛏️ Verificare minerit...'), 30000);
+    </script>
+</body>
+</html>

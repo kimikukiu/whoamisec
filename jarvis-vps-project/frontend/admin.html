@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhoamiSec | Admin Panel</title>
+    <meta name="description" content="WhoamiSec Admin Panel - Manage users, credits, and monitor platform activity.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0B0D17;
+            --bg-secondary: #111827;
+            --bg-card: #1F2937;
+            --bg-card-hover: #283548;
+            --border: rgba(255,255,255,0.08);
+            --border-glow: rgba(6,182,212,0.3);
+            --text-primary: #F9FAFB;
+            --text-secondary: #9CA3AF;
+            --text-muted: #6B7280;
+            --cyan: #06B6D4;
+            --blue: #3B82F6;
+            --emerald: #10B981;
+            --amber: #F59E0B;
+            --red: #EF4444;
+            --purple: #8B5CF6;
+            --gradient: linear-gradient(135deg, #06B6D4, #3B82F6);
+            --gradient-text: linear-gradient(135deg, #06B6D4, #8B5CF6);
+            --glass: rgba(17,24,39,0.7);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --shadow: 0 4px 30px rgba(0,0,0,0.3);
+            --shadow-glow: 0 0 40px rgba(6,182,212,0.15);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* ---- NAVBAR ---- */
+        .navbar {
+            position: fixed; top:0; left:0; right:0; z-index:1000;
+            background: var(--glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+        }
+        .navbar-inner {
+            max-width: 1200px; margin:0 auto;
+            display: flex; align-items:center; justify-content:space-between;
+            height: 64px;
+        }
+        .logo {
+            font-size: 1.3rem; font-weight: 700;
+            background: var(--gradient-text);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        .logo span { color: var(--text-primary); -webkit-text-fill-color: var(--text-primary); }
+        .nav-right { display:flex; align-items:center; gap:0.75rem; }
+        .admin-badge {
+            display: inline-flex; align-items:center; gap:0.35rem;
+            padding: 0.3rem 0.75rem;
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 6px;
+            font-size: 0.7rem; font-weight: 600;
+            color: var(--red);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .btn {
+            display: inline-flex; align-items:center; gap:0.5rem;
+            padding: 0.45rem 0.9rem; border-radius:8px;
+            font-size: 0.8rem; font-weight:500;
+            text-decoration:none; border:none; cursor:pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-ghost {
+            background: transparent; color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.15); }
+        .btn-danger {
+            background: transparent; color: var(--red);
+            border: 1px solid rgba(239,68,68,0.2);
+        }
+        .btn-danger:hover { background: rgba(239,68,68,0.1); }
+
+        /* ---- MAIN ---- */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 88px 2rem 3rem;
+        }
+
+        /* ---- STATS ---- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+        }
+        .stat-label {
+            font-size: 0.75rem; font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+        .stat-value {
+            font-size: 1.6rem; font-weight: 700;
+        }
+        .stat-value.cyan { color: var(--cyan); }
+        .stat-value.amber { color: var(--amber); }
+        .stat-value.emerald { color: var(--emerald); }
+        .stat-value.purple { color: var(--purple); }
+
+        /* ---- TABLE ---- */
+        .table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        .table-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .table-header h2 {
+            font-size: 1.05rem; font-weight: 600;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .users-table thead {
+            background: rgba(0,0,0,0.2);
+        }
+        .users-table th {
+            padding: 0.75rem 1.25rem;
+            text-align: left;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            border-bottom: 1px solid var(--border);
+        }
+        .users-table td {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: var(--text-secondary);
+        }
+        .users-table tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+        .users-table tr:last-child td { border-bottom: none; }
+
+        .user-name { color: var(--text-primary); font-weight: 500; }
+        .badge {
+            display: inline-flex;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .badge-admin {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.2);
+            color: var(--red);
+        }
+        .badge-user {
+            background: rgba(6,182,212,0.1);
+            border: 1px solid rgba(6,182,212,0.2);
+            color: var(--cyan);
+        }
+        .badge-plan {
+            background: rgba(139,92,246,0.1);
+            border: 1px solid rgba(139,92,246,0.2);
+            color: var(--purple);
+        }
+
+        .credits-input {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            background: rgba(0,0,0,0.3);
+            color: var(--amber);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 0.4rem 0.6rem;
+            width: 80px;
+            text-align: center;
+            outline: none;
+        }
+        .credits-input:focus {
+            border-color: var(--amber);
+            box-shadow: 0 0 0 2px rgba(245,158,11,0.1);
+        }
+
+        .btn-update {
+            padding: 0.4rem 0.75rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: var(--gradient);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-update:hover { box-shadow: 0 2px 10px rgba(6,182,212,0.3); }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .error-box {
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: var(--radius);
+            padding: 0.75rem 1rem;
+            font-size: 0.8rem;
+            color: var(--red);
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .error-box.show { display: block; }
+
+        /* ---- TOAST ---- */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 0.75rem 1.25rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            box-shadow: var(--shadow);
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.error { border-color: rgba(239,68,68,0.3); color: var(--red); }
+        .toast.success { border-color: rgba(16,185,129,0.3); color: var(--emerald); }
+
+        /* ---- RESPONSIVE ---- */
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .main-container { padding: 80px 1rem 2rem; }
+            .navbar { padding: 0 1rem; }
+            .users-table { font-size: 0.7rem; }
+            .users-table th, .users-table td { padding: 0.5rem 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="navbar-inner">
+        <a href="index.html" class="logo">WHOAMI<span>.SEC</span></a>
+        <div class="nav-right">
+            <span class="admin-badge">Admin Panel</span>
+            <a href="dashboard.html" class="btn btn-ghost">Dashboard</a>
+            <a href="index.html" class="btn btn-ghost">Home</a>
+            <button class="btn btn-danger" onclick="logout()">Sign Out</button>
+        </div>
+    </div>
+</nav>
+
+<div class="main-container">
+    <!-- STATS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value cyan" id="stat-users">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value amber" id="stat-revenue">0 XMR</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">API Requests</div>
+            <div class="stat-value emerald" id="stat-requests">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Transactions</div>
+            <div class="stat-value purple" id="stat-txns">0</div>
+        </div>
+    </div>
+
+    <div class="error-box" id="error-box"></div>
+
+    <!-- USERS TABLE -->
+    <div class="table-card">
+        <div class="table-header">
+            <h2>User Management</h2>
+            <button class="btn btn-ghost" onclick="loadData()">&#8635; Refresh</button>
+        </div>
+        <div class="loading" id="loading">Loading platform data...</div>
+        <div style="display:none;overflow-x:auto" id="table-wrapper">
+            <table class="users-table" id="users-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Plan</th>
+                        <th>Credits</th>
+                        <th>Admin</th>
+                        <th>API Key</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="users-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:5001' : '';
+
+    function getToken() { return localStorage.getItem('whoamisec_token'); }
+
+    function showError(msg) {
+        document.getElementById('error-box').textContent = msg;
+        document.getElementById('error-box').classList.add('show');
+    }
+    function hideError() { document.getElementById('error-box').classList.remove('show'); }
+
+    function showToast(msg, type = '') {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.className = 'toast ' + type;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Check admin access & load data
+    (async function init() {
+        const token = getToken();
+        if (!token) { window.location.href = 'login.html'; return; }
+        try {
+            const res = await fetch(API_BASE + '/api/v1/auth/me', {
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+            if (!res.ok) throw new Error('Not authenticated');
+            const data = await res.json();
+            const user = data.user || data;
+            if (!user.is_admin) {
+                showError('Access denied. Admin privileges required.');
+                return;
+            }
+            loadData();
+        } catch (e) {
+            showError('Authentication failed.');
+            setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+        }
+    })();
+
+    async function loadData() {
+        hideError();
+        const loading = document.getElementById('loading');
+        const tableWrapper = document.getElementById('table-wrapper');
+        loading.style.display = 'block';
+        tableWrapper.style.display = 'none';
+
+        try {
+            // Load stats
+            const statsRes = await fetch(API_BASE + '/api/v1/admin/stats', {
+                headers: { 'Authorization': 'Bearer ' + getToken() }
+            });
+            if (statsRes.ok) {
+                const stats = await statsRes.json();
+                document.getElementById('stat-users').textContent = stats.total_users || 0;
+                document.getElementById('stat-revenue').textContent = (stats.revenue_xmr || 0).toFixed(6) + ' XMR';
+                document.getElementById('stat-requests').textContent = (stats.total_api_requests || 0).toLocaleString();
+                document.getElementById('stat-txns').textContent = stats.total_transactions || 0;
+            }
+
+            // Load users
+            const usersRes = await fetch(API_BASE + '/api/v1/admin/users', {
+                headers: { 'Authorization': 'Bearer ' + getToken() }
+            });
+            if (!usersRes.ok) throw new Error('Failed to fetch users');
+            const users = await usersRes.json();
+
+            loading.style.display = 'none';
+            tableWrapper.style.display = 'block';
+
+            const tbody = document.getElementById('users-tbody');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="mono" style="color:var(--text-muted)">#${user.id}</td>
+                    <td class="user-name">${escapeHTML(user.username)}</td>
+                    <td>${escapeHTML(user.email || '---')}</td>
+                    <td><span class="badge badge-plan">${escapeHTML(user.plan || 'starter')}</span></td>
+                    <td>
+                        <input type="number" class="credits-input" value="${user.credits || 0}" data-userid="${user.id}" data-original="${user.credits || 0}">
+                    </td>
+                    <td><span class="badge ${user.is_admin ? 'badge-admin' : 'badge-user'}">${user.is_admin ? 'Admin' : 'User'}</span></td>
+                    <td class="mono" style="font-size:0.65rem;max-width:120px;overflow:hidden;text-overflow:ellipsis" title="${escapeHTML(user.api_key || '')}">${escapeHTML(user.api_key || '---')}</td>
+                    <td style="color:var(--text-muted);font-size:0.75rem">${user.created_at ? new Date(user.created_at).toLocaleDateString() : '---'}</td>
+                    <td>
+                        <button class="btn-update" onclick="updateUser(${user.id}, this)">Save</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (e) {
+            loading.textContent = 'Failed to load data. Make sure the backend is running.';
+            loading.style.color = 'var(--red)';
+        }
+    }
+
+    async function updateUser(userId, btn) {
+        const input = document.querySelector(`.credits-input[data-userid="${userId}"]`);
+        const newCredits = parseInt(input.value);
+        const original = parseInt(input.dataset.original);
+
+        if (newCredits === original) {
+            showToast('No changes to save');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = '...';
+
+        try {
+            const res = await fetch(API_BASE + '/api/v1/admin/user/' + userId, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + getToken()
+                },
+                body: JSON.stringify({ credits: newCredits })
+            });
+
+            if (res.ok) {
+                showToast('Credits updated to ' + newCredits, 'success');
+                input.dataset.original = newCredits;
+                btn.textContent = 'Saved';
+                setTimeout(() => { btn.textContent = 'Save'; }, 1500);
+            } else {
+                const data = await res.json();
+                showToast(data.error || 'Update failed', 'error');
+                btn.textContent = 'Save';
+            }
+        } catch (e) {
+            showToast('Failed to update', 'error');
+            btn.textContent = 'Save';
+        }
+        btn.disabled = false;
+    }
+
+    function escapeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+    }
+
+    function logout() {
+        localStorage.removeItem('whoamisec_token');
+        window.location.href = 'login.html';
+    }
+</script>
+</body>
+</html>

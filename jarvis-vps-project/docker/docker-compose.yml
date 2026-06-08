@@ -1,0 +1,183 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # NGINX - Reverse Proxy + Static Files
+  # ============================================
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../frontend:/var/www/html
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    networks:
+      - jarvis-net
+    restart: always
+
+  # ============================================
+  # JARVIS MIND - Admin VPS Control (Port 5004)
+  # ============================================
+  jarvis-mind:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    ports:
+      - "5004:5004"
+    environment:
+      - JWT_SECRET=SuperSecretKeyChangeMe123!
+      - ADMIN_USERNAME=boss
+      - ADMIN_PASSWORD=WhoamiSecBoss2026!
+    volumes:
+      - jarvis-data:/var/lib/jarvis
+      - ../logs:/var/log/jarvis
+    networks:
+      - jarvis-net
+    restart: always
+    command: python3 jarvis_mind_secure.py
+
+  # ============================================
+  # OLLAMA - AI Models Server (Port 11434)
+  # ============================================
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - jarvis-net
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 16G
+
+  # ============================================
+  # SUBSCRIPTION SYSTEM - Monetization (Port 5005)
+  # ============================================
+  subscription:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    ports:
+      - "5005:5005"
+    environment:
+      - XMR_ADDRESS=8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ
+    volumes:
+      - jarvis-data:/var/lib/jarvis
+    networks:
+      - jarvis-net
+    restart: always
+    command: python3 jarvis_subscription_system.py
+
+  # ============================================
+  # MONERO API - Enterprise (Port 5000)
+  # ============================================
+  monero-api:
+    build:
+      context: ../mining
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    env_file:
+      - ../mining/.env
+    volumes:
+      - jarvis-data:/var/lib/jarvis
+      - ../logs:/var/log/jarvis
+    networks:
+      - jarvis-net
+    restart: always
+    command: python3 api_enterprise.py
+
+  # ============================================
+  # CICADA 3301 - Puzzle Platform (Port 5050)
+  # ============================================
+  cicada3301:
+    build:
+      context: ../cicada3301
+      dockerfile: Dockerfile
+    ports:
+      - "5050:5050"
+    volumes:
+      - jarvis-data:/var/lib/jarvis
+    networks:
+      - jarvis-net
+    restart: always
+    command: python3 cicada_ultimate.py
+
+  # ============================================
+  # FLASK BACKEND - Main API (Port 5001)
+  # ============================================
+  backend-api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    volumes:
+      - jarvis-data:/var/lib/jarvis
+      - ../logs:/var/log/jarvis
+    networks:
+      - jarvis-net
+    restart: always
+    command: python3 app.py
+
+  # ============================================
+  # MINER FLEET - XMR Mining (100 Nodes)
+  # ============================================
+  miner-fleet:
+    build:
+      context: ../mining
+      dockerfile: Dockerfile.miner
+    ports:
+      - "8080:80"
+      - "8081:8081"
+    volumes:
+      - miner-data:/var/lib/xmrig
+    networks:
+      - jarvis-net
+    restart: always
+
+  # ============================================
+  # REDIS - Rate Limiting / Caching
+  # ============================================
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - jarvis-net
+    restart: always
+
+  # ============================================
+  # OPEN WEBUI - ChatGPT-like Interface
+  # ============================================
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "8080:8080"
+    volumes:
+      - open-webui-data:/app/backend/data
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    networks:
+      - jarvis-net
+    restart: always
+
+networks:
+  jarvis-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  jarvis-data:
+  ollama-data:
+  miner-data:
+  open-webui-data:
