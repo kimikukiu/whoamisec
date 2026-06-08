@@ -13,19 +13,20 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-14
     permissions:
       contents: write
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
-      - name: Select latest Xcode
-        run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+      - name: Select Xcode 15
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer || sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
       - name: Install CocoaPods
         run: |
@@ -44,36 +45,26 @@ jobs:
           cp sw.js                apk-build/www/ 2>/dev/null || true
 
           cd apk-build
-          cat > package.json << 'EOF'
-          {"name":"jarvis-mind","version":"3.0.0","scripts":{"build":"echo ok"}}
-          EOF
+
+          echo '{"name":"jarvis-mind","version":"3.0.0","scripts":{"build":"echo ok"}}' > package.json
 
           npm install --save-dev \
-            @capacitor/cli@latest \
-            @capacitor/core@latest \
-            @capacitor/ios@latest
+            @capacitor/cli@6 \
+            @capacitor/core@6 \
+            @capacitor/ios@6 2>&1 | tail -5
 
-          cat > capacitor.config.json << 'EOF'
-          {
-            "appId": "com.whoamisec.jarvis",
-            "appName": "JARVIS MIND",
-            "webDir": "www",
-            "server": {"iosScheme": "https"}
-          }
-          EOF
+          echo '{"appId":"com.whoamisec.jarvis","appName":"JARVIS MIND","webDir":"www","server":{"iosScheme":"https"}}' > capacitor.config.json
 
-          npx cap add ios
-          npx cap sync ios
+          npx cap add ios 2>&1 | tail -5
+          npx cap sync ios 2>&1 | tail -5
 
-      - name: Patch iOS deployment target — JARVIS MIND
+      - name: Patch iOS target — JARVIS MIND
         working-directory: apk-build
         run: |
           find ios -name "project.pbxproj" -exec \
-            perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = [\d.]+/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' {} \;
+            perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = [\d.]+/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' {} \;
           if [ -f ios/App/Podfile ]; then
-            perl -pi -e "s/platform :ios, '[\d.]+'/platform :ios, '13.0'/" ios/App/Podfile
-            # Remove any problematic pod sources that may timeout
-            perl -pi -e 's/pod .+/pod --repo-update/' ios/App/Podfile
+            perl -pi -e "s/platform :ios, '[\d.]+'/platform :ios, '15.0'/" ios/App/Podfile
           fi
 
       - name: Pod install — JARVIS MIND
@@ -115,32 +106,25 @@ jobs:
           cp whoamisec-business-app.html apk-build/www/index.html
 
           cd apk-build
-          rm -rf ios node_modules capacitor.config.json
+          rm -rf ios node_modules capacitor.config.json package-lock.json
 
           npm install --save-dev \
-            @capacitor/cli@latest \
-            @capacitor/core@latest \
-            @capacitor/ios@latest
+            @capacitor/cli@6 \
+            @capacitor/core@6 \
+            @capacitor/ios@6 2>&1 | tail -5
 
-          cat > capacitor.config.json << 'EOF'
-          {
-            "appId": "com.whoamisec.business",
-            "appName": "WHOAMISEC Business",
-            "webDir": "www",
-            "server": {"iosScheme": "https"}
-          }
-          EOF
+          echo '{"appId":"com.whoamisec.business","appName":"WHOAMISEC Business","webDir":"www","server":{"iosScheme":"https"}}' > capacitor.config.json
 
-          npx cap add ios
-          npx cap sync ios
+          npx cap add ios 2>&1 | tail -5
+          npx cap sync ios 2>&1 | tail -5
 
-      - name: Patch iOS deployment target — WHOAMISEC Business
+      - name: Patch iOS target — WHOAMISEC Business
         working-directory: apk-build
         run: |
           find ios -name "project.pbxproj" -exec \
-            perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = [\d.]+/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' {} \;
+            perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = [\d.]+/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' {} \;
           if [ -f ios/App/Podfile ]; then
-            perl -pi -e "s/platform :ios, '[\d.]+'/platform :ios, '13.0'/" ios/App/Podfile
+            perl -pi -e "s/platform :ios, '[\d.]+'/platform :ios, '15.0'/" ios/App/Podfile
           fi
 
       - name: Pod install — WHOAMISEC Business

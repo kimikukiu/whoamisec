@@ -16,9 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    timeout-minutes: 30
 
     env:
-      KS_PASS: WhoamiSecAdmin2026
+      KS_PASS: ${{ secrets.KEYSTORE_PASSWORD || 'WhoamiSec2026' }}
       KS_ALIAS: whoamisec
 
     steps:
@@ -26,23 +27,23 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
       - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK & NDK
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Accept Android licenses & install build-tools
+      - name: Accept licenses & install build-tools
         run: |
           yes | sdkmanager --licenses 2>/dev/null || true
           sdkmanager "build-tools;34.0.0" "platforms;android-34" "platform-tools" 2>/dev/null || true
 
       # ── Signing keystore ──────────────────────────────────────
-      - name: Generate keystore
+      - name: Generate signing keystore
         run: |
           keytool -genkeypair -v \
             -keystore "$GITHUB_WORKSPACE/whoamisec.keystore" \
@@ -51,57 +52,7 @@ jobs:
             -validity 10000 \
             -storepass "$KS_PASS" \
             -keypass "$KS_PASS" \
-            -dname "CN=WhoamiSec,OU=JARVIS,O=WhoamiSec,L=Online,ST=Online,C=US"
-
-      # ── Shared Gradle patcher ─────────────────────────────────
-      - name: Write Gradle patcher
-        run: |
-          cat > "$GITHUB_WORKSPACE/patch_gradle.py" << 'PY'
-          import re, sys, os
-
-          gradle = sys.argv[1] if len(sys.argv) > 1 else "android/app/build.gradle"
-          if not os.path.exists(gradle):
-              print(f"SKIP: {gradle} not found (Capacitor will create it)")
-              sys.exit(0)
-
-          content = open(gradle).read()
-
-          for old, new in [
-              (r'minSdkVersion\s+\d+',    'minSdkVersion 23'),
-              (r'minSdk\s+\d+',           'minSdk 23'),
-              (r'targetSdkVersion\s+\d+', 'targetSdkVersion 34'),
-              (r'targetSdk\s+\d+',        'targetSdk 34'),
-              (r'compileSdkVersion\s+\d+','compileSdkVersion 34'),
-              (r'compileSdk\s+\d+',       'compileSdk 34'),
-          ]:
-              content = re.sub(old, new, content)
-
-          content = re.sub(r'splits\s*\{[^}]*(?:\{[^}]*\}[^}]*)?\}', '', content, flags=re.DOTALL)
-
-          universal = '''
-              splits {
-                  abi {
-                      enable true
-                      reset()
-                      include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
-                      universalApk true
-                  }
-              }
-          '''
-          idx = content.find('android {')
-          if idx >= 0:
-              depth = 0
-              for i in range(idx, len(content)):
-                  if content[i] == '{': depth += 1
-                  elif content[i] == '}':
-                      depth -= 1
-                      if depth == 0:
-                          content = content[:i] + universal + content[i:]
-                          break
-
-          open(gradle, 'w').write(content)
-          print("Gradle patched OK")
-          PY
+            -dname "CN=WhoamiSec,OU=JARVIS,O=WhoamiSec,L=Bucharest,ST=BU,C=RO"
 
       # ════════════════════════════════════════════════════════
       # APK 1 — JARVIS MIND v3
@@ -114,59 +65,74 @@ jobs:
           cp sw.js                apk-build/www/ 2>/dev/null || true
 
           cd apk-build
-          cat > package.json << 'EOF'
-          {"name":"jarvis-mind","version":"3.0.0","scripts":{"build":"echo ok"}}
-          EOF
+
+          echo '{"name":"jarvis-mind","version":"3.0.0","scripts":{"build":"echo ok"}}' > package.json
 
           npm install --save-dev \
-            @capacitor/cli@latest \
-            @capacitor/core@latest \
-            @capacitor/android@latest
+            @capacitor/cli@6 \
+            @capacitor/core@6 \
+            @capacitor/android@6 2>&1 | tail -5
 
-          cat > capacitor.config.json << 'EOF'
-          {
-            "appId": "com.whoamisec.jarvis",
-            "appName": "JARVIS MIND",
-            "webDir": "www",
-            "server": {"androidScheme": "https"}
+          echo '{"appId":"com.whoamisec.jarvis","appName":"JARVIS MIND","webDir":"www","server":{"androidScheme":"https"},"android":{"allowMixedContent":true}}' > capacitor.config.json
+
+          npx cap add android 2>&1 | tail -5
+          npx cap sync android 2>&1 | tail -5
+
+      - name: Configure Gradle signing — JARVIS MIND
+        run: |
+          GRADLE_FILE="apk-build/android/app/build.gradle"
+          # Inject signing config before the android { block closes
+          SIGNING_BLOCK="
+          signingConfigs {
+              release {
+                  storeFile file('${GITHUB_WORKSPACE}/whoamisec.keystore')
+                  storePassword System.getenv('KS_PASS') ?: 'WhoamiSec2026'
+                  keyAlias '${KS_ALIAS}'
+                  keyPassword System.getenv('KS_PASS') ?: 'WhoamiSec2026'
+              }
           }
-          EOF
+          buildTypes {
+              release {
+                  signingConfig signingConfigs.release
+                  minifyEnabled false
+              }
+          }"
 
-          npx cap add android
-          npx cap sync android
+          python3 -c "
+          import sys
+          f = sys.argv[1]
+          c = open(f).read()
+          # Ensure release build type has signing
+          if 'signingConfigs' not in c:
+              c = c.replace('buildTypes {', 'signingConfigs {\n    release {\n        storeFile file(\"\\$GITHUB_WORKSPACE/whoamisec.keystore\")\n        storePassword \"\\$KS_PASS\"\n        keyAlias \"whoamisec\"\n        keyPassword \"\\$KS_PASS\"\n    }\n}\nbuildTypes {')
+              if 'signingConfig signingConfigs.release' not in c:
+                  c = c.replace('release {', 'release {\n            signingConfig signingConfigs.release')
+          # Fix SDK versions
+          import re
+          c = re.sub(r'minSdkVersion\s+\d+', 'minSdkVersion 23', c)
+          c = re.sub(r'targetSdkVersion\s+\d+', 'targetSdkVersion 34', c)
+          c = re.sub(r'compileSdkVersion\s+\d+', 'compileSdkVersion 34', c)
+          open(f, 'w').write(c)
+          print('Gradle patched')
+          " "$GRADLE_FILE"
 
-      - name: Patch Gradle — JARVIS MIND
-        working-directory: apk-build
-        run: python3 "$GITHUB_WORKSPACE/patch_gradle.py"
-
-      - name: Build JARVIS MIND release APK
+      - name: Build JARVIS MIND APK
         working-directory: apk-build/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon 2>&1 | tail -30
+          ./gradlew assembleRelease --no-daemon 2>&1 | tail -40
 
-      - name: Sign JARVIS MIND APK
+      - name: Verify JARVIS MIND APK
         run: |
-          BUILD_TOOLS=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)
-          APK_IN=$(find apk-build/android/app/build/outputs/apk/release \
-                   -name "*universal*.apk" 2>/dev/null | head -1)
-          [ -z "$APK_IN" ] && APK_IN=$(find apk-build/android/app/build/outputs/apk/release \
-                                        -name "*.apk" | head -1)
-          if [ -z "$APK_IN" ]; then
+          APK=$(find apk-build/android/app/build/outputs/apk/release -name "*.apk" | head -1)
+          if [ -z "$APK" ]; then
             echo "ERROR: No APK found!"
-            find apk-build/android/app/build/outputs/ -type f 2>/dev/null || true
+            find apk-build/android/ -name "*.apk" 2>/dev/null
             exit 1
           fi
-          echo "Signing: $APK_IN"
-          "$ANDROID_HOME/build-tools/$BUILD_TOOLS/zipalign" -v 4 "$APK_IN" jm-aligned.apk
-          "$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner" sign \
-            --ks "$GITHUB_WORKSPACE/whoamisec.keystore" \
-            --ks-pass pass:"$KS_PASS" \
-            --key-pass pass:"$KS_PASS" \
-            --ks-key-alias "$KS_ALIAS" \
-            --out JARVIS-MIND-v3.apk \
-            jm-aligned.apk
-          echo "Size: $(du -sh JARVIS-MIND-v3.apk)"
+          echo "Found APK: $APK"
+          echo "Size: $(du -sh $APK)"
+          cp "$APK" JARVIS-MIND-v3.apk
 
       # ════════════════════════════════════════════════════════
       # APK 2 — WHOAMISEC Business v16
@@ -176,56 +142,53 @@ jobs:
           cp whoamisec-business-app.html apk-build/www/index.html
 
           cd apk-build
-          rm -rf android node_modules capacitor.config.json
+          rm -rf android node_modules capacitor.config.json package-lock.json
 
           npm install --save-dev \
-            @capacitor/cli@latest \
-            @capacitor/core@latest \
-            @capacitor/android@latest
+            @capacitor/cli@6 \
+            @capacitor/core@6 \
+            @capacitor/android@6 2>&1 | tail -5
 
-          cat > capacitor.config.json << 'EOF'
-          {
-            "appId": "com.whoamisec.business",
-            "appName": "WHOAMISEC Business",
-            "webDir": "www",
-            "server": {"androidScheme": "https"}
-          }
-          EOF
+          echo '{"appId":"com.whoamisec.business","appName":"WHOAMISEC Business","webDir":"www","server":{"androidScheme":"https"},"android":{"allowMixedContent":true}}' > capacitor.config.json
 
-          npx cap add android
-          npx cap sync android
+          npx cap add android 2>&1 | tail -5
+          npx cap sync android 2>&1 | tail -5
 
-      - name: Patch Gradle — WHOAMISEC Business
-        working-directory: apk-build
-        run: python3 "$GITHUB_WORKSPACE/patch_gradle.py"
+      - name: Configure Gradle signing — WHOAMISEC Business
+        run: |
+          GRADLE_FILE="apk-build/android/app/build.gradle"
+          python3 -c "
+          import sys, re
+          f = sys.argv[1]
+          c = open(f).read()
+          if 'signingConfigs' not in c:
+              c = c.replace('buildTypes {', 'signingConfigs {\n    release {\n        storeFile file(\"\\$GITHUB_WORKSPACE/whoamisec.keystore\")\n        storePassword \"\\$KS_PASS\"\n        keyAlias \"whoamisec\"\n        keyPassword \"\\$KS_PASS\"\n    }\n}\nbuildTypes {')
+              if 'signingConfig signingConfigs.release' not in c:
+                  c = c.replace('release {', 'release {\n            signingConfig signingConfigs.release')
+          c = re.sub(r'minSdkVersion\s+\d+', 'minSdkVersion 23', c)
+          c = re.sub(r'targetSdkVersion\s+\d+', 'targetSdkVersion 34', c)
+          c = re.sub(r'compileSdkVersion\s+\d+', 'compileSdkVersion 34', c)
+          open(f, 'w').write(c)
+          print('Gradle patched')
+          " "$GRADLE_FILE"
 
-      - name: Build WHOAMISEC Business release APK
+      - name: Build WHOAMISEC Business APK
         working-directory: apk-build/android
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon 2>&1 | tail -30
+          ./gradlew assembleRelease --no-daemon 2>&1 | tail -40
 
-      - name: Sign WHOAMISEC Business APK
+      - name: Verify WHOAMISEC Business APK
         run: |
-          BUILD_TOOLS=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)
-          APK_IN=$(find apk-build/android/app/build/outputs/apk/release \
-                   -name "*universal*.apk" 2>/dev/null | head -1)
-          [ -z "$APK_IN" ] && APK_IN=$(find apk-build/android/app/build/outputs/apk/release \
-                                        -name "*.apk" | head -1)
-          if [ -z "$APK_IN" ]; then
+          APK=$(find apk-build/android/app/build/outputs/apk/release -name "*.apk" | head -1)
+          if [ -z "$APK" ]; then
             echo "ERROR: No APK found!"
+            find apk-build/android/ -name "*.apk" 2>/dev/null
             exit 1
           fi
-          echo "Signing: $APK_IN"
-          "$ANDROID_HOME/build-tools/$BUILD_TOOLS/zipalign" -v 4 "$APK_IN" ws-aligned.apk
-          "$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner" sign \
-            --ks "$GITHUB_WORKSPACE/whoamisec.keystore" \
-            --ks-pass pass:"$KS_PASS" \
-            --key-pass pass:"$KS_PASS" \
-            --ks-key-alias "$KS_ALIAS" \
-            --out WHOAMISEC-Business-v16.apk \
-            ws-aligned.apk
-          echo "Size: $(du -sh WHOAMISEC-Business-v16.apk)"
+          echo "Found APK: $APK"
+          echo "Size: $(du -sh $APK)"
+          cp "$APK" WHOAMISEC-Business-v16.apk
 
       # ════════════════════════════════════════════════════════
       # Release
@@ -243,7 +206,7 @@ jobs:
             | `JARVIS-MIND-v3.apk` | JARVIS MIND — VPS, 2700 agents, Commander, Plans |
             | `WHOAMISEC-Business-v16.apk` | Business — XMR Mining, Monero, Plans |
 
-            - Android **6.0+** (API 23) — Universal APK
+            - Android **6.0+** (API 23) — Signed APK
           files: |
             JARVIS-MIND-v3.apk
             WHOAMISEC-Business-v16.apk
