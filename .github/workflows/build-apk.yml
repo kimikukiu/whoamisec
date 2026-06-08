@@ -121,18 +121,26 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew assembleRelease --no-daemon 2>&1 | tail -40
+          echo "=== Build output structure ==="
+          find . -name "*.apk" -type f 2>/dev/null || echo "No APK found in build"
+          find app/build/outputs -type f 2>/dev/null | head -20 || echo "No outputs"
 
       - name: Verify JARVIS MIND APK
         run: |
-          APK=$(find apk-build/android/app/build/outputs/apk/release -name "*.apk" | head -1)
+          echo "Searching for APK..."
+          find apk-build/android/ -name "*.apk" -type f 2>/dev/null
+          APK=$(find apk-build/android/ -name "*.apk" -type f | head -1)
           if [ -z "$APK" ]; then
-            echo "ERROR: No APK found!"
-            find apk-build/android/ -name "*.apk" 2>/dev/null
+            echo "ERROR: No APK found anywhere!"
+            echo "Build output structure:"
+            find apk-build/android/app/build/outputs/ -type f 2>/dev/null || echo "No outputs dir"
+            find apk-build/android/app/build/ -name "*.apk" 2>/dev/null || echo "No APK in build dir"
             exit 1
           fi
           echo "Found APK: $APK"
           echo "Size: $(du -sh $APK)"
           cp "$APK" JARVIS-MIND-v3.apk
+          echo "Copied to JARVIS-MIND-v3.apk"
 
       # ════════════════════════════════════════════════════════
       # APK 2 — WHOAMISEC Business v16
@@ -177,18 +185,24 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew assembleRelease --no-daemon 2>&1 | tail -40
+          echo "=== Build output structure ==="
+          find . -name "*.apk" -type f 2>/dev/null || echo "No APK found in build"
+          find app/build/outputs -type f 2>/dev/null | head -20 || echo "No outputs"
 
       - name: Verify WHOAMISEC Business APK
         run: |
-          APK=$(find apk-build/android/app/build/outputs/apk/release -name "*.apk" | head -1)
+          echo "Searching for APK..."
+          find apk-build/android/ -name "*.apk" -type f 2>/dev/null
+          APK=$(find apk-build/android/ -name "*.apk" -type f | head -1)
           if [ -z "$APK" ]; then
-            echo "ERROR: No APK found!"
-            find apk-build/android/ -name "*.apk" 2>/dev/null
+            echo "ERROR: No APK found anywhere!"
+            find apk-build/android/app/build/outputs/ -type f 2>/dev/null || echo "No outputs dir"
             exit 1
           fi
           echo "Found APK: $APK"
           echo "Size: $(du -sh $APK)"
           cp "$APK" WHOAMISEC-Business-v16.apk
+          echo "Copied to WHOAMISEC-Business-v16.apk"
 
       # ════════════════════════════════════════════════════════
       # Release
