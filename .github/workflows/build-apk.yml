@@ -18,178 +18,149 @@ jobs:
       contents: write
     timeout-minutes: 30
 
-    env:
-      KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
-      KS_ALIAS: whoamisec
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-
-      - name: Accept licenses & install build-tools
+      - name: Accept licenses
         run: |
           yes | sdkmanager --licenses 2>/dev/null || true
           sdkmanager "build-tools;34.0.0" "platforms;android-34" "platform-tools" 2>/dev/null || true
 
-      - name: Generate signing keystore
+      - name: Generate keystore
         run: |
-          keytool -genkeypair -v \
-            -keystore whoamisec.keystore \
-            -alias whoamisec \
-            -keyalg RSA -keysize 2048 \
-            -validity 10000 \
-            -storepass "${{ secrets.KEYSTORE_PASSWORD || 'WhoamiSec2026' }}" \
-            -keypass "${{ secrets.KEYSTORE_PASSWORD || 'WhoamiSec2026' }}" \
+          STOREPASS="${STOREPASS:-WhoamiSec2026}"
+          keytool -genkeypair -v -keystore whoamisec.keystore -alias whoamisec \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass "$STOREPASS" -keypass "$STOREPASS" \
             -dname "CN=WhoamiSec,OU=JARVIS,O=WhoamiSec,L=Bucharest,ST=BU,C=RO"
 
-      - name: Create Gradle patcher script
+      - name: Create patcher script
         run: |
-          cat > patch_gradle.py << 'PYEOF'
+          cat > /tmp/patch.py << 'SCRIPT'
           import sys, re
           f = sys.argv[1]
           c = open(f).read()
           if 'signingConfigs' not in c:
-              c = c.replace('buildTypes {', 'signingConfigs {\n    release {\n        storeFile file("$GITHUB_WORKSPACE/whoamisec.keystore")\n        storePassword "$KS_PASS"\n        keyAlias "whoamisec"\n        keyPassword "$KS_PASS"\n    }\n}\nbuildTypes {')
+              sc = """\
+          signingConfigs {
+              release {
+                  storeFile file('whoamisec.keystore')
+                  storePassword System.getenv('KS_PASS') ?: 'WhoamiSec2026'
+                  keyAlias 'whoamisec'
+                  keyPassword System.getenv('KS_PASS') ?: 'WhoamiSec2026'
+              }
+          }"""
+              c = c.replace('buildTypes {', sc + '\nbuildTypes {')
               if 'signingConfig signingConfigs.release' not in c:
                   c = c.replace('release {', 'release {\n            signingConfig signingConfigs.release')
-          c = re.sub(r'minSdkVersion\s+\d+', 'minSdkVersion 23', c)
-          c = re.sub(r'targetSdkVersion\s+\d+', 'targetSdkVersion 34', c)
-          c = re.sub(r'compileSdkVersion\s+\d+', 'compileSdkVersion 34', c)
+          for pat, repl in [('minSdkVersion\\s+\\d+', 'minSdkVersion 23'), ('targetSdkVersion\\s+\\d+', 'targetSdkVersion 34'), ('compileSdkVersion\\s+\\d+', 'compileSdkVersion 34')]:
+              c = re.sub(pat, repl, c)
           open(f, 'w').write(c)
-          print('Gradle patched')
-          PYEOF
-          echo "Patcher script created"
+          print('Patched OK')
+          SCRIPT
 
-      # ════════════════════════════════════════════════════════
+      # ══════════════════════════════════════════
       # APK 1 — JARVIS MIND v3
-      # ════════════════════════════════════════════════════════
-      - name: Init Capacitor — JARVIS MIND
+      # ══════════════════════════════════════════
+      - name: Init JARVIS MIND
         run: |
           mkdir -p apk-build/www
           cp jarvis-mind-app.html apk-build/www/index.html
           cp manifest.json apk-build/www/ 2>/dev/null || true
           cp sw.js apk-build/www/ 2>/dev/null || true
           cd apk-build
-          echo '{"name":"jarvis-mind","version":"3.0.0","scripts":{"build":"echo ok"}}' > package.json
-          npm install --save-dev @capacitor/cli@6 @capacitor/core@6 @capacitor/android@6 2>&1 | tail -5
+          echo '{"name":"jarvis-mind","version":"3.0","scripts":{"build":"echo ok"}}' > package.json
+          npm install --save-dev @capacitor/cli@6 @capacitor/core@6 @capacitor/android@6 2>&1 | tail -3
           echo '{"appId":"com.whoamisec.jarvis","appName":"JARVIS MIND","webDir":"www","server":{"androidScheme":"https"},"android":{"allowMixedContent":true}}' > capacitor.config.json
-          npx cap add android 2>&1 | tail -5
-          npx cap sync android 2>&1 | tail -5
+          npx cap add android 2>&1 | tail -3
+          npx cap sync android 2>&1 | tail -3
 
-      - name: Patch Gradle — JARVIS MIND
+      - name: Patch + Build JARVIS MIND
+        env:
+          KS_PASS: "WhoamiSec2026"
         run: |
-          export GITHUB_WORKSPACE="$PWD"
-          export KS_PASS="${{ secrets.KEYSTORE_PASSWORD || 'WhoamiSec2026' }}"
-          python3 patch_gradle.py apk-build/android/app/build.gradle
-
-      - name: Build JARVIS MIND APK
-        working-directory: apk-build/android
-        run: |
+          cp whoamisec.keystore apk-build/android/app/whoamisec.keystore
+          python3 /tmp/patch.py apk-build/android/app/build.gradle
+          cat apk-build/android/app/build.gradle | grep -A2 signingConfigs || echo "No signing found"
+          cd apk-build/android
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleRelease --no-daemon 2>&1 | tail -30
+          echo "EXIT: $?"
+          find . -name "*.apk" -type f
 
       - name: Collect JARVIS MIND APK
         run: |
-          find apk-build/android -name "*.apk" -type f 2>/dev/null
-          FOUND=""
-          for dir in apk-build/android/app/build/outputs/apk/release apk-build/android/app/build/outputs/apk/debug apk-build/android/app/build/outputs/apk apk-build/android/app/build; do
-            APK=$(find "$dir" -name "*.apk" -type f 2>/dev/null | head -1)
-            if [ -n "$APK" ]; then
-              cp "$APK" JARVIS-MIND-v3.apk
-              FOUND=yes
-              break
-            fi
-          done
-          if [ -z "$FOUND" ]; then
-            APK=$(find . -maxdepth 10 -name "*.apk" -type f 2>/dev/null | grep -v keystore | head -1)
-            if [ -n "$APK" ]; then
-              cp "$APK" JARVIS-MIND-v3.apk
-              FOUND=yes
-            fi
-          fi
-          if [ "$FOUND" = "yes" ] && [ -f "JARVIS-MIND-v3.apk" ]; then
-            echo "APK ready: $(du -sh JARVIS-MIND-v3.apk)"
+          APK=$(find apk-build/android -name "*.apk" -type f | head -1)
+          if [ -n "$APK" ]; then
+            cp "$APK" JARVIS-MIND-v3.apk
+            echo "Done: $(du -sh JARVIS-MIND-v3.apk)"
           else
-            echo "FAIL: No APK produced by Gradle"
-            exit 1
+            echo "No APK built, trying debug..."
+            cd apk-build/android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon 2>&1 | tail -20
+            APK=$(find . -name "*.apk" -type f | head -1)
+            if [ -n "$APK" ]; then
+              cp "$APK" ../../JARVIS-MIND-v3.apk
+              echo "Debug APK: $(du -sh ../../JARVIS-MIND-v3.apk)"
+            else
+              echo "FAIL: No APK at all"
+              exit 1
+            fi
           fi
 
-      # ════════════════════════════════════════════════════════
+      # ══════════════════════════════════════════
       # APK 2 — WHOAMISEC Business v16
-      # ════════════════════════════════════════════════════════
-      - name: Init Capacitor — WHOAMISEC Business
+      # ══════════════════════════════════════════
+      - name: Init WHOAMISEC Business
         run: |
           cp whoamisec-business-app.html apk-build/www/index.html
           cd apk-build
           rm -rf android node_modules capacitor.config.json package-lock.json
-          npm install --save-dev @capacitor/cli@6 @capacitor/core@6 @capacitor/android@6 2>&1 | tail -5
+          npm install --save-dev @capacitor/cli@6 @capacitor/core@6 @capacitor/android@6 2>&1 | tail -3
           echo '{"appId":"com.whoamisec.business","appName":"WHOAMISEC Business","webDir":"www","server":{"androidScheme":"https"},"android":{"allowMixedContent":true}}' > capacitor.config.json
-          npx cap add android 2>&1 | tail -5
-          npx cap sync android 2>&1 | tail -5
+          npx cap add android 2>&1 | tail -3
+          npx cap sync android 2>&1 | tail -3
 
-      - name: Patch Gradle — WHOAMISEC Business
+      - name: Patch + Build WHOAMISEC Business
+        env:
+          KS_PASS: "WhoamiSec2026"
         run: |
-          export GITHUB_WORKSPACE="$PWD"
-          export KS_PASS="${{ secrets.KEYSTORE_PASSWORD || 'WhoamiSec2026' }}"
-          python3 patch_gradle.py apk-build/android/app/build.gradle
-
-      - name: Build WHOAMISEC Business APK
-        working-directory: apk-build/android
-        run: |
+          cp whoamisec.keystore apk-build/android/app/whoamisec.keystore
+          python3 /tmp/patch.py apk-build/android/app/build.gradle
+          cd apk-build/android
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleRelease --no-daemon 2>&1 | tail -30
+          echo "EXIT: $?"
+          find . -name "*.apk" -type f
 
       - name: Collect WHOAMISEC Business APK
         run: |
-          find apk-build/android -name "*.apk" -type f 2>/dev/null
-          FOUND=""
-          for dir in apk-build/android/app/build/outputs/apk/release apk-build/android/app/build/outputs/apk/debug apk-build/android/app/build/outputs/apk apk-build/android/app/build; do
-            APK=$(find "$dir" -name "*.apk" -type f 2>/dev/null | head -1)
-            if [ -n "$APK" ]; then
-              cp "$APK" WHOAMISEC-Business-v16.apk
-              FOUND=yes
-              break
-            fi
-          done
-          if [ -z "$FOUND" ]; then
-            APK=$(find . -maxdepth 10 -name "*.apk" -type f 2>/dev/null | grep -v keystore | head -1)
-            if [ -n "$APK" ]; then
-              cp "$APK" WHOAMISEC-Business-v16.apk
-              FOUND=yes
-            fi
-          fi
-          if [ "$FOUND" = "yes" ] && [ -f "WHOAMISEC-Business-v16.apk" ]; then
-            echo "APK ready: $(du -sh WHOAMISEC-Business-v16.apk)"
+          APK=$(find apk-build/android -name "*.apk" -type f | head -1)
+          if [ -n "$APK" ]; then
+            cp "$APK" WHOAMISEC-Business-v16.apk
+            echo "Done: $(du -sh WHOAMISEC-Business-v16.apk)"
           else
-            echo "FAIL: No APK produced"
+            echo "FAIL: No APK"
             exit 1
           fi
 
-      # ════════════════════════════════════════════════════════
+      # ══════════════════════════════════════════
       # Release
-      # ════════════════════════════════════════════════════════
+      # ══════════════════════════════════════════
       - name: Upload APKs to GitHub Releases
         uses: softprops/action-gh-release@v2
         with:
           tag_name: apk-${{ github.run_number }}
-          name: "WhoamiSec APKs — Build #${{ github.run_number }}"
+          name: "WhoamiSec APKs Build #${{ github.run_number }}"
           body: |
-            ## WhoamiSec APK Build #${{ github.run_number }}
-            | File | Description |
-            |------|-------------|
-            | `JARVIS-MIND-v3.apk` | JARVIS MIND — VPS, 2700 agents |
-            | `WHOAMISEC-Business-v16.apk` | Business — XMR Mining, Monero |
+            APKs built with Capacitor v6 + Gradle
           files: |
             JARVIS-MIND-v3.apk
             WHOAMISEC-Business-v16.apk
