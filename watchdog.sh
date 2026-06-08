@@ -72,6 +72,22 @@ check_and_restart_ollama() {
     fi
 }
 
+check_and_restart_cicada() {
+    if ! curl -sf http://localhost:5060/api/stats > /dev/null 2>&1; then
+        if command -v docker &>/dev/null && docker ps --format '{{.Names}}' 2>/dev/null | grep -q 'cicada-style'; then
+            log "Cicada Style container unhealthy — restarting"
+            cd "$REPO_DIR/jarvis-vps-project/docker"
+            docker compose restart cicada-style 2>&1
+        elif command -v python3 &>/dev/null; then
+            log "Cicada Style DOWN — starting direct"
+            mkdir -p /var/lib/jarvis
+            cd /opt 2>/dev/null || cd "$REPO_DIR/jarvis-vps-project/cicada3301"
+            nohup python3 cicada_3301_style.py > /var/log/cicada_3301.log 2>&1 &
+            log "Cicada Style started on :5060"
+        fi
+    fi
+}
+
 # ════════════════════════════════════════════════════════════
 # Main loop
 # ════════════════════════════════════════════════════════════
@@ -83,5 +99,6 @@ while true; do
     check_and_restart_nginx
     check_and_restart_flask
     check_and_restart_ollama
+    check_and_restart_cicada
     sleep $INTERVAL
 done

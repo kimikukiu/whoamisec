@@ -114,6 +114,22 @@ services:
     command: python3 cicada_ultimate.py
 
   # ============================================
+  # CICADA 3301 STYLE - With Our Design (Port 5060)
+  # ============================================
+  cicada-style:
+    build:
+      context: ../cicada3301
+      dockerfile: Dockerfile
+    ports:
+      - "5060:5060"
+    volumes:
+      - jarvis-data:/var/lib/jarvis
+    networks:
+      - jarvis-net
+    restart: always
+    command: python3 cicada_3301_style.py
+
+  # ============================================
   # FLASK BACKEND - Main API (Port 5001)
   # ============================================
   backend-api:
