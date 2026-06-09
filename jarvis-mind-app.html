@@ -290,6 +290,9 @@
         .code-block-btns { display:flex; gap:0.3rem; margin-top:0.22rem; }
         .code-run-btn { padding:0.18rem 0.5rem; border-radius:5px; border:1px solid rgba(16,185,129,0.25); background:rgba(16,185,129,0.07); color:var(--emerald); font-size:0.64rem; cursor:pointer; font-family:'JetBrains Mono',monospace; }
         .code-edit-btn { padding:0.18rem 0.5rem; border-radius:5px; border:1px solid rgba(139,92,246,0.25); background:rgba(139,92,246,0.07); color:var(--purple); font-size:0.64rem; cursor:pointer; font-family:'JetBrains Mono',monospace; }
+        .cipher-banner { font-family:'JetBrains Mono',monospace; font-size:0.78rem; font-weight:700; letter-spacing:0.1em; color:#39ff14; text-shadow:0 0 8px #39ff14,0 0 18px rgba(57,255,20,0.5); text-align:center; padding:0.5rem 0.75rem; margin-bottom:0.75rem; background:rgba(57,255,20,0.04); border:1px solid rgba(57,255,20,0.15); border-radius:8px; animation:cipher-glow-j 3s ease-in-out infinite,cipher-flick-j 9s steps(1) infinite; }
+        @keyframes cipher-glow-j { 0%,100%{text-shadow:0 0 8px #39ff14,0 0 18px rgba(57,255,20,.5);}50%{text-shadow:0 0 18px #39ff14,0 0 38px rgba(57,255,20,.9);} }
+        @keyframes cipher-flick-j { 0%,88%,100%{opacity:1;}89%,91%{opacity:.1;}90%{opacity:1;} }
         @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
 
         /* Terminal */
@@ -431,6 +434,7 @@
 
     <!-- TAB 1: DASHBOARD -->
     <div class="tab-pane active" id="tab-dashboard">
+        <div class="cipher-banner">W 3 w1|../_&nbsp;&nbsp;&nbsp;F1|\|)&nbsp;&nbsp;Y[][_]&nbsp;&nbsp;3301</div>
         <div class="stats-row">
             <div class="stat-box">
                 <div class="stat-label">VPS Online</div>

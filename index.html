@@ -143,6 +143,19 @@
             font-size:1.15rem; color:var(--text-secondary);
             max-width:520px; margin-bottom:2rem;
         }
+        .hero-cipher {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem; font-weight: 700; letter-spacing: 0.1em;
+            color: #39ff14;
+            text-shadow: 0 0 8px #39ff14, 0 0 20px rgba(57,255,20,0.5);
+            margin-bottom: 1.5rem;
+            animation: cipher-glow-w 3s ease-in-out infinite, cipher-flick 9s steps(1) infinite;
+        }
+        @keyframes cipher-glow-w {
+            0%,100%{text-shadow:0 0 8px #39ff14,0 0 20px rgba(57,255,20,.5);}
+            50%{text-shadow:0 0 18px #39ff14,0 0 40px rgba(57,255,20,.9),0 0 60px rgba(57,255,20,.3);}
+        }
+        @keyframes cipher-flick { 0%,88%,100%{opacity:1;}89%,91%{opacity:.15;}90%{opacity:1;} }
         .hero-actions { display:flex; gap:1rem; flex-wrap:wrap; }
         .hero-visual {
             position:relative; display:flex; justify-content:center; align-items:center;
@@ -414,6 +427,7 @@
             <div class="hero-badge">AI Infrastructure &mdash; Live</div>
             <h1>Anonymous AI<br>Infrastructure<br><span class="gradient">for Everyone</span></h1>
             <p>Privacy-first AI platform with zero KYC. Run powerful open-source models through a scalable API, pay with Monero, and build without boundaries.</p>
+            <div class="hero-cipher">W 3 w1|../_&nbsp;&nbsp;&nbsp;F1|\|)&nbsp;&nbsp;Y[][_]&nbsp;&nbsp;3301</div>
             <div class="hero-actions">
                 <a href="/login.html" class="btn btn-primary btn-lg">Start Building &rarr;</a>
                 <a href="#api" class="btn btn-outline btn-lg">View API Docs</a>

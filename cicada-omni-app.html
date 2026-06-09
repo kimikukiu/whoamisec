@@ -67,6 +67,16 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',
   animation:btn-pulse 2s ease-in-out infinite;
 }
 @keyframes btn-pulse{0%,100%{box-shadow:0 0 8px var(--green);}50%{box-shadow:0 0 24px var(--green),0 0 48px rgba(57,255,20,.3);}}
+.splash-cipher{
+  margin-top:1.4rem;
+  font-family:'Courier New',monospace;font-size:1.05rem;font-weight:700;
+  letter-spacing:.12em;color:var(--green);
+  text-shadow:0 0 10px var(--green),0 0 22px rgba(57,255,20,.6);
+  animation:cipher-glow 3s ease-in-out infinite, cipher-scan 8s steps(1) infinite;
+  text-align:center;
+}
+@keyframes cipher-glow{0%,100%{text-shadow:0 0 10px var(--green),0 0 22px rgba(57,255,20,.6);}50%{text-shadow:0 0 24px var(--green),0 0 50px rgba(57,255,20,.9),0 0 80px rgba(57,255,20,.4);}}
+@keyframes cipher-scan{0%,85%,100%{opacity:1;}86%,88%,90%{opacity:.1;}87%,89%{opacity:1;}}
 
 /* ── MAIN APP ── */
 #app{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;overflow:hidden;}
@@ -216,6 +226,7 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',
     <path d="M110 67 Q145 55 175 52" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
     <path d="M110 72 Q145 78 178 85" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
   </svg>
+  <div class="splash-cipher">W 3 w1|../_&nbsp;&nbsp;&nbsp;F1|\|)&nbsp;&nbsp;Y[][_]&nbsp;&nbsp;3301</div>
   <button class="splash-enter" onclick="enterApp()">▶ ENTER THE PUZZLE</button>
 </div>
 
@@ -236,6 +247,7 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',
       <div style="text-align:center;margin-bottom:1rem;padding:.75rem;background:rgba(0,0,0,.7);border:1px solid rgba(255,32,32,.25);border-radius:8px;">
         <div style="font-size:1.6rem;font-weight:900;letter-spacing:.2em;" class="color-cycle">CICADA 3301</div>
         <div style="font-size:.72rem;color:rgba(255,255,255,.5);margin-top:.2rem;letter-spacing:.1em;">WE ARE LOOKING FOR HIGHLY INTELLIGENT INDIVIDUALS</div>
+        <div style="font-family:'Courier New',monospace;font-size:.72rem;font-weight:700;letter-spacing:.1em;color:#39ff14;text-shadow:0 0 8px #39ff14,0 0 18px rgba(57,255,20,.5);margin-top:.4rem;animation:cipher-glow 3s ease-in-out infinite,cipher-scan 8s steps(1) infinite;">W 3 w1|../_&nbsp;&nbsp;&nbsp;F1|\|)&nbsp;&nbsp;Y[][_]&nbsp;&nbsp;3301</div>
         <div style="margin-top:.5rem;">
           <svg width="80" height="50" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg" style="animation:moth-color 6s linear infinite;">
             <ellipse cx="75" cy="70" rx="68" ry="38" fill="none" stroke="#39ff14" stroke-width="2"/>
