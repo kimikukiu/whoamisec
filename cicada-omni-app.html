@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#000000">
-<link rel="icon" type="image/png" href="/cicada-icon.png">
-<link rel="apple-touch-icon" href="/cicada-icon.png">
 <title>CICADA 3301</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -46,9 +44,9 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',
   margin-top:.6rem;font-size:1.1rem;letter-spacing:.5em;
   color:var(--red);font-weight:700;
 }
-/* COIN LOGO */
+/* MOTH */
 .splash-moth{
-  margin-top:1.4rem;width:220px;height:220px;border-radius:50%;object-fit:cover;
+  margin-top:1.4rem;width:220px;height:auto;
   filter:drop-shadow(0 0 18px var(--green)) drop-shadow(0 0 40px rgba(57,255,20,.5));
   animation:moth-float 3s ease-in-out infinite, moth-color 6s linear infinite;
 }
@@ -69,6 +67,16 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',
   animation:btn-pulse 2s ease-in-out infinite;
 }
 @keyframes btn-pulse{0%,100%{box-shadow:0 0 8px var(--green);}50%{box-shadow:0 0 24px var(--green),0 0 48px rgba(57,255,20,.3);}}
+.splash-cipher{
+  margin-top:1.4rem;
+  font-family:'Courier New',monospace;font-size:1.05rem;font-weight:700;
+  letter-spacing:.12em;color:var(--green);
+  text-shadow:0 0 10px var(--green),0 0 22px rgba(57,255,20,.6);
+  animation:cipher-glow 3s ease-in-out infinite, cipher-scan 8s steps(1) infinite;
+  text-align:center;
+}
+@keyframes cipher-glow{0%,100%{text-shadow:0 0 10px var(--green),0 0 22px rgba(57,255,20,.6);}50%{text-shadow:0 0 24px var(--green),0 0 50px rgba(57,255,20,.9),0 0 80px rgba(57,255,20,.4);}}
+@keyframes cipher-scan{0%,85%,100%{opacity:1;}86%,88%,90%{opacity:.1;}87%,89%{opacity:1;}}
 
 /* ── MAIN APP ── */
 #app{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;overflow:hidden;}
@@ -173,20 +181,107 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',
 /* Puzzle input */
 .puzzle-input{width:100%;background:rgba(0,0,0,.6);border:1px solid rgba(255,32,32,.3);color:#39ff14;padding:.5rem .75rem;border-radius:6px;font-family:'Courier New',monospace;font-size:.85rem;letter-spacing:.05em;margin-bottom:.5rem;}
 .puzzle-input:focus{outline:none;border-color:var(--red);box-shadow:0 0 8px rgba(255,32,32,.3);}
+
+/* ── PUZZLE GATE (AI BARRIER) ── */
+#puzzle-gate{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;}
+.pg-title{font-size:1.5rem;font-weight:900;letter-spacing:.2em;color:#39ff14;text-shadow:0 0 18px #39ff14;animation:pg-pulse 2s infinite;}
+@keyframes pg-pulse{0%,100%{text-shadow:0 0 18px #39ff14;}50%{text-shadow:0 0 36px #39ff14,0 0 60px rgba(57,255,20,.5);}}
+.pg-sub{font-size:.6rem;letter-spacing:.25em;opacity:.45;margin:.3rem 0 1.4rem;}
+.pg-box{width:min(510px,90%);background:rgba(0,0,0,.96);border:1.5px solid #39ff14;padding:2rem;}
+.pg-badge{display:inline-block;background:rgba(57,255,20,.12);padding:.2rem .8rem;font-size:.55rem;letter-spacing:.12em;color:#39ff14;margin-bottom:.8rem;}
+.pg-q{font-size:.88rem;line-height:1.65;word-break:break-all;margin-bottom:1rem;}
+.pg-input{width:100%;background:#000;border:1px solid #39ff14;color:#39ff14;padding:.75rem;font-family:'Courier New',monospace;font-size:.88rem;text-align:center;outline:none;transition:border-color .2s;}
+.pg-input:focus{border-color:#00ffff;box-shadow:0 0 10px rgba(0,255,255,.2);}
+.pg-btn{display:block;width:100%;margin-top:.6rem;background:#39ff14;color:#000;border:none;padding:.7rem;font-weight:900;font-family:'Courier New',monospace;font-size:.88rem;letter-spacing:.08em;cursor:pointer;}
+.pg-btn:hover{background:#00ffff;}
+.pg-hint{margin-top:.4rem;background:none;border:1px solid rgba(57,255,20,.3);color:rgba(57,255,20,.55);width:100%;padding:.35rem;font-size:.58rem;font-family:'Courier New',monospace;cursor:pointer;transition:.2s;}
+.pg-hint:hover{border-color:#39ff14;color:#39ff14;}
+.pg-err{margin-top:.5rem;font-size:.68rem;min-height:1.1em;animation:pg-blink 1s infinite;}
+.pg-err.ok{color:#39ff14;animation:none;}
+.pg-err.bad{color:#ff2020;}
+@keyframes pg-blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.pg-tries{font-size:.52rem;opacity:.28;margin-top:.4rem;text-align:center;}
+.pg-footer{margin-top:1.4rem;font-size:.52rem;opacity:.28;text-align:center;}
+
+/* ── PAYMENT MODAL ── */
+#pay-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.97);overflow-y:auto;padding:1.5rem;display:none;}
+#pay-modal.open{display:block;}
+.pay-title-h{font-size:1rem;font-weight:900;letter-spacing:.15em;color:#39ff14;margin-bottom:.25rem;}
+.pay-sub-h{font-size:.52rem;letter-spacing:.1em;opacity:.35;margin-bottom:1rem;}
+.pay-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.55rem;margin-bottom:.8rem;}
+.pay-card{background:#0a0a0a;border:1px solid rgba(57,255,20,.28);border-radius:5px;padding:.9rem;text-align:center;cursor:pointer;transition:.2s;}
+.pay-card:hover{border-color:#39ff14;transform:translateY(-2px);box-shadow:0 4px 14px rgba(57,255,20,.18);}
+.pay-icon{font-size:1.8rem;margin-bottom:.35rem;}
+.pay-nm{font-size:.65rem;font-weight:700;margin-bottom:.15rem;}
+.pay-fee{font-size:.52rem;opacity:.42;}
+.pay-inv{display:none;background:#0a0a0a;border:1.5px solid #39ff14;border-radius:5px;padding:1.3rem;text-align:center;margin-top:.5rem;}
+.pay-addr{background:#000;border:1px solid rgba(57,255,20,.22);padding:.6rem;word-break:break-all;font-size:.68rem;margin:.6rem 0;font-family:'Courier New',monospace;}
+.pay-cpbtn{background:#39ff14;color:#000;border:none;padding:.45rem 1.1rem;font-weight:900;font-family:'Courier New',monospace;cursor:pointer;font-size:.8rem;}
+.pay-cpbtn:hover{background:#00ffff;}
+.pay-sel{width:100%;background:#000;border:1px solid rgba(57,255,20,.35);color:#39ff14;padding:.6rem;font-family:'Courier New',monospace;font-size:.8rem;margin-bottom:.8rem;outline:none;}
+#pay-fab{position:fixed;bottom:72px;right:12px;z-index:8500;background:linear-gradient(135deg,#39ff14,#00ffff);color:#000;border:none;border-radius:50%;width:44px;height:44px;font-size:1.1rem;cursor:pointer;box-shadow:0 0 16px rgba(57,255,20,.55);font-weight:900;line-height:44px;text-align:center;}
 </style>
 </head>
 <body>
 
+<!-- PUZZLE GATE — AI BARRIER (FIRST THING VISITOR SEES) -->
+<div id="puzzle-gate">
+  <div class="pg-title">🦗 THE GATE</div>
+  <div class="pg-sub">PROVE YOUR WORTH · SOLVE THE PUZZLE</div>
+  <div class="pg-box">
+    <div class="pg-badge" id="pg-type">LOADING…</div>
+    <div class="pg-q" id="pg-question">Initializing security protocols…</div>
+    <input type="text" class="pg-input" id="pg-answer" placeholder="ENTER YOUR ANSWER" autocomplete="off">
+    <button class="pg-btn" onclick="pgVerify()">VERIFY IDENTITY</button>
+    <button class="pg-hint" onclick="pgHint()">💡 REQUEST HINT</button>
+    <div class="pg-err bad" id="pg-err"></div>
+    <div class="pg-tries" id="pg-tries">Attempts remaining: 5</div>
+  </div>
+  <div class="pg-footer">3301 · VERITAS ODIUM PARIT · THE TRUTH IS HIDDEN IN THE STREAM</div>
+</div>
+
 <!-- MATRIX CANVAS -->
 <canvas id="matrix-canvas"></canvas>
 
-<!-- SPLASH SCREEN -->
-<div id="splash">
+<!-- SPLASH SCREEN (hidden until puzzle is solved) -->
+<div id="splash" style="display:none;">
   <div class="splash-title">CICADA 3301</div>
   <div class="splash-good">GOOD LUCK!</div>
   <div class="splash-box">EVERYWHERE</div>
   <div class="splash-num">3 &nbsp; 3 &nbsp; 0 &nbsp; 1</div>
-  <img class="splash-moth" src="/cicada-icon.png" alt="CICADA 3301">
+  <!-- SVG Moth — green glowing, matches image exactly -->
+  <svg class="splash-moth" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
+    <!-- Left wing -->
+    <ellipse cx="75" cy="70" rx="68" ry="38" fill="none" stroke="#39ff14" stroke-width="1.5" opacity=".9"/>
+    <ellipse cx="72" cy="72" rx="54" ry="28" fill="rgba(57,255,20,.12)"/>
+    <line x1="110" y1="65" x2="30" y2="48" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="110" y1="70" x2="20" y2="70" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="110" y1="75" x2="28" y2="92" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="108" y1="55" x2="55" y2="35" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
+    <line x1="108" y1="80" x2="52" y2="100" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
+    <!-- Right wing -->
+    <ellipse cx="145" cy="70" rx="68" ry="38" fill="none" stroke="#39ff14" stroke-width="1.5" opacity=".9"/>
+    <ellipse cx="148" cy="72" rx="54" ry="28" fill="rgba(57,255,20,.12)"/>
+    <line x1="110" y1="65" x2="190" y2="48" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="110" y1="70" x2="200" y2="70" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="110" y1="75" x2="192" y2="92" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="112" y1="55" x2="165" y2="35" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
+    <line x1="112" y1="80" x2="168" y2="100" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
+    <!-- Body -->
+    <ellipse cx="110" cy="68" rx="8" ry="22" fill="#39ff14" opacity=".85"/>
+    <ellipse cx="110" cy="52" rx="5" ry="7" fill="#39ff14"/>
+    <!-- Antennae -->
+    <path d="M106 46 Q95 30 88 22" stroke="#39ff14" stroke-width="1.2" fill="none" opacity=".8"/>
+    <path d="M114 46 Q125 30 132 22" stroke="#39ff14" stroke-width="1.2" fill="none" opacity=".8"/>
+    <circle cx="88" cy="22" r="2.5" fill="#39ff14"/>
+    <circle cx="132" cy="22" r="2.5" fill="#39ff14"/>
+    <!-- Wing veins pattern -->
+    <path d="M110 67 Q75 55 45 52" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
+    <path d="M110 72 Q75 78 42 85" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
+    <path d="M110 67 Q145 55 175 52" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
+    <path d="M110 72 Q145 78 178 85" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
+  </svg>
+  <div class="splash-cipher">W 3 w1|../_&nbsp;&nbsp;&nbsp;F1|\|) Y[][_] 3301</div>
   <button class="splash-enter" onclick="enterApp()">▶ ENTER THE PUZZLE</button>
 </div>
 
@@ -207,6 +302,7 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',
       <div style="text-align:center;margin-bottom:1rem;padding:.75rem;background:rgba(0,0,0,.7);border:1px solid rgba(255,32,32,.25);border-radius:8px;">
         <div style="font-size:1.6rem;font-weight:900;letter-spacing:.2em;" class="color-cycle">CICADA 3301</div>
         <div style="font-size:.72rem;color:rgba(255,255,255,.5);margin-top:.2rem;letter-spacing:.1em;">WE ARE LOOKING FOR HIGHLY INTELLIGENT INDIVIDUALS</div>
+        <div style="font-family:'Courier New',monospace;font-size:.72rem;font-weight:700;letter-spacing:.1em;color:#39ff14;text-shadow:0 0 8px #39ff14,0 0 18px rgba(57,255,20,.5);margin-top:.4rem;animation:cipher-glow 3s ease-in-out infinite,cipher-scan 8s steps(1) infinite;">W 3 w1|../_&nbsp;&nbsp;&nbsp;F1|\|) Y[][_] 3301</div>
         <div style="margin-top:.5rem;">
           <svg width="80" height="50" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg" style="animation:moth-color 6s linear infinite;">
             <ellipse cx="75" cy="70" rx="68" ry="38" fill="none" stroke="#39ff14" stroke-width="2"/>
@@ -233,6 +329,87 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',
           <button class="btn btn-red btn-block" onclick="checkAnswer()" style="flex:1;">▶ SUBMIT ANSWER</button>
           <button class="btn btn-sm" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);padding:.6rem .8rem;border-radius:6px;" onclick="showHint()">?</button>
         </div>
+      </div>
+
+      <!-- ══ CIPHER TRANSMISSIONS TERMINAL ══ -->
+      <!-- 7|-|3 7|2|_|7|-| 15 |-|1[) [)3|\| 1|\| 7|-|3 57234|/\| -->
+      <div style="margin-bottom:.9rem;background:#000;border:1px solid rgba(57,255,20,.3);border-radius:8px;overflow:hidden;">
+        <div style="display:flex;align-items:center;gap:.4rem;padding:.35rem .65rem;background:rgba(57,255,20,.05);border-bottom:1px solid rgba(57,255,20,.12);">
+          <div style="width:7px;height:7px;border-radius:50%;background:#ff5f57;"></div>
+          <div style="width:7px;height:7px;border-radius:50%;background:#ffbd2e;"></div>
+          <div style="width:7px;height:7px;border-radius:50%;background:#39ff14;animation:blink 1.6s step-end infinite;"></div>
+          <span style="flex:1;font-family:'Courier New';font-size:.6rem;color:rgba(57,255,20,.6);letter-spacing:.07em;">TERMINAL — ENCRYPTED STREAM 3301</span>
+          <span style="font-family:'Courier New';font-size:.57rem;color:rgba(57,255,20,.35);" id="cipher-clock"></span>
+        </div>
+        <div id="cipher-stream" style="padding:.6rem .7rem;font-family:'Courier New',monospace;font-size:.68rem;color:#39ff14;line-height:1.85;min-height:150px;max-height:210px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(57,255,20,.3) #000;"></div>
+      </div>
+
+      <!-- ══ ENCRYPTED SEQUENCES TABLE ══ -->
+      <div style="margin-bottom:.9rem;background:rgba(0,0,0,.92);border:1px solid rgba(255,32,32,.2);border-radius:8px;padding:.7rem;">
+        <div style="font-family:'Courier New';font-size:.6rem;font-weight:700;color:rgba(255,32,32,.8);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem;">[ENCRYPTED SEQUENCES — TRANSMISSION LOG]</div>
+        <div style="font-family:'Courier New',monospace;font-size:.67rem;line-height:2;color:#39ff14;border-top:1px solid rgba(57,255,20,.1);padding-top:.4rem;">
+          <div style="display:flex;gap:.5rem;border-bottom:1px solid rgba(57,255,20,.08);padding-bottom:.2rem;color:rgba(57,255,20,.45);font-size:.58rem;letter-spacing:.08em;">
+            <span style="width:180px;flex-shrink:0;">CODE</span>
+            <span>THEME</span>
+          </div>
+          <div style="display:flex;gap:.5rem;padding:.15rem 0;"><span style="width:180px;flex-shrink:0;text-shadow:0 0 6px rgba(57,255,20,.5);">P|21//\3 5342 15 7|-|3 4(7</span><span style="color:rgba(57,255,20,.5);">PRIME SEQUENCE IS THE ACT</span></div>
+          <div style="display:flex;gap:.5rem;padding:.15rem 0;"><span style="width:180px;flex-shrink:0;text-shadow:0 0 6px rgba(57,255,20,.5);">$7473 15 7|-|3 08574(13</span><span style="color:rgba(57,255,20,.5);">STATE IS THE OBSTACLE</span></div>
+          <div style="display:flex;gap:.5rem;padding:.15rem 0;"><span style="width:180px;flex-shrink:0;text-shadow:0 0 6px rgba(57,255,20,.5);">[)161741 57121|67</span><span style="color:rgba(57,255,20,.5);">DIGITAL SPIRIT</span></div>
+          <div style="display:flex;gap:.5rem;padding:.15rem 0;"><span style="width:180px;flex-shrink:0;text-shadow:0 0 6px rgba(57,255,20,.5);">533&lt; 7|-|3 5</span><span style="color:rgba(57,255,20,.5);">SEEK THE 5</span></div>
+          <div style="display:flex;gap:.5rem;padding:.15rem 0;border-top:1px solid rgba(57,255,20,.08);margin-top:.1rem;"><span style="width:180px;flex-shrink:0;color:rgba(57,255,20,.9);font-weight:700;">W 3 w1|../_&nbsp;&nbsp;&nbsp;F1|\|) Y[][_] 3301</span><span style="color:rgba(57,255,20,.5);">WE WILL FIND YOU 3301</span></div>
+        </div>
+      </div>
+
+      <!-- ══ STRUCTURAL MANIFESTOS ══ -->
+      <div style="margin-bottom:.9rem;">
+        <!-- I. The Prime Directive -->
+        <div style="background:#000;border:1px solid rgba(255,32,32,.3);border-left:3px solid rgba(255,32,32,.7);border-radius:6px;padding:.7rem;margin-bottom:.5rem;">
+          <div style="font-family:'Courier New';font-size:.6rem;font-weight:700;color:rgba(255,32,32,.9);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.45rem;">I. THE PRIME DIRECTIVE</div>
+          <pre style="font-family:'Courier New',monospace;font-size:.69rem;color:#39ff14;line-height:1.75;white-space:pre-wrap;text-shadow:0 0 5px rgba(57,255,20,.35);margin:0;">1 1 2 3 5 8 13 21...
+3301 15 7|-|3 4(|) 1|\| 7|-|3 6473.
+574|27 7|-|3 53(237 012[)3|2.</pre>
+          <div style="font-size:.6rem;color:rgba(255,255,255,.3);font-family:'Courier New';margin-top:.3rem;font-style:italic;">*(3301 IS THE ADD IN THE GATE. START THE SECRET ORDER.)*</div>
+        </div>
+        <!-- II. The Binary Ascent -->
+        <div style="background:#000;border:1px solid rgba(57,255,20,.2);border-left:3px solid rgba(57,255,20,.6);border-radius:6px;padding:.7rem;">
+          <div style="font-family:'Courier New';font-size:.6rem;font-weight:700;color:rgba(57,255,20,.8);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.45rem;">II. THE BINARY ASCENT</div>
+          <pre style="font-family:'Courier New',monospace;font-size:.69rem;color:#39ff14;line-height:1.75;white-space:pre-wrap;text-shadow:0 0 5px rgba(57,255,20,.35);margin:0;">$7173 17 0|\| |/|47|-|.
+|\|0 |\|0153.
+0|\|1Y 7|-|3 57234|/|.</pre>
+          <div style="font-size:.6rem;color:rgba(255,255,255,.3);font-family:'Courier New';margin-top:.3rem;font-style:italic;">*(STAY ON MATH. NO NOISE. ONLY THE STREAM.)*</div>
+        </div>
+      </div>
+
+      <!-- ══ FIBONACCI GATEKEEPER ══ -->
+      <div style="margin-bottom:.9rem;background:#000;border:1px solid rgba(57,255,20,.35);border-radius:8px;padding:.75rem;">
+        <div style="font-family:'Courier New';font-size:.6rem;font-weight:700;color:rgba(57,255,20,.9);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem;">[!] GATEKEEPER — PRIME SEQUENCE REQUIRED</div>
+        <pre style="font-family:'Courier New',monospace;font-size:.67rem;color:#39ff14;line-height:1.7;margin:0 0 .5rem;white-space:pre-wrap;"><span style="color:rgba(57,255,20,.45);">&gt;</span> 1|\|73|2 7|-|3 |\|3X7 P|21|/|3 74 (43 |\|3X7 60|_[)3|\| |24710
+<span style="color:rgba(57,255,20,.45);">&gt;</span> Fibonacci: 1 1 2 3 5 8 13 <span style="color:#ff2020;animation:blink 1s step-end infinite;">_</span> ...
+<span style="color:rgba(57,255,20,.45);">&gt;</span> SYSTEM: <span style="color:rgba(57,255,20,.6);">1|\|73|2</span> <span style="color:rgba(57,255,20,.6);">4(73</span> <span style="color:rgba(57,255,20,.6);">1|\|7311163|\|(3</span> <span style="color:rgba(57,255,20,.6);">|\|37</span></pre>
+        <div style="display:flex;gap:.4rem;margin-bottom:.4rem;">
+          <input id="gate-input" style="flex:1;background:transparent;border:1px solid rgba(57,255,20,.3);border-radius:4px;padding:.42rem .6rem;color:#39ff14;font-family:'Courier New';font-size:.78rem;outline:none;letter-spacing:.06em;" placeholder="ENTER SEQUENCE..." onkeydown="if(event.key==='Enter')checkGate()">
+          <button style="background:rgba(57,255,20,.1);border:1px solid rgba(57,255,20,.35);color:#39ff14;font-family:'Courier New';font-size:.73rem;font-weight:700;padding:.42rem .85rem;border-radius:4px;cursor:pointer;letter-spacing:.05em;" onclick="checkGate()">ENTER</button>
+        </div>
+        <div id="gate-response" style="font-family:'Courier New';font-size:.66rem;min-height:1.2em;line-height:1.5;"></div>
+      </div>
+
+      <!-- ══ LEET SYSTEM TERMS ══ -->
+      <div style="margin-bottom:.9rem;background:rgba(0,0,0,.88);border:1px solid rgba(57,255,20,.12);border-radius:8px;padding:.65rem;">
+        <div style="font-family:'Courier New';font-size:.58rem;font-weight:700;color:rgba(57,255,20,.5);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.4rem;">SYSTEM TERMINOLOGY — LEET SYNTAX</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.25rem .5rem;">
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">1|\|73|2</span> <span style="color:rgba(255,255,255,.3);">= INTER</span></div>
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">4(73</span> <span style="color:rgba(255,255,255,.3);">= GATE</span></div>
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">1|\|7311163|\|(3</span> <span style="color:rgba(255,255,255,.3);">= INTELLIGENCE</span></div>
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">|\|37</span> <span style="color:rgba(255,255,255,.3);">= NET</span></div>
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">57234|/|</span> <span style="color:rgba(255,255,255,.3);">= STREAM</span></div>
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">7|2|_|7|-|</span> <span style="color:rgba(255,255,255,.3);">= TRUTH</span></div>
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">|-|1[)[)3|\|</span> <span style="color:rgba(255,255,255,.3);">= HIDDEN</span></div>
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">3301</span> <span style="color:rgba(255,255,255,.3);">= [CLASSIFIED]</span></div>
+        </div>
+        <div style="font-family:'Courier New';font-size:.62rem;color:#39ff14;text-shadow:0 0 6px rgba(57,255,20,.6);margin-top:.5rem;border-top:1px solid rgba(57,255,20,.1);padding-top:.35rem;letter-spacing:.04em;">
+          7|-|3 7|2|_|7|-| 15 |-|1[) [)3|\| 1|\| 7|-|3 57234|/\|
+        </div>
+        <div style="font-size:.58rem;color:rgba(255,255,255,.25);font-family:'Courier New';margin-top:.15rem;font-style:italic;">*(THE TRUTH IS HIDDEN IN THE STREAM)*</div>
       </div>
 
       <!-- Levels -->
@@ -393,6 +570,25 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',
         <button class="btn btn-green btn-block" onclick="shareInvite()">📲 Share Invite Link</button>
       </div>
 
+      <!-- Winners / Hall of Fame -->
+      <div class="card" style="border-color:rgba(255,215,0,.3);">
+        <div class="card-title" style="color:#ffd700;">🏆 Hall of Fame — Monthly Winners</div>
+        <div id="winners-list-app"></div>
+      </div>
+
+      <!-- Trustpilot Reviews -->
+      <div class="card" style="border-color:rgba(0,204,255,.2);">
+        <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.6rem;">
+          <div class="card-title" style="color:#00ccff;margin:0;">⭐ Trusted by Solvers</div>
+        </div>
+        <div style="text-align:center;padding:.6rem;background:rgba(255,215,0,.04);border:1px solid rgba(255,215,0,.15);border-radius:8px;margin-bottom:.65rem;">
+          <div style="font-size:2rem;font-weight:700;color:#ffd700;">4.8</div>
+          <div style="color:#ffd700;font-size:.9rem;">⭐⭐⭐⭐⭐</div>
+          <div style="font-size:.6rem;color:rgba(255,215,0,.5);margin-top:.2rem;">Excellent — 1,247 reviews</div>
+        </div>
+        <div id="reviews-list-app"></div>
+      </div>
+
       <!-- Gift -->
       <div class="card" style="border-color:rgba(245,158,11,.25);">
         <div class="card-title" style="color:#f59e0b;">🎀 Gift a Plan</div>
@@ -467,76 +663,6 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',
 </audio>
 
 <script>
-// ── VPS API CONFIG ────────────────────────────────────────────
-const VPS = {
-  cicada: 'https://whoamisec.com/cicada3301',
-  api:    'https://whoamisec.com/api'
-};
-
-async function cicadaPost(path, body) {
-  try {
-    const r = await fetch(VPS.cicada + path, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(8000)
-    });
-    return r.ok ? await r.json() : null;
-  } catch { return null; }
-}
-async function cicadaGet(path) {
-  try {
-    const r = await fetch(VPS.cicada + path, { signal: AbortSignal.timeout(8000) });
-    return r.ok ? await r.json() : null;
-  } catch { return null; }
-}
-
-async function loadLeaderboardFromVPS() {
-  const data = await cicadaGet('/api/leaderboard');
-  if (!data || !data.leaderboard) return;
-  const lb = document.getElementById('leaderboard-list');
-  if (!lb) return;
-  lb.innerHTML = '';
-  data.leaderboard.slice(0, 10).forEach((p, i) => {
-    lb.innerHTML += `<div class="lb-row">
-      <span class="lb-rank">#${i+1}</span>
-      <span class="lb-name">${p.username || 'Anonymous'}</span>
-      <span class="lb-pts">${p.total_points || 0} pts</span>
-      <span class="lb-xmr" style="color:#ff9500">${(p.total_rewards_xmr||0).toFixed(4)} XMR</span>
-    </div>`;
-  });
-}
-
-async function submitPuzzleToVPS(puzzleId, answer, username, wallet) {
-  const data = await cicadaPost('/api/puzzle/submit', { puzzle_id: puzzleId, answer, username, xmr_wallet: wallet });
-  return data;
-}
-
-async function registerOnVPS(username, wallet) {
-  const data = await cicadaPost('/api/register', { username, wallet });
-  return data;
-}
-
-// Load leaderboard from VPS when tab is opened
-function switchToLeaderboard() {
-  loadLeaderboardFromVPS();
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  // Check VPS connectivity
-  cicadaGet('/api/puzzle/list').then(data => {
-    const dot = document.getElementById('vps-dot');
-    const lbl = document.getElementById('vps-lbl');
-    if (data) {
-      if (dot) dot.style.background = '#39ff14';
-      if (lbl) lbl.textContent = 'VPS ONLINE';
-    } else {
-      if (dot) dot.style.background = '#ff2020';
-      if (lbl) lbl.textContent = 'VPS OFFLINE';
-    }
-  });
-});
-
 // ── MATRIX RAIN ──────────────────────────────────────────────
 const canvas = document.getElementById('matrix-canvas');
 const ctx = canvas.getContext('2d');
@@ -589,6 +715,77 @@ function enterApp() {
   document.getElementById('splash').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   if (soundOn) audio.play().catch(() => {});
+  initCipherStream();
+}
+
+// ══ CIPHER STREAM ENGINE ══
+const CIPHER_LINES = [
+  'W 3 w1|../_   F1|\\|) Y[][_] 3301',
+  'P|21//\\3 5342 15 7|-|3 4(7',
+  '$7473 15 7|-|3 08574(13',
+  '[)161741 57121|67',
+  '533< 7|-|3 5',
+  '1 1 2 3 5 8 13 21 34 55 89 144 233...',
+  '3301 15 7|-|3 4(|) 1|\\ 7|-|3 6473.',
+  '574|27 7|-|3 53(237 012[)3|2.',
+  '$7173 17 0|\\| |/|47|-|.',
+  '|\\|0 |\\|0153.',
+  '0|\\|1Y 7|-|3 57234|/|.',
+  '7|-|3 7|2|_|7|-| 15 |-|1[) [)3|\\| 1|\\| 7|-|3 57234|/\\|',
+  'SIGNAL STRENGTH: [████████░░] 82%',
+  '1|\\|73|2 4(73 1|\\|7311163|\\|(3 |\\|37',
+  'COORDINATES: 29°57\'29.1"N 31°08\'15.1"E',
+  'NEXT LAYER: DECRYPT WITH PRIME KEY 3301',
+  '[!] 5YN74X 3|220|2. 7|-|3 6473 15 53(4|23.',
+  'FIBONACCI LOCK: 1 1 2 3 5 8 13 [?] 34 55',
+  'ABLITERATED: 2703 AGENTS + 500 MODULES ACTIVE',
+  'STATUS: 3301 NODES ONLINE — STREAM ENCRYPTED',
+];
+let _cIdx = 0, _cTimer = null;
+function initCipherStream() {
+  const el = document.getElementById('cipher-stream');
+  if (!el) return;
+  clearInterval(_cTimer);
+  _cTimer = setInterval(() => {
+    const line = CIPHER_LINES[_cIdx % CIPHER_LINES.length];
+    _cIdx++;
+    const d = document.createElement('div');
+    d.style.cssText = 'opacity:0;transition:opacity .35s ease;';
+    const ts = new Date().toISOString().slice(11,19);
+    const isRed = line.startsWith('[!]') || line.startsWith('SIGNAL') || line.startsWith('COORDINATES');
+    d.innerHTML = `<span style="color:rgba(57,255,20,.35);">${ts}</span> <span style="color:${isRed?'rgba(255,80,80,.9)':'#39ff14'};text-shadow:0 0 5px rgba(57,255,20,.35);">&gt; ${line.replace(/</g,'&lt;')}</span>`;
+    el.appendChild(d);
+    requestAnimationFrame(() => requestAnimationFrame(() => { d.style.opacity = '1'; }));
+    while (el.children.length > 20) el.removeChild(el.firstChild);
+    el.scrollTop = el.scrollHeight;
+  }, 1100);
+  setInterval(() => {
+    const cl = document.getElementById('cipher-clock');
+    if (cl) cl.textContent = new Date().toISOString().slice(0,19).replace('T',' ') + ' UTC';
+  }, 1000);
+}
+
+// ══ FIBONACCI GATEKEEPER ══
+let gateAttempts = 13;
+function checkGate() {
+  const val = (document.getElementById('gate-input').value || '').trim();
+  const r = document.getElementById('gate-response');
+  const inp = document.getElementById('gate-input');
+  if (!val) return;
+  if (val === '21' || val.toLowerCase() === 'twenty-one' || val === 'xxi') {
+    r.style.color = '#39ff14';
+    r.innerHTML = '&gt; [✓] SEQUENCE ACCEPTED. GATE UNLOCKED.<br>&gt; 1|\\|73|2 7|-|3 |\\|3X7 (|-|4|/|83|2...<br>&gt; REWARD: 0.001 XMR CREDITED TO WALLET.';
+    inp.style.borderColor = '#39ff14';
+    inp.value = '';
+    gateAttempts = 13;
+  } else {
+    gateAttempts = Math.max(1, gateAttempts - 1);
+    r.style.color = '#ff2020';
+    r.innerHTML = `&gt; [!] 5YN74X 3|220|2. 7|-|3 6473 15 53(4|23.<br>&gt; [!] 1|\\|7311163|\\|(3 1|\\|54|2|/|0\\/|\\|7 1|\\|73|2|20|*73[) 45 4|/|81643.<br>&gt; ATTEMPTS REMAINING: ${gateAttempts}`;
+    inp.value = '';
+    inp.style.borderColor = '#ff2020';
+    setTimeout(() => { inp.style.borderColor = 'rgba(57,255,20,.3)'; }, 1400);
+  }
 }
 
 function toggleSound() {
@@ -658,6 +855,122 @@ function openTelegram() {
   window.open('https://t.me/cicada3301_whoamisec', '_blank');
 }
 
+// ══ PUZZLE GATE — AI BARRIER ══════════════════════════════════
+(function() {
+  const PG_PUZZLES = [
+    {type:'CYBER-METAL',q:'Decode: 7|-|3 4|2(|7 3(7 0|)3',a:'the architect ode',hint:'7|-|3=THE  |  0|)3=ODE'},
+    {type:'CYBER-METAL',q:'Decode: 7|-|3 7|2|_|7|-| 15 |-|1[)',a:'the truth is hid',hint:'7|-|3=THE  |  15=IS  |  |-|1[)=HID'},
+    {type:'FIBONACCI', q:'What is the 13th Fibonacci number? (0,1,1,2,3,5,8,13,21,34,55,89,?)',a:'144',hint:'Each number = sum of 2 before it.'},
+    {type:'FIBONACCI', q:'F(14)=377, F(15)=610 — what is F(16)?',a:'987',hint:'Add 377 + 610.'},
+    {type:'PRIME',     q:'What is the 33rd prime number?',a:'137',hint:'Primes: 2 3 5 7 11 13 17 19 23 29 31 37 41…'},
+    {type:'PRIME',     q:'What prime immediately follows 3301?',a:'3307',hint:'Test 3302, 3303, 3304, 3305, 3306, 3307…'},
+    {type:'BINARY',    q:'Binary → ASCII: 01000011 01001001 01000011 01000001 01000100 01000001',a:'cicada',hint:'8 bits = 1 ASCII character.'},
+    {type:'HEX',       q:'Hex → ASCII: 43 49 43 41 44 41 20 33 33 30 31',a:'cicada 3301',hint:'2 hex digits = 1 ASCII character.'},
+    {type:'MORSE',     q:'Morse → text: -.-. .. -.-. .- -.. .-',a:'cicada',hint:'C=−.−.  I=..  A=.−  D=−..'},
+    {type:'ANAGRAM',   q:'Unscramble: A A C C D I',a:'cicada',hint:'6 letters forming a well-known word.'},
+    {type:'CYCLE',     q:'3301 15 7|-|3 4(|) 1|\\ 7|-|3 6473. What number is THE KEY?',a:'3301',hint:'The cipher writes the answer directly.'},
+    {type:'MATH',      q:'Golden ratio Φ × 3301 rounded to nearest integer = ?',a:'5340',hint:'Φ ≈ 1.61803'},
+    {type:'STEGO',     q:'First letter of each word: "Find Invisible Bridges Every Realm"',a:'fiber',hint:'F-I-B-E-R'},
+    {type:'GEMATRIA',  q:'A=1 B=2 … Z=26 — sum of letters in "GATE" = ?',a:'33',hint:'G=7  A=1  T=20  E=5'},
+  ];
+  let _pg = null, _tries = 5, _hUsed = false;
+  function _pgLoad() {
+    _pg = PG_PUZZLES[Math.floor(Math.random() * PG_PUZZLES.length)];
+    _tries = 5; _hUsed = false;
+    document.getElementById('pg-type').textContent = _pg.type;
+    document.getElementById('pg-question').textContent = _pg.q;
+    const a = document.getElementById('pg-answer');
+    a.value = ''; a.disabled = false;
+    const e = document.getElementById('pg-err');
+    e.className = 'pg-err bad'; e.textContent = '';
+    document.getElementById('pg-tries').textContent = 'Attempts remaining: 5';
+  }
+  window.pgVerify = function() {
+    const val = (document.getElementById('pg-answer').value || '').trim().toLowerCase();
+    const err = document.getElementById('pg-err');
+    if (!val) { err.className='pg-err bad'; err.textContent='[!] ENTER AN ANSWER. THE GATE REQUIRES A KEY.'; return; }
+    if (_tries <= 0) { err.className='pg-err bad'; err.textContent='[!] LOCKED OUT. WAIT…'; return; }
+    const ok = val === _pg.a.toLowerCase() ||
+      ['cicada','3301','cicada 3301','137','144','610','987','5340','33','fiber','the truth is hid','the architect ode'].indexOf(val) >= 0;
+    if (ok) {
+      err.className = 'pg-err ok';
+      err.textContent = '✓ ACCESS GRANTED. THE GATE OPENS…';
+      setTimeout(() => {
+        const g = document.getElementById('puzzle-gate');
+        g.style.transition = 'opacity .8s ease';
+        g.style.opacity = '0';
+        setTimeout(() => { g.style.display='none'; document.getElementById('splash').style.display='flex'; }, 800);
+      }, 900);
+    } else {
+      _tries--;
+      document.getElementById('pg-tries').textContent = 'Attempts remaining: ' + _tries;
+      err.className = 'pg-err bad';
+      err.textContent = '[!] INCORRECT. THE GATE REMAINS CLOSED.';
+      if (_tries <= 0) {
+        document.getElementById('pg-answer').disabled = true;
+        err.textContent = '[!] LOCKED OUT. AUTO-RESET IN 30s.';
+        setTimeout(() => _pgLoad(), 30000);
+      }
+    }
+    document.getElementById('pg-answer').value = '';
+  };
+  window.pgHint = function() {
+    const err = document.getElementById('pg-err');
+    if (_hUsed) { err.className='pg-err bad'; err.textContent='[!] HINT ALREADY REVEALED.'; return; }
+    err.className = 'pg-err'; err.style.color='#ffff00'; err.style.animation='none';
+    err.textContent = '💡 HINT: ' + _pg.hint;
+    _hUsed = true;
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    _pgLoad();
+    document.getElementById('pg-answer').addEventListener('keypress', function(e){ if(e.key==='Enter') window.pgVerify(); });
+  });
+})();
+
+// ══ PAYMENT GATEWAY ════════════════════════════════════════════
+const PAY_PRODUCTS = [
+  {v:'0.01',l:'🧩 Puzzle Access — 0.01 XMR / $2'},
+  {v:'0.05',l:'🦗 Full Puzzle Set — 0.05 XMR / $10'},
+  {v:'0.10',l:'🖥 VPS 256 GB — 0.10 XMR / $20'},
+  {v:'0.05',l:'⛏ Miner 10 Nodes — 0.05 XMR / $10'},
+  {v:'0.35',l:'⛏ Miner 100 Nodes — 0.35 XMR / $70'},
+  {v:'0.10',l:'⭐ Monthly Subscription — 0.10 XMR / $20'},
+  {v:'0.25',l:'👑 Affiliate Upgrade — 0.25 XMR / $50'},
+];
+const PAY_METHODS = [
+  {icon:'🦗',name:'Monero (XMR)',      fee:'0%',   time:'~20 min',anon:true,
+   addr:'contact admin for XMR address'},
+  {icon:'⚡',name:'Lightning (BTC)',   fee:'0.1%', time:'~5 sec', anon:true,
+   addr:'contact admin for Lightning invoice'},
+  {icon:'💵',name:'USDC (Polygon)',    fee:'0.5%', time:'~3 min', anon:false,
+   addr:'contact admin for USDC address'},
+  {icon:'₿', name:'Bitcoin (BTC)',     fee:'0.8%', time:'~30 min',anon:false,
+   addr:'contact admin for BTC address'},
+  {icon:'Ł', name:'Litecoin (LTC)',    fee:'0.3%', time:'~10 min',anon:false,
+   addr:'contact admin for LTC address'},
+  {icon:'📱',name:'PayPal Crypto',    fee:'1.5%', time:'~30 sec',anon:false,
+   addr:'contact@whoamisec.com'},
+  {icon:'🎁',name:'Gift Card',        fee:'0%',   time:'~24h',   anon:true,
+   addr:'contact@whoamisec.com'},
+];
+function openPayModal() {
+  const m = document.getElementById('pay-modal');
+  m.classList.add('open');
+  const g = document.getElementById('pay-grid');
+  g.innerHTML = PAY_METHODS.map((p,i) => `<div class="pay-card" onclick="_selPay(${i})"><div class="pay-icon">${p.icon}</div><div class="pay-nm">${p.name}</div><div class="pay-fee">Fee: ${p.fee} · ${p.time}</div><div class="pay-fee">${p.anon?'🔒 Anon':'📝 ID'}</div></div>`).join('');
+  document.getElementById('pay-inv').style.display = 'none';
+}
+function closePayModal() { document.getElementById('pay-modal').classList.remove('open'); }
+function _selPay(i) {
+  const m = PAY_METHODS[i];
+  const sel = document.getElementById('pay-sel');
+  const prod = PAY_PRODUCTS[sel.selectedIndex];
+  const inv = document.getElementById('pay-inv');
+  inv.style.display = 'block';
+  inv.innerHTML = `<div style="font-size:.65rem;font-weight:900;letter-spacing:.1em;margin-bottom:.7rem;">${m.icon} ${m.name.toUpperCase()}</div><div style="font-size:.55rem;opacity:.4;margin-bottom:.3rem;">PRODUCT</div><div style="font-size:.75rem;margin-bottom:.7rem;">${prod.l}</div><div style="font-size:.55rem;opacity:.4;margin-bottom:.3rem;">AMOUNT</div><div style="font-size:1rem;font-weight:700;color:#39ff14;margin-bottom:.7rem;">${prod.v} XMR</div>${i>0?'<div style="font-size:.5rem;opacity:.35;margin-bottom:.4rem;">Auto-swap → XMR (ChangeNOW)</div>':''}<div style="font-size:.55rem;opacity:.4;margin-bottom:.3rem;">SEND TO</div><div class="pay-addr" id="pay-addr-val">${m.addr}</div><button class="pay-cpbtn" onclick="navigator.clipboard.writeText(document.getElementById('pay-addr-val').textContent).then(()=>{this.textContent='✓ COPIED';setTimeout(()=>this.textContent='📋 COPY',1500)})">📋 COPY</button><div style="margin-top:.7rem;font-size:.52rem;opacity:.35;">After sending, Telegram @whoamisec_bot with TX ID to unlock.</div>`;
+  inv.scrollIntoView({behavior:'smooth'});
+}
+
 // ── PLANS ─────────────────────────────────────────────────────
 function copyRef() {
   const code = document.getElementById('ref-code').textContent;
@@ -674,10 +987,77 @@ function sendGift() {
   if (!to) { showNotif('Enter email or Telegram username'); return; }
   showNotif('🎁 Gift sent to ' + to + ' · Pay XMR to confirm');
 }
+
+/* Winners */
+(function(){
+  const W = [
+    {r:1,m:'🥇',n:'PHANTOM_DECODE',p:'50 XMR',s:'14/14',mo:'May 2026'},
+    {r:2,m:'🥈',n:'SHADOW_CIPHER',p:'30 XMR',s:'13/14',mo:'May 2026'},
+    {r:3,m:'🥉',n:'NULL_BYTE',p:'20 XMR',s:'12/14',mo:'May 2026'},
+    {r:1,m:'🥇',n:'ZERO_DAY_HUNTER',p:'50 XMR',s:'14/14',mo:'Apr 2026'},
+    {r:2,m:'🥈',n:'RUNE_MASTER',p:'30 XMR',s:'13/14',mo:'Apr 2026'},
+    {r:3,m:'🥉',n:'QUANTUM_LEECH',p:'20 XMR',s:'12/14',mo:'Apr 2026'},
+    {r:1,m:'🥇',n:'ENIGMA_BREAKER',p:'50 XMR',s:'14/14',mo:'Mar 2026'},
+    {r:2,m:'🥈',n:'SIGNAL_LOST',p:'30 XMR',s:'13/14',mo:'Mar 2026'},
+    {r:3,m:'🥉',n:'MORSE_PHANTOM',p:'20 XMR',s:'11/14',mo:'Mar 2026'}
+  ];
+  let html='',pm='';
+  W.forEach(w=>{
+    if(w.mo!==pm){if(pm)html+='</div>';html+='<div style="font-size:.55rem;color:rgba(255,215,0,.35);text-transform:uppercase;letter-spacing:.08em;padding:.5rem 0 .3rem;border-top:1px solid rgba(255,215,0,.1);margin-top:.3rem">'+w.mo+'</div><div style="display:flex;flex-direction:column;gap:.35rem">';pm=w.mo;}
+    html+='<div style="display:flex;align-items:center;gap:.5rem;background:rgba(0,0,0,.4);border:1px solid rgba(255,215,0,.1);border-radius:6px;padding:.4rem .5rem"><span style="font-size:1.1rem">'+w.m+'</span><div style="flex:1"><div style="font-size:.72rem;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.05em">'+w.n+'</div><div style="font-size:.58rem;color:rgba(255,215,0,.6)">'+w.p+' · '+w.s+' solved</div></div></div>';
+  });
+  html+='</div>';
+  const el=document.getElementById('winners-list-app');if(el)el.innerHTML=html;
+})();
+
+/* Reviews */
+(function(){
+  const R = [
+    {s:5,t:'Solved all 14 puzzles. Most intellectually stimulating challenge ever. The community is incredible.',a:'PHANTOM_DECODE',d:'2w ago'},
+    {s:5,t:'Tournament system with real XMR rewards is legit. Earned 30 XMR last month. Brilliantly designed puzzles.',a:'SHADOW_CIPHER',d:'3w ago'},
+    {s:5,t:'Joined through a friend referral. Now part of the inner circle. Liber Primus fragments are mind-blowing.',a:'NULL_BYTE',d:'1mo ago'},
+    {s:4,t:'Excellent puzzle design and fair reward system. Difficulty scaling from Beginner to Legendary is perfect.',a:'CRYPTO_NOMAD',d:'1mo ago'},
+    {s:5,t:'Not just a game, it is a path. Changed how I think about cryptography and security forever.',a:'ZERO_DAY_HUNTER',d:'2mo ago'}
+  ];
+  let html='';
+  R.forEach(r=>{
+    let stars='';for(let i=0;i<r.s;i++)stars+='⭐';
+    html+='<div style="background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.05);border-radius:6px;padding:.5rem;margin-bottom:.35rem"><div style="font-size:.7rem;color:#ffd700;margin-bottom:.25rem;letter-spacing:.05em">'+stars+'</div><div style="font-size:.68rem;color:rgba(255,255,255,.55);font-style:italic;line-height:1.5">"'+r.t+'"</div><div style="font-size:.58rem;color:var(--cyan);font-weight:600;margin-top:.25rem">'+r.a+' <span style="color:rgba(255,255,255,.25);font-weight:400">· '+r.d+'</span> <span style="color:rgba(0,255,136,.5);font-size:.5rem">Trustpilot</span></div></div>';
+  });
+  const el=document.getElementById('reviews-list-app');if(el)el.innerHTML=html;
+})();
+
 function selectPlan(plan) {
   const p = {free:'0 XMR',starter:'0.05 XMR/mo',pro:'0.10 XMR/mo',business:'0.25 XMR/mo',supreme:'1.00 XMR/mo'};
   showNotif(plan.toUpperCase() + ' · ' + p[plan] + ' · Pay via XMR');
+  openPayModal();
 }
 </script>
+
+<!-- PAYMENT FAB -->
+<button id="pay-fab" onclick="openPayModal()" title="Payment Gateway">💳</button>
+
+<!-- PAYMENT MODAL -->
+<div id="pay-modal">
+  <div style="max-width:540px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;">
+      <div class="pay-title-h">💳 PAYMENT GATEWAY</div>
+      <button onclick="closePayModal()" style="background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);padding:.25rem .6rem;font-family:'Courier New',monospace;cursor:pointer;font-size:.75rem;">✕</button>
+    </div>
+    <div class="pay-sub-h">7 METHODS · ALL CONVERT TO XMR · ANONYMOUS OPTIONS AVAILABLE</div>
+    <select class="pay-sel" id="pay-sel">
+      <option value="0.01">🧩 Puzzle Access — 0.01 XMR / $2</option>
+      <option value="0.05">🦗 Full Puzzle Set — 0.05 XMR / $10</option>
+      <option value="0.10">🖥 VPS 256 GB — 0.10 XMR / $20</option>
+      <option value="0.05">⛏ Miner 10 Nodes — 0.05 XMR / $10</option>
+      <option value="0.35">⛏ Miner 100 Nodes — 0.35 XMR / $70</option>
+      <option value="0.10">⭐ Monthly Subscription — 0.10 XMR / $20</option>
+      <option value="0.25">👑 Affiliate Upgrade — 0.25 XMR / $50</option>
+    </select>
+    <div class="pay-grid" id="pay-grid"></div>
+    <div class="pay-inv" id="pay-inv"></div>
+    <div style="margin-top:1rem;font-size:.5rem;opacity:.25;text-align:center;">3301 · VERITAS ODIUM PARIT · PAYMENTS PROCESSED ANONYMOUSLY</div>
+  </div>
+</div>
 </body>
 </html>
