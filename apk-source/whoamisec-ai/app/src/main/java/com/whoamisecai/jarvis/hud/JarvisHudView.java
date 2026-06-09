@@ -20,7 +20,7 @@ import java.util.Random;
 /**
  * JARVIS HUD — MKII-Inspired Holographic Renderer
  *
- * Inspired by JARVIS-MKII (github.com/kimikukiu/JARVIS-MKII)
+ * Inspired by JARVIS-MKII (github.com/whoamisecai/JARVIS-MKII)
  * Complete Iron Man HUD experience on Android Canvas:
  *
  *  - Boot sequence (15-step staggered initialization)

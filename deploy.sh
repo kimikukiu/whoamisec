@@ -2,8 +2,8 @@
 # ============================================================
 # WhoamiSec — One-command deploy script
 # Run on a fresh Ubuntu 22.04 VPS as root:
-#   curl -sL https://raw.githubusercontent.com/kimikukiu/whoamisec/main/deploy.sh | bash
-#   OR: git clone https://github.com/kimikukiu/whoamisec && cd whoamisec && bash deploy.sh
+#   curl -sL https://raw.githubusercontent.com/whoamisecai/whoamisec/main/deploy.sh | bash
+#   OR: git clone https://github.com/whoamisecai/whoamisec && cd whoamisec && bash deploy.sh
 #
 # Args:
 #   --vps1   Deploy VPS-01 (whoamisec.com) — default
@@ -13,7 +13,7 @@
 set -euo pipefail
 VPS_TYPE="${1:-}"
 
-REPO_URL="https://github.com/kimikukiu/whoamisec"
+REPO_URL="https://github.com/whoamisecai/whoamisec"
 WEB_DIR="/var/www/whoamisec"
 APK_DIR="/var/apk"
 CICADA_DIR="/var/www/cicada"

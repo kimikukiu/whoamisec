@@ -4,7 +4,7 @@
 # Works WITHOUT any DNS / domain name — just VPS IP
 #
 # Run on a fresh Ubuntu/Debian VPS:
-#   curl -fsSL https://raw.githubusercontent.com/kimikukiu/whoamisec/main/vps-deploy.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/whoamisecai/whoamisec/main/vps-deploy.sh | bash
 #
 # Or after git clone:
 #   bash vps-deploy.sh
@@ -61,7 +61,7 @@ elif [ -f "$(dirname "$0")/docker-compose.yml" ]; then
     ok "Using existing repo at $DEPLOY_DIR"
 else
     log "Cloning repo to $DEPLOY_DIR..."
-    git clone https://github.com/kimikukiu/whoamisec.git "$DEPLOY_DIR"
+    git clone https://github.com/whoamisecai/whoamisec.git "$DEPLOY_DIR"
     cd "$DEPLOY_DIR"
     ok "Repo cloned"
 fi

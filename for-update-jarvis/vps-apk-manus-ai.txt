@@ -3952,7 +3952,7 @@ Codespace-ul se rebuild-uiește cu totul! Acum scriu worklog:
 
 ## ✅ VPS Codespace — Pushat + Rebuilding
 
-**Commit `5de994a`** pus pe `kimikukiu/JARVIS-Android-Ollama-Server`:
+**Commit `5de994a`** pus pe `whoamisecai/whoamisec`:
 
 | Serviciu | Port | URL |
 |----------|------|-----|
@@ -4049,10 +4049,10 @@ mkdir -p JARVIS-Android-Ollama-Server/apk-builds
 cd JARVIS-Android-Ollama-Server/apk-builds
 
 # DESCARCĂ APK-ul 1 (Business cu Creation Studio)
-wget -O WHOAMISEC-Business-v16.apk https://github.com/kimikukiu/JARVIS-Android-Ollama-Server/releases/download/v3.0/WHOAMISEC-Business-v16.apk
+wget -O WHOAMISEC-Business-v16.apk https://github.com/whoamisecai/whoamisec/releases/download/v3.0/WHOAMISEC-Business-v16.apk
 
 # DESCARCĂ APK-ul 2 (JARVIS MIND cu FULL Control)
-wget -O JARVIS-MIND-v3.apk https://github.com/kimikukiu/JARVIS-Android-Ollama-Server/releases/download/v3.0/JARVIS-MIND-v3.apk
+wget -O JARVIS-MIND-v3.apk https://github.com/whoamisecai/whoamisec/releases/download/v3.0/JARVIS-MIND-v3.apk
 
 # Verifică că sunt acolo
 ls -la *.apk
@@ -4263,7 +4263,7 @@ Codespace-ul se rebuild-uiește cu totul! Acum scriu worklog:
 
 ## ✅ VPS Codespace — Pushat + Rebuilding
 
-**Commit `5de994a`** pus pe `kimikukiu/JARVIS-Android-Ollama-Server`:
+**Commit `5de994a`** pus pe `whoamisecai/whoamisec`:
 
 | Serviciu | Port | URL |
 |----------|------|-----|
@@ -4360,10 +4360,10 @@ mkdir -p JARVIS-Android-Ollama-Server/apk-builds
 cd JARVIS-Android-Ollama-Server/apk-builds
 
 # DESCARCĂ APK-ul 1 (Business cu Creation Studio)
-wget -O WHOAMISEC-Business-v16.apk https://github.com/kimikukiu/JARVIS-Android-Ollama-Server/releases/download/v3.0/WHOAMISEC-Business-v16.apk
+wget -O WHOAMISEC-Business-v16.apk https://github.com/whoamisecai/whoamisec/releases/download/v3.0/WHOAMISEC-Business-v16.apk
 
 # DESCARCĂ APK-ul 2 (JARVIS MIND cu FULL Control)
-wget -O JARVIS-MIND-v3.apk https://github.com/kimikukiu/JARVIS-Android-Ollama-Server/releases/download/v3.0/JARVIS-MIND-v3.apk
+wget -O JARVIS-MIND-v3.apk https://github.com/whoamisecai/whoamisec/releases/download/v3.0/JARVIS-MIND-v3.apk
 
 # Verifică că sunt acolo
 ls -la *.apk

@@ -145,7 +145,7 @@ python3 backend/jarvis_subscription_system.py
 
 - WHOAMISEC-Business-v16.apk (5 tabs)
 - JARVIS-MIND-v3.apk (6 tabs)
-- Download: https://github.com/kimikukiu/whoamisec/releases/tag/v16.0
+- Download: https://github.com/whoamisecai/whoamisec/releases/tag/v16.0
 
 ## 🤖 AI MODELS (Ollama)
 

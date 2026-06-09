@@ -930,7 +930,7 @@ body::after{
   </div>
   <div id="chatMessages">
     <div class="chat-msg assistant">
-      <div>JARVIS online. All systems operational. 2,700 agents standing by. 20 jailbreak models loaded. AI Server connected. Awaiting your command, sir.</div>
+      <div>JARVIS online. Connectează-te la AI Server din Settings pentru a folosi AI-ul. Pastează JWT token de la whoamisec.com sau configurează AI Server URL.</div>
       <div class="msg-model">claude-sonnet-4</div>
       <div class="msg-time" id="initMsgTime"></div>
     </div>
@@ -1157,7 +1157,7 @@ body::after{
     <div class="deploy-section">
       <div class="deploy-row">
         <label>Repository</label>
-        <input class="hud-input" value="kimikukiu/WHOAMISecAI-SaaS" readonly style="font-size:.7rem">
+        <input class="hud-input" value="whoamisecai/WHOAMISecAI-SaaS" readonly style="font-size:.7rem">
       </div>
       <div class="deploy-row">
         <label>Branch</label>
@@ -1616,35 +1616,10 @@ function removeTyping() {
 }
 
 function generateResponse(msg, model) {
-  const lower = msg.toLowerCase();
-  let text = '';
-  let copilot = null;
-  if (lower.includes('scan') || lower.includes('security')) {
-    text = 'Initiating full security scan across all 2,700 agents. Nmap sweep running on subnet. Vulnerability assessment in progress. Estimated completion: 45 seconds. I\'ve detected 3 open ports that need attention.';
-    copilot = 'Suggested action: Run `nmap -sV -sC --script vuln` on detected hosts. Consider deploying WAF rules for exposed ports 8080 and 3000.';
-  } else if (lower.includes('agent') || lower.includes('swarm')) {
-    text = `Swarm status: 2,341 agents online, 847 active tasks. Security fleet at 97% capacity. AI/ML cluster processing 12 concurrent training jobs. All systems nominal.`;
-    copilot = 'You can optimize agent allocation by routing idle Development agents to the Security cluster. Use Swarm Pulse to rebalance.';
-  } else if (lower.includes('mine') || lower.includes('xmrig') || lower.includes('xmr')) {
-    text = 'Mining fleet status: 87/100 nodes active. Total hashrate: 12.4 KH/s. Pool: pool.supportxmr.com:3333. Estimated daily earnings: 0.0042 XMR. Node 23 and 67 showing reduced hashrate — restarting.';
-    copilot = 'Recommendation: Check XMRig config on nodes 23 and 67. Possible thermal throttling. Set "max-threads-hint": 75 for stability.';
-  } else if (lower.includes('deploy') || lower.includes('upgrade') || lower.includes('update')) {
-    text = 'Current version: v3.7.1. Remote version: v3.7.2 available. Changes include: voice dialect support, mining fleet dashboard improvements, agent swarm optimization. Ready to auto-upgrade on command.';
-    copilot = 'Before upgrading, ensure all active agents are in standby mode. Backup current config with `jarvis-backup --full`.';
-  } else if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey')) {
-    text = 'Hello, sir. JARVIS systems fully operational. What would you like me to do today? I have 2,700 agents ready, 20 models loaded, and the mining fleet is humming along.';
-    copilot = 'Quick actions available: "Run security audit", "Check mining status", "Deploy upgrade v3.7.2", "Analyze social media".';
-  } else {
-    const responses = [
-      'Acknowledged. Processing your request through the neural network. Cross-referencing with 2,700 agent capabilities. Standing by for further instruction.',
-      'Understood. Routing through JARVIS OMNI pipeline. All subsystems responding. I can handle that — shall I proceed with full automation or would you prefer step-by-step confirmation?',
-      'Processing. Analysis complete. The quantum co-processor is crunching numbers on that one. I\'ll have a comprehensive report momentarily, sir.',
-      'Copy that. Engaging the appropriate agent clusters. Cross-domain analysis initiated. Results will appear in your console shortly.'
-    ];
-    text = responses[Math.floor(Math.random() * responses.length)];
-    copilot = '💡 Pro tip: Use Copilot mode for enhanced code suggestions and automated analysis of all responses.';
-  }
-  return { text, copilot };
+  return {
+    text: '⚠ AI Server offline — Nu am putut conecta la whoamisec.com API.\n\nDeschide Settings → pastează JWT token de la whoamisec.com sau configurează AI Server URL.\n\nDacă ai server propriu, setează URL-ul în Settings → AI Server URL.',
+    copilot: null
+  };
 }
 
 function escapeHtml(text) {
@@ -2047,7 +2022,7 @@ async function connectGitHub() {
   }
 
   try {
-    const resp = await fetch('https://api.github.com/repos/kimikukiu/WHOAMISecAI-SaaS', {
+    const resp = await fetch('https://api.github.com/repos/whoamisecai/WHOAMISecAI-SaaS', {
       headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
     });
     const data = await resp.json();
@@ -2269,7 +2244,7 @@ function checkSubscription() {
 }
 
 function showAdminPanel() {
-  const msg = 'Admin Panel — Full system control active. All 2,700 agents online. 20 jailbreak models loaded.';
+  const msg = 'Admin Panel activ. Configurează AI Server în Settings pentru a conecta AI-ul.';
   addSwarmLog('[ADMIN] ' + msg);
   showToast(msg);
 }

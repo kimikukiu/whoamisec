@@ -1329,7 +1329,7 @@ NFT Gallery & Tournaments nft.cicada.omni
 
 ```bash
 # Rulează acest script pe VPS-ul tău principal
-curl -s https://raw.githubusercontent.com/kimikukiu/JARVIS-Android-Ollama-Server/main/scripts/setup_cicada_omni.sh | bash
+curl -s https://raw.githubusercontent.com/whoamisecai/whoamisec/main/scripts/setup_cicada_omni.sh | bash
 ```
 
 Scriptul va face următoarele:
@@ -1377,7 +1377,7 @@ Admin Panel https://admin.whoamisec.com ✅ Control total
 
 ```bash
 # Platforma Cicada 3301 - puzzle-uri, NFT-uri, turnee
-curl -s https://raw.githubusercontent.com/kimikukiu/JARVIS-Android-Ollama-Server/main/setup_cicada_omni.sh | bash
+curl -s https://raw.githubusercontent.com/whoamisecai/whoamisec/main/setup_cicada_omni.sh | bash
 ```
 
 Ce rulează pe cicada.omni:

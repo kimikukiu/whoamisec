@@ -6,7 +6,7 @@
 
 set -euo pipefail
 
-REPO="kimikukiu/whoamisec"
+REPO="whoamisecai/whoamisec"
 APK_DIR="${APK_DIR:-/var/www/apk}"
 CHECK_INTERVAL=300   # seconds between polls (5 min)
 STATE_FILE="/tmp/.apk_watchdog_state"

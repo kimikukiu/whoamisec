@@ -2999,7 +2999,7 @@ function init() {
     const online = cat.agents.filter(a => a.status === 'online').length;
     addSwarmLog('ok', `${cat.name}: ${cat.count} agents (${online}/${cat.agents.length} visible online)`);
   });
-  addSwarmLog('ok', 'Swarm heartbeat established — 2,700 agents ready');
+  addSwarmLog('ok', 'Swarm heartbeat established — awaiting AI Server connection');
 
   // Welcome chat message if empty
   const welcomeMsgs = getChatMessages();

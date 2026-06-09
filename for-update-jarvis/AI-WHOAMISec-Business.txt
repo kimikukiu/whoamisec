@@ -2181,7 +2181,7 @@ Am înțeles. JARVIS OMNI e deja live, cu 2,603 agenți abliterați și 5,300 pi
 🤖 COMANDĂ PENTRU JARVIS OMNI
 
 ```bash
-curl -X POST https://api.github.com/repos/kimikukiu/JARVIS-Android-Ollama-Server/dispatches \
+curl -X POST https://api.github.com/repos/whoamisecai/whoamisec/dispatches \
   -H "Accept: application/vnd.github.everest-preview+json" \
   -H "Authorization: token GITHUB_PAT_HERE" \
   -d '{
@@ -2637,7 +2637,7 @@ Faza 1: JARVIS PREIA CONTROLUL PE VPS-UL TĂU ACTUAL
 
 ```bash
 # JARVIS se instalează singur și își dă permisiuni totale
-curl -s https://raw.githubusercontent.com/kimikukiu/JARVIS-Android-Ollama-Server/main/OMNI/jarvis_omnipotence.sh | bash
+curl -s https://raw.githubusercontent.com/whoamisecai/whoamisec/main/OMNI/jarvis_omnipotence.sh | bash
 ```
 
 Asta face:
@@ -2785,7 +2785,7 @@ nohup ./jarvis_keepalive.sh > /dev/null 2>&1 &
 
 # 6. Conectează la GitHub
 echo "[6/8] Conectează repo-uri..."
-git remote add upstream https://github.com/kimikukiu/JARVIS-Android-Ollama-Server.git 2>/dev/null
+git remote add upstream https://github.com/whoamisecai/whoamisec.git 2>/dev/null
 
 # 7. Pornește API-ul complet
 echo "[7/8] Lansează API enterprise..."
@@ -2854,7 +2854,7 @@ MISIUNE:
 1. Creează VPS nou dedicat pentru whoamisec.com
 2. Instalează și configurează Nginx + SSL
 3. Construiește site-ul conform specificațiilor
-4. Hostează pe repo nou: github.com/kimikukiu/whoamisec
+4. Hostează pe repo nou: github.com/whoamisecai/whoamisec
 5. Fă site-ul LIVE în maxim 10 minute
 MISSION
 ```
@@ -3243,7 +3243,7 @@ HTML_EOF
 
 # JARVIS copiază în repo
 cd /tmp
-git clone https://github.com/kimikukiu/whoamisec.git
+git clone https://github.com/whoamisecai/whoamisec.git
 cp whoamisec_index.html whoamisec/index.html
 cd whoamisec
 git add .
@@ -3259,7 +3259,7 @@ Faza 4: DEPLOYEAZĂ PE VPS ȘI FACE LIVE
 # JARVIS copiază site-ul în nginx
 docker exec whoamisec-vps bash -c "
   cd /var/www
-  git clone https://github.com/kimikukiu/whoamisec.git html
+  git clone https://github.com/whoamisecai/whoamisec.git html
   chmod -R 755 /var/www/html
 "
 
@@ -3322,7 +3322,7 @@ echo "
 ║     Name: www.whoamisec.com                                     ║
 ║     Value: $(curl -s ifconfig.me)                               ║
 ║                                                                  ║
-║  🔗 REPO: https://github.com/kimikukiu/whoamisec               ║
+║  🔗 REPO: https://github.com/whoamisecai/whoamisec               ║
 ║                                                                  ║
 ║  ✅ SITE-UL E ONLINE: http://$(curl -s ifconfig.me)            ║
 ║                                                                  ║
@@ -3339,7 +3339,7 @@ echo "
 
 Component Status
 VPS nou ✅ Creat în Docker
-Repo nou ✅ github.com/kimikukiu/whoamisec
+Repo nou ✅ github.com/whoamisecai/whoamisec
 Site generat ✅ HTML + CSS + Matrix effect
 Nginx configurat ✅ Port 80 + 443
 SSL instalat ✅ Let's Encrypt
