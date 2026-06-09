@@ -504,35 +504,30 @@ let voiceOn=false, recog=null, wakeT=null, jSt='standby';
 let activeModel=0, activeJB=0, att=null;
 
 // ── BOOT ──
-const BMSGS=[
-  'INIȚIALIZARE KERNEL...','PORNIRE SWARM 2700 AGENȚI...','ÎNCĂRCARE 9 MODELE AI...',
-  'APLICARE 145 JAILBREAKS...','CALIBRARE HUD 3D IRON MAN...','ACTIVARE Jules AI AGENT...',
-  'PORNIRE OBSIDIAN GRAPH...','SISTEME ONLINE ⚡'
-];
+const BMSGS=['KERNEL OK','9 MODELE AI','2700 AGENȚI','145 JB','HUD 3D','ONLINE ⚡'];
 (function(){
   let p=0, mi=0;
   const fill=document.getElementById('bfill'), msg=document.getElementById('bmsg');
   const iv=setInterval(()=>{
-    p+=2+Math.random()*4; if(p>100)p=100;
+    p+=8+Math.random()*12; if(p>100)p=100;
     fill.style.width=p+'%';
     if(mi<BMSGS.length && p>(mi+1)*(100/BMSGS.length)) msg.textContent=BMSGS[mi++];
-    if(p>=100){ clearInterval(iv); setTimeout(()=>{ document.getElementById('boot').classList.add('gone'); init(); },350); }
-  },55);
+    if(p>=100){ clearInterval(iv); setTimeout(()=>{ document.getElementById('boot').classList.add('gone'); init(); },120); }
+  },30);
 })();
 
 function init(){
   buildBars(); buildModels(); buildJailbreaks(); buildAgents();
   loadSet(); updateDataStrips();
-  initHexFloats();
-  initSwarm();
-  initDeviceSensors();
-  autoCheckUpgrade();
+  // Heavy stuff deferred — don't block first render
+  setTimeout(initHexFloats, 400);
+  setTimeout(initSwarm, 600);
+  setTimeout(initDeviceSensors, 800);
+  setTimeout(autoCheckUpgrade, 2000);
   if(C.tgbot&&C.tgid){
-    setTimeout(()=>sendTelegram(`🤖 JARVIS MIND pornit!\n⏰ ${new Date().toLocaleString('ro-RO')}\nModel: ${MODELS[activeModel].n}\nJailbreak: ${JAILBREAKS[activeJB].n}\nSisteme: 2700 agenți, Obsidian Graph, Jules AI — ONLINE`),2000);
+    setTimeout(()=>sendTelegram(`🤖 JARVIS MIND pornit!\n⏰ ${new Date().toLocaleString('ro-RO')}\nModel: ${MODELS[activeModel].n}\nJailbreak: ${JAILBREAKS[activeJB].n}\nSisteme: 2700 agenți, Obsidian Graph, Jules AI — ONLINE`),3000);
   }
-  setTimeout(()=>{ setR('awake'); speak('Sisteme pornite. 2700 agenți online. Bine ai venit bă!'); actLog('Sisteme pornite OK'); },900);
-  // Init obsidian when panel opens
-  document.getElementById('panel-obsidian').addEventListener('transitionend', ()=>{});
+  setTimeout(()=>{ setR('awake'); speak('Sisteme pornite. Bine ai venit bă!'); actLog('Online'); },300);
 }
 
 // ── ACTIVITY LOG ──
@@ -1225,8 +1220,8 @@ function initHexFloats(){
   });
 }
 
-// ── AGENT SWARM ANIMATION ──
-let swarmAF=null;
+// ── AGENT SWARM ANIMATION (mobile optimized) ──
+let swarmAF=null, swarmLastT=0;
 function initSwarm(){
   const canvas=document.getElementById('swarm-canvas');
   const ctx=canvas.getContext('2d');
@@ -1234,71 +1229,38 @@ function initSwarm(){
   resize();
   window.addEventListener('resize',resize);
 
-  const COLS=['rgba(0,212,255,', 'rgba(0,255,136,', 'rgba(255,184,0,', 'rgba(192,132,252,', 'rgba(255,59,59,'];
-  const agents=Array.from({length:220},()=>{
+  const COLS=['rgba(0,212,255,','rgba(0,255,136,','rgba(255,184,0,','rgba(192,132,252,','rgba(255,59,59,'];
+  // 80 agents — enough visually, mobile-friendly
+  const agents=Array.from({length:80},()=>{
     const col=COLS[Math.floor(Math.random()*COLS.length)];
     return {
       x:Math.random()*window.innerWidth,
       y:Math.random()*window.innerHeight,
-      vx:(Math.random()-.5)*1.2,
-      vy:(Math.random()-.5)*1.2,
-      r:Math.random()*1.8+.4,
-      col,
-      op:Math.random()*.7+.15,
-      type:Math.random()<.05?'jules':Math.random()<.2?'master':'sub'
+      vx:(Math.random()-.5)*.9,
+      vy:(Math.random()-.5)*.9,
+      r:Math.random()*1.6+.5,
+      col, op:Math.random()*.6+.2,
+      master:Math.random()<.15
     };
   });
 
-  function frame(){
+  function frame(ts){
+    // Cap at ~24 FPS on mobile
+    if(ts-swarmLastT<42){ swarmAF=requestAnimationFrame(frame); return; }
+    swarmLastT=ts;
     ctx.clearRect(0,0,canvas.width,canvas.height);
     agents.forEach(a=>{
       a.x+=a.vx; a.y+=a.vy;
       if(a.x<0) a.x=canvas.width; if(a.x>canvas.width) a.x=0;
       if(a.y<0) a.y=canvas.height; if(a.y>canvas.height) a.y=0;
       ctx.beginPath();
-      if(a.type==='jules'){
-        // Jules agent: small star/diamond shape
-        ctx.save();
-        ctx.translate(a.x,a.y);
-        ctx.rotate(Date.now()*0.001);
-        ctx.fillStyle=`rgba(255,107,53,${a.op})`;
-        ctx.strokeStyle=`rgba(255,107,53,${a.op*1.5})`;
-        for(let i=0;i<4;i++){
-          ctx.beginPath();
-          ctx.moveTo(0,-4); ctx.lineTo(1,-1); ctx.lineTo(4,0);
-          ctx.lineTo(1,1); ctx.lineTo(0,4); ctx.lineTo(-1,1);
-          ctx.lineTo(-4,0); ctx.lineTo(-1,-1);
-          ctx.closePath(); ctx.fill();
-          ctx.rotate(Math.PI/2);
-        }
-        ctx.restore();
-      } else {
-        ctx.arc(a.x,a.y,a.r,0,Math.PI*2);
-        ctx.fillStyle=a.col+a.op+')';
-        ctx.fill();
-        if(a.type==='master'){
-          ctx.strokeStyle=a.col+(a.op*0.4)+')';
-          ctx.lineWidth=.5; ctx.stroke();
-        }
-      }
+      ctx.arc(a.x,a.y,a.r,0,Math.PI*2);
+      ctx.fillStyle=a.col+a.op+')';
+      ctx.fill();
     });
-    // Draw connections between nearby agents (sparse)
-    for(let i=0;i<agents.length;i+=3){
-      for(let j=i+3;j<agents.length;j+=3){
-        const dx=agents[i].x-agents[j].x, dy=agents[i].y-agents[j].y;
-        const d=dx*dx+dy*dy;
-        if(d<2800){
-          ctx.beginPath();
-          ctx.moveTo(agents[i].x,agents[i].y);
-          ctx.lineTo(agents[j].x,agents[j].y);
-          ctx.strokeStyle=`rgba(0,212,255,${0.06*(1-d/2800)})`;
-          ctx.lineWidth=.4; ctx.stroke();
-        }
-      }
-    }
     swarmAF=requestAnimationFrame(frame);
   }
-  frame();
+  swarmAF=requestAnimationFrame(frame);
 }
 
 // ── OBSIDIAN KNOWLEDGE GRAPH ──
