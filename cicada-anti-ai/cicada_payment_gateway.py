@@ -17,7 +17,7 @@ app.config['SECRET_KEY'] = secrets.token_hex(32)
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 # Replace with real addresses before deploying
-XMR_ADDRESS = "YOUR_XMR_ADDRESS_HERE"
+XMR_ADDRESS = "8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ"
 BTC_ADDRESS = "YOUR_BTC_ADDRESS_HERE"
 LTC_ADDRESS = "YOUR_LTC_ADDRESS_HERE"
 USDC_ADDRESS = "YOUR_USDC_ADDRESS_HERE"
