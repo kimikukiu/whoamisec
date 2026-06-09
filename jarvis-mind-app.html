@@ -319,6 +319,37 @@
         .waveform-bar { width:3px; border-radius:2px; background:var(--cyan); }
         @keyframes wave { 0%,100%{height:6px;opacity:0.35;} 50%{height:30px;opacity:1;} }
 
+        /* ── IRON MAN JARVIS HUD ── */
+        .jarvis-hud{position:relative;background:radial-gradient(ellipse at 50% 40%,rgba(0,90,120,0.18) 0%,rgba(0,0,0,0) 70%);border:1px solid rgba(0,212,255,0.18);border-radius:14px;overflow:hidden;padding:0.9rem 0.75rem;}
+        .jarvis-hud::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(0,212,255,0.025) 29px);pointer-events:none;}
+        .jarvis-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;}
+        .jarvis-title{font-size:0.62rem;letter-spacing:.28em;color:rgba(0,212,255,0.7);font-weight:700;}
+        .jarvis-status-pill{font-size:0.58rem;letter-spacing:.18em;padding:.15rem .5rem;border-radius:20px;border:1px solid rgba(0,212,255,0.3);color:rgba(0,212,255,0.8);background:rgba(0,212,255,0.07);}
+        .jarvis-center{display:flex;flex-direction:column;align-items:center;padding:.4rem 0;}
+        .jarvis-ring-wrap{position:relative;width:140px;height:140px;margin:0 auto;}
+        .jarvis-ring{position:absolute;inset:0;border:1.5px solid rgba(0,212,255,0.5);border-radius:50%;animation:j-spin 8s linear infinite;}
+        .jarvis-ring2{position:absolute;inset:14px;border:1px solid rgba(0,212,255,0.25);border-radius:50%;animation:j-spin 5s linear infinite reverse;}
+        .jarvis-ring3{position:absolute;inset:28px;border:1.5px solid rgba(0,212,255,0.4);border-radius:50%;animation:j-spin 3s linear infinite;}
+        .jarvis-core{position:absolute;inset:42px;background:radial-gradient(circle,rgba(0,212,255,0.25) 0%,rgba(0,212,255,0.05) 60%,transparent 100%);border-radius:50%;border:1px solid rgba(0,212,255,0.4);display:flex;align-items:center;justify-content:center;animation:j-pulse 2s ease-in-out infinite;}
+        .jarvis-core-icon{font-size:1.4rem;}
+        @keyframes j-spin{to{transform:rotate(360deg);}}
+        @keyframes j-pulse{0%,100%{box-shadow:0 0 8px rgba(0,212,255,0.3),inset 0 0 8px rgba(0,212,255,0.1);}50%{box-shadow:0 0 28px rgba(0,212,255,0.7),inset 0 0 20px rgba(0,212,255,0.25);}}
+        @keyframes j-pulse-active{0%,100%{box-shadow:0 0 18px rgba(0,212,255,0.6),inset 0 0 15px rgba(0,212,255,0.2);}50%{box-shadow:0 0 50px rgba(0,212,255,1),inset 0 0 30px rgba(0,212,255,0.4);}}
+        .jarvis-core.listening{animation:j-pulse-active 0.8s ease-in-out infinite;}
+        .jarvis-bars-row{display:flex;align-items:center;gap:2px;height:32px;justify-content:center;margin:.5rem 0;}
+        .j-bar{width:3px;border-radius:2px;background:rgba(0,212,255,0.7);height:4px;transition:height 0.1s;}
+        .j-bar.active{animation:j-wave var(--delay,0.3s) ease-in-out infinite alternate;}
+        @keyframes j-wave{0%{height:4px;opacity:.4;}100%{height:28px;opacity:1;}}
+        .jarvis-transcript-box{background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.12);border-radius:8px;padding:.5rem .7rem;font-size:.76rem;color:rgba(0,212,255,0.8);min-height:36px;margin:.4rem 0 .3rem;font-family:'Courier New',monospace;letter-spacing:.02em;}
+        .jarvis-response-box{background:rgba(0,0,0,0.4);border-left:2px solid rgba(0,212,255,0.5);padding:.5rem .7rem;font-size:.81rem;color:#cde;line-height:1.55;min-height:44px;border-radius:0 6px 6px 0;}
+        .jarvis-btn-row{display:flex;gap:.45rem;margin-top:.6rem;}
+        .j-mic-btn{flex:1;padding:.6rem;border-radius:10px;font-size:.8rem;font-weight:700;letter-spacing:.08em;border:none;cursor:pointer;transition:all .2s;background:linear-gradient(135deg,rgba(0,120,160,0.3),rgba(0,212,255,0.15));border:1px solid rgba(0,212,255,0.35);color:rgba(0,212,255,0.9);}
+        .j-mic-btn:active{background:rgba(0,212,255,0.25);}
+        .j-mic-btn.recording{background:linear-gradient(135deg,rgba(255,50,50,0.2),rgba(255,100,100,0.1));border-color:rgba(255,80,80,0.5);color:rgba(255,120,120,0.9);animation:j-rec-blink 1s ease-in-out infinite;}
+        @keyframes j-rec-blink{0%,100%{opacity:1;}50%{opacity:.6;}}
+        .j-clear-btn{padding:.6rem .8rem;border-radius:10px;font-size:.75rem;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:var(--muted);cursor:pointer;}
+        .jarvis-wake-hint{text-align:center;font-size:.62rem;letter-spacing:.12em;color:rgba(0,212,255,0.4);margin-top:.4rem;}
+
         /* Wiki/Knowledge mode */
         .wiki-search-row { display:flex; gap:0.45rem; margin-bottom:0.65rem; }
         .wiki-search-input { flex:1; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.55rem 0.8rem; color:var(--text); font-size:0.83rem; outline:none; }
@@ -976,24 +1007,46 @@
 
         <!-- VOICE MODE -->
         <div class="mode-pane" id="mode-voice">
-            <div class="card" style="margin-bottom:0.6rem;">
-                <div class="card-title">TTS Engine</div>
-                <div class="voice-engine-row">
-                    <button class="voice-engine-btn active" onclick="setVoiceEngine('miso',this)">&#x1F3A4; MisoTTS 8B</button>
-                    <button class="voice-engine-btn" onclick="setVoiceEngine('wavtts',this)">&#x1F4E1; WavTTS Zero-Shot</button>
+            <div class="jarvis-hud">
+                <div class="jarvis-top">
+                    <span class="jarvis-title">J · A · R · V · I · S</span>
+                    <span class="jarvis-status-pill" id="j-status-pill">STANDBY</span>
                 </div>
-                <textarea class="voice-textarea" id="voice-text" placeholder="Enter text to synthesize — supports voice cloning with reference audio..."></textarea>
-                <div style="display:flex;gap:0.4rem;">
-                    <button class="btn btn-cyan btn-sm" style="flex:1;" onclick="synthesizeVoice()">&#x1F3A4; Synthesize Speech</button>
-                    <button class="btn btn-outline-p btn-sm" onclick="cloneVoice()">&#x1F501; Clone Voice</button>
-                </div>
-                <div class="voice-player" id="voice-player">
-                    <div class="voice-waveform" id="voice-waveform"></div>
-                    <div style="display:flex;gap:0.5rem;align-items:center;">
-                        <button class="btn btn-sm btn-grad" onclick="playVoice()">&#x25B6; Play</button>
-                        <button class="btn btn-sm" style="background:rgba(107,114,128,0.15);color:var(--muted);" onclick="stopVoice()">&#x23F9; Stop</button>
-                        <span style="font-size:0.75rem;color:var(--muted);flex:1;text-align:right;" id="voice-engine-lbl">MisoTTS 8B</span>
+
+                <div class="jarvis-center">
+                    <div class="jarvis-ring-wrap">
+                        <div class="jarvis-ring"></div>
+                        <div class="jarvis-ring2"></div>
+                        <div class="jarvis-ring3"></div>
+                        <div class="jarvis-core" id="j-core">
+                            <span class="jarvis-core-icon" id="j-core-icon">&#x1F916;</span>
+                        </div>
                     </div>
+                </div>
+
+                <div class="jarvis-bars-row" id="j-bars">
+                    <div class="j-bar" style="--delay:.1s"></div><div class="j-bar" style="--delay:.18s"></div>
+                    <div class="j-bar" style="--delay:.09s"></div><div class="j-bar" style="--delay:.22s"></div>
+                    <div class="j-bar" style="--delay:.15s"></div><div class="j-bar" style="--delay:.07s"></div>
+                    <div class="j-bar" style="--delay:.19s"></div><div class="j-bar" style="--delay:.13s"></div>
+                    <div class="j-bar" style="--delay:.24s"></div><div class="j-bar" style="--delay:.11s"></div>
+                    <div class="j-bar" style="--delay:.17s"></div><div class="j-bar" style="--delay:.08s"></div>
+                    <div class="j-bar" style="--delay:.21s"></div><div class="j-bar" style="--delay:.14s"></div>
+                    <div class="j-bar" style="--delay:.06s"></div><div class="j-bar" style="--delay:.20s"></div>
+                </div>
+
+                <div class="jarvis-transcript-box" id="j-transcript">Say <b>"JARVIS"</b> to activate voice mode...</div>
+                <div class="jarvis-response-box" id="j-response">Good day. I am JARVIS — Just A Rather Very Intelligent System. How may I assist you?</div>
+
+                <div class="jarvis-btn-row">
+                    <button class="j-mic-btn" id="j-mic-btn" onclick="jarvisMicToggle()">&#x1F3A4; ACTIVATE JARVIS</button>
+                    <button class="j-clear-btn" onclick="jClear()">&#x1F5D1;</button>
+                </div>
+                <div class="jarvis-wake-hint" id="j-hint">Wake word: "JARVIS" &nbsp;·&nbsp; Commands via voice or text</div>
+
+                <div style="display:flex;gap:.4rem;margin-top:.5rem;">
+                    <input id="j-text-input" style="flex:1;background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:.45rem .7rem;color:#cde;font-size:.8rem;outline:none;font-family:'Courier New',monospace;" placeholder="Or type a command..." onkeydown="if(event.key==='Enter')jTextSend()">
+                    <button onclick="jTextSend()" style="padding:.45rem .8rem;border-radius:8px;background:rgba(0,212,255,0.12);border:1px solid rgba(0,212,255,0.3);color:rgba(0,212,255,0.9);cursor:pointer;font-size:.8rem;">&#x25B6;</button>
                 </div>
             </div>
         </div>
@@ -1783,9 +1836,9 @@ function handleInputKey(e) {
     if (e.key === 'Escape') { document.getElementById('slash-dropdown').classList.remove('show'); dismissSuggestions(); }
 }
 
-function sendJarvis() {
+async function sendJarvis() {
     const inp = document.getElementById('jarvis-input');
-    const model = document.getElementById('model-select')?.value || 'jarvis-omni';
+    const model = document.getElementById('model-select')?.value || 'tinyllama';
     const cmd = inp.value.trim();
     if (!cmd) return;
     dismissSuggestions();
@@ -1794,19 +1847,236 @@ function sendJarvis() {
     chatHistory.push({role:'user', content: cmd});
     const thinking = document.createElement('div');
     thinking.className = 'msg msg-ai';
-    thinking.innerHTML = '<div class="msg-label">JARVIS MIND</div><div class="msg-bubble" style="color:var(--muted);font-style:italic;">&#x23F3; thinking...</div>';
+    thinking.innerHTML = '<div class="msg-label">JARVIS</div><div class="msg-bubble" style="color:var(--muted);font-style:italic;">&#x23F3; processing...</div>';
     document.getElementById('chat-messages').appendChild(thinking);
     document.getElementById('chat-messages').scrollTop = 9999;
-    setTimeout(() => {
-        thinking.remove();
+
+    // Try real VPS Ollama API first
+    let resp = await jarvisAskAI(cmd, model);
+    thinking.remove();
+    if (!resp) {
+        // Fallback to local slash-command responses
         const slash = cmd.match(/^(\/\w+)/)?.[1];
         const arg = slash ? cmd.slice(slash.length).trim() : cmd;
-        let resp;
-        if (slash && AI_RESPONSES[slash]) resp = AI_RESPONSES[slash](arg);
-        else resp = AI_RESPONSES['default'](cmd, model);
-        appendMsg('ai', resp);
-        chatHistory.push({role:'assistant', content: cmd});
-    }, 600 + Math.random()*800);
+        resp = (slash && AI_RESPONSES[slash]) ? AI_RESPONSES[slash](arg) : AI_RESPONSES['default'](cmd, model);
+    }
+    appendMsg('ai', resp);
+    chatHistory.push({role:'assistant', content: resp});
+}
+
+// ── IRON MAN JARVIS VOICE ENGINE ──────────────────────────────────────────
+const JARVIS_SYSTEM = `You are JARVIS (Just A Rather Very Intelligent System), Tony Stark's AI assistant.
+Reply in 1-3 short sentences. Be helpful, slightly formal, and precise. Address the user as "sir" occasionally.`;
+
+let jRecognition = null;
+let jState = 'standby'; // standby | awake | listening | processing | speaking
+let jWakeTimeout = null;
+let jVoiceEnabled = false;
+
+async function jarvisAskAI(prompt, model) {
+    try {
+        if (!vpsToken) await vpsLogin();
+        const r = await fetch(VPS.api + '/v1/chat', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json','Authorization':'Bearer '+vpsToken},
+            body: JSON.stringify({
+                messages: [
+                    {role:'system', content: JARVIS_SYSTEM},
+                    ...chatHistory.slice(-4),
+                    {role:'user', content: prompt}
+                ],
+                model: model || 'tinyllama'
+            }),
+            signal: AbortSignal.timeout(20000)
+        });
+        if (r.ok) {
+            const d = await r.json();
+            return d.response || d.message;
+        }
+    } catch {}
+    return null;
+}
+
+function jSetStatus(s) {
+    jState = s;
+    const pill = document.getElementById('j-status-pill');
+    const core = document.getElementById('j-core');
+    const bars = document.querySelectorAll('#j-bars .j-bar');
+    const icon = document.getElementById('j-core-icon');
+    const states = {
+        standby:    {text:'STANDBY',    color:'rgba(0,212,255,0.6)',  icon:'🤖', bars:false},
+        awake:      {text:'AWAKE',      color:'rgba(0,255,180,0.8)',  icon:'⚡', bars:true},
+        listening:  {text:'LISTENING',  color:'rgba(0,212,255,1)',    icon:'🎙️', bars:true},
+        processing: {text:'PROCESSING', color:'rgba(255,180,0,0.9)', icon:'⚙️', bars:true},
+        speaking:   {text:'SPEAKING',   color:'rgba(0,255,120,0.9)', icon:'🔊', bars:true}
+    };
+    const st = states[s] || states.standby;
+    if (pill) { pill.textContent = st.text; pill.style.color = st.color; pill.style.borderColor = st.color; }
+    if (core) { core.className = 'jarvis-core' + (s !== 'standby' ? ' listening' : ''); }
+    if (icon) icon.textContent = st.icon;
+    bars.forEach(b => {
+        b.className = st.bars ? 'j-bar active' : 'j-bar';
+    });
+}
+
+function jSetTranscript(t) {
+    const el = document.getElementById('j-transcript');
+    if (el) el.innerHTML = t;
+}
+function jSetResponse(t) {
+    const el = document.getElementById('j-response');
+    if (el) el.textContent = t;
+}
+function jClear() {
+    jSetTranscript('Say <b>"JARVIS"</b> to activate...');
+    jSetResponse('Cleared. Ready for your next command, sir.');
+    jSetStatus('standby');
+}
+
+function jarvisSpeak(text) {
+    return new Promise(resolve => {
+        if (!('speechSynthesis' in window)) { resolve(); return; }
+        speechSynthesis.cancel();
+        jSetStatus('speaking');
+        const u = new SpeechSynthesisUtterance(text);
+        u.rate = 0.88;
+        u.pitch = 0.82;
+        u.volume = 1;
+        const voices = speechSynthesis.getVoices();
+        const v = voices.find(v => /daniel|google uk|british|male.*en/i.test(v.name))
+               || voices.find(v => /en[-_]GB|en[-_]AU/i.test(v.lang))
+               || voices.find(v => /en/i.test(v.lang) && !v.name.includes('Female'));
+        if (v) u.voice = v;
+        u.onend = () => { jSetStatus(jVoiceEnabled ? 'listening' : 'standby'); resolve(); };
+        u.onerror = () => { jSetStatus(jVoiceEnabled ? 'listening' : 'standby'); resolve(); };
+        speechSynthesis.speak(u);
+    });
+}
+
+async function jarvisHandleCommand(cmd) {
+    if (!cmd.trim()) return;
+    jSetTranscript('You: ' + cmd);
+    jSetStatus('processing');
+    jSetResponse('Processing...');
+
+    let resp = await jarvisAskAI(cmd, 'tinyllama');
+    if (!resp) {
+        const lower = cmd.toLowerCase();
+        if (/time|clock/.test(lower)) resp = 'The current time is ' + new Date().toLocaleTimeString() + ', sir.';
+        else if (/date|day/.test(lower)) resp = 'Today is ' + new Date().toLocaleDateString('en-GB', {weekday:'long',year:'numeric',month:'long',day:'numeric'}) + '.';
+        else if (/status|health|online/.test(lower)) resp = 'All systems are operational. VPS fleet online. Mining fleet active, sir.';
+        else if (/hello|hi|hey/.test(lower)) resp = 'Hello, sir. JARVIS at your service. What do you need?';
+        else if (/thank/.test(lower)) resp = 'Of course, sir. That is what I am here for.';
+        else resp = 'Understood. VPS connection required for full AI processing. I am running in local mode, sir.';
+    }
+
+    jSetResponse(resp);
+    await jarvisSpeak(resp);
+}
+
+function jarvisWakeUp() {
+    jSetStatus('awake');
+    jSetTranscript('<span style="color:rgba(0,255,150,0.9)">⚡ JARVIS activated</span>');
+    clearTimeout(jWakeTimeout);
+    jarvisSpeak("Yes, sir?").then(() => {
+        if (jVoiceEnabled) jSetStatus('listening');
+    });
+    jWakeTimeout = setTimeout(() => {
+        if (jState === 'awake' || jState === 'listening') {
+            jSetStatus('standby');
+            jSetTranscript('Session timed out. Say <b>"JARVIS"</b> to wake again.');
+        }
+    }, 20000);
+}
+
+function initJarvisVoice() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+        jSetTranscript('Voice recognition not available in this browser. Use Chrome or Edge.');
+        return false;
+    }
+    jRecognition = new SR();
+    jRecognition.continuous = true;
+    jRecognition.interimResults = true;
+    jRecognition.lang = 'en-US';
+
+    let finalBuffer = '';
+    jRecognition.onresult = (e) => {
+        let interim = '', final = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+            if (e.results[i].isFinal) final += e.results[i][0].transcript;
+            else interim += e.results[i][0].transcript;
+        }
+        const combined = (finalBuffer + final + interim).toLowerCase();
+        jSetTranscript(interim || final || '...');
+
+        if (jState === 'standby' || jState === 'awake') {
+            if (/\bjarvis\b/.test(combined)) {
+                finalBuffer = '';
+                jarvisWakeUp();
+                return;
+            }
+        }
+        if (jState === 'listening' && final) {
+            const cleaned = final.replace(/\bjarvis[,.]?\s*/gi,'').trim();
+            if (cleaned.length > 2) {
+                finalBuffer = '';
+                jarvisHandleCommand(cleaned);
+            }
+        }
+        if (final) finalBuffer = '';
+    };
+
+    jRecognition.onerror = (e) => {
+        if (e.error !== 'no-speech') {
+            jSetTranscript('Mic error: ' + e.error + '. Please allow microphone access.');
+            jVoiceEnabled = false;
+            jSetStatus('standby');
+            document.getElementById('j-mic-btn').className = 'j-mic-btn';
+            document.getElementById('j-mic-btn').textContent = '🎤 ACTIVATE JARVIS';
+        }
+    };
+
+    jRecognition.onend = () => {
+        if (jVoiceEnabled) {
+            try { jRecognition.start(); } catch {}
+        }
+    };
+    return true;
+}
+
+function jarvisMicToggle() {
+    const btn = document.getElementById('j-mic-btn');
+    if (!jVoiceEnabled) {
+        if (!jRecognition && !initJarvisVoice()) return;
+        try {
+            jRecognition.start();
+            jVoiceEnabled = true;
+            btn.className = 'j-mic-btn recording';
+            btn.textContent = '⏹ STOP JARVIS';
+            jSetStatus('standby');
+            jSetTranscript('Listening for wake word... say <b>"JARVIS"</b>');
+            jarvisSpeak('JARVIS online. Say my name to activate, sir.');
+        } catch(e) {
+            jSetTranscript('Could not start microphone: ' + e.message);
+        }
+    } else {
+        jVoiceEnabled = false;
+        try { jRecognition.stop(); } catch {}
+        btn.className = 'j-mic-btn';
+        btn.textContent = '🎤 ACTIVATE JARVIS';
+        jSetStatus('standby');
+        jSetTranscript('Voice mode off. Say <b>"JARVIS"</b> to activate...');
+        speechSynthesis.cancel();
+    }
+}
+
+async function jTextSend() {
+    const inp = document.getElementById('j-text-input');
+    const cmd = inp.value.trim();
+    if (!cmd) return;
+    inp.value = '';
+    await jarvisHandleCommand(cmd);
 }
 
 function sendAbliterated() {
