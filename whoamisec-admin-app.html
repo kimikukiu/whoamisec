@@ -841,7 +841,7 @@ body {
                 <div class="chat-msg-label">WHOAMISec AI</div>
                 <div class="chat-msg-bubble">
                     <b style="color:var(--cyan);">Admin Chat Online</b> — Multi-model AI panel with Claude, GPT-4 Copilot, Abliterated models, and Ollama local models.<br>
-                    <span style="color:var(--text2);">Select a model above and start chatting. Responses are routed through 9Router at <code>localhost:20128</code>.</span><br>
+                    <span style="color:var(--text2);">Select a model above and start chatting. Auto-connects to <b>whoamisec.com</b> or your 9Router. Configure endpoints & JWT in Settings.</span><br>
                     <span style="color:var(--purple);">Copilot Mode</span> will auto-analyze system output and code.
                 </div>
             </div>
@@ -1137,9 +1137,20 @@ body {
     </div>
 
     <div class="card card-purple">
-        <div class="card-title"><span class="ct-icon">&#x1F310;</span> Service Endpoints</div>
+        <div class="card-title"><span class="ct-icon">&#x1F310;</span> AI Connection</div>
         <div class="setting-row">
-            <div><div class="setting-label">9Router Endpoint</div><div class="setting-sub">AI model router</div></div>
+            <div><div class="setting-label">Active Endpoint</div><div class="setting-sub" id="activeEndpointLabel">Checking...</div></div>
+            <div style="display:flex;align-items:center;gap:0.3rem;">
+                <div class="health-dot warn" id="connDot" style="width:8px;height:8px;"></div>
+                <span style="font-size:0.7rem;font-weight:600;color:var(--amber);" id="connText">Testing...</span>
+            </div>
+        </div>
+        <div class="setting-row">
+            <div><div class="setting-label">WHOAMISec JWT Token</div><div class="setting-sub">whoamisec.com auth token</div></div>
+            <input type="password" class="setting-input" id="whoamisecJwtInput" placeholder="Paste JWT token..." style="width:140px;">
+        </div>
+        <div class="setting-row">
+            <div><div class="setting-label">9Router Endpoint</div><div class="setting-sub">AI model router (fallback)</div></div>
             <input type="text" class="setting-input" id="routerUrl" value="http://localhost:20128">
         </div>
         <div class="setting-row">
@@ -1267,6 +1278,94 @@ try {
 
 function saveSettings() {
     try { localStorage.setItem('whoamisec_admin_settings', JSON.stringify(settings)); } catch(e) {}
+}
+
+/* ─── SMART CONNECTION SYSTEM ─── */
+const WHOAMISEC_API = 'https://whoamisec.com';
+let activeEndpoint = null; // 'whoamisec' | '9router' | null
+
+function getRouterUrl() {
+    var el = document.getElementById('routerUrl');
+    return el ? el.value.trim() : 'http://localhost:20128';
+}
+
+function getWhoamisecToken() {
+    var el = document.getElementById('whoamisecJwtInput');
+    if (el && el.value.trim()) return el.value.trim();
+    return localStorage.getItem('whoamisec_jwt') || '';
+}
+
+function saveJwtToken() {
+    var el = document.getElementById('whoamisecJwtInput');
+    if (el) localStorage.setItem('whoamisec_jwt', el.value.trim());
+}
+
+/* ─── CONNECTION CHECK ─── */
+function checkConnection() {
+    var dot = document.getElementById('connDot');
+    var txt = document.getElementById('connText');
+    var chatDot = document.getElementById('chatStatusDot');
+    var lbl = document.getElementById('activeEndpointLabel');
+
+    function setStatus(cls, color, label) {
+        if (dot) { dot.className = 'health-dot ' + cls; dot.style.width = '8px'; dot.style.height = '8px'; }
+        if (txt) { txt.textContent = label; txt.style.color = color; }
+        if (chatDot) chatDot.className = 'chat-status-dot ' + (cls === 'on' ? 'on' : 'off');
+    }
+
+    setStatus('warn', 'var(--amber)', 'Testing...');
+
+    // Test whoamisec.com first (3s timeout)
+    var controller = new AbortController();
+    var timeout = setTimeout(() => controller.abort(), 3000);
+
+    fetch(WHOAMISEC_API + '/api/v1/health', {
+        method: 'GET',
+        signal: controller.signal,
+        headers: getWhoamisecToken() ? { 'Authorization': 'Bearer ' + getWhoamisecToken() } : {}
+    }).then(function(res) {
+        clearTimeout(timeout);
+        if (res.ok) {
+            activeEndpoint = 'whoamisec';
+            setStatus('on', 'var(--green)', 'whoamisec.com');
+            if (lbl) lbl.textContent = 'Connected via whoamisec.com';
+            return;
+        }
+        return testRouter();
+    }).catch(function() {
+        clearTimeout(timeout);
+        return testRouter();
+    });
+
+    function testRouter() {
+        var router = getRouterUrl();
+        if (!router || router.indexOf('localhost') !== -1) {
+            activeEndpoint = null;
+            setStatus('off', 'var(--red)', 'Offline');
+            if (lbl) lbl.textContent = 'No reachable endpoint';
+            return;
+        }
+        var ctrl2 = new AbortController();
+        var t2 = setTimeout(() => ctrl2.abort(), 3000);
+        fetch(router + '/v1/models', { signal: ctrl2.signal })
+            .then(function(res) {
+                clearTimeout(t2);
+                if (res.ok) {
+                    activeEndpoint = '9router';
+                    setStatus('on', 'var(--cyan)', '9Router');
+                    if (lbl) lbl.textContent = 'Connected via 9Router';
+                } else {
+                    activeEndpoint = null;
+                    setStatus('off', 'var(--red)', 'Offline');
+                    if (lbl) lbl.textContent = 'Both endpoints failed';
+                }
+            }).catch(function() {
+                clearTimeout(t2);
+                activeEndpoint = null;
+                setStatus('off', 'var(--red)', 'Offline');
+                if (lbl) lbl.textContent = 'Both endpoints failed';
+            });
+    }
 }
 
 /* ─── SIMULATED DATA ─── */
@@ -1428,6 +1527,9 @@ function init() {
     startClock();
     startLiveUpdates();
     setInterval(addRandomActivity, 8000);
+    // Smart AI connection check on load + every 30s
+    checkConnection();
+    setInterval(checkConnection, 30000);
 }
 
 /* ─── CLOCK ─── */
@@ -1772,18 +1874,56 @@ window.sendChat = async function() {
     msgsEl.scrollTop = msgsEl.scrollHeight;
 
     try {
-        const routerUrl = document.getElementById('routerUrl').value || settings.routerUrl;
-        const res = await fetch(routerUrl + '/v1/chat/completions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                model: currentModel,
-                messages: messages,
-                temperature: 0.7,
-                max_tokens: 4096
-            })
-        });
-        const data = await res.json();
+        let res, data;
+
+        if (activeEndpoint === 'whoamisec') {
+            // Route via whoamisec.com API
+            const token = getWhoamisecToken();
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = 'Bearer ' + token;
+            res = await fetch(WHOAMISEC_API + '/api/v1/chat', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({
+                    model: currentModel,
+                    messages: messages,
+                    temperature: 0.7,
+                    max_tokens: 4096
+                })
+            });
+            data = await res.json();
+            // Normalize whoamisec response to OpenAI format
+            if (data.reply && !data.choices) {
+                data = { choices: [{ message: { content: data.reply } }] };
+            } else if (data.response && !data.choices) {
+                data = { choices: [{ message: { content: data.response } }] };
+            }
+        } else if (activeEndpoint === '9router') {
+            // Route via 9Router (OpenAI format)
+            const routerUrl = getRouterUrl();
+            res = await fetch(routerUrl + '/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: currentModel,
+                    messages: messages,
+                    temperature: 0.7,
+                    max_tokens: 4096
+                })
+            });
+            data = await res.json();
+        } else {
+            // No active endpoint
+            const typingEl = document.getElementById(typingId);
+            if (typingEl) typingEl.remove();
+            const offMsg = '⚠ <b>AI Offline</b> — No reachable endpoint. Configure your <b>WHOAMISec JWT token</b> or <b>9Router URL</b> in Settings and make sure at least one is accessible.';
+            chatHistories[currentModel].push({ role:'assistant', content: offMsg });
+            saveChatHistory();
+            msgsEl.insertAdjacentHTML('beforeend',
+                '<div class="chat-msg ai slide-up"><div class="chat-msg-label">System</div><div class="chat-msg-bubble" style="color:var(--red);">' + offMsg + '</div></div>');
+            msgsEl.scrollTop = msgsEl.scrollHeight;
+            return;
+        }
 
         // Remove typing indicator
         const typingEl = document.getElementById(typingId);
@@ -1817,7 +1957,7 @@ window.sendChat = async function() {
     } catch(err) {
         const typingEl = document.getElementById(typingId);
         if (typingEl) typingEl.remove();
-        const errMsg = 'Connection failed: ' + err.message + '\n\nEnsure 9Router is running at ' + settings.routerUrl;
+        const errMsg = 'Connection failed: ' + err.message + '\n\nEndpoint: ' + (activeEndpoint || 'none') + '. Check Settings and try again.';
         chatHistories[currentModel].push({ role:'assistant', content:errMsg });
         saveChatHistory();
         msgsEl.insertAdjacentHTML('beforeend',
@@ -1940,6 +2080,12 @@ function loadSettings() {
     document.getElementById('updateInterval').value = settings.updateInterval;
     document.getElementById('poolUrl').value = settings.poolUrl || 'supportxmr.com:3333';
     document.getElementById('poolWorker').value = settings.poolWorker || 'whoamisec-admin-01';
+    // JWT token
+    var jwtEl = document.getElementById('whoamisecJwtInput');
+    if (jwtEl) {
+        jwtEl.value = localStorage.getItem('whoamisec_jwt') || '';
+        jwtEl.addEventListener('input', saveJwtToken);
+    }
 }
 
 window.exportData = function() {

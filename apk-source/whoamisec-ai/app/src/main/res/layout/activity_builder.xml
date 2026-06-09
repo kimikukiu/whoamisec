@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- WHOAMISecAI Builder — 28-Phase Pipeline UI -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0a0a0f">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:background="#0d0d14"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🔨 28-Phase Neural Pipeline"
+            android:textColor="#8b5cf6"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace" />
+
+        <TextView
+            android:id="@+id/elapsed_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00"
+            android:textColor="#a0a0b0"
+            android:textSize="12sp"
+            android:fontFamily="monospace"
+            android:layout_marginStart="8dp" />
+
+        <Button
+            android:id="@+id/builder_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="⏹ Stop"
+            android:textColor="#f87171"
+            android:textSize="11sp"
+            android:background="#1a1a2e"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:visibility="gone"
+            android:fontFamily="monospace" />
+
+        <Button
+            android:id="@+id/builder_clear"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:text="🗑 Clear"
+            android:textColor="#666"
+            android:textSize="11sp"
+            android:background="#1a1a2e"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:fontFamily="monospace"
+            android:layout_marginStart="4dp" />
+    </LinearLayout>
+
+    <!-- Phase Bar (horizontal scroll, 28 dots) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#08080e"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/phase_bar_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp" />
+        </HorizontalScrollView>
+
+        <!-- Phase label -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp">
+
+            <TextView
+                android:id="@+id/phase_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="IDLE"
+                android:textColor="#a0a0b0"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:fontFamily="monospace" />
+
+            <TextView
+                android:id="@+id/phase_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="#666"
+                android:textSize="11sp"
+                android:fontFamily="monospace"
+                android:layout_marginStart="8dp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <!-- Agent panel toggle -->
+            <LinearLayout
+                android:id="@+id/agent_panel_toggle"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="#1a1a2e"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="👥 11 Agents"
+                    android:textColor="#8b5cf6"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Agent detail label -->
+        <TextView
+            android:id="@+id/phase_agent_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#666"
+            android:textSize="10sp"
+            android:fontFamily="monospace"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="4dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <!-- Overall progress -->
+        <ProgressBar
+            android:id="@+id/overall_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:max="100"
+            android:progress="0"
+            android:progressTint="#8b5cf6"
+            android:progressBackgroundTint="#1a1a2e" />
+    </LinearLayout>
+
+    <!-- Agent Panel (expandable) -->
+    <LinearLayout
+        android:id="@+id/agent_panel_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="#08080e"
+        android:visibility="gone">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/agent_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="6dp"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            android:nestedScrollingEnabled="true" />
+    </LinearLayout>
+
+    <!-- Terminal + Chat (scrollable) -->
+    <LinearLayout
+        android:id="@+id/content_panel"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Terminal -->
+        <ScrollView
+            android:id="@+id/terminal_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#060609"
+            android:padding="8dp"
+            android:scrollbars="vertical">
+
+            <LinearLayout
+                android:id="@+id/terminal_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </ScrollView>
+
+        <!-- Chat messages (below terminal) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/builder_chat_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="8dp"
+            android:clipToPadding="false"
+            android:scrollbars="vertical" />
+    </LinearLayout>
+
+    <!-- Input area -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#0d0d14"
+        android:padding="8dp"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/builder_input"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:background="#1a1a2e"
+            android:hint="Describe what to build…"
+            android:textColorHint="#444"
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            android:fontFamily="monospace"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:inputType="textMultiLine"
+            android:maxLines="3"
+            android:imeOptions="flagNoEnterAction|actionSend"
+            android:importantForAutofill="no" />
+
+        <Button
+            android:id="@+id/builder_send"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:text="▶"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            android:background="#8b5cf6"
+            android:padding="0dp" />
+    </LinearLayout>
+</LinearLayout>

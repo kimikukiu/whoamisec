@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- WHOAMISecAI Settings -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0a0a0f">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="⚙️ Settings"
+            android:textColor="#8b5cf6"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace" />
+
+        <!-- API Key -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔑 Admin API Key"
+            android:textColor="#a0a0b0"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace" />
+
+        <EditText
+            android:id="@+id/settings_admin_key"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="6dp"
+            android:background="#1a1a2e"
+            android:hint="Enter your WHOAMISecAI admin key"
+            android:textColorHint="#444"
+            android:textColor="#ffffff"
+            android:textSize="13sp"
+            android:fontFamily="monospace"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:inputType="textPassword"
+            android:importantForAutofill="no" />
+
+        <!-- Default Model -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="🤖 Default Model"
+            android:textColor="#a0a0b0"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace" />
+
+        <EditText
+            android:id="@+id/settings_model"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="6dp"
+            android:background="#1a1a2e"
+            android:hint="openai/gpt-4o"
+            android:textColorHint="#444"
+            android:textColor="#ffffff"
+            android:textSize="13sp"
+            android:fontFamily="monospace"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:inputType="text"
+            android:importantForAutofill="no" />
+
+        <!-- Pipeline Mode -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="⚡ Default Pipeline Mode"
+            android:textColor="#a0a0b0"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace" />
+
+        <Spinner
+            android:id="@+id/settings_pipeline_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="6dp"
+            android:backgroundTint="#8b5cf6"
+            android:entries="@array/pipeline_modes" />
+
+        <!-- Save button -->
+        <Button
+            android:id="@+id/settings_save"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="24dp"
+            android:text="💾 Save Settings"
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            android:background="#8b5cf6"
+            android:fontFamily="monospace" />
+
+        <!-- Biometric -->
+        <Button
+            android:id="@+id/settings_biometric"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:text="🔐 Test Biometric Auth"
+            android:textColor="#8b5cf6"
+            android:textSize="14sp"
+            android:background="#1a1a2e"
+            android:fontFamily="monospace" />
+
+        <!-- Info -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="WHOAMISecAI v10 — Synthetic Intelligence Engine\nwhoamisecai | @proplanwh\nhttps://whoamisecai.vercel.app\n\nEndpoints:\n• Builder: /api/builder/ide-chat\n• Chat: /api/ai/v1/chat/completions\n• OSINT: /api/tools/telegram-osint\n• JARVIS: /api/jarvis-orchestrator"
+            android:textColor="#555"
+            android:textSize="11sp"
+            android:fontFamily="monospace"
+            android:lineSpacingExtra="4dp" />
+    </LinearLayout>
+</ScrollView>

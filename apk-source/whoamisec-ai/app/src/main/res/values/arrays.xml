@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pipeline_modes">
+        <item>LLM — Fast</item>
+        <item>MLM — Multi-Level</item>
+        <item>ALLM — Full Pipeline</item>
+    </string-array>
+
+    <string-array name="pipeline_mode_values">
+        <item>llm</item>
+        <item>mlm</item>
+        <item>allm</item>
+    </string-array>
+</resources>

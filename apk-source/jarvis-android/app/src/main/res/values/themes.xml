@@ -1,0 +1,39 @@
+<resources>
+    <style name="Theme_Jarvis" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/jarvis_primary</item>
+        <item name="colorOnPrimary">@color/jarvis_bg</item>
+        <item name="colorSecondary">@color/jarvis_accent</item>
+        <item name="android:statusBarColor">@color/jarvis_bg</item>
+        <item name="android:navigationBarColor">@color/jarvis_bg</item>
+        <item name="android:windowBackground">@color/jarvis_bg</item>
+        <item name="android:colorBackground">@color/jarvis_bg</item>
+        <item name="android:textColorPrimary">@color/jarvis_text</item>
+        <item name="android:textColorSecondary">@color/jarvis_dim</item>
+    </style>
+
+    <style name="JarvisTextGreen" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/jarvis_primary</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="JarvisTextStatus" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/jarvis_primary</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:letterSpacing">0.15</item>
+    </style>
+
+    <style name="JarvisTranscript" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/jarvis_text</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="JarvisResponse" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/jarvis_primary</item>
+        <item name="android:fontFamily">monospace</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+</resources>

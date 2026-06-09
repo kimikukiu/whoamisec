@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- JARVIS HUD — Full Screen Immersive Overlay -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- JARVIS HUD Canvas (full screen) -->
+    <com.whoamisecai.jarvis.hud.JarvisHudView
+        android:id="@+id/jarvis_hud"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Transcript overlay (what JARVIS heard) -->
+    <TextView
+        android:id="@+id/jarvis_transcript"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginTop="90dp"
+        android:padding="12dp"
+        android:background="#88000000"
+        android:text=""
+        android:textColor="#00E5FF"
+        android:textSize="16sp"
+        android:fontFamily="monospace"
+        android:textAlignment="center"
+        android:visibility="gone"
+        android:shadowColor="#00E5FF"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="4" />
+
+    <!-- Response overlay (what JARVIS says) -->
+    <TextView
+        android:id="@+id/jarvis_response"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_gravity="center"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="160dp"
+        android:layout_marginBottom="120dp"
+        android:padding="16dp"
+        android:background="#44000000"
+        android:text=""
+        android:textColor="#AAFFFFFF"
+        android:textSize="14sp"
+        android:fontFamily="monospace"
+        android:lineSpacingExtra="4dp"
+        android:scrollbars="vertical"
+        android:visibility="gone"
+        android:gravity="center_horizontal|top"
+        android:shadowColor="#8B5CF6"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="2" />
+
+    <!-- Command log (scrollable, bottom-left) -->
+    <TextView
+        android:id="@+id/jarvis_log"
+        android:layout_width="280dp"
+        android:layout_height="100dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="60dp"
+        android:padding="8dp"
+        android:background="#22000000"
+        android:text=""
+        android:textColor="#5500E5FF"
+        android:textSize="8sp"
+        android:fontFamily="monospace"
+        android:scrollbars="vertical"
+        android:visibility="visible" />
+
+</FrameLayout>

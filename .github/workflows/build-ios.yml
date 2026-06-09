@@ -7,8 +7,16 @@ on:
       - 'jarvis-mind-app.html'
       - 'whoamisec-business-app.html'
       - 'cicada-omni-app.html'
+      - 'cicada-admin-app.html'
+      - 'whoamisec-admin-app.html'
+      - 'xmr-miner-fleet-app.html'
+      - 'jarvis-admin-app.html'
+      - 'dashboard.html'
       - 'manifest.json'
       - 'sw.js'
+      - 'cicada-icon.png'
+      - 'jarvis-icon.png'
+      - 'whoamisec-icon.png'
       - '.github/workflows/build-ios.yml'
   workflow_dispatch:
 
@@ -186,11 +194,16 @@ jobs:
       - name: Set CICADA 3301 iOS app icon
         working-directory: apk-build
         run: |
-          pip3 install -q Pillow 2>/dev/null || true
-          python3 << 'EOF'
+          pip3 install Pillow
+          python3 << 'PYEOF'
           from PIL import Image
           import os, json
-          img = Image.open('${{ github.workspace }}/cicada-icon.png').convert('RGBA')
+          img = Image.open('${{ github.workspace }}/cicada-icon.png')
+          if img.mode != 'RGBA':
+              img = img.convert('RGBA')
+          w, h = img.size
+          size = min(w, h)
+          img = img.crop(((w-size)//2, (h-size)//2, (w+size)//2, (h+size)//2))
           icon_dir = 'ios/App/App/Assets.xcassets/AppIcon.appiconset'
           os.makedirs(icon_dir, exist_ok=True)
           sizes = [(20,1),(20,2),(20,3),(29,1),(29,2),(29,3),(40,1),(40,2),(40,3),(60,2),(60,3),(76,1),(76,2),(83,2),(1024,1)]
@@ -203,7 +216,7 @@ jobs:
           with open(f'{icon_dir}/Contents.json','w') as f:
               json.dump(contents, f, indent=2)
           print('CICADA iOS icons installed')
-          EOF
+          PYEOF
 
       - name: Build archive — CICADA 3301
         working-directory: apk-build/ios/App

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Whoamisecai" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/bgMain</item>
+        <item name="android:navigationBarColor">@color/navigationBarColor</item>
+        <item name="android:statusBarColor">@color/statusBarColor</item>
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="textColorPrimary">@color/textPrimary</item>
+        <item name="textColorSecondary">@color/textSecondary</item>
+        <item name="android:textColorPrimary">@color/textPrimary</item>
+        <item name="android:textColorSecondary">@color/textSecondary</item>
+    </style>
+
+    <style name="Theme.Whoamisecai.Splash" parent="Theme.Whoamisecai">
+        <item name="android:windowBackground">@color/splashBackground</item>
+    </style>
+
+    <style name="Theme.Jarvis" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:windowBackground">#000000</item>
+        <item name="android:statusBarColor">#00000000</item>
+        <item name="android:navigationBarColor">#00000000</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
+    <!-- Dark Card Style -->
+    <style name="DarkCardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/bgCard</item>
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">#1a1a2e</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <!-- Dark TextInput -->
+    <style name="DarkTextInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/bgInput</item>
+        <item name="boxStrokeColor">#1a1a2e</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="hintTextColor">@color/textTertiary</item>
+        <item name="android:textColor">@color/textPrimary</item>
+    </style>
+
+    <!-- Dark Button -->
+    <style name="DarkButton" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/colorPrimary</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <!-- Dark Outlined Button -->
+    <style name="DarkOutlinedButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+</resources>

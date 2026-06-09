@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Agent card for Mission Control panel -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/agent_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="#1a1a2e"
+    android:padding="8dp"
+    android:layout_margin="2dp"
+    android:gravity="center_vertical">
+
+    <!-- Emoji -->
+    <TextView
+        android:id="@+id/agent_emoji"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:text="🛡️"
+        android:textSize="18sp"
+        android:gravity="center" />
+
+    <!-- Name + Role -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="8dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/agent_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Agent Name"
+            android:textColor="#ffffff"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace" />
+
+        <TextView
+            android:id="@+id/agent_role"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Role description"
+            android:textColor="#666"
+            android:textSize="9sp"
+            android:fontFamily="monospace"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <!-- Current task (shown when active) -->
+        <TextView
+            android:id="@+id/agent_task"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#f59e0b"
+            android:textSize="9sp"
+            android:fontFamily="monospace"
+            android:visibility="gone"
+            android:maxLines="1"
+            android:ellipsize="end" />
+    </LinearLayout>
+
+    <!-- Status Badge -->
+    <TextView
+        android:id="@+id/agent_status_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="18dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:text="STANDBY"
+        android:textColor="#ffffff"
+        android:textSize="8sp"
+        android:textStyle="bold"
+        android:fontFamily="monospace"
+        android:gravity="center" />
+</LinearLayout>

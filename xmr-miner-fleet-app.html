@@ -1008,6 +1008,54 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        /* ===== SETTINGS INPUT ===== */
+        .settings-input-row {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #00ff0011;
+            gap: 8px;
+        }
+        .settings-input-row:last-child {
+            border-bottom: none;
+        }
+        .settings-input-row .sr-label {
+            color: #00ff0066;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+        .settings-input-row input[type="text"] {
+            flex: 1;
+            background: #0a0a0a;
+            border: 1px solid #00ff0033;
+            color: #00ff00;
+            padding: 5px 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            border-radius: 4px;
+            outline: none;
+            min-width: 0;
+        }
+        .settings-input-row input[type="text"]:focus {
+            border-color: #00ff00;
+            box-shadow: 0 0 4px #00ff0033;
+        }
+        .settings-input-row button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 9px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .settings-input-row button:active {
+            opacity: 0.7;
+        }
+
         /* ===== MISC ===== */
         .text-center { text-align: center; }
         .text-amber { color: #f59e0b; }
@@ -1097,8 +1145,8 @@
                 <div class="log-box" id="miningLog"></div>
 
                 <!-- API Status -->
-                <div class="text-center" style="font-size:9px;color:#00ff0033;padding:4px 0;">
-                    API: localhost:8081 | POOL: pool.supportxmr.com:3333 | AUTO-REFRESH: 3s
+                <div class="text-center" id="apiStatusFooter" style="font-size:9px;color:#00ff0033;padding:4px 0;">
+                    API: loading... | POOL: pool.supportxmr.com:3333 | AUTO-REFRESH: 3s
                 </div>
             </div>
 
@@ -1261,6 +1309,21 @@
                     </div>
                 </div>
 
+                <!-- API Endpoint Config -->
+                <div class="section-title">API Endpoint</div>
+                <div class="settings-group">
+                    <div class="sg-title">XMRig API URL (configurable)</div>
+                    <div class="settings-input-row">
+                        <span class="sr-label">API URL</span>
+                        <input type="text" id="apiUrlInput" placeholder="http://localhost:8081/api/summary">
+                        <button onclick="saveApiUrl()">SAVE</button>
+                    </div>
+                    <div class="settings-row">
+                        <span class="sr-label">Status</span>
+                        <span class="sr-value" id="apiUrlStatus">--</span>
+                    </div>
+                </div>
+
                 <!-- Pool Config -->
                 <div class="section-title">Pool Configuration</div>
                 <div class="settings-group">
@@ -1272,10 +1335,6 @@
                     <div class="settings-row">
                         <span class="sr-label">Algorithm</span>
                         <span class="sr-value">RANDOMX (Monero)</span>
-                    </div>
-                    <div class="settings-row">
-                        <span class="sr-label">API Port</span>
-                        <span class="sr-value">localhost:8081</span>
                     </div>
                     <div class="settings-row">
                         <span class="sr-label">Worker ID</span>
@@ -1416,7 +1475,8 @@
 
         // ===== CONSTANTS =====
         const XMR_WALLET = '8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ';
-        const API_URL = 'http://localhost:8081/api/summary';
+        const DEFAULT_API_URL = 'http://localhost:8081/api/summary';
+        let API_URL = DEFAULT_API_URL;
         const MINING_REFRESH = 3000;     // 3 seconds
         const NODE_REFRESH = 10000;       // 10 seconds
         const HASH_HISTORY_MAX = 60;       // data points for chart
@@ -1452,8 +1512,37 @@
             payouts: []
         };
 
+        // ===== API URL MANAGEMENT =====
+        function loadApiUrl() {
+            try {
+                var saved = localStorage.getItem('minerFleetApiUrl');
+                if (saved && saved.trim().length > 0) {
+                    API_URL = saved.trim();
+                }
+            } catch (e) {}
+            document.getElementById('apiUrlInput').value = API_URL;
+            document.getElementById('apiUrlStatus').textContent = API_URL;
+        }
+
+        function saveApiUrl() {
+            var input = document.getElementById('apiUrlInput');
+            var val = input.value.trim();
+            if (!val) {
+                val = DEFAULT_API_URL;
+            }
+            API_URL = val;
+            try {
+                localStorage.setItem('minerFleetApiUrl', API_URL);
+            } catch (e) {}
+            document.getElementById('apiUrlStatus').textContent = API_URL;
+            document.getElementById('apiStatusFooter').textContent = 'API: ' + API_URL.replace(/^https?:\/\//, '').replace(/\/.*$/, '') + ' | POOL: pool.supportxmr.com:3333 | AUTO-REFRESH: 3s';
+            addLog('[CONFIG] API URL updated to ' + API_URL, 'ok');
+            showToast('API URL Saved');
+        }
+
         // ===== INITIALIZATION =====
         function init() {
+            loadApiUrl();
             loadClientData();
             initNodes();
             initChart();
@@ -1487,6 +1576,7 @@
 
             addLog('MINER_FLEET v2.0.0 initialized');
             addLog('Connecting to XMRig API at ' + API_URL);
+            document.getElementById('apiStatusFooter').textContent = 'API: ' + API_URL.replace(/^https?:\/\//, '').replace(/\/.*$/, '') + ' | POOL: pool.supportxmr.com:3333 | AUTO-REFRESH: 3s';
         }
 
         // ===== LOCAL STORAGE =====
