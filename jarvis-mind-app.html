@@ -81,8 +81,8 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
 .sbtn{background:linear-gradient(135deg,rgba(0,110,150,.4),rgba(0,212,255,.18));border-color:rgba(0,212,255,.45);font-size:.72rem;font-weight:800;padding:.48rem .8rem;}
 
 /* COPILOT */
-#cop{position:fixed;bottom:0;left:0;right:0;z-index:600;background:rgba(0,5,15,.97);border-top:2px solid rgba(0,212,255,.32);transform:translateY(100%);transition:transform .22s ease;max-height:52vh;display:flex;flex-direction:column;}
-#cop.open{transform:translateY(0);}
+#cop{position:fixed;bottom:0;left:0;right:0;z-index:600;background:rgba(0,5,15,.97);border-top:2px solid rgba(0,212,255,.32);transform:translateY(100%);transition:transform .22s ease;max-height:52vh;display:flex;flex-direction:column;pointer-events:none;}
+#cop.open{transform:translateY(0);pointer-events:auto;}
 .cph{display:flex;align-items:center;padding:.45rem .75rem;border-bottom:1px solid var(--b);flex-shrink:0;gap:.5rem;}
 .cpl{font-size:.58rem;color:var(--c);flex:1;}
 .cpbt{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.22);color:var(--c);border-radius:6px;padding:.2rem .45rem;font-size:.62rem;cursor:pointer;}
