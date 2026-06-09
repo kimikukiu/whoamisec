@@ -125,7 +125,7 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
 .anm{font-size:.68rem;flex:1;}.ata{font-size:.56rem;color:var(--m);}
 
 /* SWARM */
-#swc{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:.18;}
+#swc{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.15;}
 
 .slbl{font-size:.64rem;color:var(--m);letter-spacing:.1em;margin-bottom:.25rem;}
 .sinp{width:100%;background:rgba(0,212,255,.05);border:1px solid var(--b);color:var(--t);padding:.45rem .6rem;font-family:'Courier New',monospace;font-size:.76rem;border-radius:8px;outline:none;margin-bottom:.65rem;}
@@ -150,8 +150,6 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
 </head>
 <body>
 
-<!-- SWARM CANVAS — 2700 agenți animați -->
-<canvas id="swc"></canvas>
 
 
 <div id="app">
@@ -164,6 +162,7 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
   </div>
 
   <div id="hud">
+    <canvas id="swc"></canvas>
     <div class="rw" id="rwrap">
       <div class="ri3d" id="ri3d">
         <div class="r r0"></div><div class="r r1"></div>
