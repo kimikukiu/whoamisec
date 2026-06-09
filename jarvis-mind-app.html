@@ -26,12 +26,6 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
 #hud{flex:1;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:.15rem .7rem .2rem;position:relative;}
 #hud::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 35%,rgba(0,90,140,.22) 0%,transparent 62%);pointer-events:none;}
 
-/* CORNER BRACKETS */
-.cx{position:fixed;width:20px;height:20px;pointer-events:none;z-index:5;}
-.cx.tl{top:46px;left:4px;border-top:2px solid rgba(0,212,255,.6);border-left:2px solid rgba(0,212,255,.6);}
-.cx.tr{top:46px;right:4px;border-top:2px solid rgba(0,212,255,.6);border-right:2px solid rgba(0,212,255,.6);}
-.cx.bl{bottom:52px;left:4px;border-bottom:2px solid rgba(0,212,255,.6);border-left:2px solid rgba(0,212,255,.6);}
-.cx.br{bottom:52px;right:4px;border-bottom:2px solid rgba(0,212,255,.6);border-right:2px solid rgba(0,212,255,.6);}
 
 /* RINGS — animations OFF until .go class added by JS */
 .rw{position:relative;width:min(34vw,120px);height:min(34vw,120px);margin:.04rem auto;flex-shrink:0;perspective:600px;pointer-events:none;}
@@ -159,9 +153,6 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
 <!-- SWARM CANVAS — 2700 agenți animați -->
 <canvas id="swc"></canvas>
 
-<!-- CORNER BRACKETS -->
-<div class="cx tl"></div><div class="cx tr"></div>
-<div class="cx bl"></div><div class="cx br"></div>
 
 <div id="app">
   <div class="hdr">
