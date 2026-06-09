@@ -316,6 +316,22 @@
         .cipher-banner { font-family:'JetBrains Mono',monospace; font-size:0.78rem; font-weight:700; letter-spacing:0.1em; color:#39ff14; text-shadow:0 0 8px #39ff14,0 0 18px rgba(57,255,20,0.5); text-align:center; padding:0.5rem 0.75rem; margin-bottom:0.75rem; background:rgba(57,255,20,0.04); border:1px solid rgba(57,255,20,0.15); border-radius:8px; animation:cipher-glow-b 3s ease-in-out infinite,cipher-flick-b 9s steps(1) infinite; }
         @keyframes cipher-glow-b { 0%,100%{text-shadow:0 0 8px #39ff14,0 0 18px rgba(57,255,20,.5);}50%{text-shadow:0 0 18px #39ff14,0 0 38px rgba(57,255,20,.9);} }
         @keyframes cipher-flick-b { 0%,88%,100%{opacity:1;}89%,91%{opacity:.1;}90%{opacity:1;} }
+        /* ── PAYMENT MODAL ── */
+        #pay-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.97);overflow-y:auto;padding:1.5rem;display:none;}
+        #pay-modal.open{display:block;}
+        .pay-title-h{font-size:1rem;font-weight:900;letter-spacing:.15em;color:var(--cyan);margin-bottom:.25rem;}
+        .pay-sub-h{font-size:.52rem;letter-spacing:.1em;color:var(--muted);margin-bottom:1rem;}
+        .pay-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.55rem;margin-bottom:.8rem;}
+        .pay-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;padding:.9rem;text-align:center;cursor:pointer;transition:.2s;}
+        .pay-card:hover{border-color:var(--cyan);transform:translateY(-2px);box-shadow:0 4px 14px rgba(6,182,212,.2);}
+        .pay-icon{font-size:1.8rem;margin-bottom:.35rem;}
+        .pay-nm{font-size:.65rem;font-weight:700;margin-bottom:.15rem;}
+        .pay-fee{font-size:.52rem;color:var(--muted);}
+        .pay-inv{display:none;background:rgba(255,255,255,.02);border:1.5px solid var(--cyan);border-radius:8px;padding:1.3rem;text-align:center;margin-top:.5rem;}
+        .pay-addr{background:rgba(0,0,0,.5);border:1px solid var(--border);padding:.6rem;word-break:break-all;font-size:.68rem;margin:.6rem 0;font-family:'JetBrains Mono',monospace;border-radius:4px;color:var(--cyan);}
+        .pay-cpbtn{background:var(--cyan);color:#000;border:none;padding:.45rem 1.1rem;font-weight:700;font-family:inherit;cursor:pointer;font-size:.8rem;border-radius:6px;}
+        .pay-sel{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text1);padding:.6rem;font-family:inherit;font-size:.8rem;margin-bottom:.8rem;border-radius:6px;outline:none;}
+        #pay-fab{position:fixed;bottom:72px;right:12px;z-index:8500;background:linear-gradient(135deg,var(--cyan),var(--emerald));color:#000;border:none;border-radius:50%;width:44px;height:44px;font-size:1.1rem;cursor:pointer;box-shadow:0 0 16px rgba(6,182,212,.5);line-height:44px;text-align:center;}
     </style>
 </head>
 <body>
@@ -1277,6 +1293,72 @@ function bsSendGift() {
     if (!to) { showNotif('Enter email or Telegram username'); return; }
     showNotif('🎁 Gift ' + plan.toUpperCase() + ' → ' + to + ' · Pay XMR to confirm');
 }
+function bsPlan(plan) {
+    const p = {free:'0 XMR',starter:'0.05 XMR/mo',pro:'0.10 XMR/mo',business:'0.25 XMR/mo',enterprise:'0.50 XMR/mo',supreme:'1.00 XMR/mo'};
+    showNotif('Plan: ' + plan.toUpperCase() + ' · ' + (p[plan]||'') + ' · Opening payment…');
+    openPayModal();
+}
+
+// ══ PAYMENT GATEWAY ════════════════════════════════════════════
+const PAY_PRODUCTS_B = [
+  {v:'0.01',l:'🧩 Puzzle Access — 0.01 XMR / $2'},
+  {v:'0.05',l:'🦗 Full Puzzle Set — 0.05 XMR / $10'},
+  {v:'0.10',l:'🖥 VPS 256 GB — 0.10 XMR / $20'},
+  {v:'0.05',l:'⛏ Miner 10 Nodes — 0.05 XMR / $10'},
+  {v:'0.35',l:'⛏ Miner 100 Nodes — 0.35 XMR / $70'},
+  {v:'0.10',l:'⭐ Monthly Subscription — 0.10 XMR / $20'},
+  {v:'0.25',l:'👑 Affiliate Upgrade — 0.25 XMR / $50'},
+];
+const PAY_METHODS_B = [
+  {icon:'🦗',name:'Monero (XMR)',    fee:'0%',   time:'~20 min',anon:true, addr:'contact admin for XMR address'},
+  {icon:'⚡',name:'Lightning (BTC)', fee:'0.1%', time:'~5 sec', anon:true, addr:'contact admin for Lightning invoice'},
+  {icon:'💵',name:'USDC (Polygon)',  fee:'0.5%', time:'~3 min', anon:false,addr:'contact admin for USDC address'},
+  {icon:'₿', name:'Bitcoin (BTC)',   fee:'0.8%', time:'~30 min',anon:false,addr:'contact admin for BTC address'},
+  {icon:'Ł', name:'Litecoin (LTC)',  fee:'0.3%', time:'~10 min',anon:false,addr:'contact admin for LTC address'},
+  {icon:'📱',name:'PayPal Crypto',  fee:'1.5%', time:'~30 sec',anon:false,addr:'contact@whoamisec.com'},
+  {icon:'🎁',name:'Gift Card',      fee:'0%',   time:'~24h',   anon:true, addr:'contact@whoamisec.com'},
+];
+function openPayModal() {
+  document.getElementById('pay-modal').classList.add('open');
+  document.getElementById('pay-grid').innerHTML = PAY_METHODS_B.map((p,i) => `<div class="pay-card" onclick="_bPay(${i})"><div class="pay-icon">${p.icon}</div><div class="pay-nm">${p.name}</div><div class="pay-fee">Fee: ${p.fee} · ${p.time}</div><div class="pay-fee">${p.anon?'🔒 Anon':'📝 ID'}</div></div>`).join('');
+  document.getElementById('pay-inv').style.display = 'none';
+}
+function closePayModal() { document.getElementById('pay-modal').classList.remove('open'); }
+function _bPay(i) {
+  const m = PAY_METHODS_B[i];
+  const sel = document.getElementById('pay-sel');
+  const prod = PAY_PRODUCTS_B[sel.selectedIndex];
+  const inv = document.getElementById('pay-inv');
+  inv.style.display = 'block';
+  inv.innerHTML = `<div style="font-size:.65rem;font-weight:900;letter-spacing:.08em;color:var(--cyan);margin-bottom:.6rem;">${m.icon} ${m.name.toUpperCase()}</div><div style="font-size:.6rem;color:var(--muted);margin-bottom:.25rem;">PRODUCT</div><div style="font-size:.78rem;margin-bottom:.6rem;">${prod.l}</div><div style="font-size:.6rem;color:var(--muted);margin-bottom:.25rem;">AMOUNT</div><div style="font-size:1rem;font-weight:700;color:var(--cyan);margin-bottom:.6rem;">${prod.v} XMR</div>${i>0?'<div style="font-size:.5rem;color:var(--muted);margin-bottom:.4rem;">Auto-swap → XMR via ChangeNOW</div>':''}<div style="font-size:.6rem;color:var(--muted);margin-bottom:.25rem;">SEND TO</div><div class="pay-addr" id="pay-addr-val">${m.addr}</div><button class="pay-cpbtn" onclick="navigator.clipboard.writeText(document.getElementById('pay-addr-val').textContent).then(()=>{this.textContent='✓ COPIED';setTimeout(()=>this.textContent='📋 COPY',1500)})">📋 COPY</button><div style="margin-top:.7rem;font-size:.52rem;color:var(--muted);">Send TX ID to Telegram @whoamisec_bot to activate.</div>`;
+  inv.scrollIntoView({behavior:'smooth'});
+}
 </script>
+
+<!-- PAYMENT FAB -->
+<button id="pay-fab" onclick="openPayModal()" title="Payment Gateway">💳</button>
+
+<!-- PAYMENT MODAL -->
+<div id="pay-modal">
+  <div style="max-width:560px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;">
+      <div class="pay-title-h">💳 PAYMENT GATEWAY</div>
+      <button onclick="closePayModal()" style="background:none;border:1px solid var(--border);color:var(--muted);padding:.25rem .6rem;font-family:inherit;cursor:pointer;border-radius:4px;font-size:.75rem;">✕ Close</button>
+    </div>
+    <div class="pay-sub-h">7 METHODS · ALL CONVERT TO XMR · ANONYMOUS OPTIONS AVAILABLE</div>
+    <select class="pay-sel" id="pay-sel">
+      <option>🧩 Puzzle Access — 0.01 XMR / $2</option>
+      <option>🦗 Full Puzzle Set — 0.05 XMR / $10</option>
+      <option>🖥 VPS 256 GB — 0.10 XMR / $20</option>
+      <option>⛏ Miner 10 Nodes — 0.05 XMR / $10</option>
+      <option>⛏ Miner 100 Nodes — 0.35 XMR / $70</option>
+      <option>⭐ Monthly Subscription — 0.10 XMR / $20</option>
+      <option>👑 Affiliate Upgrade — 0.25 XMR / $50</option>
+    </select>
+    <div class="pay-grid" id="pay-grid"></div>
+    <div class="pay-inv" id="pay-inv"></div>
+    <div style="margin-top:1rem;font-size:.5rem;color:var(--muted);text-align:center;">WHOAMISEC BUSINESS · PAYMENTS PROCESSED ANONYMOUSLY VIA XMR</div>
+  </div>
+</div>
 </body>
 </html>

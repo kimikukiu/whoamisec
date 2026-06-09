@@ -53,6 +53,53 @@ services:
     profiles:
       - tunnel   # only starts with: docker compose --profile tunnel up
 
+  # ── CICADA Anti-AI Encryption Engine (port 5110) ──────────
+  cicada-anti-ai:
+    build: ./cicada-anti-ai
+    ports:
+      - "5110:5110"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5110/api/health"]
+      interval: 30s
+      retries: 3
+
+  # ── CICADA Puzzle Gate Basic (port 5115) ───────────────────
+  cicada-puzzle-gate:
+    build: ./cicada-anti-ai
+    command: python cicada_puzzle_gate.py
+    ports:
+      - "5115:5115"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5115/api/health"]
+      interval: 30s
+      retries: 3
+
+  # ── CICADA Ultimate Gate — 12 puzzle types (port 5120) ────
+  cicada-ultimate-gate:
+    build: ./cicada-anti-ai
+    command: python cicada_ultimate_puzzle.py
+    ports:
+      - "5120:5120"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5120/api/health"]
+      interval: 30s
+      retries: 3
+
+  # ── CICADA Payment Gateway — 7 methods (port 5130) ────────
+  cicada-payment:
+    build: ./cicada-anti-ai
+    command: python cicada_payment_gateway.py
+    ports:
+      - "5130:5130"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5130/api/health"]
+      interval: 30s
+      retries: 3
+
   # ── APK watchdog — auto-downloads new APK releases ────────
   apk-watchdog:
     image: alpine:3.19
