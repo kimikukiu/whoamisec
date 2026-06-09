@@ -34,16 +34,16 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
 .cx.br{bottom:52px;right:4px;border-bottom:2px solid rgba(0,212,255,.6);border-right:2px solid rgba(0,212,255,.6);}
 
 /* RINGS — animations OFF until .go class added by JS */
-.rw{position:relative;width:min(42vw,155px);height:min(42vw,155px);margin:.04rem auto;flex-shrink:0;perspective:700px;}
+.rw{position:relative;width:min(34vw,120px);height:min(34vw,120px);margin:.04rem auto;flex-shrink:0;perspective:600px;pointer-events:none;}
 .ri3d{position:absolute;inset:0;transform:rotateX(14deg);transform-style:preserve-3d;transition:transform .12s ease-out;will-change:transform;}
 .r{position:absolute;border-radius:50%;will-change:transform;}
-.r0{inset:-10px;border:1px solid rgba(0,212,255,.06);}
-.r1{inset:0;border:2px solid rgba(0,212,255,.52);box-shadow:0 0 12px rgba(0,212,255,.16);}
-.r2{inset:12px;border:1.5px dashed rgba(0,212,255,.22);}
-.r3{inset:24px;border:2px solid rgba(0,212,255,.45);box-shadow:0 0 8px rgba(0,212,255,.12);}
-.r4{inset:36px;border:1.5px solid rgba(0,212,255,.14);}
-.core{position:absolute;inset:44px;background:radial-gradient(circle,rgba(0,212,255,.38) 0%,transparent 100%);border-radius:50%;border:2px solid rgba(0,212,255,.6);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1;will-change:box-shadow;}
-.ci{font-size:min(5.5vw,1.7rem);}
+.r0{inset:-6px;border:1px solid rgba(0,212,255,.06);}
+.r1{inset:0;border:2px solid rgba(0,212,255,.52);box-shadow:0 0 10px rgba(0,212,255,.16);}
+.r2{inset:9px;border:1.5px dashed rgba(0,212,255,.22);}
+.r3{inset:18px;border:2px solid rgba(0,212,255,.45);box-shadow:0 0 7px rgba(0,212,255,.12);}
+.r4{inset:27px;border:1.5px solid rgba(0,212,255,.14);}
+.core{position:absolute;inset:34px;background:radial-gradient(circle,rgba(0,212,255,.38) 0%,transparent 100%);border-radius:50%;border:2px solid rgba(0,212,255,.6);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1;will-change:box-shadow;pointer-events:auto;}
+.ci{font-size:min(5vw,1.4rem);}
 
 /* Animations only active after .go */
 .go .r0{animation:sp 22s linear infinite reverse;}
@@ -68,9 +68,9 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
 .b{width:3px;border-radius:2px;background:rgba(0,212,255,.7);height:4px;}
 
 /* BOXES */
-.bxs{width:100%;flex:1;display:flex;flex-direction:column;gap:.28rem;overflow:hidden;}
-.trx{background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:.35rem .6rem;font-size:.7rem;color:rgba(0,212,255,.82);min-height:26px;max-height:40px;overflow:hidden;flex-shrink:0;}
-.rsp{background:rgba(0,0,0,.5);border-left:2.5px solid rgba(0,212,255,.5);padding:.42rem .65rem;font-size:.78rem;color:#cde;line-height:1.5;min-height:60px;flex:1;overflow-y:auto;border-radius:0 8px 8px 0;}
+.bxs{width:100%;flex:1;min-height:0;display:flex;flex-direction:column;gap:.28rem;overflow:hidden;}
+.trx{background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.12);border-radius:8px;padding:.35rem .6rem;font-size:.7rem;color:rgba(0,212,255,.82);min-height:26px;max-height:38px;overflow:hidden;flex-shrink:0;}
+.rsp{background:rgba(0,0,0,.5);border-left:2.5px solid rgba(0,212,255,.5);padding:.42rem .65rem;font-size:.78rem;color:#cde;line-height:1.5;min-height:0;flex:1;overflow-y:auto;border-radius:0 8px 8px 0;}
 
 /* ATT */
 .att{display:none;align-items:center;gap:.4rem;background:rgba(0,212,255,.06);border:1px solid var(--b);border-radius:8px;padding:.32rem .55rem;font-size:.65rem;flex-shrink:0;}
@@ -78,7 +78,7 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
 .att-x{background:none;border:none;color:var(--m);cursor:pointer;}
 
 /* INPUT */
-.inp-bar{display:flex;align-items:center;gap:.28rem;width:100%;flex-shrink:0;margin-top:.22rem;}
+.inp-bar{display:flex;align-items:center;gap:.28rem;width:100%;flex-shrink:0;margin-top:.18rem;}
 .inp{flex:1;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.2);border-radius:10px;color:rgba(0,212,255,.9);padding:.48rem .6rem;font-family:'Courier New',monospace;font-size:.78rem;outline:none;}
 .inp::placeholder{color:rgba(0,212,255,.22);}
 .ib{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);color:rgba(0,212,255,.82);border-radius:10px;padding:.48rem .55rem;font-size:.88rem;cursor:pointer;flex-shrink:0;}
@@ -487,32 +487,56 @@ function speak(text){
   u.onend=()=>{setR('awake');clearTimeout(wakeT);wakeT=setTimeout(()=>setR('standby'),8000);};
   speechSynthesis.speak(u);
 }
-function micToggle(){
-  const btn=document.getElementById('mbtn'),SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!voiceOn){
-    if(!SR){showN('Voce indisponibilă','#f59e0b');return;}
-    recog=new SR();recog.lang='ro-RO';recog.continuous=true;recog.interimResults=true;
-    recog.onresult=e=>{
-      let fin='',int='';
-      for(let i=e.resultIndex;i<e.results.length;i++)
-        e.results[i].isFinal?(fin+=e.results[i][0].transcript):(int+=e.results[i][0].transcript);
-      if(fin||int)setT('🎤 '+(fin||int));
-      if(fin){
-        const low=fin.toLowerCase();
-        if(low.includes('jarvis')&&jSt==='standby'){
-          setR('awake');speak(SALUT[Math.floor(Math.random()*SALUT.length)]);
-          clearTimeout(wakeT);wakeT=setTimeout(()=>setR('standby'),10000);
-        } else if(jSt!=='standby'){
-          const cmd=fin.replace(/jarvis/gi,'').trim();
-          if(cmd.length>1){document.getElementById('tinp').value=cmd;doSend();}
-        }
+function startRecog(){
+  const btn=document.getElementById('mbtn');
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){showN('SpeechRecognition indisponibil','#f59e0b');return;}
+  recog=new SR();recog.lang='ro-RO';recog.continuous=true;recog.interimResults=true;
+  recog.onresult=e=>{
+    let fin='',int='';
+    for(let i=e.resultIndex;i<e.results.length;i++)
+      e.results[i].isFinal?(fin+=e.results[i][0].transcript):(int+=e.results[i][0].transcript);
+    if(fin||int)setT('🎤 '+(fin||int));
+    if(fin){
+      const low=fin.toLowerCase();
+      if(low.includes('jarvis')&&jSt==='standby'){
+        setR('awake');speak(SALUT[Math.floor(Math.random()*SALUT.length)]);
+        clearTimeout(wakeT);wakeT=setTimeout(()=>setR('standby'),10000);
+      } else if(jSt!=='standby'){
+        const cmd=fin.replace(/jarvis/gi,'').trim();
+        if(cmd.length>1){document.getElementById('tinp').value=cmd;doSend();}
       }
-    };
-    recog.onerror=e=>{if(e.error!=='no-speech')showN('Eroare: '+e.error,'#ef4444');};
-    recog.onend=()=>{if(voiceOn){try{recog.start();}catch(x){}}};
-    recog.start();voiceOn=true;
-    btn.textContent='🔴';btn.classList.add('rec');setR('listening');
-    showN('🎤 Zi "JARVIS"','var(--c)');
+    }
+  };
+  recog.onerror=e=>{
+    showN('Eroare mic: '+e.error,'#ef4444');
+    if(e.error==='not-allowed'||e.error==='service-not-allowed'){
+      voiceOn=false;btn.textContent='🎤';btn.classList.remove('rec');setR('standby');
+    }
+  };
+  recog.onend=()=>{if(voiceOn){try{recog.start();}catch(x){}}};
+  try{recog.start();}catch(x){showN('Eroare pornire mic: '+x,'#ef4444');return;}
+  voiceOn=true;btn.textContent='🔴';btn.classList.add('rec');setR('listening');
+  showN('🎤 Zi "JARVIS"','var(--c)');
+}
+function micToggle(){
+  const btn=document.getElementById('mbtn');
+  if(!voiceOn){
+    // Request mic permission via getUserMedia first, then start recognition
+    if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
+      navigator.mediaDevices.getUserMedia({audio:true,video:false})
+        .then(stream=>{
+          stream.getTracks().forEach(t=>t.stop()); // close test stream
+          startRecog();
+        })
+        .catch(err=>{
+          showN('Microfon blocat: '+err.name,'#ef4444');
+          // Try anyway — maybe permission was already granted
+          startRecog();
+        });
+    } else {
+      startRecog();
+    }
   }else{
     voiceOn=false;if(recog){try{recog.stop();}catch(x){}recog=null;}
     btn.textContent='🎤';btn.classList.remove('rec');setR('standby');clearTimeout(wakeT);
