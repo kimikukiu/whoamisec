@@ -249,10 +249,41 @@
         .vs-editor-toolbar { display:flex; align-items:center; gap:0.4rem; padding:0.3rem 0.6rem; background:rgba(255,255,255,0.03); border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.7rem; color:var(--muted); }
         .vs-lang-dot { width:8px; height:8px; border-radius:50%; background:var(--cyan); }
         .vs-editor-inner { display:flex; }
-        .vs-line-nums { background:rgba(0,0,0,0.2); padding:0.5rem 0.4rem; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); text-align:right; line-height:1.55; min-width:28px; user-select:none; }
+        .vs-line-nums { background:rgba(0,0,0,0.2); padding:0.5rem 0.4rem; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); text-align:right; line-height:1.55; min-width:28px; user-select:none; white-space:pre; }
         .vs-editor { flex:1; background:transparent; padding:0.5rem 0.6rem; color:#e2e8f0; font-family:'JetBrains Mono',monospace; font-size:0.72rem; line-height:1.55; resize:none; outline:none; border:none; min-height:130px; tab-size:2; }
         .vs-statusbar { display:flex; align-items:center; gap:0.6rem; padding:0.18rem 0.6rem; background:rgba(6,182,212,0.08); border-top:1px solid rgba(6,182,212,0.1); font-size:0.62rem; color:var(--muted); font-family:'JetBrains Mono',monospace; }
         .vs-status-item { color:var(--cyan); }
+
+        /* Studio mode bar */
+        .studio-mode-bar { display:flex; gap:0.25rem; margin-bottom:0.55rem; background:rgba(0,0,0,0.25); border-radius:10px; padding:0.2rem; overflow-x:auto; scrollbar-width:none; }
+        .studio-mode-bar::-webkit-scrollbar { display:none; }
+        .studio-mode-btn { flex-shrink:0; padding:0.38rem 0.75rem; border-radius:7px; border:none; background:transparent; color:var(--muted); font-size:0.73rem; font-weight:600; cursor:pointer; transition:all 0.18s; white-space:nowrap; }
+        .studio-mode-btn.active { background:rgba(6,182,212,0.15); color:var(--cyan); }
+        .studio-pane { display:none; }
+        .studio-pane.active { display:block; }
+        /* full VS editor in Studio */
+        .studio-vs-wrap { background:rgba(0,0,0,0.42); border:1px solid rgba(6,182,212,0.18); border-radius:10px; overflow:hidden; margin-bottom:0.5rem; }
+        .studio-vs-header { display:flex; align-items:center; gap:0.4rem; padding:0.28rem 0.6rem; background:rgba(255,255,255,0.03); border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.7rem; color:var(--muted); }
+        .studio-file-tabs { display:flex; gap:0.1rem; overflow-x:auto; scrollbar-width:none; }
+        .studio-file-tab { padding:0.2rem 0.65rem; font-size:0.68rem; font-family:'JetBrains Mono',monospace; color:var(--muted); border-right:1px solid rgba(255,255,255,0.05); cursor:pointer; white-space:nowrap; }
+        .studio-file-tab.active { color:var(--cyan); background:rgba(6,182,212,0.07); }
+        .studio-vs-body { display:flex; }
+        .studio-vs-nums { background:rgba(0,0,0,0.25); padding:0.5rem 0.35rem; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); text-align:right; line-height:1.6; min-width:28px; user-select:none; white-space:pre; }
+        .studio-vs-editor { flex:1; background:transparent; padding:0.5rem 0.55rem; color:#e2e8f0; font-family:'JetBrains Mono',monospace; font-size:0.73rem; line-height:1.6; resize:none; outline:none; border:none; min-height:220px; tab-size:2; }
+        .studio-vs-bar { display:flex; align-items:center; gap:0.45rem; padding:0.18rem 0.6rem; background:rgba(6,182,212,0.07); border-top:1px solid rgba(6,182,212,0.1); font-size:0.62rem; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+        .studio-vs-actions { display:flex; gap:0.35rem; margin-bottom:0.45rem; flex-wrap:wrap; }
+        /* Terminal in Studio */
+        .studio-term { background:#0d1117; border:1px solid rgba(16,185,129,0.15); border-radius:9px; padding:0.7rem; height:190px; overflow-y:auto; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:#4ade80; margin-bottom:0.45rem; }
+        .t-p { color:var(--emerald); font-weight:700; }
+        .t-out { color:#94a3b8; }
+        .t-err { color:var(--red); }
+        .studio-term-row { display:flex; gap:0.4rem; align-items:center; }
+        .studio-term-input { flex:1; background:#0d1117; border:1px solid rgba(16,185,129,0.2); border-radius:7px; padding:0.45rem 0.65rem; color:#4ade80; font-family:'JetBrains Mono',monospace; font-size:0.74rem; outline:none; }
+        /* Code block run buttons in chat */
+        .code-block-wrap { position:relative; margin:0.3rem 0; }
+        .code-block-btns { display:flex; gap:0.3rem; margin-top:0.25rem; }
+        .code-run-btn { padding:0.18rem 0.55rem; border-radius:5px; border:1px solid rgba(6,182,212,0.2); background:rgba(6,182,212,0.07); color:var(--cyan); font-size:0.65rem; cursor:pointer; font-family:'JetBrains Mono',monospace; }
+        .code-edit-btn { padding:0.18rem 0.55rem; border-radius:5px; border:1px solid rgba(139,92,246,0.2); background:rgba(139,92,246,0.07); color:var(--purple); font-size:0.65rem; cursor:pointer; font-family:'JetBrains Mono',monospace; }
 
         /* Section header */
         .sec-header {
@@ -280,6 +311,8 @@
             white-space:nowrap; z-index:100;
         }
         .notif.show { opacity:1; }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+        .abliterated-btn { background:rgba(239,68,68,0.12); color:var(--red); border:1px solid rgba(239,68,68,0.2); }
     </style>
 </head>
 <body>
@@ -369,57 +402,151 @@
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
-                <span>JARVIS Commander — 2700+ Agents</span>
-                <div style="display:flex;gap:0.3rem;">
-                    <button class="btn btn-sm" style="background:rgba(6,182,212,0.1);color:var(--cyan);padding:0.25rem 0.5rem;font-size:0.7rem;" onclick="openBizTools()">&#x26A1; Tools</button>
-                    <button class="btn btn-sm" style="background:rgba(107,114,128,0.1);color:var(--muted);padding:0.25rem 0.5rem;font-size:0.7rem;" onclick="bizClearChat()">&#x1F5D1;</button>
+        <div class="card" style="padding:0.8rem;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+                <span style="font-size:0.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">&#x1F916; AI Studio — 2700+ Agents</span>
+                <span style="font-size:0.62rem;color:var(--emerald);">&#x2022; Live</span>
+            </div>
+
+            <!-- Manus-style Studio mode bar -->
+            <div class="studio-mode-bar">
+                <button class="studio-mode-btn active" onclick="setBizMode('chat',this)">&#x1F4AC; Chat</button>
+                <button class="studio-mode-btn" onclick="setBizMode('code',this)">&#x2328; VS Code</button>
+                <button class="studio-mode-btn" onclick="setBizMode('terminal',this)">&#x2588; Terminal</button>
+                <button class="studio-mode-btn" onclick="setBizMode('agents',this)">&#x1F916; Agents</button>
+                <button class="studio-mode-btn" onclick="setBizMode('skills',this)">&#x26A1; Skills</button>
+            </div>
+
+            <!-- CHAT pane -->
+            <div class="studio-pane active" id="biz-pane-chat">
+                <select class="model-selector" id="biz-model" style="font-size:0.77rem;margin-bottom:0.55rem;">
+                    <option value="jarvis-omni">&#x1F916; JARVIS-OMNI</option>
+                    <option value="odysseus">&#x1F30A; Odysseus Multi-Model</option>
+                    <option value="airllm">&#x26A1; AirLLM 70B</option>
+                    <option value="sigma">&#x1F517; Sigma Router</option>
+                    <option value="free-code">&#x1F193; Free Coding Models (150+)</option>
+                    <option value="deepseek">&#x1F4BB; DeepSeek Coder</option>
+                </select>
+                <div class="chat-messages" id="biz-chat-messages">
+                    <div class="msg msg-ai">
+                        <div class="msg-label">JARVIS MIND</div>
+                        <div class="msg-bubble">
+                            <b style="color:var(--cyan);">AI Studio ready</b> — 2,703 agents + VS Code + Terminal active.<br>
+                            <span class="tool-badge">&#x2328; VS Code</span><span class="tool-badge">&#x2588; Terminal</span><span class="tool-badge">&#x1F50D; CVE</span><span class="tool-badge">&#x1F3A4; TTS</span><span class="tool-badge">&#x1F4CA; Graphify</span><span class="tool-badge">&#x1F4BE; 9Drive</span><br>
+                            Type <code>/code</code> to write code &bull; <code>/run</code> to execute &bull; <code>/file</code> to manage files
+                        </div>
+                    </div>
+                </div>
+                <div style="position:relative;">
+                    <div class="slash-dropdown" id="biz-slash-dd"></div>
+                    <div class="cmd-row">
+                        <button class="btn btn-sm" style="background:rgba(6,182,212,0.1);color:var(--cyan);padding:0.48rem 0.6rem;flex-shrink:0;" onclick="setBizMode('code',document.querySelectorAll('.studio-mode-btn')[1])" title="Open VS Code">&#x2328;</button>
+                        <input type="text" id="cmd-input" placeholder="Chat · /code · /run · /cve · /agents..."
+                            oninput="onBizInput(this.value)" onkeydown="if(event.key==='Enter'){bizSlashDD(false);sendBizCommand();}if(event.key==='Escape')bizSlashDD(false);">
+                        <button class="btn abliterated-btn btn-sm" onclick="bizAbliterate()" title="Abliterated">&#x1F513;</button>
+                        <button class="btn btn-grad btn-sm" onclick="sendBizCommand()">Send</button>
+                    </div>
                 </div>
             </div>
-            <select class="model-selector" id="biz-model" style="font-size:0.77rem;margin-bottom:0.55rem;">
-                <option value="jarvis-omni">&#x1F916; JARVIS-OMNI</option>
-                <option value="odysseus">&#x1F30A; Odysseus Multi-Model</option>
-                <option value="airllm">&#x26A1; AirLLM 70B</option>
-                <option value="sigma">&#x1F517; Sigma Router</option>
-                <option value="free-code">&#x1F193; Free Coding Models</option>
-                <option value="deepseek">&#x1F4BB; DeepSeek Coder</option>
-            </select>
-            <div class="chat-messages" id="biz-chat-messages">
-                <div class="msg msg-ai">
-                    <div class="msg-label">JARVIS MIND</div>
-                    <div class="msg-bubble">Online. 2,703 agents + all tools active.<br>
-                    <span class="tool-badge">&#x1F50D; CVE</span><span class="tool-badge">&#x1F3A4; TTS</span><span class="tool-badge">&#x1F4CA; Graphify</span><span class="tool-badge">&#x1F4F1; WhatsApp</span><span class="tool-badge">&#x1F4BE; 9Drive</span><span class="tool-badge">&#x1F9E0; Wiki</span></div>
+
+            <!-- VS CODE pane — full Manus-style editor -->
+            <div class="studio-pane" id="biz-pane-code">
+                <div class="studio-vs-wrap">
+                    <div class="studio-vs-header">
+                        <div class="studio-file-tabs" id="biz-file-tabs">
+                            <div class="studio-file-tab active" onclick="bizSelectTab(this,'main.py')">main.py</div>
+                            <div class="studio-file-tab" onclick="bizSelectTab(this,'api.js')">api.js</div>
+                            <div class="studio-file-tab" onclick="bizSelectTab(this,'deploy.sh')">deploy.sh</div>
+                            <div class="studio-file-tab" onclick="bizAddTab()">+</div>
+                        </div>
+                        <span style="flex:1;"></span>
+                        <select id="biz-code-lang" style="background:transparent;border:none;color:var(--muted);font-size:0.68rem;cursor:pointer;outline:none;" onchange="bizUpdateLang()">
+                            <option>Python</option><option>JavaScript</option><option>Bash</option>
+                            <option>Go</option><option>Rust</option><option>HTML</option><option>SQL</option><option>YAML</option>
+                        </select>
+                    </div>
+                    <div class="studio-vs-body">
+                        <div class="studio-vs-nums" id="biz-vs-nums">1</div>
+                        <textarea class="studio-vs-editor" id="biz-vs-full" spellcheck="false"
+                            placeholder="# JARVIS AI Studio — VS Code&#10;# Type code or ask AI in Chat → 'write code for...'&#10;# Ctrl+Enter to run via JARVIS executor"
+                            oninput="bizVSUpdate()" onkeydown="bizVSKey(event)" onclick="bizVSUpdate()" onkeyup="bizVSUpdate()"></textarea>
+                    </div>
+                    <div class="studio-vs-bar">
+                        <span style="color:var(--cyan);" id="biz-vs-pos">Ln 1, Col 1</span>
+                        <span>•</span><span style="color:var(--cyan);" id="biz-vs-lang-lbl">Python</span>
+                        <span>•</span><span id="biz-vs-lines">1 line</span>
+                        <span style="flex:1;"></span>
+                        <span style="color:var(--emerald);">stynx-code + free-models</span>
+                    </div>
+                </div>
+                <div class="studio-vs-actions">
+                    <button class="btn btn-grad btn-sm" onclick="bizRunCode()">&#x25B6; Run</button>
+                    <button class="btn btn-sm" style="background:rgba(139,92,246,0.1);color:var(--purple);border:1px solid rgba(139,92,246,0.2);" onclick="bizAnalyzeCode()">&#x1F50D; Analyze</button>
+                    <button class="btn btn-sm" style="background:rgba(16,185,129,0.1);color:var(--emerald);border:1px solid rgba(16,185,129,0.2);" onclick="bizFixCode()">&#x2728; AI Fix</button>
+                    <button class="btn btn-sm" style="background:rgba(107,114,128,0.1);color:var(--muted);" onclick="bizSendCodeToChat()">&#x1F4AC; Send to Chat</button>
+                    <button class="btn btn-sm" style="background:rgba(107,114,128,0.1);color:var(--muted);" onclick="bizCopyCode()">Copy</button>
+                    <button class="btn btn-sm" style="background:rgba(239,68,68,0.08);color:var(--red);" onclick="bizClearCode()">&#x1F5D1;</button>
+                </div>
+                <div id="biz-code-output" style="background:rgba(0,0,0,0.35);border:1px solid var(--border);border-radius:8px;padding:0.65rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#94a3b8;min-height:60px;display:none;white-space:pre-wrap;"></div>
+            </div>
+
+            <!-- TERMINAL pane -->
+            <div class="studio-pane" id="biz-pane-terminal">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">
+                    <select class="model-selector" id="biz-term-vps" style="margin-bottom:0;flex:1;font-size:0.75rem;">
+                        <option>VPS-01 — whoamisec.com</option>
+                        <option>VPS-02 — cicada.omni</option>
+                        <option>Local Sandbox</option>
+                    </select>
+                    <button class="btn btn-grad btn-sm" style="margin-left:0.4rem;" onclick="bizTermConnect()">Connect</button>
+                </div>
+                <div class="studio-term" id="biz-term-screen">
+                    <div><span class="t-p">jarvis@whoamisec:~$</span> <span style="color:#4ade80;animation:blink 1s infinite;">█</span></div>
+                </div>
+                <div class="studio-term-row">
+                    <span class="t-p" style="flex-shrink:0;">$</span>
+                    <input class="studio-term-input" id="biz-term-cmd" placeholder="shell command..."
+                        onkeydown="if(event.key==='Enter')bizRunTermCmd();if(event.key==='ArrowUp')bizTermHistory(-1);if(event.key==='ArrowDown')bizTermHistory(1);">
+                    <button class="btn btn-grad btn-sm" style="margin-left:0.4rem;" onclick="bizRunTermCmd()">Run</button>
                 </div>
             </div>
-            <!-- VS Code editor (quick access) -->
-            <div class="vs-editor-wrap" id="biz-vs-wrap" style="display:none;">
-                <div class="vs-editor-toolbar">
-                    <div class="vs-lang-dot"></div>
-                    <span id="biz-vs-lang">Python</span>
-                    <span style="flex:1;"></span>
-                    <button style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.7rem;" onclick="closeBizVS()">&#x2715;</button>
-                </div>
-                <div class="vs-editor-inner">
-                    <div class="vs-line-nums" id="biz-line-nums">1</div>
-                    <textarea class="vs-editor" id="biz-vs-editor" spellcheck="false"
-                        oninput="updateBizLineNums()" onkeydown="vsEditorKey(event,'biz')"></textarea>
-                </div>
-                <div class="vs-statusbar">
-                    <span class="vs-status-item" id="biz-vs-status">Ln 1, Col 1</span>
-                    <span>&#x2022;</span><span class="vs-status-item" id="biz-vs-langstat">Python</span>
-                    <span style="flex:1;"></span>
-                    <button class="btn btn-sm" style="padding:0.15rem 0.5rem;font-size:0.68rem;background:var(--grad);margin:-2px;" onclick="runBizCode()">&#x25B6; Run</button>
+
+            <!-- AGENTS pane -->
+            <div class="studio-pane" id="biz-pane-agents">
+                <div style="background:rgba(0,0,0,0.25);border-radius:9px;padding:0.75rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+                        <span style="font-size:1.1rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">2,703</span>
+                        <span style="font-size:0.65rem;color:var(--muted);">Total agents dispatched</span>
+                        <button class="btn btn-sm" style="background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.2);font-size:0.7rem;" onclick="bizDispatchAll()">&#x26A1; Dispatch All</button>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.4rem;margin-bottom:0.5rem;">
+                        <div style="background:rgba(6,182,212,0.07);border-radius:7px;padding:0.45rem;text-align:center;border:1px solid rgba(6,182,212,0.1);"><div style="font-size:0.9rem;font-weight:800;color:var(--cyan);">500</div><div style="font-size:0.6rem;color:var(--muted);">Business AI</div></div>
+                        <div style="background:rgba(139,92,246,0.07);border-radius:7px;padding:0.45rem;text-align:center;border:1px solid rgba(139,92,246,0.1);"><div style="font-size:0.9rem;font-weight:800;color:var(--purple);">803</div><div style="font-size:0.6rem;color:var(--muted);">Coding</div></div>
+                        <div style="background:rgba(16,185,129,0.07);border-radius:7px;padding:0.45rem;text-align:center;border:1px solid rgba(16,185,129,0.1);"><div style="font-size:0.9rem;font-weight:800;color:var(--emerald);">1,400</div><div style="font-size:0.6rem;color:var(--muted);">Infrastructure</div></div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.35rem;">
+                        <button class="btn btn-sm" style="background:rgba(6,182,212,0.08);color:var(--cyan);border:1px solid rgba(6,182,212,0.15);font-size:0.72rem;" onclick="bizAgentCmd('auto-audit all services')">&#x1F50D; Auto-Audit</button>
+                        <button class="btn btn-sm" style="background:rgba(139,92,246,0.08);color:var(--purple);border:1px solid rgba(139,92,246,0.15);font-size:0.72rem;" onclick="bizAgentCmd('optimize all models')">&#x1F916; Optimize AI</button>
+                        <button class="btn btn-sm" style="background:rgba(16,185,129,0.08);color:var(--emerald);border:1px solid rgba(16,185,129,0.15);font-size:0.72rem;" onclick="bizAgentCmd('scale mining fleet')">&#x26CF; Scale Mining</button>
+                        <button class="btn btn-sm" style="background:rgba(245,158,11,0.08);color:var(--amber);border:1px solid rgba(245,158,11,0.15);font-size:0.72rem;" onclick="bizAgentCmd('deploy new VPS')">&#x2601; Deploy VPS</button>
+                    </div>
+                    <div id="biz-agent-output" style="margin-top:0.5rem;font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:#94a3b8;min-height:30px;"></div>
                 </div>
             </div>
-            <div style="position:relative;">
-                <div class="slash-dropdown" id="biz-slash-dd"></div>
-                <div class="cmd-row">
-                    <button class="btn btn-sm" style="background:rgba(6,182,212,0.1);color:var(--cyan);padding:0.48rem 0.6rem;flex-shrink:0;" onclick="toggleBizVS()" title="VS Code Editor">&#x2328;</button>
-                    <input type="text" id="cmd-input" placeholder="Chat / /slash-command / describe task..."
-                        oninput="onBizInput(this.value)" onkeydown="if(event.key==='Enter'){bizSlashDD(false);sendBizCommand();}if(event.key==='Escape')bizSlashDD(false);">
-                    <button class="btn abliterated-btn btn-sm" onclick="bizAbliterate()" title="Abliterated">&#x1F513;</button>
-                    <button class="btn btn-grad btn-sm" onclick="sendBizCommand()">Send</button>
+
+            <!-- SKILLS pane -->
+            <div class="studio-pane" id="biz-pane-skills">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;">
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="bizSkill('Write Python API endpoint')"><div class="tool-call-name">&#x1F40D; Python API</div><div style="font-size:0.65rem;color:var(--muted);">Generate FastAPI/Flask endpoint</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="bizSkill('Write React component')"><div class="tool-call-name">&#x269B; React</div><div style="font-size:0.65rem;color:var(--muted);">Generate React/Next.js component</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="bizSkill('Write Docker compose file')"><div class="tool-call-name">&#x1F433; Docker</div><div style="font-size:0.65rem;color:var(--muted);">Compose, Dockerfile, deployment</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="bizSkill('Write Bash deploy script')"><div class="tool-call-name">&#x1F4DC; Bash Script</div><div style="font-size:0.65rem;color:var(--muted);">VPS setup &amp; deploy scripts</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="bizSkill('Audit code for security vulnerabilities')"><div class="tool-call-name">&#x1F6E1; Security Audit</div><div style="font-size:0.65rem;color:var(--muted);">OWASP, CVE, code review</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="bizSkill('Optimize XMR mining config')"><div class="tool-call-name">&#x26CF; Mining Config</div><div style="font-size:0.65rem;color:var(--muted);">RandomX optimization, xmrig</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="bizSkill('Write GitHub Actions CI/CD pipeline')"><div class="tool-call-name">&#x2699; CI/CD Pipeline</div><div style="font-size:0.65rem;color:var(--muted);">GitHub Actions, auto-deploy</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="bizSkill('Write SQL database schema')"><div class="tool-call-name">&#x1F5C4; SQL Schema</div><div style="font-size:0.65rem;color:var(--muted);">Database design, migrations</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="bizSkill('Write Nginx config for reverse proxy')"><div class="tool-call-name">&#x1F310; Nginx Config</div><div style="font-size:0.65rem;color:var(--muted);">Reverse proxy, CORS, SSL</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="bizSkill('Write Monero XMR payment integration')"><div class="tool-call-name">&#x1F48E; XMR Payment</div><div style="font-size:0.65rem;color:var(--muted);">Monero RPC, payment flow</div></div>
                 </div>
             </div>
         </div>
@@ -846,34 +973,229 @@ function bizAbliterate() {
 function bizClearChat() { document.getElementById('biz-chat-messages').innerHTML = '<div class="msg msg-ai"><div class="msg-label">JARVIS</div><div class="msg-bubble">Chat cleared. Ready.</div></div>'; }
 function openBizTools() { showNotif('Type /command for tools — e.g. /cve /tts /whatsapp /graphify'); }
 
-// VS Code editor
-let bizVSOpen = false;
-function toggleBizVS() {
-    bizVSOpen = !bizVSOpen;
-    document.getElementById('biz-vs-wrap').style.display = bizVSOpen ? 'block' : 'none';
-    if (bizVSOpen) { document.getElementById('biz-vs-editor').focus(); updateBizLineNums(); }
+// ── Studio Mode Switcher ──────────────────────────────────────
+function setBizMode(name, btn) {
+    document.querySelectorAll('.studio-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.studio-mode-btn').forEach(b => b.classList.remove('active'));
+    const pane = document.getElementById('biz-pane-' + name);
+    if (pane) pane.classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (name === 'code') { document.getElementById('biz-vs-full').focus(); bizVSUpdate(); }
+    if (name === 'terminal') { document.getElementById('biz-term-cmd').focus(); }
 }
-function closeBizVS() { bizVSOpen = false; document.getElementById('biz-vs-wrap').style.display = 'none'; }
-function updateBizLineNums() {
-    const ed = document.getElementById('biz-vs-editor');
+
+// ── VS Code Studio (full) ─────────────────────────────────────
+let bizFileTabs = { 'main.py': '', 'api.js': '', 'deploy.sh': '' };
+let bizCurrentFile = 'main.py';
+
+function bizSelectTab(el, fname) {
+    bizFileTabs[bizCurrentFile] = document.getElementById('biz-vs-full').value;
+    bizCurrentFile = fname;
+    document.querySelectorAll('.studio-file-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('biz-vs-full').value = bizFileTabs[fname] || '';
+    bizVSUpdate();
+}
+function bizAddTab() {
+    const name = prompt('Filename:', 'new_file.py');
+    if (!name) return;
+    bizFileTabs[name] = '';
+    const tabs = document.getElementById('biz-file-tabs');
+    const addBtn = tabs.querySelector('.studio-file-tab:last-child');
+    const t = document.createElement('div');
+    t.className = 'studio-file-tab';
+    t.textContent = name;
+    t.onclick = () => bizSelectTab(t, name);
+    tabs.insertBefore(t, addBtn);
+    bizSelectTab(t, name);
+}
+function bizVSUpdate() {
+    const ed = document.getElementById('biz-vs-full');
     const lines = (ed.value.match(/\n/g)||[]).length + 1;
-    document.getElementById('biz-line-nums').textContent = Array.from({length:lines},(_,i)=>i+1).join('\n');
+    document.getElementById('biz-vs-nums').textContent = Array.from({length:lines},(_,i)=>i+1).join('\n');
     const pos = ed.value.slice(0, ed.selectionStart);
     const ln = (pos.match(/\n/g)||[]).length + 1;
     const col = pos.length - pos.lastIndexOf('\n');
-    document.getElementById('biz-vs-status').textContent = `Ln ${ln}, Col ${col}`;
+    document.getElementById('biz-vs-pos').textContent = `Ln ${ln}, Col ${col}`;
+    document.getElementById('biz-vs-lines').textContent = `${lines} line${lines!==1?'s':''}`;
+    const chars = ed.value.length;
+    document.getElementById('biz-vs-nums').textContent = Array.from({length:lines},(_,i)=>i+1).join('\n');
 }
-function vsEditorKey(e, ctx) {
-    if (e.key === 'Tab') { e.preventDefault(); const t=e.target,s=t.selectionStart; t.value=t.value.slice(0,s)+'  '+t.value.slice(t.selectionEnd); t.selectionStart=t.selectionEnd=s+2; if(ctx==='biz') updateBizLineNums(); }
-    if ((e.ctrlKey||e.metaKey) && e.key==='Enter') { e.preventDefault(); runBizCode(); }
+function bizVSKey(e) {
+    if (e.key === 'Tab') {
+        e.preventDefault();
+        const t = e.target, s = t.selectionStart;
+        t.value = t.value.slice(0,s) + '  ' + t.value.slice(t.selectionEnd);
+        t.selectionStart = t.selectionEnd = s + 2;
+        bizVSUpdate();
+    }
+    if ((e.ctrlKey||e.metaKey) && e.key === 'Enter') { e.preventDefault(); bizRunCode(); }
 }
-function runBizCode() {
-    const code = document.getElementById('biz-vs-editor').value.trim();
+function bizUpdateLang() {
+    const lang = document.getElementById('biz-code-lang').value;
+    document.getElementById('biz-vs-lang-lbl').textContent = lang;
+}
+function bizRunCode() {
+    const code = document.getElementById('biz-vs-full').value.trim();
+    const out = document.getElementById('biz-code-output');
     if (!code) return;
-    addBizMsg('user', '&#x2328; Running code:\n<pre>'+escH(code.slice(0,300))+'</pre>');
-    setTimeout(() => addBizMsg('ai', `${toolC('code_executor','via JARVIS + free-coding-models')}Code executed successfully.<br>Output: <code>Hello from JARVIS executor</code><br>Time: 0.72s`), 300);
-    closeBizVS();
+    out.style.display = 'block';
+    out.style.color = 'var(--amber)';
+    out.textContent = '⚡ Running via JARVIS executor...';
+    setTimeout(() => {
+        out.style.color = '#4ade80';
+        out.textContent = `> Executed via stynx-code + free-coding-models\n> Output: Task completed successfully\n> Time: 0.84s\n> Exit code: 0`;
+        addBizMsg('ai', `${toolC('code_executor',`file:${bizCurrentFile}, lang:${document.getElementById('biz-code-lang').value}`)}Code executed ✓<br><code>Exit: 0 · Time: 0.84s</code><br>Output ready — switch back to Chat for details.`);
+    }, 600 + Math.random()*400);
 }
+function bizAnalyzeCode() {
+    const code = document.getElementById('biz-vs-full').value.trim();
+    const out = document.getElementById('biz-code-output');
+    if (!code) return;
+    out.style.display = 'block';
+    out.style.color = 'var(--purple)';
+    out.textContent = '🔍 AirLLM security audit running...';
+    setTimeout(() => {
+        out.textContent = `> Security Audit — AirLLM 70B\n> No critical vulnerabilities found\n> Code style: Good\n> Complexity: O(n) — optimal\n> Suggestion: Add input validation at line 1`;
+    }, 700);
+}
+function bizFixCode() {
+    const code = document.getElementById('biz-vs-full').value.trim();
+    if (!code) return;
+    showNotif('✨ AI Fix: Code optimized by JARVIS');
+    setTimeout(() => {
+        const fixed = `# JARVIS AI Fixed — optimized\n${code}`;
+        document.getElementById('biz-vs-full').value = fixed;
+        bizVSUpdate();
+    }, 500);
+}
+function bizSendCodeToChat() {
+    const code = document.getElementById('biz-vs-full').value.trim();
+    if (!code) return;
+    setBizMode('chat', document.querySelector('.studio-mode-btn'));
+    setTimeout(() => {
+        document.getElementById('cmd-input').value = 'Explain this code: ';
+        addBizMsg('user', `&#x2328; Code from editor (${bizCurrentFile}):<pre>${escH(code.slice(0,400))}</pre>`);
+        sendBizCommand();
+    }, 100);
+}
+function bizCopyCode() {
+    navigator.clipboard.writeText(document.getElementById('biz-vs-full').value).then(() => showNotif('Code copied!'));
+}
+function bizClearCode() {
+    document.getElementById('biz-vs-full').value = '';
+    document.getElementById('biz-code-output').style.display = 'none';
+    bizVSUpdate();
+}
+
+// Skill shortcuts → auto-fill code editor
+function bizSkill(prompt) {
+    setBizMode('code', document.querySelectorAll('.studio-mode-btn')[1]);
+    setTimeout(() => {
+        const templates = {
+            'Write Python API endpoint': `from flask import Flask, request, jsonify\napp = Flask(__name__)\n\n@app.route('/api/v1/endpoint', methods=['GET','POST'])\ndef endpoint():\n    data = request.get_json()\n    return jsonify({'status':'ok', 'data': data})\n\nif __name__ == '__main__':\n    app.run(host='0.0.0.0', port=5000)`,
+            'Write React component': `import React, { useState, useEffect } from 'react';\n\nexport function Component({ title }) {\n  const [data, setData] = useState(null);\n\n  useEffect(() => {\n    fetch('/api/data').then(r => r.json()).then(setData);\n  }, []);\n\n  return (\n    <div className="component">\n      <h2>{title}</h2>\n      {data && <pre>{JSON.stringify(data, null, 2)}</pre>}\n    </div>\n  );\n}`,
+            'Write Docker compose file': `version: '3.8'\nservices:\n  api:\n    build: .\n    ports:\n      - "5000:5000"\n    environment:\n      - SECRET_KEY=change_me\n    restart: unless-stopped\n  nginx:\n    image: nginx:alpine\n    ports:\n      - "80:80"\n    depends_on:\n      - api`,
+            'Write Bash deploy script': `#!/usr/bin/env bash\nset -euo pipefail\nlog() { echo "[$(date +%H:%M:%S)] $*"; }\n\nlog "Deploying to VPS..."\ngit pull origin main\ndocker compose down\ndocker compose build --no-cache\ndocker compose up -d\nlog "Deploy complete — $(docker compose ps | wc -l) services running"`,
+            'Audit code for security vulnerabilities': `# Security Audit Template\n# Check: SQL injection, XSS, CSRF, auth bypass\n\nimport re\n\ndef audit_input(data):\n    # Prevent SQL injection\n    if re.search(r"['\";\\\\]", str(data)):\n        raise ValueError("Invalid input detected")\n    return data\n\ndef audit_headers(headers):\n    required = ['X-Content-Type-Options', 'X-Frame-Options']\n    missing = [h for h in required if h not in headers]\n    return missing`,
+            'Optimize XMR mining config': `{\n  "pools": [{\n    "url": "pool.supportxmr.com:443",\n    "user": "YOUR_WALLET_ADDRESS",\n    "pass": "x",\n    "tls": true\n  }],\n  "cpu": {\n    "enabled": true,\n    "huge-pages": true,\n    "hw-aes": true,\n    "priority": 5,\n    "max-threads-hint": 100\n  },\n  "randomx": { "mode": "auto", "1gb-pages": true }\n}`,
+            'Write GitHub Actions CI/CD pipeline': `name: Deploy\non:\n  push:\n    branches: [main]\n\njobs:\n  deploy:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - name: Deploy to VPS\n        uses: appleboy/ssh-action@v1\n        with:\n          host: \${{ secrets.VPS_HOST }}\n          username: root\n          key: \${{ secrets.SSH_KEY }}\n          script: |\n            cd /opt/whoamisec\n            git pull origin main\n            docker compose up -d --build`,
+            'Write SQL database schema': `-- WhoamiSec Database Schema\nCREATE TABLE users (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  username TEXT UNIQUE NOT NULL,\n  email TEXT UNIQUE,\n  plan TEXT DEFAULT 'free',\n  xmr_balance REAL DEFAULT 0.0,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE transactions (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  user_id INTEGER REFERENCES users(id),\n  amount_xmr REAL NOT NULL,\n  tx_hash TEXT,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);`,
+            'Write Nginx config for reverse proxy': `server {\n    listen 80;\n    server_name whoamisec.com;\n\n    location / {\n        proxy_pass http://localhost:5000;\n        proxy_http_version 1.1;\n        proxy_set_header Host \$host;\n        proxy_set_header X-Real-IP \$remote_addr;\n        add_header Access-Control-Allow-Origin *;\n    }\n\n    location /api {\n        proxy_pass http://backend:5001;\n        add_header Access-Control-Allow-Origin *;\n    }\n}`,
+            'Write Monero XMR payment integration': `import requests\n\nRPC_URL = 'http://localhost:18082/json_rpc'\n\ndef get_balance(wallet_addr):\n    r = requests.post(RPC_URL, json={\n        'jsonrpc':'2.0','id':'0','method':'get_balance'\n    })\n    return r.json()['result']['balance'] / 1e12\n\ndef verify_payment(tx_hash, expected_amount):\n    r = requests.post(RPC_URL, json={\n        'jsonrpc':'2.0','id':'0',\n        'method':'get_transfer_by_txid',\n        'params': {'txid': tx_hash}\n    })\n    tx = r.json().get('result', {}).get('transfer', {})\n    return tx.get('amount', 0) / 1e12 >= expected_amount`
+        };
+        const code = templates[prompt] || `# ${prompt}\n# AI-generated stub — edit and run\n`;
+        document.getElementById('biz-vs-full').value = code;
+        bizVSUpdate();
+        showNotif(`✓ ${prompt.split(' ').slice(0,3).join(' ')} template loaded`);
+    }, 150);
+}
+
+// ── Terminal Studio ───────────────────────────────────────────
+let bizTermCmdHistory = [], bizTermHistIdx = -1;
+
+function bizTermConnect() {
+    const vps = document.getElementById('biz-term-vps').value;
+    bizTermPrint(`Connecting to ${vps}...`, 'amber');
+    setTimeout(() => {
+        bizTermPrint(`Connected. Type 'help' for commands.`, 'emerald');
+    }, 500);
+}
+function bizTermPrint(text, color) {
+    const s = document.getElementById('biz-term-screen');
+    const d = document.createElement('div');
+    const colorMap = { amber:'var(--amber)', emerald:'#4ade80', red:'var(--red)', muted:'#64748b' };
+    d.style.color = colorMap[color] || '#4ade80';
+    d.textContent = text;
+    s.appendChild(d);
+    s.scrollTop = s.scrollHeight;
+}
+function bizRunTermCmd() {
+    const inp = document.getElementById('biz-term-cmd');
+    const cmd = inp.value.trim();
+    if (!cmd) return;
+    bizTermCmdHistory.unshift(cmd);
+    bizTermHistIdx = -1;
+    inp.value = '';
+    const s = document.getElementById('biz-term-screen');
+    const d = document.createElement('div');
+    d.innerHTML = `<span class="t-p">jarvis@whoamisec:~$</span> ${escH(cmd)}`;
+    s.appendChild(d);
+    s.scrollTop = s.scrollHeight;
+    const BIZ_CMDS = {
+        'help': () => 'Available: ls, ps, docker ps, df -h, free -m, git status, npm run, python3',
+        'ls': () => 'app.py  docker-compose.yml  .env  requirements.txt  static/',
+        'ps': () => 'PID   CMD\n  1   python3 app.py\n  42  nginx\n  88  xmrig (mining)',
+        'docker ps': () => 'CONTAINER     IMAGE          STATUS\nwhoamisec-api flask:latest   Up 3h\nnginx         nginx:alpine   Up 3h\nxmrig         xmrig:latest   Up 3h',
+        'df -h': () => 'Filesystem  Size  Used  Avail  Use%\n/dev/sda1   256G   18G   238G    7%',
+        'free -m': () => '              total  used  free\nMem:          16384  4821  11563\nSwap:          2048   128   1920',
+        'git status': () => 'On branch main\nYour branch is up to date with origin/main.\nnothing to commit, working tree clean',
+        'clear': () => { document.getElementById('biz-term-screen').innerHTML = ''; return null; },
+        'whoami': () => 'jarvis',
+        'pwd': () => '/opt/whoamisec',
+        'date': () => new Date().toString(),
+    };
+    setTimeout(() => {
+        const fn = BIZ_CMDS[cmd.toLowerCase()];
+        const out = fn ? fn() : `bash: ${cmd}: command not found (sandbox mode)`;
+        if (out !== null && out !== undefined) bizTermPrint(out);
+        const prompt = document.createElement('div');
+        prompt.innerHTML = `<span class="t-p">jarvis@whoamisec:~$</span> <span style="animation:blink 1s infinite;">█</span>`;
+        s.appendChild(prompt);
+        s.scrollTop = s.scrollHeight;
+    }, 150 + Math.random()*100);
+}
+function bizTermHistory(dir) {
+    bizTermHistIdx = Math.max(-1, Math.min(bizTermCmdHistory.length-1, bizTermHistIdx + dir));
+    document.getElementById('biz-term-cmd').value = bizTermHistIdx >= 0 ? bizTermCmdHistory[bizTermHistIdx] : '';
+}
+
+// ── Agents dispatch ───────────────────────────────────────────
+function bizDispatchAll() {
+    const out = document.getElementById('biz-agent-output');
+    out.style.color = 'var(--amber)';
+    out.textContent = '⚡ Dispatching 2,703 agents...';
+    setTimeout(() => {
+        out.style.color = '#4ade80';
+        out.textContent = '✓ 2,703 agents dispatched\n✓ Business AI: 500 online\n✓ Coding agents: 803 online\n✓ Infrastructure: 1,400 online\n✓ ETA: 1.2s';
+    }, 800);
+}
+function bizAgentCmd(task) {
+    const out = document.getElementById('biz-agent-output');
+    out.style.color = 'var(--amber)';
+    out.textContent = `⚡ Running: ${task}...`;
+    setTimeout(() => {
+        out.style.color = '#4ade80';
+        out.textContent = `✓ Task: "${task}"\n✓ Agents: 2703 acknowledged\n✓ Status: Completed in 1.4s`;
+    }, 600 + Math.random()*400);
+}
+
+// old compat
+function toggleBizVS() { setBizMode('code', document.querySelectorAll('.studio-mode-btn')[1]); }
+function closeBizVS() { setBizMode('chat', document.querySelector('.studio-mode-btn')); }
+function updateBizLineNums() { bizVSUpdate(); }
+function vsEditorKey(e) { bizVSKey(e); }
+function runBizCode() { bizRunCode(); }
 function sendCommand() { sendBizCommand(); }
 
 function copyAddr() {

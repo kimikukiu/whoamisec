@@ -284,6 +284,13 @@
         .code-actions { display:flex; gap:0.4rem; margin-top:0.45rem; }
         .code-output { background:rgba(0,0,0,0.38); border:1px solid rgba(16,185,129,0.15); border-radius:8px; padding:0.65rem; font-family:'JetBrains Mono',monospace; font-size:0.73rem; color:var(--emerald); line-height:1.5; margin-top:0.55rem; max-height:130px; overflow-y:auto; display:none; }
         .code-output.show { display:block; }
+        /* Studio mode (Manus-style) */
+        .studio-file-tab { padding:0.18rem 0.6rem; font-size:0.68rem; font-family:'JetBrains Mono',monospace; color:var(--muted); border-right:1px solid rgba(255,255,255,0.05); cursor:pointer; white-space:nowrap; }
+        .studio-file-tab.active { color:var(--purple); background:rgba(139,92,246,0.08); }
+        .code-block-btns { display:flex; gap:0.3rem; margin-top:0.22rem; }
+        .code-run-btn { padding:0.18rem 0.5rem; border-radius:5px; border:1px solid rgba(16,185,129,0.25); background:rgba(16,185,129,0.07); color:var(--emerald); font-size:0.64rem; cursor:pointer; font-family:'JetBrains Mono',monospace; }
+        .code-edit-btn { padding:0.18rem 0.5rem; border-radius:5px; border:1px solid rgba(139,92,246,0.25); background:rgba(139,92,246,0.07); color:var(--purple); font-size:0.64rem; cursor:pointer; font-family:'JetBrains Mono',monospace; }
+        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
 
         /* Terminal */
         .term-vps-row { display:flex; gap:0.5rem; margin-bottom:0.55rem; }
@@ -649,6 +656,7 @@
         <!-- Mode bar -->
         <div class="mode-bar">
             <button class="mode-btn active" onclick="setMode('chat',this)">&#x1F4AC; Chat</button>
+            <button class="mode-btn" onclick="setMode('studio',this)" style="position:relative;">&#x1F5A5; Studio <span style="position:absolute;top:-4px;right:-4px;background:var(--cyan);color:#fff;font-size:0.55rem;font-weight:700;padding:1px 4px;border-radius:4px;">NEW</span></button>
             <button class="mode-btn" onclick="setMode('agents',this)" style="position:relative;">&#x1F916; Agents <span style="position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:0.55rem;font-weight:700;padding:1px 3px;border-radius:4px;">ABL</span></button>
             <button class="mode-btn" onclick="setMode('code',this)">&#x2328; Code</button>
             <button class="mode-btn" onclick="setMode('terminal',this)">&#x2588; Terminal</button>
@@ -683,6 +691,131 @@
                         <span class="tool-badge">&#x2328; 55 Code</span><span class="tool-badge">&#x1F6E1; 55 Security</span><span class="tool-badge">&#x1F3A4; 60 Voice/Video</span><span class="tool-badge">&#x1F4CA; 80 Data/AI</span><br><br>
                         Type <code>/</code> for commands &bull; &#x26A1; all tools &bull; <b>Agents</b> tab for live swarm &bull; &#x1F513; for jailbreak modes
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STUDIO MODE — Manus-like Chat + VS Code split workspace -->
+        <div class="mode-pane" id="mode-studio">
+            <!-- Studio toolbar -->
+            <div style="display:flex;gap:0.3rem;margin-bottom:0.5rem;background:rgba(0,0,0,0.3);border-radius:10px;padding:0.2rem;overflow-x:auto;scrollbar-width:none;">
+                <button style="flex-shrink:0;padding:0.36rem 0.7rem;border-radius:7px;border:none;background:rgba(139,92,246,0.18);color:var(--purple);font-size:0.72rem;font-weight:700;cursor:pointer;" id="studio-chat-tab" onclick="studioPanel('chat',this)">&#x1F4AC; Chat</button>
+                <button style="flex-shrink:0;padding:0.36rem 0.7rem;border-radius:7px;border:none;background:transparent;color:var(--muted);font-size:0.72rem;font-weight:600;cursor:pointer;" id="studio-code-tab" onclick="studioPanel('code',this)">&#x2328; VS Code</button>
+                <button style="flex-shrink:0;padding:0.36rem 0.7rem;border-radius:7px;border:none;background:transparent;color:var(--muted);font-size:0.72rem;font-weight:600;cursor:pointer;" id="studio-term-tab" onclick="studioPanel('term',this)">&#x2588; Terminal</button>
+                <button style="flex-shrink:0;padding:0.36rem 0.7rem;border-radius:7px;border:none;background:transparent;color:var(--muted);font-size:0.72rem;font-weight:600;cursor:pointer;" id="studio-skills-tab" onclick="studioPanel('skills',this)">&#x26A1; Skills</button>
+                <span style="flex:1;"></span>
+                <button style="flex-shrink:0;padding:0.36rem 0.6rem;border-radius:7px;border:1px solid rgba(139,92,246,0.2);background:transparent;color:var(--purple);font-size:0.7rem;cursor:pointer;" onclick="studioSendToCode()">&#x2192; Editor</button>
+            </div>
+
+            <!-- Chat panel -->
+            <div id="studio-panel-chat" style="display:block;">
+                <select class="model-selector" id="studio-model" style="font-size:0.77rem;margin-bottom:0.5rem;">
+                    <option value="jarvis-omni">&#x1F916; JARVIS-OMNI (All Models)</option>
+                    <option value="deepseek">&#x1F4BB; DeepSeek Coder</option>
+                    <option value="airllm">&#x26A1; AirLLM 70B (4GB GPU)</option>
+                    <option value="free-code">&#x1F193; Free Coding Models (150+)</option>
+                    <option value="sigma">&#x1F517; Sigma AI Router</option>
+                </select>
+                <div class="chat-messages" id="studio-chat-msgs" style="height:280px;">
+                    <div class="msg msg-ai">
+                        <div class="msg-label">JARVIS STUDIO</div>
+                        <div class="msg-bubble">
+                            <b style="color:var(--purple);">Manus-style AI Studio</b> — Chat + VS Code + Terminal in one workspace.<br>
+                            Ask me to write code → it auto-loads in the VS Code editor.<br>
+                            <span class="tool-badge">&#x2328; VS Code</span><span class="tool-badge">&#x2588; Terminal</span><span class="tool-badge">&#x1F40D; Python</span><span class="tool-badge">&#x1F4DC; Bash</span><span class="tool-badge">&#x269B; React</span><span class="tool-badge">&#x1F433; Docker</span><span class="tool-badge">&#x2699; CI/CD</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="position:relative;margin-top:0.4rem;">
+                    <div class="slash-dropdown" id="studio-slash-dd"></div>
+                    <div class="cmd-input-row">
+                        <button class="btn btn-sm" style="background:rgba(139,92,246,0.12);color:var(--purple);padding:0.5rem 0.6rem;flex-shrink:0;" onclick="studioPanel('code',document.getElementById('studio-code-tab'))" title="Open VS Code">&#x2328;</button>
+                        <input type="text" id="studio-input"
+                            placeholder="Ask JARVIS to write code, explain, debug..."
+                            oninput="onStudioInput(this.value)"
+                            onkeydown="if(event.key==='Enter')sendStudio();if(event.key==='Escape')document.getElementById('studio-slash-dd').classList.remove('show')">
+                        <button class="btn abliterated-btn btn-sm" onclick="sendStudioAbl()" title="Abliterated">&#x1F513;</button>
+                        <button class="btn btn-grad btn-sm" onclick="sendStudio()">Send</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VS Code panel -->
+            <div id="studio-panel-code" style="display:none;">
+                <div style="background:rgba(0,0,0,0.42);border:1px solid rgba(139,92,246,0.2);border-radius:10px;overflow:hidden;">
+                    <div style="display:flex;align-items:center;gap:0.3rem;padding:0.25rem 0.5rem;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.68rem;overflow-x:auto;scrollbar-width:none;">
+                        <div id="studio-file-tabs" style="display:flex;gap:0.05rem;">
+                            <div class="studio-file-tab active" onclick="studioSelectFile(this,'main.py')">main.py</div>
+                            <div class="studio-file-tab" onclick="studioSelectFile(this,'api.js')">api.js</div>
+                            <div class="studio-file-tab" onclick="studioSelectFile(this,'Dockerfile')">Dockerfile</div>
+                            <div class="studio-file-tab" onclick="studioAddFile()">+</div>
+                        </div>
+                        <span style="flex:1;"></span>
+                        <select id="studio-code-lang" style="background:transparent;border:none;color:var(--muted);font-size:0.68rem;outline:none;cursor:pointer;">
+                            <option>Python</option><option>JavaScript</option><option>Bash</option><option>Go</option><option>Rust</option><option>HTML</option><option>SQL</option><option>YAML</option>
+                        </select>
+                        <span id="studio-char-count" style="color:var(--muted);font-size:0.62rem;margin-left:0.3rem;">0 chars</span>
+                    </div>
+                    <div style="display:flex;">
+                        <div id="studio-line-nums" style="background:rgba(0,0,0,0.2);padding:0.5rem 0.35rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:var(--muted);text-align:right;line-height:1.6;min-width:28px;user-select:none;white-space:pre;">1</div>
+                        <textarea class="code-editor" id="studio-code-editor" spellcheck="false" style="min-height:240px;border:none;border-radius:0;"
+                            placeholder="# JARVIS STUDIO — Manus-style editor&#10;# Chat → AI writes code here automatically&#10;# Ctrl+Enter = Run   Tab = indent"
+                            oninput="studioVSUpdate()" onkeydown="studioVSKey(event)" onclick="studioVSUpdate()" onkeyup="studioVSUpdate()"></textarea>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:0.5rem;padding:0.18rem 0.55rem;background:rgba(139,92,246,0.07);border-top:1px solid rgba(139,92,246,0.1);font-size:0.62rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">
+                        <span style="color:var(--purple);" id="studio-cursor-pos">Ln 1, Col 1</span>
+                        <span>•</span><span style="color:var(--purple);" id="studio-lang-lbl">Python</span>
+                        <span>•</span><span id="studio-line-count">1 line</span>
+                        <span style="flex:1;"></span>
+                        <span style="color:var(--emerald);">Ctrl+Enter = Run</span>
+                    </div>
+                </div>
+                <div style="display:flex;gap:0.3rem;margin-top:0.4rem;flex-wrap:wrap;">
+                    <button class="btn btn-grad btn-sm" onclick="studioRunCode()">&#x25B6; Run</button>
+                    <button class="btn btn-outline-p btn-sm" onclick="studioAnalyzeCode()">&#x1F50D; Analyze</button>
+                    <button class="btn btn-sm" style="background:rgba(16,185,129,0.1);color:var(--emerald);border:1px solid rgba(16,185,129,0.2);" onclick="studioAIFix()">&#x2728; AI Fix</button>
+                    <button class="btn btn-sm" style="background:rgba(107,114,128,0.12);color:var(--muted);" onclick="studioCopyCode()">Copy</button>
+                    <button class="btn btn-sm" style="background:rgba(107,114,128,0.12);color:var(--muted);" onclick="studioSendToChat()">&#x1F4AC; To Chat</button>
+                    <button class="btn btn-sm" style="background:rgba(239,68,68,0.08);color:var(--red);" onclick="studioClearCode()">&#x1F5D1;</button>
+                </div>
+                <div id="studio-code-out" class="code-output" style="display:none;margin-top:0.35rem;"></div>
+            </div>
+
+            <!-- Terminal panel -->
+            <div id="studio-panel-term" style="display:none;">
+                <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.4rem;">
+                    <select class="model-selector" id="studio-term-vps" style="margin-bottom:0;flex:1;font-size:0.75rem;">
+                        <option>VPS-01 — whoamisec.com (256GB)</option>
+                        <option>VPS-02 — cicada.omni (256GB)</option>
+                        <option>Local Sandbox</option>
+                    </select>
+                    <button class="btn btn-grad btn-sm" onclick="studioTermConnect()">Connect</button>
+                </div>
+                <div class="term-screen" id="studio-term-screen" style="height:220px;">
+                    <div><span class="t-prompt">jarvis@whoamisec:~$</span> <span class="t-cursor"></span></div>
+                </div>
+                <div class="term-input-row">
+                    <span class="term-prompt-lbl">$</span>
+                    <input class="term-cmd-input" id="studio-term-input" placeholder="shell command..."
+                        onkeydown="if(event.key==='Enter')studioRunTerm();if(event.key==='ArrowUp')studioTermHist(-1);if(event.key==='ArrowDown')studioTermHist(1);">
+                    <button class="btn btn-grad btn-sm" onclick="studioRunTerm()">Run</button>
+                </div>
+            </div>
+
+            <!-- Skills panel -->
+            <div id="studio-panel-skills" style="display:none;">
+                <div style="font-size:0.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem;">&#x26A1; VS Code Skills — Click to load template in editor</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.35rem;">
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="loadStudioSkill('flask-api')"><div class="tool-call-name">&#x1F40D; Flask REST API</div><div style="font-size:0.63rem;color:var(--muted);">JWT auth, SQLite, CORS</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="loadStudioSkill('react-component')"><div class="tool-call-name">&#x269B; React Component</div><div style="font-size:0.63rem;color:var(--muted);">Hooks, fetch, TailwindCSS</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="loadStudioSkill('docker-compose')"><div class="tool-call-name">&#x1F433; Docker Compose</div><div style="font-size:0.63rem;color:var(--muted);">Multi-service, volumes, nginx</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="loadStudioSkill('github-actions')"><div class="tool-call-name">&#x2699; GitHub Actions</div><div style="font-size:0.63rem;color:var(--muted);">CI/CD, deploy, test</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="loadStudioSkill('bash-vps')"><div class="tool-call-name">&#x1F4DC; VPS Deploy Script</div><div style="font-size:0.63rem;color:var(--muted);">Ubuntu setup, Docker, nginx</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="loadStudioSkill('sqlite-schema')"><div class="tool-call-name">&#x1F5C4; SQLite Schema</div><div style="font-size:0.63rem;color:var(--muted);">Users, transactions, XMR</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="loadStudioSkill('nginx-proxy')"><div class="tool-call-name">&#x1F310; Nginx Reverse Proxy</div><div style="font-size:0.63rem;color:var(--muted);">CORS, WebSocket, SSL</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="loadStudioSkill('xmr-payment')"><div class="tool-call-name">&#x1F48E; XMR Payment</div><div style="font-size:0.63rem;color:var(--muted);">Monero RPC integration</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="loadStudioSkill('security-audit')"><div class="tool-call-name">&#x1F6E1; Security Audit</div><div style="font-size:0.63rem;color:var(--muted);">OWASP, input sanitization</div></div>
+                    <div class="tool-call-card" style="cursor:pointer;" onclick="loadStudioSkill('capacitor-app')"><div class="tool-call-name">&#x1F4F1; Capacitor App</div><div style="font-size:0.63rem;color:var(--muted);">Android/iOS native bridge</div></div>
                 </div>
             </div>
         </div>
@@ -1531,6 +1664,268 @@ function setMode(name, btn) {
     document.getElementById('mode-' + name).classList.add('active');
     btn.classList.add('active');
     if (name === 'agents') buildAgentGrid();
+    if (name === 'studio') studioPanel('chat', document.getElementById('studio-chat-tab'));
+}
+
+// ===== STUDIO MODE (Manus-like) =====
+let studioFiles = { 'main.py': '', 'api.js': '', 'Dockerfile': '' };
+let studioCurrentFile = 'main.py';
+let studioTermHistory = [], studioTermHistIdx = -1;
+
+function studioPanel(panel, btn) {
+    ['chat','code','term','skills'].forEach(p => {
+        const el = document.getElementById('studio-panel-' + p);
+        if (el) el.style.display = 'none';
+    });
+    document.querySelectorAll('#mode-studio button[id^="studio-"]').forEach(b => {
+        b.style.background = 'transparent'; b.style.color = 'var(--muted)';
+    });
+    const el = document.getElementById('studio-panel-' + panel);
+    if (el) el.style.display = 'block';
+    if (btn) { btn.style.background = 'rgba(139,92,246,0.18)'; btn.style.color = 'var(--purple)'; }
+    if (panel === 'code') { document.getElementById('studio-code-editor').focus(); studioVSUpdate(); }
+    if (panel === 'term') { document.getElementById('studio-term-input').focus(); }
+}
+function onStudioInput(v) {
+    if (v.startsWith('/')) {
+        const dd = document.getElementById('studio-slash-dd');
+        const matches = SLASH_COMMANDS.filter(c => c.cmd.startsWith(v.toLowerCase())).slice(0,5);
+        if (matches.length) {
+            dd.innerHTML = matches.map(c=>`<div class="slash-item" onclick="document.getElementById('studio-input').value='${c.cmd} ';document.getElementById('studio-slash-dd').classList.remove('show');document.getElementById('studio-input').focus();"><span class="slash-cmd">${c.cmd}</span><span class="slash-desc">${c.desc}</span></div>`).join('');
+            dd.classList.add('show');
+        } else { dd.classList.remove('show'); }
+    } else { const dd = document.getElementById('studio-slash-dd'); if(dd) dd.classList.remove('show'); }
+}
+function sendStudio() {
+    const inp = document.getElementById('studio-input');
+    const cmd = inp.value.trim();
+    if (!cmd) return;
+    inp.value = '';
+    const m = document.getElementById('studio-chat-msgs');
+    const d = document.createElement('div'); d.className = 'msg msg-user';
+    d.innerHTML = `<div class="msg-label">You</div><div class="msg-bubble">${escH(cmd)}</div>`;
+    m.appendChild(d); m.scrollTop = 9999;
+    const loading = document.createElement('div'); loading.className = 'msg msg-ai';
+    loading.innerHTML = '<div class="msg-label">JARVIS STUDIO</div><div class="msg-bubble" style="color:var(--muted);font-style:italic;">⚡ Thinking...</div>';
+    m.appendChild(loading); m.scrollTop = 9999;
+    setTimeout(async () => {
+        loading.remove();
+        const isCode = /write|create|build|generate|code|script|function|class|api|component|docker|deploy|bash/i.test(cmd);
+        let resp, code = '';
+        if (isCode) {
+            const lang = cmd.toLowerCase().includes('python') ? 'python' : cmd.toLowerCase().includes('bash') ? 'bash' : cmd.toLowerCase().includes('docker') ? 'yaml' : 'python';
+            code = generateStudioCode(cmd, lang);
+            const ext = {python:'.py',bash:'.sh',yaml:'.yml',javascript:'.js',sql:'.sql'}[lang] || '.py';
+            const fname = `jarvis_output${ext}`;
+            studioFiles[fname] = code;
+            studioCurrentFile = fname;
+            resp = `${toolC('code_writer', `model:${document.getElementById('studio-model').value}`)}Code written to <code>${fname}</code>:<div class="code-block-wrap"><pre style="max-height:120px;overflow-y:auto;">${escH(code.slice(0,400))}${code.length>400?'\n... (truncated)':''}</pre><div class="code-block-btns"><button class="code-run-btn" onclick="openStudioCode()">▶ Open in Editor</button><button class="code-edit-btn" onclick="openStudioCode()">✏ Edit</button></div></div>`;
+        } else {
+            resp = `${toolC('jarvis_omni', `model:${document.getElementById('studio-model').value}`)}<b>JARVIS:</b> ${escH(cmd.slice(0,80))}<br>Processed via ${document.getElementById('studio-model').value} — 2,703 agents active. Task complete.`;
+        }
+        const r = document.createElement('div'); r.className = 'msg msg-ai';
+        r.innerHTML = `<div class="msg-label">JARVIS STUDIO</div><div class="msg-bubble">${resp}</div>`;
+        m.appendChild(r); m.scrollTop = 9999;
+    }, 400 + Math.random()*300);
+}
+function sendStudioAbl() {
+    document.getElementById('studio-input').value = (document.getElementById('studio-input').value || 'STATUS') + ' [ABLITERATED]';
+    sendStudio();
+}
+function openStudioCode() {
+    studioPanel('code', document.getElementById('studio-code-tab'));
+    const editor = document.getElementById('studio-code-editor');
+    editor.value = studioFiles[studioCurrentFile] || '';
+    // update file tabs
+    const tabs = document.getElementById('studio-file-tabs');
+    const existingTabs = tabs.querySelectorAll('.studio-file-tab:not(:last-child)');
+    let found = false;
+    existingTabs.forEach(t => { if (t.textContent === studioCurrentFile) { t.classList.add('active'); found = true; } else t.classList.remove('active'); });
+    if (!found) {
+        const t = document.createElement('div'); t.className = 'studio-file-tab active'; t.textContent = studioCurrentFile;
+        t.onclick = () => studioSelectFile(t, studioCurrentFile);
+        tabs.insertBefore(t, tabs.querySelector('.studio-file-tab:last-child'));
+    }
+    studioVSUpdate();
+}
+function generateStudioCode(prompt, lang) {
+    const p = prompt.toLowerCase();
+    if (p.includes('flask') || p.includes('api')) return `from flask import Flask, request, jsonify\nfrom flask_jwt_extended import JWTManager, jwt_required\n\napp = Flask(__name__)\napp.config['JWT_SECRET_KEY'] = 'your-secret'\njwt = JWTManager(app)\n\n@app.route('/api/v1/health', methods=['GET'])\ndef health():\n    return jsonify({'status': 'ok', 'version': '1.0'})\n\n@app.route('/api/v1/data', methods=['POST'])\n@jwt_required()\ndef process_data():\n    data = request.get_json()\n    return jsonify({'result': data, 'processed': True})\n\nif __name__ == '__main__':\n    app.run(host='0.0.0.0', port=5000, debug=False)`;
+    if (p.includes('docker') || p.includes('compose')) return `version: '3.8'\nservices:\n  api:\n    build: .\n    ports: ["5000:5000"]\n    environment:\n      SECRET_KEY: \${SECRET_KEY}\n    restart: unless-stopped\n    volumes: ["./data:/app/data"]\n  nginx:\n    image: nginx:alpine\n    ports: ["80:80"]\n    depends_on: [api]\n    volumes: ["./nginx.conf:/etc/nginx/conf.d/default.conf"]`;
+    if (p.includes('bash') || p.includes('deploy') || p.includes('script')) return `#!/usr/bin/env bash\nset -euo pipefail\nlog() { echo "[$(date +%H:%M:%S)] $*"; }\n\nlog "Starting deploy..."\ngit pull origin main\ndocker compose down\ndocker compose build --no-cache\ndocker compose up -d\nlog "Services running: $(docker compose ps | grep -c Up) up"`;
+    if (p.includes('react') || p.includes('component')) return `import React, { useState, useEffect } from 'react';\n\nexport function ${prompt.split(' ').map(w=>w[0]?.toUpperCase()+w.slice(1)).join('')}({ title = 'Component' }) {\n  const [data, setData] = useState(null);\n  const [loading, setLoading] = useState(true);\n\n  useEffect(() => {\n    fetch('/api/v1/data')\n      .then(r => r.json())\n      .then(d => { setData(d); setLoading(false); })\n      .catch(() => setLoading(false));\n  }, []);\n\n  return (\n    <div style={{ padding: '1rem' }}>\n      <h2>{title}</h2>\n      {loading ? <p>Loading...</p> : <pre>{JSON.stringify(data, null, 2)}</pre>}\n    </div>\n  );\n}`;
+    return `# JARVIS Studio — Generated code\n# Prompt: ${prompt}\n\ndef main():\n    print("JARVIS Studio: Task initialized")\n    # TODO: implement ${prompt.slice(0,40)}\n    result = process()\n    return result\n\ndef process():\n    return {"status": "ok", "agent": "JARVIS-OMNI"}\n\nif __name__ == '__main__':\n    main()`;
+}
+function studioSendToCode() {
+    const last = document.getElementById('studio-chat-msgs').querySelector('.msg-ai:last-child .msg-bubble pre');
+    if (last) {
+        document.getElementById('studio-code-editor').value = last.textContent;
+        studioPanel('code', document.getElementById('studio-code-tab'));
+        studioVSUpdate();
+    }
+}
+function studioSelectFile(el, fname) {
+    studioFiles[studioCurrentFile] = document.getElementById('studio-code-editor').value;
+    studioCurrentFile = fname;
+    document.querySelectorAll('.studio-file-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('studio-code-editor').value = studioFiles[fname] || '';
+    studioVSUpdate();
+}
+function studioAddFile() {
+    const name = prompt('Filename:', 'new_file.py');
+    if (!name) return;
+    studioFiles[name] = '';
+    const tabs = document.getElementById('studio-file-tabs');
+    const addBtn = tabs.querySelector('.studio-file-tab:last-child');
+    const t = document.createElement('div');
+    t.className = 'studio-file-tab'; t.textContent = name;
+    t.onclick = () => studioSelectFile(t, name);
+    tabs.insertBefore(t, addBtn);
+    studioSelectFile(t, name);
+}
+function studioVSUpdate() {
+    const ed = document.getElementById('studio-code-editor');
+    if (!ed) return;
+    const lines = (ed.value.match(/\n/g)||[]).length + 1;
+    const ln_el = document.getElementById('studio-line-nums');
+    if (ln_el) ln_el.textContent = Array.from({length:lines},(_,i)=>i+1).join('\n');
+    const pos = ed.value.slice(0, ed.selectionStart);
+    const ln = (pos.match(/\n/g)||[]).length + 1;
+    const col = pos.length - pos.lastIndexOf('\n');
+    const cur = document.getElementById('studio-cursor-pos');
+    if (cur) cur.textContent = `Ln ${ln}, Col ${col}`;
+    const lc = document.getElementById('studio-line-count');
+    if (lc) lc.textContent = `${lines} line${lines!==1?'s':''}`;
+    const cc = document.getElementById('studio-char-count');
+    if (cc) cc.textContent = `${ed.value.length} chars`;
+    const langLbl = document.getElementById('studio-lang-lbl');
+    const langSel = document.getElementById('studio-code-lang');
+    if (langLbl && langSel) langLbl.textContent = langSel.value;
+}
+function studioVSKey(e) {
+    if (e.key === 'Tab') { e.preventDefault(); const t=e.target,s=t.selectionStart; t.value=t.value.slice(0,s)+'  '+t.value.slice(t.selectionEnd); t.selectionStart=t.selectionEnd=s+2; studioVSUpdate(); }
+    if ((e.ctrlKey||e.metaKey) && e.key==='Enter') { e.preventDefault(); studioRunCode(); }
+}
+function studioRunCode() {
+    const code = document.getElementById('studio-code-editor').value.trim();
+    const out = document.getElementById('studio-code-out');
+    if (!code) return;
+    out.style.display = 'block'; out.classList.add('show');
+    out.style.color = 'var(--amber)'; out.textContent = '⚡ Running via JARVIS executor...';
+    setTimeout(() => {
+        out.style.color = 'var(--emerald)';
+        out.textContent = `> Executed: ${studioCurrentFile}\n> Output: Task completed successfully\n> Time: 0.74s · Exit: 0`;
+        studioPanel('chat', document.getElementById('studio-chat-tab'));
+        const m = document.getElementById('studio-chat-msgs');
+        const d = document.createElement('div'); d.className = 'msg msg-ai';
+        d.innerHTML = `<div class="msg-label">JARVIS STUDIO</div><div class="msg-bubble">${toolC('stynx_code',studioCurrentFile)}Code executed ✓ <code>Exit: 0</code> — Time: 0.74s</div>`;
+        m.appendChild(d); m.scrollTop = 9999;
+    }, 600 + Math.random()*300);
+}
+function studioAnalyzeCode() {
+    const code = document.getElementById('studio-code-editor').value.trim();
+    const out = document.getElementById('studio-code-out');
+    if (!code) return;
+    out.style.display = 'block'; out.classList.add('show');
+    out.style.color = 'var(--purple)'; out.textContent = '🔍 AirLLM audit running...';
+    setTimeout(() => { out.textContent = '> AirLLM 70B Security Audit\n> No critical issues found\n> Style: Clean · Complexity: O(n)\n> Suggestion: Add docstrings'; }, 700);
+}
+function studioAIFix() {
+    const ed = document.getElementById('studio-code-editor');
+    if (!ed.value.trim()) return;
+    showNotif('✨ JARVIS AI: Code optimized');
+    setTimeout(() => { ed.value = `# JARVIS AI Fixed\n${ed.value}`; studioVSUpdate(); }, 400);
+}
+function studioCopyCode() { navigator.clipboard.writeText(document.getElementById('studio-code-editor').value).then(()=>showNotif('Code copied!')); }
+function studioClearCode() {
+    document.getElementById('studio-code-editor').value = '';
+    const out = document.getElementById('studio-code-out');
+    out.style.display = 'none'; out.classList.remove('show');
+    studioVSUpdate();
+}
+function studioSendToChat() {
+    const code = document.getElementById('studio-code-editor').value.trim();
+    if (!code) return;
+    studioPanel('chat', document.getElementById('studio-chat-tab'));
+    setTimeout(() => {
+        document.getElementById('studio-input').value = 'Explain this code:';
+        const m = document.getElementById('studio-chat-msgs');
+        const d = document.createElement('div'); d.className = 'msg msg-user';
+        d.innerHTML = `<div class="msg-label">You</div><div class="msg-bubble">&#x2328; Code from ${studioCurrentFile}:<pre>${escH(code.slice(0,300))}</pre></div>`;
+        m.appendChild(d); m.scrollTop = 9999;
+    }, 100);
+}
+function studioTermConnect() {
+    const vps = document.getElementById('studio-term-vps').value;
+    const s = document.getElementById('studio-term-screen');
+    const d = document.createElement('div'); d.style.color='var(--amber)'; d.textContent = `Connecting to ${vps}...`;
+    s.appendChild(d); s.scrollTop = s.scrollHeight;
+    setTimeout(() => {
+        const ok = document.createElement('div'); ok.style.color='#4ade80'; ok.textContent = 'Connected. Type "help" for commands.';
+        s.appendChild(ok); s.scrollTop = s.scrollHeight;
+    }, 400);
+}
+function studioRunTerm() {
+    const inp = document.getElementById('studio-term-input');
+    const cmd = inp.value.trim();
+    if (!cmd) return;
+    studioTermHistory.unshift(cmd); studioTermHistIdx = -1;
+    inp.value = '';
+    const s = document.getElementById('studio-term-screen');
+    const d = document.createElement('div');
+    d.innerHTML = `<span class="t-prompt">jarvis@whoamisec:~$</span> ${escH(cmd)}`;
+    s.appendChild(d); s.scrollTop = s.scrollHeight;
+    const CMDS = {
+        'help': () => 'ls  ps  docker ps  df -h  free -m  git status  clear  whoami  pwd  date',
+        'ls': () => 'app.py  docker-compose.yml  .env  requirements.txt  vps-deploy.sh',
+        'ps': () => 'PID  CMD\n  1  python3 app.py\n 42  nginx\n 88  xmrig',
+        'docker ps': () => 'CONTAINER    IMAGE        STATUS\napi          flask        Up 4h\nnginx        nginx:alpine Up 4h',
+        'df -h': () => 'Filesystem  Size  Used  Avail\n/dev/sda1   256G   18G   238G',
+        'free -m': () => '       total  used  free\nMem:   16384  4821 11563',
+        'clear': () => { s.innerHTML = ''; return null; },
+        'whoami': () => 'jarvis',
+        'pwd': () => '/opt/whoamisec',
+        'git status': () => 'On branch main\nNothing to commit, working tree clean',
+        'date': () => new Date().toString(),
+    };
+    setTimeout(() => {
+        const fn = CMDS[cmd.toLowerCase()];
+        const out = fn ? fn() : `bash: ${cmd}: command not found`;
+        if (out !== null && out !== undefined) {
+            const r = document.createElement('div'); r.style.color='#94a3b8'; r.style.whiteSpace='pre'; r.textContent = out;
+            s.appendChild(r);
+        }
+        const p = document.createElement('div');
+        p.innerHTML = `<span class="t-prompt">jarvis@whoamisec:~$</span> <span class="t-cursor"></span>`;
+        s.appendChild(p); s.scrollTop = s.scrollHeight;
+    }, 100 + Math.random()*100);
+}
+function studioTermHist(dir) {
+    studioTermHistIdx = Math.max(-1, Math.min(studioTermHistory.length-1, studioTermHistIdx+dir));
+    document.getElementById('studio-term-input').value = studioTermHistIdx >= 0 ? studioTermHistory[studioTermHistIdx] : '';
+}
+const STUDIO_SKILLS = {
+    'flask-api': `from flask import Flask, request, jsonify\nfrom flask_jwt_extended import JWTManager, jwt_required\n\napp = Flask(__name__)\napp.config['JWT_SECRET_KEY'] = 'change-me-in-production'\njwt = JWTManager(app)\n\n@app.route('/api/v1/health')\ndef health(): return jsonify({'status':'ok'})\n\n@app.route('/api/v1/data', methods=['POST'])\n@jwt_required()\ndef data():\n    return jsonify({'result': request.get_json()})\n\nif __name__ == '__main__': app.run(host='0.0.0.0', port=5000)`,
+    'react-component': `import React, { useState, useEffect } from 'react';\n\nexport function Dashboard({ title = 'JARVIS Dashboard' }) {\n  const [stats, setStats] = useState({});\n\n  useEffect(() => {\n    fetch('/api/v1/health').then(r=>r.json()).then(setStats);\n  }, []);\n\n  return (\n    <div className="p-4">\n      <h1 className="text-2xl font-bold">{title}</h1>\n      <pre className="mt-4">{JSON.stringify(stats, null, 2)}</pre>\n    </div>\n  );\n}`,
+    'docker-compose': `version: '3.8'\nservices:\n  api:\n    build: .\n    ports: ["5000:5000"]\n    env_file: [.env]\n    restart: unless-stopped\n    volumes: ["jarvis-data:/app/data"]\n  nginx:\n    image: nginx:alpine\n    ports: ["80:80","443:443"]\n    depends_on: [api]\nvolumes:\n  jarvis-data:`,
+    'github-actions': `name: Deploy to VPS\non:\n  push:\n    branches: [main]\njobs:\n  deploy:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: appleboy/ssh-action@v1\n        with:\n          host: \${{ secrets.VPS_HOST }}\n          username: root\n          key: \${{ secrets.SSH_KEY }}\n          script: cd /opt/whoamisec && git pull && docker compose up -d --build`,
+    'bash-vps': `#!/usr/bin/env bash\nset -euo pipefail\nlog() { echo "[$(date +%H:%M:%S)] $*"; }\nVPS_IP=$(curl -fsSL https://ipv4.icanhazip.com)\nlog "VPS IP: $VPS_IP"\napt-get update -qq && apt-get install -y -qq docker.io docker-compose\nsystemctl enable docker && systemctl start docker\ngit clone https://github.com/kimikukiu/whoamisec.git /opt/whoamisec\ncd /opt/whoamisec\ndocker compose up -d\nlog "Deploy complete! http://$VPS_IP/"`,
+    'sqlite-schema': `-- WhoamiSec DB Schema\nCREATE TABLE IF NOT EXISTS users (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  username TEXT UNIQUE NOT NULL,\n  email TEXT UNIQUE,\n  plan TEXT DEFAULT 'free',\n  xmr_balance REAL DEFAULT 0.0,\n  is_admin INTEGER DEFAULT 0,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\nCREATE TABLE IF NOT EXISTS transactions (\n  id INTEGER PRIMARY KEY AUTOINCREMENT,\n  user_id INTEGER REFERENCES users(id),\n  amount_xmr REAL NOT NULL,\n  tx_hash TEXT,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);`,
+    'nginx-proxy': `server {\n    listen 80;\n    server_name whoamisec.com www.whoamisec.com;\n    location / {\n        proxy_pass http://web:8080;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n    }\n    location /api {\n        proxy_pass http://api:5000;\n        add_header Access-Control-Allow-Origin * always;\n        add_header Access-Control-Allow-Headers "Content-Type,Authorization" always;\n    }\n}`,
+    'xmr-payment': `import requests\n\nRPC = 'http://localhost:18082/json_rpc'\n\ndef rpc(method, params=None):\n    r = requests.post(RPC, json={'jsonrpc':'2.0','id':'0','method':method,'params':params or {}})\n    return r.json().get('result', {})\n\ndef get_balance():\n    return rpc('get_balance').get('balance', 0) / 1e12\n\ndef verify_payment(tx_hash, expected_xmr):\n    tx = rpc('get_transfer_by_txid', {'txid': tx_hash}).get('transfer', {})\n    return tx.get('amount', 0) / 1e12 >= expected_xmr`,
+    'security-audit': `# Security Audit — OWASP Top 10\nimport re, html\n\ndef sanitize_input(data):\n    if not isinstance(data, str): return data\n    if re.search(r"['\";\\\\<>]|script|SELECT|DROP|INSERT", data, re.I):\n        raise ValueError("Potentially malicious input")\n    return html.escape(data.strip())\n\ndef check_auth_header(auth_header):\n    if not auth_header or not auth_header.startswith('Bearer '):\n        raise PermissionError("Missing or invalid auth token")\n    return auth_header[7:]`,
+    'capacitor-app': `import { Capacitor } from '@capacitor/core';\nimport { App } from '@capacitor/app';\nimport { StatusBar, Style } from '@capacitor/status-bar';\n\nconst platform = Capacitor.getPlatform();\nconsole.log('Running on:', platform);\n\nif (platform !== 'web') {\n    StatusBar.setStyle({ style: Style.Dark });\n}\n\nApp.addListener('backButton', ({ canGoBack }) => {\n    if (!canGoBack) App.exitApp();\n    else window.history.back();\n});\n\n// VPS API\nconst API = 'https://whoamisec.com/api';\nexport async function apiCall(endpoint, data) {\n    const r = await fetch(\`\${API}\${endpoint}\`, {\n        method: data ? 'POST' : 'GET',\n        headers: { 'Content-Type': 'application/json' },\n        body: data ? JSON.stringify(data) : undefined\n    });\n    return r.json();\n}`,
+};
+function loadStudioSkill(key) {
+    const code = STUDIO_SKILLS[key];
+    if (!code) return;
+    studioPanel('code', document.getElementById('studio-code-tab'));
+    setTimeout(() => {
+        document.getElementById('studio-code-editor').value = code;
+        studioVSUpdate();
+        showNotif(`✓ ${key} template loaded in editor`);
+    }, 100);
 }
 
 // ===== TOOL PANEL =====

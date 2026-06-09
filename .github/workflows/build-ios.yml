@@ -6,6 +6,7 @@ on:
     paths:
       - 'jarvis-mind-app.html'
       - 'whoamisec-business-app.html'
+      - 'cicada-omni-app.html'
       - 'manifest.json'
       - 'sw.js'
       - '.github/workflows/build-ios.yml'
@@ -26,12 +27,6 @@ jobs:
 
       - name: Select latest Xcode
         run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-
-      - name: Install CocoaPods
-        run: sudo gem install cocoapods --no-document 2>/dev/null || true
-
-      - name: Install xcpretty
-        run: gem install xcpretty 2>/dev/null || true
 
       # ════════════════════════════════════════════════════════
       # IPA 1 — JARVIS MIND v3
@@ -70,19 +65,12 @@ jobs:
         run: |
           find ios -name "project.pbxproj" -exec \
             perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = [\d.]+/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' {} \;
-          if [ -f ios/App/Podfile ]; then
-            perl -pi -e "s/platform :ios, '[\d.]+'/platform :ios, '13.0'/" ios/App/Podfile
-          fi
-
-      - name: Pod install — JARVIS MIND
-        working-directory: apk-build/ios/App
-        run: pod install --repo-update
 
       - name: Build archive — JARVIS MIND
         working-directory: apk-build/ios/App
         run: |
           xcodebuild \
-            -workspace App.xcworkspace \
+            -project App.xcodeproj \
             -scheme App \
             -configuration Release \
             -destination 'generic/platform=iOS' \
@@ -135,19 +123,12 @@ jobs:
         run: |
           find ios -name "project.pbxproj" -exec \
             perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = [\d.]+/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' {} \;
-          if [ -f ios/App/Podfile ]; then
-            perl -pi -e "s/platform :ios, '[\d.]+'/platform :ios, '13.0'/" ios/App/Podfile
-          fi
-
-      - name: Pod install — WHOAMISEC Business
-        working-directory: apk-build/ios/App
-        run: pod install --repo-update
 
       - name: Build archive — WHOAMISEC Business
         working-directory: apk-build/ios/App
         run: |
           xcodebuild \
-            -workspace App.xcworkspace \
+            -project App.xcodeproj \
             -scheme App \
             -configuration Release \
             -destination 'generic/platform=iOS' \
@@ -196,24 +177,51 @@ jobs:
           ./node_modules/.bin/cap add ios
           ./node_modules/.bin/cap sync ios
 
-      - name: Patch iOS — CICADA 3301
+      - name: Patch iOS deployment target — CICADA 3301
         working-directory: apk-build
         run: |
           find ios -name "project.pbxproj" -exec \
             perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = [\d.]+/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' {} \;
-          if [ -f ios/App/Podfile ]; then
-            perl -pi -e "s/platform :ios, '[\d.]+'/platform :ios, '13.0'/" ios/App/Podfile
-          fi
 
-      - name: Pod install — CICADA 3301
-        working-directory: apk-build/ios/App
-        run: pod install --repo-update
+      - name: Set CICADA 3301 iOS app icon
+        working-directory: apk-build
+        run: |
+          ICON="${{ github.workspace }}/cicada-icon.png"
+          ICON_DIR="ios/App/App/Assets.xcassets/AppIcon.appiconset"
+          mkdir -p "$ICON_DIR"
+          # sips is macOS built-in — no pip install needed
+          for px in 20 29 40 58 60 76 80 87 120 152 167 180 1024; do
+            sips -z $px $px "$ICON" --out "$ICON_DIR/cicada_${px}x${px}.png" 2>/dev/null
+          done
+          cat > "$ICON_DIR/Contents.json" << 'CONTENTS'
+          {
+            "images": [
+              {"filename":"cicada_20x20.png",   "idiom":"iphone","scale":"1x","size":"20x20"},
+              {"filename":"cicada_40x40.png",   "idiom":"iphone","scale":"2x","size":"20x20"},
+              {"filename":"cicada_60x60.png",   "idiom":"iphone","scale":"3x","size":"20x20"},
+              {"filename":"cicada_29x29.png",   "idiom":"iphone","scale":"1x","size":"29x29"},
+              {"filename":"cicada_58x58.png",   "idiom":"iphone","scale":"2x","size":"29x29"},
+              {"filename":"cicada_87x87.png",   "idiom":"iphone","scale":"3x","size":"29x29"},
+              {"filename":"cicada_40x40.png",   "idiom":"iphone","scale":"1x","size":"40x40"},
+              {"filename":"cicada_80x80.png",   "idiom":"iphone","scale":"2x","size":"40x40"},
+              {"filename":"cicada_120x120.png", "idiom":"iphone","scale":"3x","size":"40x40"},
+              {"filename":"cicada_120x120.png", "idiom":"iphone","scale":"2x","size":"60x60"},
+              {"filename":"cicada_180x180.png", "idiom":"iphone","scale":"3x","size":"60x60"},
+              {"filename":"cicada_76x76.png",   "idiom":"ipad",  "scale":"1x","size":"76x76"},
+              {"filename":"cicada_152x152.png", "idiom":"ipad",  "scale":"2x","size":"76x76"},
+              {"filename":"cicada_167x167.png", "idiom":"ipad",  "scale":"2x","size":"83.5x83.5"},
+              {"filename":"cicada_1024x1024.png","idiom":"ios-marketing","scale":"1x","size":"1024x1024"}
+            ],
+            "info": {"author":"whoamisec","version":1}
+          }
+          CONTENTS
+          echo "CICADA iOS icons installed via sips"
 
       - name: Build archive — CICADA 3301
         working-directory: apk-build/ios/App
         run: |
           xcodebuild \
-            -workspace App.xcworkspace \
+            -project App.xcodeproj \
             -scheme App \
             -configuration Release \
             -destination 'generic/platform=iOS' \
@@ -247,8 +255,8 @@ jobs:
 
             | File | Description |
             |------|-------------|
-            | `JARVIS-MIND-v3.ipa` | JARVIS MIND — VPS, 2700 agents, Commander, SSH, Plans |
-            | `WHOAMISEC-Business-v16.ipa` | Business — XMR Mining, Monero, Plans, Invite Friend |
+            | `JARVIS-MIND-v3.ipa` | JARVIS MIND — VPS, 2700 agents, Commander, SSH, Plans, AI Studio |
+            | `WHOAMISEC-Business-v16.ipa` | Business — XMR Mining, Monero, Plans, AI Studio, VS Code |
             | `CICADA-3301.ipa` | CICADA 3301 — Puzzle platform, matrix UI, XMR rewards, Telegram |
 
             ### Compatibility — ALL 3 IPAs
