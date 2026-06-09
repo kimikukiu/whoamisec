@@ -220,8 +220,9 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
 <div class="pan" id="panel-settings">
   <div class="ph"><span class="pt">⚙️ SETĂRI</span><button class="pc" onclick="closeP('settings')">✕</button></div>
   <div class="pb">
-    <div style="font-size:.6rem;color:var(--g);margin-bottom:.65rem;border:1px solid rgba(0,255,136,.2);padding:.38rem .55rem;border-radius:6px;">🤖 API: <b>whoamisec-repo.vercel.app</b> · 9 modele free</div>
-    <div class="slbl">🌐 API URL</div><input class="sinp" id="surl" placeholder="https://whoamisec-repo.vercel.app">
+    <div style="font-size:.6rem;color:var(--g);margin-bottom:.65rem;border:1px solid rgba(0,255,136,.2);padding:.38rem .55rem;border-radius:6px;">🤖 9router — FREE: kr/claude-sonnet-4.5 · kr/deepseek-3.2 · kr/glm-5</div>
+    <div class="slbl">🌐 9ROUTER URL</div><input class="sinp" id="surl" placeholder="http://IP:20128">
+    <div class="slbl">🔑 9ROUTER API KEY</div><input class="sinp" id="s9key" type="password" placeholder="(opțional dacă REQUIRE_API_KEY=false)">
     <div class="slbl">🐙 GITHUB TOKEN</div><input class="sinp" id="sgh" type="password" placeholder="ghp_...">
     <div class="slbl">📱 TELEGRAM BOT TOKEN</div><input class="sinp" id="stgbot" type="password" placeholder="...">
     <div class="slbl">📱 TELEGRAM CHAT ID</div><input class="sinp" id="stgid" placeholder="123456789">
@@ -264,6 +265,7 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
 // ── INSTANT RENDER — show HUD immediately, defer everything else ──
 const C={
   apiUrl:localStorage.getItem('j_url')||'https://whoamisec-repo.vercel.app',
+  nr9key:localStorage.getItem('j_9key')||'',
   gh:localStorage.getItem('jgh')||'',
   tgbot:localStorage.getItem('jtgbot')||'',
   tgid:localStorage.getItem('jtgid')||''
@@ -312,23 +314,26 @@ function setR(s){
 function setT(t){document.getElementById('tbox').innerHTML=t;}
 function setResp(t){const e=document.getElementById('rbox');e.innerHTML=t;e.scrollTop=9999;}
 
-// MODELS
+// MODELS — 9router (9router.com) — prefix/model format
 const MODELS=[
-  {n:'GPT-4o Mini',i:'⚡',d:'OpenAI — rapid',m:'gpt-4o-mini'},
-  {n:'GPT-4o',i:'🧠',d:'OpenAI — top',m:'gpt-4o'},
-  {n:'Phi-4',i:'💡',d:'Microsoft — cod',m:'Phi-4'},
-  {n:'Phi-3.5 Mini',i:'🔷',d:'128k context',m:'Phi-3.5-mini-128k-instruct'},
-  {n:'Llama 3.3 70B',i:'🦙',d:'Meta open source',m:'Llama-3.3-70B-Instruct'},
-  {n:'DeepSeek V3',i:'🔮',d:'Raționament',m:'DeepSeek-V3'},
-  {n:'Mistral Large',i:'🌊',d:'Multilingv',m:'Mistral-large'},
-  {n:'Llama 3.1 70B',i:'🌟',d:'Meta instrucțiuni',m:'Meta-Llama-3.1-70B-Instruct'},
-  {n:'Cohere R+',i:'🎯',d:'RAG & analiză',m:'cohere-command-r-plus-08-2024'},
+  // FREE — Kiro tier
+  {n:'Claude Sonnet 4.5',i:'🤖',d:'Kiro — FREE',m:'kr/claude-sonnet-4.5',f:true},
+  {n:'DeepSeek 3.2',i:'🔮',d:'Kiro — FREE',m:'kr/deepseek-3.2',f:true},
+  {n:'GLM-5',i:'🧠',d:'Kiro — FREE',m:'kr/glm-5',f:true},
+  // CHEAP
+  {n:'GLM-5.1',i:'💡',d:'$0.6/1M tok',m:'glm/glm-5.1',f:false},
+  {n:'MiniMax M2.7',i:'⚡',d:'$0.2/1M tok',m:'minimax/MiniMax-M2.7',f:false},
+  {n:'Kimi K2.5',i:'🌊',d:'$9/lună',m:'kimi/kimi-k2.5',f:false},
+  // SUBSCRIPTION
+  {n:'Claude Opus 4.7',i:'👑',d:'Claude Code',m:'cc/claude-opus-4-7',f:false},
+  {n:'Claude Sonnet 4.6',i:'🔷',d:'Claude Code',m:'cc/claude-sonnet-4-6',f:false},
+  {n:'GPT-5.4',i:'🌟',d:'GitHub Copilot',m:'gh/gpt-5.4',f:false},
 ];
 function buildModels(){
   document.getElementById('mlist').innerHTML=MODELS.map((m,i)=>`
     <div class="mc ${i===AM?'sel':''}" onclick="selM(${i})">
       <div style="font-size:1.4rem">${m.i}</div>
-      <div><div class="mn">${m.n}</div><div class="md">${m.d}</div><span class="mbg">FREE</span></div>
+      <div><div class="mn">${m.n}</div><div class="md">${m.d}</div><span class="mbg" style="${m.f?'':'background:rgba(255,184,0,.12);color:#f59e0b;border-color:rgba(255,184,0,.3)'}">${m.f?'FREE':'PAID'}</span></div>
       ${i===AM?'<span style="color:var(--c)">✓</span>':''}
     </div>`).join('');
 }
@@ -403,9 +408,14 @@ function buildAgents(){
 async function callAI(msg,ctx=''){
   const mo=MODELS[AM],jb=getJBS()[AJ];
   const msgs=[{role:'system',content:jb.p},{role:'user',content:(ctx?'[Context]\n'+ctx+'\n\n':'')+msg}];
+  // 9router OpenAI-compatible — /v1/chat/completions
+  const base=C.apiUrl.replace(/\/+$/,'');
+  const ep=base.includes('vercel.app')?base+'/api/chat':base+'/v1/chat/completions';
   try{
-    const r=await fetch(C.apiUrl+'/api/chat',{
-      method:'POST',headers:{'Content-Type':'application/json'},
+    const h={'Content-Type':'application/json'};
+    if(C.nr9key)h['Authorization']='Bearer '+C.nr9key;
+    const r=await fetch(ep,{
+      method:'POST',headers:h,
       body:JSON.stringify({model:mo.m,messages:msgs,max_tokens:2048}),
       signal:AbortSignal.timeout(60000)
     });
@@ -550,25 +560,34 @@ function navHUD(){
 function loadSet(){
   const g=id=>document.getElementById(id);
   if(g('surl'))g('surl').value=C.apiUrl;
+  if(g('s9key'))g('s9key').value=C.nr9key;
   if(g('sgh'))g('sgh').value=C.gh;
   if(g('stgbot'))g('stgbot').value=C.tgbot;
   if(g('stgid'))g('stgid').value=C.tgid;
 }
 async function saveSet(){
-  C.apiUrl=document.getElementById('surl').value.trim()||'https://whoamisec-repo.vercel.app';
+  C.apiUrl=document.getElementById('surl').value.trim()||'http://localhost:20128';
+  C.nr9key=document.getElementById('s9key').value.trim();
   C.gh=document.getElementById('sgh').value.trim();
   C.tgbot=document.getElementById('stgbot').value.trim();
   C.tgid=document.getElementById('stgid').value.trim();
-  localStorage.setItem('j_url',C.apiUrl);localStorage.setItem('jgh',C.gh);
-  localStorage.setItem('jtgbot',C.tgbot);localStorage.setItem('jtgid',C.tgid);
-  showN('⏳ Test...','var(--a)');
+  localStorage.setItem('j_url',C.apiUrl);
+  localStorage.setItem('j_9key',C.nr9key);
+  localStorage.setItem('jgh',C.gh);
+  localStorage.setItem('jtgbot',C.tgbot);
+  localStorage.setItem('jtgid',C.tgid);
+  showN('⏳ Test 9router...','var(--a)');
+  const base=C.apiUrl.replace(/\/+$/,'');
+  const ep=base.includes('vercel.app')?base+'/api/chat':base+'/v1/chat/completions';
+  const h={'Content-Type':'application/json'};
+  if(C.nr9key)h['Authorization']='Bearer '+C.nr9key;
   try{
-    const r=await fetch(C.apiUrl+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'user',content:'ping'}],max_tokens:5}),
+    const r=await fetch(ep,{method:'POST',headers:h,
+      body:JSON.stringify({model:'kr/claude-sonnet-4.5',messages:[{role:'user',content:'ping'}],max_tokens:5}),
       signal:AbortSignal.timeout(10000)});
-    showN(r.ok?'✅ Conectat!':'⚠️ Eroare '+r.status,r.ok?'var(--g)':'#f59e0b');
+    showN(r.ok?'✅ 9router conectat!':'⚠️ Eroare '+r.status,r.ok?'var(--g)':'#f59e0b');
     if(r.ok)closeP('settings');
-  }catch(e){showN('⚠️ Offline','#ef4444');}
+  }catch(e){showN('⚠️ Offline: '+e.message,'#ef4444');}
 }
 
 // PAYMENT
