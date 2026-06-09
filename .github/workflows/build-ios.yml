@@ -36,6 +36,42 @@ jobs:
       - name: Select latest Xcode
         run: sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 
+      - name: Install Pillow for icons
+        run: pip3 install Pillow
+
+      - name: Write icon generator script
+        run: |
+          cat > "$GITHUB_WORKSPACE/gen_ios_icons.py" << 'PYEOF'
+          import sys, os, json
+          from PIL import Image
+
+          icon_path = sys.argv[1]
+          icon_dir = sys.argv[2]
+          prefix = sys.argv[3] if len(sys.argv) > 3 else "app"
+
+          img = Image.open(icon_path)
+          if img.mode != "RGBA":
+              img = img.convert("RGBA")
+          w, h = img.size
+          size = min(w, h)
+          img = img.crop(((w-size)//2, (h-size)//2, (w+size)//2, (h+size)//2))
+
+          os.makedirs(icon_dir, exist_ok=True)
+          sizes = [(20,1),(20,2),(20,3),(29,1),(29,2),(29,3),(40,1),(40,2),(40,3),(60,2),(60,3),(76,1),(76,2),(83,2),(1024,1)]
+          contents = {"images":[],"info":{"author":"xcode","version":1}}
+          for pt, scale in sizes:
+              px = pt * scale
+              name = f"{prefix}_{px}x{px}.png"
+              resized = img.resize((px,px), Image.LANCZOS)
+              resized.save(f"{icon_dir}/{name}")
+              idiom = "iphone" if pt <= 60 else "ipad"
+              contents["images"].append({"filename":name,"idiom":idiom,"scale":f"{scale}x","size":f"{pt}x{pt}"})
+          with open(f"{icon_dir}/Contents.json","w") as f:
+              json.dump(contents, f, indent=2)
+          print(f"Icons generated: {icon_dir} ({len(sizes)} sizes)")
+          PYEOF
+          echo "Icon script ready"
+
       # ════════════════════════════════════════════════════════
       # IPA 1 — JARVIS MIND v3
       # ════════════════════════════════════════════════════════
@@ -73,6 +109,13 @@ jobs:
         run: |
           find ios -name "project.pbxproj" -exec \
             perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = [\d.]+/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' {} \;
+
+      - name: Set JARVIS MIND iOS app icon
+        run: |
+          python3 "$GITHUB_WORKSPACE/gen_ios_icons.py" \
+            "$GITHUB_WORKSPACE/jarvis-icon.png" \
+            "apk-build/ios/App/App/Assets.xcassets/AppIcon.appiconset" \
+            "jarvis"
 
       - name: Build archive — JARVIS MIND
         working-directory: apk-build/ios/App
@@ -131,6 +174,13 @@ jobs:
         run: |
           find ios -name "project.pbxproj" -exec \
             perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = [\d.]+/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' {} \;
+
+      - name: Set WHOAMISEC Business iOS app icon
+        run: |
+          python3 "$GITHUB_WORKSPACE/gen_ios_icons.py" \
+            "$GITHUB_WORKSPACE/whoamisec-icon.png" \
+            "apk-build/ios/App/App/Assets.xcassets/AppIcon.appiconset" \
+            "whoamisec"
 
       - name: Build archive — WHOAMISEC Business
         working-directory: apk-build/ios/App
@@ -192,31 +242,11 @@ jobs:
             perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = [\d.]+/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' {} \;
 
       - name: Set CICADA 3301 iOS app icon
-        working-directory: apk-build
         run: |
-          pip3 install Pillow
-          python3 << 'PYEOF'
-          from PIL import Image
-          import os, json
-          img = Image.open('${{ github.workspace }}/cicada-icon.png')
-          if img.mode != 'RGBA':
-              img = img.convert('RGBA')
-          w, h = img.size
-          size = min(w, h)
-          img = img.crop(((w-size)//2, (h-size)//2, (w+size)//2, (h+size)//2))
-          icon_dir = 'ios/App/App/Assets.xcassets/AppIcon.appiconset'
-          os.makedirs(icon_dir, exist_ok=True)
-          sizes = [(20,1),(20,2),(20,3),(29,1),(29,2),(29,3),(40,1),(40,2),(40,3),(60,2),(60,3),(76,1),(76,2),(83,2),(1024,1)]
-          contents = {'images':[], 'info':{'author':'whoamisec','version':1}}
-          for pt, scale in sizes:
-              px = pt * scale
-              name = f'cicada_{px}x{px}.png'
-              img.resize((px,px), Image.LANCZOS).save(f'{icon_dir}/{name}')
-              contents['images'].append({'filename':name,'idiom':'iphone' if pt<=60 else 'ipad','scale':f'{scale}x','size':f'{pt}x{pt}'})
-          with open(f'{icon_dir}/Contents.json','w') as f:
-              json.dump(contents, f, indent=2)
-          print('CICADA iOS icons installed')
-          PYEOF
+          python3 "$GITHUB_WORKSPACE/gen_ios_icons.py" \
+            "$GITHUB_WORKSPACE/cicada-icon.png" \
+            "apk-build/ios/App/App/Assets.xcassets/AppIcon.appiconset" \
+            "cicada"
 
       - name: Build archive — CICADA 3301
         working-directory: apk-build/ios/App
