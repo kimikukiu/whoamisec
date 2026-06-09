@@ -605,7 +605,7 @@ function showN(msg,col='var(--c)'){
 // COPILOT
 let cpI=null,cpT='';
 const LD={python:/\bdef |import |print\(|class \w+:/,javascript:/function |const |let |var |=>/,
-  bash:/#!/|apt |curl |sudo /,html:/<html|<div|<body/i,sql:/SELECT |INSERT |FROM /i};
+  bash:/\bapt |curl |sudo |chmod |grep /,html:/<html|<div|<body/i,sql:/SELECT |INSERT |FROM /i};
 function detectLang(c){for(const[l,r]of Object.entries(LD))if(r.test(c))return l;return 'text';}
 function synHL(code){
   return code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -678,7 +678,9 @@ function autoCheckUpgrade(){
 let swAF=null,swLT=0;
 function initSwarm(){
   const cv=document.getElementById('swc');
+  if(!cv||cv.style.display==='none')return;
   const ctx=cv.getContext('2d');
+  if(!ctx)return;
   function rsz(){cv.width=window.innerWidth;cv.height=window.innerHeight;}
   rsz();window.addEventListener('resize',rsz);
   const COLS=['rgba(0,212,255,','rgba(0,255,136,','rgba(255,184,0,','rgba(192,132,252,','rgba(255,107,53,'];
