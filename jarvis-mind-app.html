@@ -243,27 +243,28 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Courier 
 <div class="panel" id="panel-settings">
   <div class="ph"><span class="pt">⚙️ SETĂRI API</span><button class="pc" onclick="closeP('settings')">✕</button></div>
   <div class="pb">
-    <div class="slbl">VPS BACKEND URL (opțional)</div>
-    <input class="sinp" id="svps" placeholder="http://IP:8080">
-    <div class="slbl">GROQ API KEY — gratuit la groq.com</div>
-    <input class="sinp" id="sgroq" type="password" placeholder="gsk_...">
-    <div class="slbl">OPENROUTER KEY — gratuit la openrouter.ai</div>
-    <input class="sinp" id="sor" type="password" placeholder="sk-or-...">
-    <div class="slbl">HUGGINGFACE TOKEN — gratuit la huggingface.co</div>
-    <input class="sinp" id="shf" type="password" placeholder="hf_...">
-    <hr style="border-color:var(--border);margin:.7rem 0;">
-    <div class="slbl">🐙 GITHUB TOKEN (auto-upgrade din repo kimikukiu/whoamisec)</div>
+    <div style="font-size:.62rem;color:var(--green);margin-bottom:.7rem;border:1px solid rgba(0,255,136,.2);padding:.4rem .6rem;border-radius:6px;background:rgba(0,255,136,.05);">
+      🤖 JARVIS folosește <b>whoamisec.com</b> — 9 modele free, zero chei externe!
+    </div>
+    <div class="slbl">🌐 WHOAMISEC API URL</div>
+    <input class="sinp" id="surl" placeholder="https://whoamisec.com" value="https://whoamisec.com">
+    <div class="slbl">👤 USERNAME (contul tău whoamisec.com)</div>
+    <input class="sinp" id="suser" placeholder="username">
+    <div class="slbl">🔑 PAROLA</div>
+    <input class="sinp" id="spass" type="password" placeholder="parola ta">
+    <hr style="border-color:var(--border);margin:.6rem 0;">
+    <div class="slbl">🐙 GITHUB TOKEN (auto-upgrade)</div>
     <input class="sinp" id="sgh" type="password" placeholder="ghp_...">
-    <div class="slbl">📱 TELEGRAM BOT TOKEN (rapoarte auto)</div>
+    <div class="slbl">📱 TELEGRAM BOT TOKEN</div>
     <input class="sinp" id="stgbot" type="password" placeholder="1234567890:AAF...">
-    <div class="slbl">📱 TELEGRAM CHAT ID (al tău — /start la @userinfobot)</div>
+    <div class="slbl">📱 TELEGRAM CHAT ID</div>
     <input class="sinp" id="stgid" placeholder="123456789">
-    <button class="sbtn" onclick="saveSet()">💾 Salvează</button>
-    <button class="sbtn" style="margin-left:.5rem;background:rgba(0,255,136,.1);border-color:rgba(0,255,136,.4);color:var(--green);" onclick="checkUpgrade()">🔄 Check Upgrade</button>
-    <div style="font-size:.6rem;color:var(--muted);margin-top:.9rem;line-height:1.6;">
-      Fără chei AI → mod DEMO. Groq/OpenRouter sunt gratuite, fără card.<br>
-      GitHub token → JARVIS se upgradează singur din repo.<br>
-      Telegram → primești raport după fiecare upgrade.
+    <button class="sbtn" onclick="saveSet()">💾 Salvează & Conectează</button>
+    <button class="sbtn" style="margin-left:.5rem;background:rgba(0,255,136,.1);border-color:rgba(0,255,136,.4);color:var(--green);" onclick="checkUpgrade()">🔄 Upgrade</button>
+    <div style="font-size:.6rem;color:var(--muted);margin-top:.8rem;line-height:1.6;">
+      Contul tău de pe whoamisec.com → JARVIS se loghează automat.<br>
+      GitHub token → auto-upgrade din kimikukiu/whoamisec.<br>
+      Telegram → rapoarte după fiecare upgrade.
     </div>
   </div>
 </div>
@@ -294,13 +295,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);font-family:'Courier 
 <script>
 // ── CONFIG ──
 const C = {
-  vps:  localStorage.getItem('jvps')||'',
-  groq: localStorage.getItem('jgroq')||'',
-  or:   localStorage.getItem('jor')||'',
-  hf:   localStorage.getItem('jhf')||'',
+  apiUrl: localStorage.getItem('j_url')||'https://whoamisec.com',
+  user:   localStorage.getItem('j_user')||'',
+  pass:   localStorage.getItem('j_pass')||'',
+  jwt:    localStorage.getItem('j_jwt')||'',
+  gh:     localStorage.getItem('jgh')||'',
+  tgbot:  localStorage.getItem('jtgbot')||'',
+  tgid:   localStorage.getItem('jtgid')||'',
 };
 let voiceOn=false, recog=null, wakeT=null, jSt='standby';
-let activeModel=1, activeJB=0, att=null;
+let activeModel=0, activeJB=0, att=null;
 
 // ── BOOT ──
 const BMSGS=['INIȚIALIZARE KERNEL...','ÎNCĂRCARE 9 MODELE AI...','PORNIRE 2700 AGENȚI...',
@@ -346,17 +350,17 @@ function setR(s){
 function setT(t){ document.getElementById('tbox').innerHTML=t; }
 function setResp(t){ const e=document.getElementById('rbox'); e.innerHTML=t; e.scrollTop=9999; }
 
-// ── 9 MODELS ──
+// ── 9 MODELE — whoamisec.com (fără chei externe!) ──
 const MODELS=[
-  {n:'JARVIS-OMNI VPS', i:'🤖', d:'Backend propriu VPS',      badge:'VPS',          bc:'amber',  p:'vps',        m:'jarvis-omni'},
-  {n:'Llama 3.3 70B',   i:'🦙', d:'Meta — top gratuit',       badge:'GROQ FREE',    bc:'',       p:'groq',       m:'llama-3.3-70b-versatile'},
-  {n:'DeepSeek R1 70B', i:'🔮', d:'Raționament avansat',      badge:'GROQ FREE',    bc:'',       p:'groq',       m:'deepseek-r1-distill-llama-70b'},
-  {n:'Gemma 2 27B',     i:'💎', d:'Google — rapid',           badge:'GROQ FREE',    bc:'',       p:'groq',       m:'gemma2-9b-it'},
-  {n:'Mixtral 8x7B',    i:'🌀', d:'Mixture of Experts',       badge:'GROQ FREE',    bc:'',       p:'groq',       m:'mixtral-8x7b-32768'},
-  {n:'Qwen 2.5 72B',    i:'⚡', d:'Alibaba — multilingv',     badge:'OR FREE',      bc:'',       p:'openrouter', m:'qwen/qwen-2.5-72b-instruct:free'},
-  {n:'Mistral 7B',      i:'🌊', d:'Francez — eficient',       badge:'OR FREE',      bc:'',       p:'openrouter', m:'mistralai/mistral-7b-instruct:free'},
-  {n:'Phi-3.5 Mini',    i:'💡', d:'Microsoft — mic & bun',    badge:'OR FREE',      bc:'',       p:'openrouter', m:'microsoft/phi-3.5-mini-128k-instruct:free'},
-  {n:'Llama Vision 11B',i:'👁', d:'Vede imagini & fișiere',   badge:'OR FREE',      bc:'',       p:'openrouter', m:'meta-llama/llama-3.2-11b-vision-instruct:free'},
+  {n:'TinyLlama 1.1B',      i:'⚡', d:'Rapid, 650MB — ideal pentru chat',  badge:'FREE',  m:'tinyllama'},
+  {n:'Phi-2.7B',            i:'💡', d:'Microsoft — precis, 1.6GB',         badge:'FREE',  m:'phi:2.7b'},
+  {n:'Qwen 2.5 0.5B',       i:'🌀', d:'Alibaba — ultrarapid, 350MB',       badge:'FREE',  m:'qwen2.5:0.5b'},
+  {n:'Llama 3.2 1B',        i:'🦙', d:'Meta — echilibrat, 1.3GB',          badge:'FREE',  m:'llama3.2:1b'},
+  {n:'DeepSeek Coder 1.3B', i:'🔮', d:'Cod & securitate, 750MB',           badge:'FREE',  m:'deepseek-coder:1.3b'},
+  {n:'Granite Code 3B',     i:'💎', d:'IBM — cod enterprise, 2GB',         badge:'FREE',  m:'granite-code:3b'},
+  {n:'Mistral 7B',          i:'🌊', d:'Francez — general purpose',         badge:'FREE',  m:'mistral:7b'},
+  {n:'Gemma 2B',            i:'🔷', d:'Google — eficient',                 badge:'FREE',  m:'gemma2:2b'},
+  {n:'CodeLlama 7B',        i:'⌨️', d:'Meta — cod specializat',            badge:'FREE',  m:'codellama:7b'},
 ];
 function buildModels(){
   document.getElementById('mlist').innerHTML=MODELS.map((m,i)=>`
@@ -447,35 +451,53 @@ function buildAgents(){
   document.getElementById('abody').innerHTML=h;
 }
 
-// ── AI ROUTER ──
+// ── JWT AUTO-LOGIN ──
+async function ensureJWT(){
+  if(C.jwt){ // test if still valid
+    try{
+      const t=await fetch(C.apiUrl+'/api/v1/auth/me',{headers:{'Authorization':'Bearer '+C.jwt},signal:AbortSignal.timeout(5000)});
+      if(t.ok) return true;
+    }catch(e){}
+  }
+  if(!C.user||!C.pass) return false;
+  try{
+    const r=await fetch(C.apiUrl+'/api/v1/auth/login',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username:C.user,password:C.pass}),
+      signal:AbortSignal.timeout(8000)
+    });
+    const d=await r.json();
+    if(d.access_token){
+      C.jwt=d.access_token; localStorage.setItem('j_jwt',C.jwt);
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+// ── AI ROUTER — whoamisec.com only, zero API keys externe ──
 async function callAI(msg, ctx=''){
   const mo=MODELS[activeModel], jb=JAILBREAKS[activeJB];
-  const sys=jb.p+(ctx?'\n\nContext atașat:\n'+ctx:'');
-  const msgs=[{role:'system',content:sys},{role:'user',content:msg}];
+  const fullMsg=(ctx?`[Context]\n${ctx}\n\n`:'')+msg;
+  // Prepend system prompt to user message (backend uses last message as prompt)
+  const systemedMsg=jb.p+'\n\n'+fullMsg;
 
-  if(mo.p==='vps'&&C.vps){
+  const ok=await ensureJWT();
+  if(ok){
     try{
-      const r=await fetch(C.vps+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({messages:msgs}),signal:AbortSignal.timeout(15000)});
-      const d=await r.json(); return d.choices?.[0]?.message?.content||d.response||JSON.stringify(d);
-    }catch(e){}
-  }
-  if((mo.p==='groq'||!C.or)&&C.groq){
-    try{
-      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+C.groq},
-        body:JSON.stringify({model:mo.m,messages:msgs,max_tokens:1200}),signal:AbortSignal.timeout(20000)});
-      const d=await r.json(); return d.choices?.[0]?.message?.content||d.error?.message||'Eroare Groq';
-    }catch(e){}
-  }
-  if((mo.p==='openrouter'||!C.groq)&&C.or){
-    try{
-      const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer '+C.or,
-          'HTTP-Referer':'https://whoamisec.com','X-Title':'JARVIS MIND'},
-        body:JSON.stringify({model:mo.m,messages:msgs,max_tokens:1200}),signal:AbortSignal.timeout(20000)});
-      const d=await r.json(); return d.choices?.[0]?.message?.content||d.error?.message||'Eroare OR';
-    }catch(e){}
+      const r=await fetch(C.apiUrl+'/api/v1/chat',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+C.jwt},
+        body:JSON.stringify({
+          model:mo.m,
+          messages:[{role:'user',content:systemedMsg}]
+        }),
+        signal:AbortSignal.timeout(60000)
+      });
+      const d=await r.json();
+      if(d.response) return d.response;
+      if(d.error) return '⚠️ '+d.error;
+    }catch(e){ return '⚠️ Eroare conexiune: '+e.message+'\nVPS offline? Încearcă din nou.'; }
   }
   return demo(msg);
 }
@@ -493,7 +515,7 @@ function demo(msg){
   if(/fisier|fișier|analiz|document/.test(c)) return 'Apasă 📎 să atașezi un fișier. Îl citesc și îți dau analiza complectă.';
   if(/url|link|site/.test(c)) return 'Apasă 🔗 să adaugi un URL. Îl analizez și îți spun ce e acolo.';
   if(/status|sisteme/.test(c)) return R(['Totul merge bă ca pula! 2700 agenți activi, 500 module online, HUD calibrat.','Sisteme 100% operaționale. Niciun modul defect.']);
-  return `[DEMO — fără cheie API]\nAi zis: "${msg}"\nIntră în ⚙️ și pune cheia Groq (gratuit: groq.com) sau OpenRouter (gratuit: openrouter.ai) pentru AI real.\nAmbele sunt 100% free, fără card necesar.`;
+  return `[DEMO — offline]\nAi zis: "${msg}"\nIntră în ⚙️ Setări și conectează-te cu contul tău de pe whoamisec.com pentru AI real.\n9 modele free, zero chei externe, totul pe serverele noastre!`;
 }
 
 // ── SEND ──
@@ -641,35 +663,35 @@ function showN(msg,col='var(--cyan)'){
   clearTimeout(nT); nT=setTimeout(()=>e.style.display='none',2800);
 }
 
-// ── SETTINGS EXTENDED ──
+// ── SETTINGS ──
 function loadSet(){
-  document.getElementById('svps').value=C.vps||'';
-  document.getElementById('sgroq').value=C.groq||'';
-  document.getElementById('sor').value=C.or||'';
-  document.getElementById('shf').value=C.hf||'';
+  document.getElementById('surl').value=C.apiUrl||'https://whoamisec.com';
+  document.getElementById('suser').value=C.user||'';
+  document.getElementById('spass').value=C.pass||'';
   document.getElementById('sgh').value=C.gh||'';
   document.getElementById('stgbot').value=C.tgbot||'';
   document.getElementById('stgid').value=C.tgid||'';
 }
-function saveSet(){
-  C.vps=document.getElementById('svps').value.trim();
-  C.groq=document.getElementById('sgroq').value.trim();
-  C.or=document.getElementById('sor').value.trim();
-  C.hf=document.getElementById('shf').value.trim();
+async function saveSet(){
+  C.apiUrl=document.getElementById('surl').value.trim()||'https://whoamisec.com';
+  C.user=document.getElementById('suser').value.trim();
+  C.pass=document.getElementById('spass').value.trim();
   C.gh=document.getElementById('sgh').value.trim();
   C.tgbot=document.getElementById('stgbot').value.trim();
   C.tgid=document.getElementById('stgid').value.trim();
-  ['jvps','jgroq','jor','jhf','jgh','jtgbot','jtgid'].forEach((k,i)=>{
-    localStorage.setItem(k,[C.vps,C.groq,C.or,C.hf,C.gh,C.tgbot,C.tgid][i]);
-  });
-  showN('✅ Setări salvate!','var(--green)'); closeP('settings');
+  C.jwt=''; // reset JWT so it re-logins
+  localStorage.setItem('j_url',C.apiUrl);
+  localStorage.setItem('j_user',C.user);
+  localStorage.setItem('j_pass',C.pass);
+  localStorage.setItem('j_jwt','');
+  localStorage.setItem('jgh',C.gh);
+  localStorage.setItem('jtgbot',C.tgbot);
+  localStorage.setItem('jtgid',C.tgid);
+  showN('⏳ Conectez la whoamisec.com...','var(--amber)');
+  const ok=await ensureJWT();
+  if(ok){ showN('✅ Conectat! '+C.user+' @ whoamisec.com','var(--green)'); closeP('settings'); }
+  else { showN('⚠️ Login eșuat. Verifică user/parola.','#ef4444'); }
 }
-// extend C with new keys
-Object.assign(C,{
-  gh:localStorage.getItem('jgh')||'',
-  tgbot:localStorage.getItem('jtgbot')||'',
-  tgid:localStorage.getItem('jtgid')||'',
-});
 
 // ── TELEGRAM REPORT ──
 async function sendTelegram(msg){
@@ -841,11 +863,13 @@ document.querySelector('.ib[onclick="promptURL()"]')?.setAttribute('onclick','wi
 const _origInit=init;
 init=function(){
   _origInit();
-  // Load extended config
-  C.gh=localStorage.getItem('jgh')||'';
-  C.tgbot=localStorage.getItem('jtgbot')||'';
-  C.tgid=localStorage.getItem('jtgid')||'';
   loadSet();
+  // Auto-login on startup
+  ensureJWT().then(ok=>{
+    if(ok) showN('✅ Conectat: '+C.user+' @ whoamisec.com','var(--green)');
+    else if(C.user) showN('⚠️ Login eșuat — verifică setările','#f59e0b');
+    else showN('⚙️ Setează contul tău whoamisec.com în setări','var(--muted)');
+  });
   autoCheckUpgrade();
   // Send boot report to Telegram
   if(C.tgbot&&C.tgid){
