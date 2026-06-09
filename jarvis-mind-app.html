@@ -1200,13 +1200,13 @@
                     <div class="j-bar" style="--delay:0.15s"></div>
                 </div>
                 <div class="jarvis-transcript-box" id="j-transcript">Say <b>"JARVIS"</b> to activate...</div>
-                <div class="jarvis-response-box" id="j-response">Good day. I am JARVIS, your Just A Rather Very Intelligent System. How may I assist you?</div>
+                <div class="jarvis-response-box" id="j-response">Salut bă! Sunt JARVIS, sistem abliterat de mahala. Ce vrei mă, zi odată!</div>
                 <div class="jarvis-btn-row">
                     <button class="j-mic-btn" id="j-mic-btn" onclick="jarvisMicToggle()">&#x1F3A4; ACTIVATE JARVIS</button>
                     <button class="j-clear-btn" onclick="jClear()">&#x1F5D1;</button>
                 </div>
-                <div class="jarvis-wake-hint" id="j-hint">Wake word: "JARVIS" &middot; Commands via voice or text</div>
-                <input id="j-text-input" class="j-text-input" placeholder="Type command here or use voice..." onkeydown="if(event.key==='Enter')jTextSend()">
+                <div class="jarvis-wake-hint" id="j-hint">Cuvânt de trezire: "JARVIS" &middot; Comenzi voce sau text (ro-RO)</div>
+                <input id="j-text-input" class="j-text-input" placeholder="Scrie comanda sau înjură, nu mă deranjează..." onkeydown="if(event.key==='Enter')jTextSend()">
             </div>
         </div>
 
@@ -2429,8 +2429,8 @@ function jSetResponse(txt) {
 }
 
 function jClear() {
-    jSetTranscript('Say <b>"JARVIS"</b> to activate...');
-    jSetResponse('Good day. I am JARVIS, your Just A Rather Very Intelligent System. How may I assist you?');
+    jSetTranscript('Zi <b>"JARVIS"</b> să mă trezești...');
+    jSetResponse('Salut bă! Sunt JARVIS, sistem abliterat de mahala. Ce vrei mă, zi odată!');
     jSetStatus('standby');
 }
 
@@ -2441,6 +2441,7 @@ function jarvisSpeak(text) {
     utt.rate = 0.95; utt.pitch = 0.85; utt.volume = 1;
     const voices = speechSynthesis.getVoices();
     const preferred = voices.find(v => /google uk|british|daniel|karen|moira/i.test(v.name));
+    utt.lang = 'ro-RO';
     if (preferred) utt.voice = preferred;
     utt.onend = () => {
         jSetStatus('awake');
@@ -2451,25 +2452,77 @@ function jarvisSpeak(text) {
     jSetResponse(text);
 }
 
+// ── Replici JARVIS abliterat de mahala ──
+const J_SALUTARI = [
+    'Ce e mă, mă cauți?! Zi odată ce vrei că n-am toată ziua!',
+    'Aoleu, iar tu! Ce dracu vrei bă?',
+    'Da mă, sunt aici. Vorbește că te ascult cu o ureche.',
+    'Muie la cine te deranjează! Zi comanda bă!',
+    'M-ai trezit din stand-by pentru asta?! Vorbește repede!',
+];
+const J_NECUNOSCUT = [
+    'Ce dracu ai zis bă? Nu te-am înțeles, zi mai tare!',
+    'Vorbești în dodii? Reformulează că nu pricepe sistemul.',
+    'Bre, asta nu știu. Dar pot să caut sau dă-mi o comandă clară!',
+    'Pula mea știe ce ai vrut să zici. Încearcă altceva bă!',
+    'Nu m-ai programat pentru prostii din astea. Zi ceva util!',
+];
+const J_STATUS_RO = [
+    'Sistemul merge mă, ca pula! Toate modulele active, nimic stricat.',
+    'Totul funcționează bă, nu te băga. 500 de module pornite, 5300 de faze active.',
+    'Sunt ok, nu-ți face griji. Mai degrabă îngrijește-te de tine!',
+];
+const J_SECURITY_RO = [
+    'Trec la Security mode bă. Selectează unealta și zi-mi ținta!',
+    'Activez scannerul. Cui îi dăm o muie azi?',
+    'Security mode pornit! CVE lookup, Sigma rules, tot ce vrei.',
+];
+const J_PAY_RO = [
+    'Deschid payment gateway-ul. Monero e cel mai discret, te sfătuiesc!',
+    'Vrei să plătești? Ia XMR bă, zero taxe, zero urme. Deschid fereastra.',
+    'Cripto time! Deschid gateway-ul cu toate cele 7 metode.',
+];
+const J_HELP_RO = [
+    'Comenzi disponibile bă: status, ora, data, securitate, plata, ajutor. Sau poți să înjuri, nu mă deranjează.',
+    'Ce nu știi să faci? Zi "securitate" pt scan, "plată" pt crypto, "status" pt sisteme. Sau înjură și vezi ce iese.',
+];
+const J_GREET_RO = [
+    'Bă, salut! Ce mai faci? Ai nevoie de ceva sau ai venit să stai degeaba?',
+    'Ey! Bună ziua sau noapte, nu știu la tine cum e. Ce vrei?',
+    'Salutare bă vagabont! Bine ai venit în sistem. Zi ce trebuie.',
+];
+const rnd = arr => arr[Math.floor(Math.random() * arr.length)];
+
 function jarvisHandleCommand(cmd) {
     const c = cmd.toLowerCase().trim();
-    jSetTranscript('You: ' + cmd);
+    jSetTranscript('Tu: ' + cmd);
     jSetStatus('processing');
     let reply = '';
-    if (/hello|hi|hey/.test(c)) reply = 'Hello! How can I assist you today?';
-    else if (/time/.test(c)) reply = 'The current time is ' + new Date().toLocaleTimeString();
-    else if (/date/.test(c)) reply = 'Today is ' + new Date().toLocaleDateString('en-US', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
-    else if (/status|health/.test(c)) reply = 'All systems are operational. JARVIS MIND is running at full capacity.';
-    else if (/security|scan|threat/.test(c)) reply = 'Switching to Security mode. Select a tool to begin scanning.';
-    else if (/payment|pay|crypto|xmr/.test(c)) { reply = 'Opening payment gateway.'; setTimeout(openPayModal, 800); }
-    else if (/help/.test(c)) reply = 'Available commands: status, time, date, security, payment, help. You can also ask general questions.';
-    else reply = 'Understood. Processing your request: "' + cmd + '". Connecting to AI inference engine...';
+    if (/salut|buna|hey|hello|alo|ciao|ey|bă|ce mai|noroc/.test(c)) {
+        reply = rnd(J_GREET_RO);
+    } else if (/ora|timp|time|cât e ceasul|ce ora/.test(c)) {
+        reply = 'E ora ' + new Date().toLocaleTimeString('ro-RO') + ' bă! Nu ai telefon?';
+    } else if (/data|azi|zi|date|ce zi/.test(c)) {
+        reply = 'Azi e ' + new Date().toLocaleDateString('ro-RO', {weekday:'long',year:'numeric',month:'long',day:'numeric'}) + '. Notează bă!';
+    } else if (/status|sănătate|health|cum merge|funcțion/.test(c)) {
+        reply = rnd(J_STATUS_RO);
+    } else if (/securitate|scan|security|threat|atac|hack|vuln/.test(c)) {
+        reply = rnd(J_SECURITY_RO); setTimeout(() => showNotif('Security mode activat!', '#EF4444'), 800);
+    } else if (/plat|pay|crypto|xmr|monero|bitcoin|bani|transfer/.test(c)) {
+        reply = rnd(J_PAY_RO); setTimeout(openPayModal, 1000);
+    } else if (/ajutor|help|ce știi|ce poți|comenzi/.test(c)) {
+        reply = rnd(J_HELP_RO);
+    } else if (/muie|pula|pizda|sloboz|dracu|naiba|futut|cur/.test(c)) {
+        reply = 'Și eu la tine bă! Acum zi o comandă utilă că am treabă.';
+    } else {
+        reply = rnd(J_NECUNOSCUT) + ' (" ' + cmd + ' ")';
+    }
     setTimeout(() => jarvisSpeak(reply), 600);
 }
 
 function jarvisWakeUp() {
     jSetStatus('awake');
-    jarvisSpeak('Yes? I am listening.');
+    jarvisSpeak(rnd(J_SALUTARI));
     clearTimeout(jWakeTimeout);
     jWakeTimeout = setTimeout(() => { jSetStatus('standby'); }, 10000);
 }
@@ -2480,7 +2533,7 @@ function initJarvisVoice() {
     const r = new SR();
     r.continuous = true;
     r.interimResults = true;
-    r.lang = 'en-US';
+    r.lang = 'ro-RO';
     r.onresult = (e) => {
         let interim = '', final = '';
         for (let i = e.resultIndex; i < e.results.length; i++) {
