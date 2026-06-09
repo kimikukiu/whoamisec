@@ -243,6 +243,23 @@ jobs:
           ./node_modules/.bin/cap add android
           ./node_modules/.bin/cap sync android
 
+      - name: Set CICADA 3301 app icon
+        working-directory: apk-build
+        run: |
+          pip install -q Pillow 2>/dev/null || true
+          python3 << 'EOF'
+          from PIL import Image
+          import os
+          img = Image.open('${{ github.workspace }}/cicada-icon.png').convert('RGBA')
+          for dpi, size in [('mdpi',48),('hdpi',72),('xhdpi',96),('xxhdpi',144),('xxxhdpi',192)]:
+              d = f'android/app/src/main/res/mipmap-{dpi}'
+              os.makedirs(d, exist_ok=True)
+              r = img.resize((size,size), Image.LANCZOS)
+              r.save(f'{d}/ic_launcher.png')
+              r.save(f'{d}/ic_launcher_round.png')
+          print('CICADA icon installed in all mipmap densities')
+          EOF
+
       - name: Patch Gradle — CICADA 3301
         working-directory: apk-build
         run: python3 "$GITHUB_WORKSPACE/patch_gradle.py"

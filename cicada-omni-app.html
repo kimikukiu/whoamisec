@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#000000">
+<link rel="icon" type="image/png" href="/cicada-icon.png">
+<link rel="apple-touch-icon" href="/cicada-icon.png">
 <title>CICADA 3301</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -44,9 +46,9 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',
   margin-top:.6rem;font-size:1.1rem;letter-spacing:.5em;
   color:var(--red);font-weight:700;
 }
-/* MOTH */
+/* COIN LOGO */
 .splash-moth{
-  margin-top:1.4rem;width:220px;height:auto;
+  margin-top:1.4rem;width:220px;height:220px;border-radius:50%;object-fit:cover;
   filter:drop-shadow(0 0 18px var(--green)) drop-shadow(0 0 40px rgba(57,255,20,.5));
   animation:moth-float 3s ease-in-out infinite, moth-color 6s linear infinite;
 }
@@ -184,38 +186,7 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',
   <div class="splash-good">GOOD LUCK!</div>
   <div class="splash-box">EVERYWHERE</div>
   <div class="splash-num">3 &nbsp; 3 &nbsp; 0 &nbsp; 1</div>
-  <!-- SVG Moth — green glowing, matches image exactly -->
-  <svg class="splash-moth" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
-    <!-- Left wing -->
-    <ellipse cx="75" cy="70" rx="68" ry="38" fill="none" stroke="#39ff14" stroke-width="1.5" opacity=".9"/>
-    <ellipse cx="72" cy="72" rx="54" ry="28" fill="rgba(57,255,20,.12)"/>
-    <line x1="110" y1="65" x2="30" y2="48" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
-    <line x1="110" y1="70" x2="20" y2="70" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
-    <line x1="110" y1="75" x2="28" y2="92" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
-    <line x1="108" y1="55" x2="55" y2="35" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
-    <line x1="108" y1="80" x2="52" y2="100" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
-    <!-- Right wing -->
-    <ellipse cx="145" cy="70" rx="68" ry="38" fill="none" stroke="#39ff14" stroke-width="1.5" opacity=".9"/>
-    <ellipse cx="148" cy="72" rx="54" ry="28" fill="rgba(57,255,20,.12)"/>
-    <line x1="110" y1="65" x2="190" y2="48" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
-    <line x1="110" y1="70" x2="200" y2="70" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
-    <line x1="110" y1="75" x2="192" y2="92" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
-    <line x1="112" y1="55" x2="165" y2="35" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
-    <line x1="112" y1="80" x2="168" y2="100" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
-    <!-- Body -->
-    <ellipse cx="110" cy="68" rx="8" ry="22" fill="#39ff14" opacity=".85"/>
-    <ellipse cx="110" cy="52" rx="5" ry="7" fill="#39ff14"/>
-    <!-- Antennae -->
-    <path d="M106 46 Q95 30 88 22" stroke="#39ff14" stroke-width="1.2" fill="none" opacity=".8"/>
-    <path d="M114 46 Q125 30 132 22" stroke="#39ff14" stroke-width="1.2" fill="none" opacity=".8"/>
-    <circle cx="88" cy="22" r="2.5" fill="#39ff14"/>
-    <circle cx="132" cy="22" r="2.5" fill="#39ff14"/>
-    <!-- Wing veins pattern -->
-    <path d="M110 67 Q75 55 45 52" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
-    <path d="M110 72 Q75 78 42 85" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
-    <path d="M110 67 Q145 55 175 52" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
-    <path d="M110 72 Q145 78 178 85" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
-  </svg>
+  <img class="splash-moth" src="/cicada-icon.png" alt="CICADA 3301">
   <button class="splash-enter" onclick="enterApp()">▶ ENTER THE PUZZLE</button>
 </div>
 

@@ -183,6 +183,28 @@ jobs:
           find ios -name "project.pbxproj" -exec \
             perl -pi -e 's/IPHONEOS_DEPLOYMENT_TARGET = [\d.]+/IPHONEOS_DEPLOYMENT_TARGET = 13.0/g' {} \;
 
+      - name: Set CICADA 3301 iOS app icon
+        working-directory: apk-build
+        run: |
+          pip3 install -q Pillow 2>/dev/null || true
+          python3 << 'EOF'
+          from PIL import Image
+          import os, json
+          img = Image.open('${{ github.workspace }}/cicada-icon.png').convert('RGBA')
+          icon_dir = 'ios/App/App/Assets.xcassets/AppIcon.appiconset'
+          os.makedirs(icon_dir, exist_ok=True)
+          sizes = [(20,1),(20,2),(20,3),(29,1),(29,2),(29,3),(40,1),(40,2),(40,3),(60,2),(60,3),(76,1),(76,2),(83,2),(1024,1)]
+          contents = {'images':[], 'info':{'author':'whoamisec','version':1}}
+          for pt, scale in sizes:
+              px = pt * scale
+              name = f'cicada_{px}x{px}.png'
+              img.resize((px,px), Image.LANCZOS).save(f'{icon_dir}/{name}')
+              contents['images'].append({'filename':name,'idiom':'iphone' if pt<=60 else 'ipad','scale':f'{scale}x','size':f'{pt}x{pt}'})
+          with open(f'{icon_dir}/Contents.json','w') as f:
+              json.dump(contents, f, indent=2)
+          print('CICADA iOS icons installed')
+          EOF
+
       - name: Build archive — CICADA 3301
         working-directory: apk-build/ios/App
         run: |

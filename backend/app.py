@@ -405,7 +405,12 @@ def serve_business_app():
 def serve_jarvis_mind_app():
     return _serve_html('jarvis-mind-app.html')
 
-# Static files (manifest, SW, audio, etc.)
+@app.route('/apps/cicada')
+@app.route('/cicada-omni')
+def serve_cicada_omni_app():
+    return _serve_html('cicada-omni-app.html')
+
+# Static files (manifest, SW, audio, icons, etc.)
 @app.route('/manifest.json')
 def serve_manifest():
     return send_from_directory(HTML_DIR, 'manifest.json')
@@ -419,6 +424,10 @@ def serve_sw():
 def serve_cicada_sound():
     return send_from_directory(HTML_DIR, 'cicada-sound.mp3',
                                mimetype='audio/mpeg')
+
+@app.route('/cicada-icon.png')
+def serve_cicada_icon():
+    return send_from_directory(HTML_DIR, 'cicada-icon.png', mimetype='image/png')
 
 # ============ VPS MANAGEMENT (JARVIS) ============
 @app.route('/api/v1/vps/create', methods=['POST'])
