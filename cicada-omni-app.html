@@ -297,6 +297,8 @@ body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backgr
 .jarvis-footer .jf-cicada span{color:rgba(var(--gold),.25)}
 @keyframes footer-glow{0%,100%{opacity:.3}50%{opacity:.7}}
 .jarvis-footer .jf-pulse{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--g);box-shadow:0 0 4px var(--g);animation:footer-glow 3s ease-in-out infinite;vertical-align:middle;margin-right:.3rem}
+
+@media (padding: max(0px, env(safe-area-inset-bottom))){.bottom-nav,.tab-bar{padding-bottom:calc(8px + env(safe-area-inset-bottom, 0)) !important;}#tabBar{padding-bottom:calc(4px + env(safe-area-inset-bottom, 0)) !important;}}
 </style>
 </head>
 <body>

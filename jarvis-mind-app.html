@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scale=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0a0a0a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -10,6 +10,7 @@
 <title>JARVIS AI — HUD Mind Interface</title>
 <link rel="manifest" href="manifest.json">
 <style>
+*{-webkit-tap-highlight-color:transparent;}
 /* ========== RESET & BASE ========== */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{font-size:14px;scroll-behavior:smooth}
@@ -749,6 +750,8 @@ body::after{
   .agents-grid{grid-template-columns:repeat(5,1fr)}
   .mining-nodes{grid-template-columns:repeat(25,1fr)}
 }
+
+@media (padding: max(0px, env(safe-area-inset-bottom))){.bottom-nav,.tab-bar{padding-bottom:calc(8px + env(safe-area-inset-bottom, 0)) !important;}#tabBar{padding-bottom:calc(4px + env(safe-area-inset-bottom, 0)) !important;}}
 </style>
 </head>
 <body>

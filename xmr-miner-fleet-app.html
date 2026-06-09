@@ -1072,7 +1072,22 @@
             background: #00ff0011;
             margin: 12px 0;
         }
-    </style>
+    
+@media(max-width:400px){
+  .stats-grid{grid-template-columns:1fr !important;}
+  .node-grid{grid-template-columns:repeat(4,1fr) !important;}
+  .node-cell{font-size:.4rem;}
+  .wallet-amount{font-size:1.8rem;}
+  .wallet-addr{font-size:.5rem;}
+  .mining-hashrate{font-size:1rem;}
+  .setting-input{font-size:.75rem !important;}
+  .agent-stats{grid-template-columns:1fr 1fr !important;}
+}
+@media(min-width:768px){
+  .stats-grid{grid-template-columns:repeat(3,1fr) !important;}
+  .node-grid{grid-template-columns:repeat(10,1fr) !important;}
+}
+</style>
 </head>
 <body>
     <div class="app-shell">
