@@ -19,6 +19,8 @@ venv/
 android/
 node_modules/
 *.apk
+# Allow APK releases in apk-dist/
+!apk-dist/*.apk
 
 # OS
 .DS_Store
