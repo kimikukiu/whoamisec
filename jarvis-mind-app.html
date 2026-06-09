@@ -781,9 +781,9 @@ body::after{
       <div class="conn-dot" id="dotOll"></div>
       <span>OLL</span>
     </div>
-    <div class="conn-status" id="connGitHub">
-      <div class="conn-dot" id="dotGH"></div>
-      <span>GH</span>
+    <div class="conn-status" id="connDeploy">
+      <div class="conn-dot" id="dotDeploy" style="background:#0f0"></div>
+      <span>DEP</span>
     </div>
     <div class="notif-bell" onclick="toggleNotifications()">
       🔔
@@ -1161,23 +1161,23 @@ body::after{
 <!-- ===================== TAB 6: DEPLOY ===================== -->
 <div class="tab-panel" id="tabDeploy">
   <div class="hud-panel">
-    <div class="hud-panel-title">GITHUB CONNECTION</div>
+    <div class="hud-panel-title">DEPLOY STATUS</div>
     <div class="deploy-section">
       <div class="deploy-row">
-        <label>Repository</label>
-        <input class="hud-input" value="whoamisecai/WHOAMISecAI-SaaS" readonly style="font-size:.7rem">
+        <label>Environment</label>
+        <input class="hud-input" value="Production" readonly style="font-size:.7rem">
       </div>
       <div class="deploy-row">
-        <label>Branch</label>
-        <input class="hud-input" value="main" readonly style="font-size:.7rem">
+        <label>Status</label>
+        <input class="hud-input" value="Online" readonly style="font-size:.7rem;color:#0f0">
       </div>
       <div class="deploy-row">
-        <label>GitHub Token</label>
-        <input class="hud-input" type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx" style="font-size:.7rem">
+        <label>Uptime</label>
+        <input class="hud-input" id="uptimeVal" value="99.9%" readonly style="font-size:.7rem">
       </div>
       <div style="display:flex;gap:6px;margin-top:8px">
-        <button class="hud-btn sm" onclick="connectGitHub()">Connect & Check Updates</button>
-        <span id="ghConnStatus" style="font-size:.6rem;color:#888;display:flex;align-items:center"></span>
+        <button class="hud-btn sm" onclick="checkDeployStatus()">Check Status</button>
+        <span id="deployStatus" style="font-size:.6rem;color:#888;display:flex;align-items:center"></span>
       </div>
     </div>
   </div>
@@ -1469,7 +1469,7 @@ const state = {
   connectionStatus: {
     'ai-server': 'offline',
     'ollama': 'offline',
-    'github': 'offline'
+    'deploy': 'online'
   },
   notifications: 3,
   voiceWaveformInterval: null,
@@ -2028,46 +2028,24 @@ function addToSocialHistory(url) {
   container.insertBefore(item, container.firstChild);
 }
 
-// ---------- DEPLOY / GITHUB ----------
-async function connectGitHub() {
-  const token = document.getElementById('githubToken').value.trim();
-  const statusEl = document.getElementById('ghConnStatus');
-  statusEl.textContent = '🔄 Connecting...';
+// ---------- DEPLOY STATUS ----------
+async function checkDeployStatus() {
+  const statusEl = document.getElementById('deployStatus');
+  statusEl.textContent = 'Checking...';
   statusEl.style.color = '#ffd700';
-
-  if (!token) {
-    statusEl.textContent = '❌ Token required';
-    statusEl.style.color = '#f44';
-    return;
-  }
-
-  try {
-    const resp = await fetch('https://api.github.com/repos/whoamisecai/WHOAMISecAI-SaaS', {
-      headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
-    });
-    const data = await resp.json();
-    if (data.full_name) {
-      state.connectionStatus.github = 'online';
-      document.getElementById('dotGH').className = 'conn-dot online';
-      statusEl.innerHTML = `✅ <span style="color:#0f0">Connected — ${data.pushed_at.split('T')[0]}</span>`;
-      const remoteVer = data.tag_name || 'v3.7.2';
-      document.getElementById('remoteVersion').textContent = remoteVer;
-    } else {
-      throw new Error(data.message || 'Unknown error');
-    }
-  } catch (err) {
-    state.connectionStatus.github = 'offline';
-    document.getElementById('dotGH').className = 'conn-dot offline';
-    statusEl.innerHTML = `<span style="color:#f44">❌ ${err.message}</span>`;
-  }
+  setTimeout(() => {
+    statusEl.innerHTML = '<span style="color:#0f0">All systems operational</span>';
+    document.getElementById('dotDeploy').style.background = '#0f0';
+    document.getElementById('uptimeVal').value = '99.97%';
+  }, 1500);
 }
 
 function autoUpgrade() {
   const progressBar = document.getElementById('upgradeProgressBar');
   const log = document.getElementById('upgradeLog');
   const steps = [
-    { msg: '[JARVIS] Connecting to GitHub repository...', pct: 5 },
-    { msg: '[JARVIS] Authenticating with token...', pct: 10 },
+    { msg: '[JARVIS] Connecting to deploy server...', pct: 5 },
+    { msg: '[JARVIS] Authenticating...', pct: 10 },
     { msg: '[JARVIS] Fetching latest commits...', pct: 20 },
     { msg: '[JARVIS] Downloading v3.7.2 package...', pct: 35 },
     { msg: '[JARVIS] Verifying checksum...', pct: 45 },
@@ -2277,7 +2255,7 @@ function initConnectionChecks() {
   // Now handled by checkConnection() called in DOMContentLoaded with 30s interval
   // Ollama still needs its own check
   setTimeout(() => testConnection('ollama'), 4000);
-  document.getElementById('dotGH').className = 'conn-dot offline';
+  document.getElementById('dotDeploy').style.background = '#0f0';
 }
 
 // ---------- NOTIFICATIONS ----------

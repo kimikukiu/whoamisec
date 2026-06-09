@@ -300,6 +300,71 @@
         .tgl{display:inline-flex;align-items:center;gap:7px;padding:9px 22px;border:1px solid #00ffff;color:#00ffff;font-family:'Orbitron',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:2px;text-decoration:none;border-radius:3px;transition:all 0.3s}
         .tgl:hover{background:#00ffff;color:#000;box-shadow:0 0 15px rgba(0,255,255,0.5)}
 
+        /* ── MYSTERY SOLVERS ── */
+        .mystery-solvers{
+            max-width:700px;margin:30px auto;
+            background:rgba(0,0,0,0.7);
+            border:1px solid rgba(204,0,255,0.25);
+            border-radius:6px;padding:20px;
+            box-shadow:0 0 20px rgba(204,0,255,0.08);
+        }
+        .mystery-title{
+            font-family:'Orbitron',sans-serif;
+            font-size:1.1rem;font-weight:800;
+            color:#cc00ff;
+            letter-spacing:8px;text-transform:uppercase;
+            text-align:center;
+            text-shadow:0 0 12px rgba(204,0,255,0.5),0 0 25px rgba(204,0,255,0.2);
+            margin-bottom:4px;
+        }
+        .mystery-subtitle{
+            font-family:'Share Tech Mono',monospace;
+            font-size:0.65rem;
+            color:rgba(255,255,255,0.35);
+            letter-spacing:4px;text-transform:uppercase;
+            text-align:center;margin-bottom:16px;
+        }
+        .mystery-list{display:flex;flex-direction:column;gap:6px}
+        .ms-row{
+            display:flex;align-items:center;justify-content:space-between;
+            padding:10px 14px;
+            background:rgba(255,255,255,0.015);
+            border:1px solid rgba(255,255,255,0.04);
+            border-radius:4px;
+            transition:all 0.3s;
+        }
+        .ms-row:hover{
+            background:rgba(204,0,255,0.06);
+            border-color:rgba(204,0,255,0.15);
+            transform:translateX(4px);
+        }
+        .ms-gold{border-left:3px solid #ffd700;background:rgba(255,215,0,0.04)}
+        .ms-silver{border-left:3px solid #c0c0c0;background:rgba(192,192,192,0.03)}
+        .ms-bronze{border-left:3px solid #cd7f32;background:rgba(205,127,50,0.03)}
+        .ms-rank{
+            font-family:'Orbitron',sans-serif;
+            font-size:0.7rem;font-weight:700;
+            min-width:35px;color:rgba(255,255,255,0.3);
+        }
+        .ms-gold .ms-rank{color:#ffd700;text-shadow:0 0 6px rgba(255,215,0,0.4)}
+        .ms-silver .ms-rank{color:#c0c0c0}
+        .ms-bronze .ms-rank{color:#cd7f32}
+        .ms-name{
+            flex:1;
+            font-family:'Share Tech Mono',monospace;
+            font-size:0.75rem;color:rgba(255,255,255,0.65);
+            margin-left:10px;
+        }
+        .ms-gold .ms-name{color:rgba(255,215,0,0.85)}
+        .ms-silver .ms-name{color:rgba(192,192,192,0.8)}
+        .ms-bronze .ms-name{color:rgba(205,127,50,0.8)}
+        .ms-pts{
+            font-family:'Orbitron',sans-serif;
+            font-size:0.65rem;font-weight:600;
+            color:#00ffff;
+            text-shadow:0 0 4px rgba(0,255,255,0.3);
+        }
+
         /* ── FOOTER ── */
         .ft{text-align:center;padding:25px 20px;font-family:'Orbitron',sans-serif;font-size:0.5rem;color:rgba(0,255,255,0.3);letter-spacing:2px;opacity:0.4}
         .ft .xmr{font-size:0.45rem;color:rgba(255,255,255,0.12);margin-top:6px;word-break:break-all;font-family:'Share Tech Mono',monospace}
@@ -481,6 +546,64 @@
     <div class="lb">
         <h3>Top Solvers</h3>
         <div id="lbList"></div>
+    </div>
+
+    <!-- ══ MYSTERY TOP SOLVERS ══ -->
+    <div class="mystery-solvers">
+        <div class="mystery-title">Mystery</div>
+        <div class="mystery-subtitle">Top Solvers</div>
+        <div class="mystery-list">
+            <div class="ms-row ms-gold">
+                <span class="ms-rank">#1</span>
+                <span class="ms-name">3301_initiate</span>
+                <span class="ms-pts">25,000 pts</span>
+            </div>
+            <div class="ms-row ms-silver">
+                <span class="ms-rank">#2</span>
+                <span class="ms-name">cipher_ghost</span>
+                <span class="ms-pts">18,500 pts</span>
+            </div>
+            <div class="ms-row ms-bronze">
+                <span class="ms-rank">#3</span>
+                <span class="ms-name">runecaster</span>
+                <span class="ms-pts">14,200 pts</span>
+            </div>
+            <div class="ms-row">
+                <span class="ms-rank">#4</span>
+                <span class="ms-name">darknet_walker</span>
+                <span class="ms-pts">10,800 pts</span>
+            </div>
+            <div class="ms-row">
+                <span class="ms-rank">#5</span>
+                <span class="ms-name">quantum_obs</span>
+                <span class="ms-pts">8,500 pts</span>
+            </div>
+            <div class="ms-row">
+                <span class="ms-rank">#6</span>
+                <span class="ms-name">steg_breaker</span>
+                <span class="ms-pts">6,200 pts</span>
+            </div>
+            <div class="ms-row">
+                <span class="ms-rank">#7</span>
+                <span class="ms-name">xmr_tracer</span>
+                <span class="ms-pts">4,100 pts</span>
+            </div>
+            <div class="ms-row">
+                <span class="ms-rank">#8</span>
+                <span class="ms-name">null_byte</span>
+                <span class="ms-pts">2,800 pts</span>
+            </div>
+            <div class="ms-row">
+                <span class="ms-rank">#9</span>
+                <span class="ms-name">freq_analyst</span>
+                <span class="ms-pts">1,500 pts</span>
+            </div>
+            <div class="ms-row">
+                <span class="ms-rank">#10</span>
+                <span class="ms-name">newcomer_01</span>
+                <span class="ms-pts">500 pts</span>
+            </div>
+        </div>
     </div>
 
     <div class="tgb">
