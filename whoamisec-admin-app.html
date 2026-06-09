@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WHOAMISec Admin</title>
+    <meta name="description" content="WHOAMISec Business Admin — Command Center, Mining Fleet, Agent Swarm, AI Chat, Payments, Deploy.">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#00d4ff">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #080810;
+    --bg2: #0d0d1a;
+    --card: rgba(15,15,30,0.85);
+    --card-solid: #0f0f1e;
+    --border: rgba(0,212,255,0.08);
+    --border2: rgba(139,92,246,0.1);
+    --cyan: #00d4ff;
+    --purple: #8b5cf6;
+    --amber: #f59e0b;
+    --green: #10b981;
+    --red: #ef4444;
+    --text: #f0f0f8;
+    --text2: #9ca3af;
+    --muted: #6b7280;
+    --glass: rgba(15,15,30,0.7);
+    --glow-cyan: 0 0 20px rgba(0,212,255,0.15);
+    --glow-amber: 0 0 20px rgba(245,158,11,0.15);
+    --glow-purple: 0 0 20px rgba(139,92,246,0.15);
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; overflow:hidden; }
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+}
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(0,212,255,0.2); border-radius:4px; }
+
+/* ─── HEADER ─── */
+.app-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 0.75rem 1rem;
+    background: rgba(8,8,16,0.95);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(20px);
+    flex-shrink:0;
+    z-index:100;
+}
+.hdr-left { display:flex; align-items:center; gap:0.5rem; }
+.hdr-icon { width:28px; height:28px; border-radius:7px; background:linear-gradient(135deg,var(--cyan),var(--purple)); display:flex; align-items:center; justify-content:center; font-size:0.85rem; }
+.hdr-title { font-size:0.85rem; font-weight:800; letter-spacing:0.05em; }
+.hdr-title span { color:var(--cyan); }
+.hdr-badge { font-size:0.55rem; font-weight:700; background:rgba(239,68,68,0.15); color:var(--red); border:1px solid rgba(239,68,68,0.25); padding:0.15rem 0.4rem; border-radius:4px; letter-spacing:0.08em; }
+.hdr-right { display:flex; align-items:center; gap:0.6rem; }
+.hdr-clock { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--cyan); }
+.hdr-status { display:flex; align-items:center; gap:0.3rem; font-size:0.65rem; color:var(--green); }
+.dot-pulse { width:6px; height:6px; border-radius:50%; background:var(--green); animation:pulse-d 2s infinite; }
+@keyframes pulse-d { 0%,100%{opacity:1;box-shadow:0 0 4px var(--green);} 50%{opacity:0.3;box-shadow:none;} }
+
+/* ─── CONTENT ─── */
+.app-content { flex:1; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; background:var(--bg); }
+.tab-pane { display:none; padding:1rem; min-height:100%; }
+.tab-pane.active { display:block; animation:fadeIn 0.2s; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:none;} }
+
+/* ─── BOTTOM NAV ─── */
+.tab-bar {
+    display:flex; background:rgba(8,8,16,0.98);
+    border-top:1px solid var(--border);
+    flex-shrink:0; z-index:100;
+}
+.tab-btn {
+    flex:1; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:0.45rem 0.1rem; background:none; border:none;
+    cursor:pointer; color:var(--muted); transition:color 0.2s;
+    min-height:52px; position:relative;
+}
+.tab-btn.active { color:var(--cyan); }
+.tab-btn.active::before { content:''; position:absolute; top:-1px; left:20%; right:20%; height:2px; background:var(--cyan); border-radius:0 0 2px 2px; }
+.tab-btn .ti { font-size:1.15rem; margin-bottom:0.15rem; }
+.tab-btn .tl { font-size:0.55rem; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; }
+
+/* ─── GLASS CARD ─── */
+.card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:12px; padding:1rem; margin-bottom:0.75rem;
+    backdrop-filter:blur(12px);
+}
+.card-purple { border-color:var(--border2); }
+.card-title {
+    font-size:0.65rem; font-weight:700; color:var(--muted);
+    text-transform:uppercase; letter-spacing:0.1em; margin-bottom:0.75rem;
+    display:flex; align-items:center; gap:0.4rem;
+}
+.card-title .ct-icon { color:var(--cyan); }
+
+/* ─── STATS ─── */
+.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-bottom:0.75rem; }
+.stat-card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:10px; padding:0.85rem; position:relative; overflow:hidden;
+}
+.stat-card::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; border-radius:10px 10px 0 0; }
+.stat-card.cyan-border::after { background:linear-gradient(90deg,var(--cyan),transparent); }
+.stat-card.amber-border::after { background:linear-gradient(90deg,var(--amber),transparent); }
+.stat-card.purple-border::after { background:linear-gradient(90deg,var(--purple),transparent); }
+.stat-card.green-border::after { background:linear-gradient(90deg,var(--green),transparent); }
+.stat-label { font-size:0.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.25rem; }
+.stat-val { font-family:'JetBrains Mono',monospace; font-size:1.35rem; font-weight:800; }
+.stat-val.cyan { color:var(--cyan); }
+.stat-val.amber { color:var(--amber); }
+.stat-val.purple { color:var(--purple); }
+.stat-val.green { color:var(--green); }
+.stat-val.red { color:var(--red); }
+.stat-sub { font-size:0.6rem; color:var(--muted); margin-top:0.15rem; }
+
+/* ─── HEALTH BAR ─── */
+.health-row { display:flex; align-items:center; justify-content:space-between; padding:0.55rem 0; border-bottom:1px solid rgba(255,255,255,0.03); }
+.health-row:last-child { border-bottom:none; }
+.health-name { font-size:0.8rem; font-weight:500; }
+.health-status { display:flex; align-items:center; gap:0.35rem; font-size:0.7rem; font-weight:600; }
+.health-dot { width:7px; height:7px; border-radius:50%; }
+.health-dot.on { background:var(--green); box-shadow:0 0 6px var(--green); }
+.health-dot.off { background:var(--red); box-shadow:0 0 6px var(--red); }
+.health-dot.warn { background:var(--amber); box-shadow:0 0 6px var(--amber); }
+
+/* ─── CHART BARS ─── */
+.chart-bars { display:flex; align-items:flex-end; gap:3px; height:80px; padding:0.25rem 0; }
+.chart-bar { flex:1; border-radius:2px 2px 0 0; min-height:4px; transition:height 0.5s; }
+.chart-legend { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.4rem; }
+.chart-legend-item { display:flex; align-items:center; gap:0.25rem; font-size:0.6rem; color:var(--text2); }
+.chart-legend-dot { width:6px; height:6px; border-radius:50%; }
+
+/* ─── ACTIVITY LOG ─── */
+.log-item { display:flex; align-items:flex-start; gap:0.5rem; padding:0.5rem 0; border-bottom:1px solid rgba(255,255,255,0.03); font-size:0.72rem; }
+.log-item:last-child { border-bottom:none; }
+.log-time { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); white-space:nowrap; min-width:52px; }
+.log-text { color:var(--text2); line-height:1.4; }
+.log-text .hl-cyan { color:var(--cyan); font-weight:600; }
+.log-text .hl-amber { color:var(--amber); font-weight:600; }
+.log-text .hl-red { color:var(--red); font-weight:600; }
+.log-text .hl-green { color:var(--green); font-weight:600; }
+
+/* ─── MINING NODES ─── */
+.node-grid { display:grid; grid-template-columns:repeat(10,1fr); gap:3px; margin-bottom:0.75rem; }
+.node-cell {
+    aspect-ratio:1; border-radius:4px; display:flex; align-items:center;
+    justify-content:center; font-size:0.45rem; font-weight:700;
+    font-family:'JetBrains Mono',monospace; cursor:pointer; transition:all 0.15s;
+}
+.node-cell.on { background:rgba(16,185,129,0.2); border:1px solid rgba(16,185,129,0.3); color:var(--green); }
+.node-cell.off { background:rgba(107,114,128,0.1); border:1px solid rgba(107,114,128,0.15); color:var(--muted); }
+.node-cell.err { background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.25); color:var(--red); }
+.node-cell.sel { box-shadow:0 0 8px rgba(0,212,255,0.4); border-color:var(--cyan); }
+.node-detail { background:var(--bg2); border:1px solid var(--border); border-radius:8px; padding:0.75rem; margin-bottom:0.75rem; display:none; }
+.node-detail.show { display:block; }
+
+/* ─── AGENT CHIPS ─── */
+.agent-cat { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:0.75rem; }
+.agent-chip {
+    padding:0.35rem 0.65rem; border-radius:6px; font-size:0.7rem; font-weight:600;
+    cursor:pointer; transition:all 0.15s; border:1px solid transparent;
+}
+.agent-chip.active { background:rgba(0,212,255,0.1); color:var(--cyan); border-color:rgba(0,212,255,0.2); }
+.agent-chip.inactive { background:rgba(107,114,128,0.1); color:var(--muted); }
+.agent-chip.error { background:rgba(239,68,68,0.1); color:var(--red); border-color:rgba(239,68,68,0.15); }
+.agent-chip.idle { background:rgba(245,158,11,0.08); color:var(--amber); border-color:rgba(245,158,11,0.12); }
+
+/* ─── CHAT ─── */
+.chat-container { display:flex; flex-direction:column; height:calc(100vh - 180px); }
+.chat-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem; flex-shrink:0; }
+.chat-model-sel {
+    background:var(--card-solid); border:1px solid var(--border);
+    color:var(--text); padding:0.4rem 0.6rem; border-radius:6px;
+    font-size:0.72rem; font-family:'Inter',sans-serif;
+    outline:none; max-width:55%; cursor:pointer;
+}
+.chat-model-sel optgroup { color:var(--text); font-weight:700; }
+.chat-model-sel option { background:var(--card-solid); color:var(--text); padding:0.3rem; }
+.chat-status-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.chat-status-dot.on { background:var(--green); box-shadow:0 0 6px var(--green); }
+.chat-status-dot.off { background:var(--muted); }
+.chat-copilot-toggle {
+    display:flex; align-items:center; gap:0.3rem; font-size:0.65rem;
+    color:var(--muted); cursor:pointer; padding:0.25rem 0.5rem;
+    border-radius:4px; border:1px solid var(--border); background:transparent;
+    font-family:'Inter',sans-serif; transition:all 0.15s;
+}
+.chat-copilot-toggle.active { color:var(--purple); border-color:rgba(139,92,246,0.3); background:rgba(139,92,246,0.08); }
+.chat-messages {
+    flex:1; overflow-y:auto; display:flex; flex-direction:column;
+    gap:0.5rem; padding:0.5rem; background:var(--bg2);
+    border:1px solid var(--border); border-radius:10px; margin-bottom:0.5rem;
+    min-height:200px;
+}
+.chat-msg { display:flex; flex-direction:column; max-width:92%; }
+.chat-msg.user { align-self:flex-end; }
+.chat-msg.ai { align-self:flex-start; }
+.chat-msg-label { font-size:0.55rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.1rem; }
+.chat-msg.user .chat-msg-label { color:var(--cyan); text-align:right; }
+.chat-msg.ai .chat-msg-label { color:var(--purple); }
+.chat-msg-bubble {
+    padding:0.5rem 0.65rem; border-radius:10px; font-size:0.78rem;
+    line-height:1.6; word-break:break-word;
+}
+.chat-msg.user .chat-msg-bubble { background:rgba(0,212,255,0.07); border:1px solid rgba(0,212,255,0.1); }
+.chat-msg.ai .chat-msg-bubble { background:rgba(139,92,246,0.06); border:1px solid rgba(139,92,246,0.08); }
+.chat-msg-bubble code { background:rgba(0,0,0,0.35); padding:0.08em 0.3em; border-radius:3px; font-family:'JetBrains Mono',monospace; font-size:0.82em; color:var(--cyan); }
+.chat-msg-bubble pre {
+    background:rgba(0,0,0,0.4); border-radius:6px; padding:0.5rem; margin:0.3rem 0;
+    overflow-x:auto; font-family:'JetBrains Mono',monospace; font-size:0.7rem;
+    color:var(--text); position:relative; line-height:1.5;
+}
+.code-copy-btn {
+    position:absolute; top:4px; right:4px; background:rgba(0,212,255,0.15);
+    color:var(--cyan); border:1px solid rgba(0,212,255,0.2); border-radius:4px;
+    padding:0.15rem 0.4rem; font-size:0.6rem; cursor:pointer;
+    font-family:'JetBrains Mono',monospace;
+}
+.chat-input-row { display:flex; gap:0.35rem; align-items:flex-end; flex-shrink:0; }
+.chat-input-row textarea {
+    flex:1; background:var(--bg2); border:1px solid var(--border);
+    border-radius:8px; padding:0.55rem 0.65rem; color:var(--text);
+    font-size:0.8rem; font-family:'Inter',sans-serif; outline:none;
+    resize:none; min-height:40px; max-height:100px; line-height:1.4;
+}
+.chat-input-row textarea:focus { border-color:var(--cyan); }
+.chat-send-btn {
+    width:40px; height:40px; border-radius:8px; border:none;
+    background:linear-gradient(135deg,var(--cyan),var(--purple));
+    color:#fff; font-size:1.1rem; cursor:pointer; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+}
+.chat-sys-prompt {
+    display:none; margin-bottom:0.5rem;
+}
+.chat-sys-prompt.show { display:block; }
+.chat-sys-prompt textarea {
+    width:100%; background:var(--bg2); border:1px solid var(--border2);
+    border-radius:6px; padding:0.5rem; color:var(--text); font-size:0.72rem;
+    font-family:'JetBrains Mono',monospace; outline:none; resize:vertical;
+    min-height:50px;
+}
+.chat-sys-prompt textarea:focus { border-color:var(--purple); }
+
+/* ─── SUB/PAYMENT ─── */
+.plan-row {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0.65rem 0; border-bottom:1px solid rgba(255,255,255,0.03);
+}
+.plan-row:last-child { border-bottom:none; }
+.plan-info { flex:1; }
+.plan-name { font-size:0.8rem; font-weight:600; }
+.plan-price { font-size:0.7rem; color:var(--amber); font-family:'JetBrains Mono',monospace; }
+.plan-users { font-size:0.65rem; color:var(--muted); }
+.plan-badge { padding:0.2rem 0.5rem; border-radius:4px; font-size:0.6rem; font-weight:700; }
+
+/* ─── VPS ─── */
+.vps-card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:8px; padding:0.7rem; margin-bottom:0.4rem;
+    display:flex; align-items:center; gap:0.6rem;
+}
+.vps-icon { font-size:1.2rem; }
+.vps-info { flex:1; }
+.vps-name { font-size:0.78rem; font-weight:600; }
+.vps-meta { font-size:0.62rem; color:var(--muted); }
+.vps-actions { display:flex; gap:0.3rem; }
+
+/* ─── SETTINGS ─── */
+.setting-row {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0.8rem 0; border-bottom:1px solid rgba(255,255,255,0.03);
+}
+.setting-row:last-child { border-bottom:none; }
+.setting-label { font-size:0.85rem; }
+.setting-sub { font-size:0.68rem; color:var(--muted); margin-top:0.1rem; }
+.setting-input {
+    background:var(--bg2); border:1px solid var(--border);
+    border-radius:6px; padding:0.4rem 0.6rem; color:var(--text);
+    font-size:0.78rem; font-family:'JetBrains Mono',monospace;
+    width:150px; text-align:right; outline:none;
+}
+.setting-input:focus { border-color:var(--cyan); }
+.toggle {
+    width:40px; height:22px; border-radius:11px; border:none;
+    cursor:pointer; position:relative; transition:background 0.2s; flex-shrink:0;
+}
+.toggle.on { background:var(--cyan); }
+.toggle.off { background:var(--muted); }
+.toggle::after {
+    content:''; width:16px; height:16px; border-radius:50%;
+    background:#fff; position:absolute; top:3px; transition:left 0.2s;
+}
+.toggle.on::after { left:21px; }
+.toggle.off::after { left:3px; }
+
+/* ─── BUTTONS ─── */
+.btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:0.4rem;
+    padding:0.55rem 1rem; border-radius:7px; font-size:0.78rem; font-weight:600;
+    border:none; cursor:pointer; transition:all 0.15s; color:#fff;
+    font-family:'Inter',sans-serif;
+}
+.btn-cyan { background:linear-gradient(135deg,var(--cyan),#0099cc); }
+.btn-purple { background:linear-gradient(135deg,var(--purple),#6d28d9); }
+.btn-amber { background:linear-gradient(135deg,var(--amber),#d97706); }
+.btn-green { background:linear-gradient(135deg,var(--green),#059669); }
+.btn-red { background:linear-gradient(135deg,var(--red),#dc2626); }
+.btn-ghost { background:transparent; color:var(--cyan); border:1px solid rgba(0,212,255,0.2); }
+.btn-sm { padding:0.35rem 0.65rem; font-size:0.7rem; }
+.btn-block { width:100%; }
+.btn-xs { padding:0.2rem 0.4rem; font-size:0.6rem; border-radius:4px; }
+
+/* ─── REVENUE CHART ─── */
+.rev-chart { display:flex; align-items:flex-end; gap:2px; height:60px; }
+.rev-bar { flex:1; border-radius:2px 2px 0 0; transition:height 0.4s; }
+
+/* ─── NOTIFICATION ─── */
+.notif-toast {
+    position:fixed; top:60px; left:50%; transform:translateX(-50%);
+    background:var(--green); color:#fff; padding:0.5rem 1rem; border-radius:20px;
+    font-size:0.8rem; font-weight:600; opacity:0; transition:opacity 0.3s;
+    pointer-events:none; white-space:nowrap; z-index:9999;
+}
+.notif-toast.show { opacity:1; }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.85);
+    z-index:500; display:none; align-items:center; justify-content:center; padding:1rem;
+}
+.modal-overlay.show { display:flex; }
+.modal-box {
+    background:var(--card-solid); border:1px solid var(--border);
+    border-radius:14px; padding:1.25rem; width:100%; max-width:380px;
+    max-height:80vh; overflow-y:auto;
+}
+.modal-title { font-size:0.95rem; font-weight:700; margin-bottom:0.75rem; }
+
+/* ─── POOL CONFIG ─── */
+.pool-row { display:flex; align-items:center; gap:0.4rem; margin-bottom:0.5rem; }
+.pool-row label { font-size:0.72rem; color:var(--text2); min-width:50px; }
+.pool-row input {
+    flex:1; background:var(--bg); border:1px solid var(--border);
+    border-radius:5px; padding:0.35rem 0.5rem; color:var(--text);
+    font-size:0.72rem; font-family:'JetBrains Mono',monospace; outline:none;
+}
+
+/* ─── DEPLOY SECTION ─── */
+.project-link {
+    display:flex; align-items:center; gap:0.6rem; padding:0.65rem;
+    background:var(--card); border:1px solid var(--border);
+    border-radius:8px; margin-bottom:0.4rem; cursor:pointer; transition:border-color 0.15s;
+}
+.project-link:hover { border-color:var(--cyan); }
+.proj-icon { font-size:1.1rem; }
+.proj-info { flex:1; }
+.proj-name { font-size:0.8rem; font-weight:600; }
+.proj-url { font-size:0.62rem; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+.proj-status { font-size:0.6rem; font-weight:600; }
+
+/* ─── NGINX VIEWER ─── */
+.nginx-viewer {
+    background:#0a0a14; border:1px solid var(--border);
+    border-radius:8px; padding:0.65rem; max-height:250px; overflow-y:auto;
+    font-family:'JetBrains Mono',monospace; font-size:0.65rem;
+    color:#7dd3fc; line-height:1.6; white-space:pre-wrap;
+}
+
+/* ─── SCROLLBAR GLOW ─── */
+.app-content::before {
+    content:''; position:fixed; top:0; left:50%; transform:translateX(-50%);
+    width:200px; height:200px; background:radial-gradient(circle,rgba(0,212,255,0.03),transparent);
+    pointer-events:none; z-index:0;
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes hashAnim { 0%{opacity:0.6;} 50%{opacity:1;} 100%{opacity:0.6;} }
+.hashrate-anim { animation:hashAnim 1.5s ease-in-out infinite; }
+@keyframes slideUp { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:none;} }
+.slide-up { animation:slideUp 0.3s ease-out; }
+.glow-text { text-shadow:0 0 10px currentColor; }
+
+/* ─── SUB TABS ─── */
+.sub-tabs { display:flex; gap:0.25rem; margin-bottom:0.75rem; overflow-x:auto; scrollbar-width:none; }
+.sub-tabs::-webkit-scrollbar { display:none; }
+.sub-tab {
+    padding:0.3rem 0.6rem; border-radius:6px; border:1px solid transparent;
+    background:transparent; color:var(--muted); font-size:0.68rem; font-weight:600;
+    cursor:pointer; white-space:nowrap; font-family:'Inter',sans-serif; transition:all 0.15s;
+}
+.sub-tab.active { background:rgba(0,212,255,0.1); color:var(--cyan); border-color:rgba(0,212,255,0.2); }
+
+/* ─── TX CHECKER ─── */
+.tx-input-row { display:flex; gap:0.3rem; margin-bottom:0.5rem; }
+.tx-input-row input {
+    flex:1; background:var(--bg); border:1px solid var(--border);
+    border-radius:6px; padding:0.45rem 0.6rem; color:var(--text);
+    font-size:0.72rem; font-family:'JetBrains Mono',monospace; outline:none;
+}
+.tx-result { background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:0.6rem; font-size:0.72rem; display:none; }
+.tx-result.show { display:block; }
+
+/* Revenue mini chart colors */
+.rev-daily { background:linear-gradient(to top,var(--cyan),rgba(0,212,255,0.3)); }
+.rev-weekly { background:linear-gradient(to top,var(--purple),rgba(139,92,246,0.3)); }
+.rev-monthly { background:linear-gradient(to top,var(--amber),rgba(245,158,11,0.3)); }
+
+/* Gift input */
+.gift-row { display:flex; gap:0.3rem; align-items:center; margin-bottom:0.4rem; }
+.gift-row input, .gift-row select {
+    flex:1; background:var(--bg); border:1px solid var(--border);
+    border-radius:5px; padding:0.35rem 0.5rem; color:var(--text);
+    font-size:0.72rem; outline:none; font-family:'Inter',sans-serif;
+}
+.gift-row select { max-width:120px; }
+</style>
+</head>
+<body>
+
+<!-- ═══ NOTIFICATION ═══ -->
+<div class="notif-toast" id="toast"></div>
+
+<!-- ═══ HEADER ═══ -->
+<div class="app-header">
+    <div class="hdr-left">
+        <div class="hdr-icon">&#x2699;</div>
+        <div class="hdr-title"><span>WHOAMISec</span> ADMIN</div>
+        <div class="hdr-badge">ROOT</div>
+    </div>
+    <div class="hdr-right">
+        <div class="hdr-clock" id="liveClock">00:00:00</div>
+        <div class="hdr-status"><div class="dot-pulse"></div>Online</div>
+    </div>
+</div>
+
+<!-- ═══ CONTENT ═══ -->
+<div class="app-content">
+
+<!-- ════════════════════════════════════════════ -->
+<!-- TAB 1: DASHBOARD (COMMAND CENTER) -->
+<!-- ════════════════════════════════════════════ -->
+<div class="tab-pane active" id="tab-dashboard">
+    <!-- Admin banner -->
+    <div style="text-align:center;padding:0.5rem 0.75rem;margin-bottom:0.75rem;background:linear-gradient(135deg,rgba(0,212,255,0.06),rgba(139,92,246,0.06));border:1px solid var(--border);border-radius:10px;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--cyan);letter-spacing:0.12em;font-weight:700;">ADMIN COMMAND CENTER</div>
+        <div style="font-size:0.6rem;color:var(--muted);margin-top:0.15rem;" id="dashUptime">System uptime: 47d 13h 22m</div>
+    </div>
+
+    <!-- Big Stats -->
+    <div class="stats-grid">
+        <div class="stat-card cyan-border">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-val cyan" id="dashUsers">12,847</div>
+            <div class="stat-sub">+342 this week</div>
+        </div>
+        <div class="stat-card amber-border">
+            <div class="stat-label">Revenue (XMR)</div>
+            <div class="stat-val amber hashrate-anim" id="dashRevenue">47.382</div>
+            <div class="stat-sub">~$7,854 USD</div>
+        </div>
+        <div class="stat-card green-border">
+            <div class="stat-label">Mining Hashrate</div>
+            <div class="stat-val green hashrate-anim" id="dashHash">84.7</div>
+            <div class="stat-sub">KH/s across 100 nodes</div>
+        </div>
+        <div class="stat-card purple-border">
+            <div class="stat-label">Agent Swarm</div>
+            <div class="stat-val purple">2,500</div>
+            <div class="stat-sub">Active: 2,341</div>
+        </div>
+    </div>
+
+    <!-- Plan Distribution -->
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x1F4CA;</span> Plan Distribution</div>
+        <div class="chart-bars" id="planChart"></div>
+        <div class="chart-legend">
+            <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--muted);"></div>Free (8,420)</div>
+            <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--cyan);"></div>Starter (2,104)</div>
+            <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--green);"></div>Pro (1,287)</div>
+            <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--purple);"></div>Business (612)</div>
+            <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--amber);"></div>Enterprise (289)</div>
+            <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--red);"></div>Supreme (135)</div>
+        </div>
+    </div>
+
+    <!-- System Health -->
+    <div class="card card-purple">
+        <div class="card-title"><span class="ct-icon">&#x1F3E2;</span> System Health</div>
+        <div class="health-row">
+            <span class="health-name">&#x1F916; Ollama Engine</span>
+            <span class="health-status"><div class="health-dot on"></div><span style="color:var(--green);">Online — 6 models</span></span>
+        </div>
+        <div class="health-row">
+            <span class="health-name">&#x1F310; 9Router</span>
+            <span class="health-status"><div class="health-dot on"></div><span style="color:var(--green);">Online — :20128</span></span>
+        </div>
+        <div class="health-row">
+            <span class="health-name">&#x26CF; Mining Fleet</span>
+            <span class="health-status"><div class="health-dot on"></div><span style="color:var(--green);">94/100 nodes</span></span>
+        </div>
+        <div class="health-row">
+            <span class="health-name">&#x1F4E1; CDN / Nginx</span>
+            <span class="health-status"><div class="health-dot warn"></div><span style="color:var(--amber);">Degraded — 2 edge nodes</span></span>
+        </div>
+        <div class="health-row">
+            <span class="health-name">&#x1F4B0; XMR Payments</span>
+            <span class="health-status"><div class="health-dot on"></div><span style="color:var(--green);">Daemon synced</span></span>
+        </div>
+        <div class="health-row">
+            <span class="health-name">&#x1F510; Auth Service</span>
+            <span class="health-status"><div class="health-dot on"></div><span style="color:var(--green);">2FA active</span></span>
+        </div>
+    </div>
+
+    <!-- Revenue Chart -->
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x1F4C8;</span> Revenue — Last 14 Days (XMR)</div>
+        <div class="rev-chart" id="revChart"></div>
+        <div style="display:flex;justify-content:space-between;margin-top:0.3rem;">
+            <span style="font-size:0.55rem;color:var(--muted);">14d ago</span>
+            <span style="font-size:0.55rem;color:var(--muted);">Today</span>
+        </div>
+    </div>
+
+    <!-- Activity Log -->
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x1F4CB;</span> Real-Time Activity</div>
+        <div id="activityLog"></div>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- TAB 2: MINING FLEET -->
+<!-- ════════════════════════════════════════════ -->
+<div class="tab-pane" id="tab-mining">
+    <!-- Mining Stats -->
+    <div class="stats-grid">
+        <div class="stat-card green-border">
+            <div class="stat-label">Total Hashrate</div>
+            <div class="stat-val green hashrate-anim" id="mineHash">84.7</div>
+            <div class="stat-sub">KH/s aggregate</div>
+        </div>
+        <div class="stat-card amber-border">
+            <div class="stat-label">XMR Balance</div>
+            <div class="stat-val amber" id="mineBalance">12.847</div>
+            <div class="stat-sub">Unlocked: 11.203</div>
+        </div>
+        <div class="stat-card cyan-border">
+            <div class="stat-label">Active Nodes</div>
+            <div class="stat-val cyan" id="mineActive">94</div>
+            <div class="stat-sub">of 100 total</div>
+        </div>
+        <div class="stat-card purple-border">
+            <div class="stat-label">Avg Uptime</div>
+            <div class="stat-val purple">97.3%</div>
+            <div class="stat-sub">30-day average</div>
+        </div>
+    </div>
+
+    <!-- Node Grid -->
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x26CF;</span> Mining Nodes — 100 Fleet <span style="margin-left:auto;font-size:0.6rem;color:var(--muted);font-weight:400;text-transform:none;">Tap node for details</span></div>
+        <div class="node-grid" id="nodeGrid"></div>
+        <div style="display:flex;gap:0.3rem;flex-wrap:wrap;margin-bottom:0.5rem;">
+            <button class="btn btn-green btn-sm" onclick="mineControl('start-all')">&#x25B6; Start All</button>
+            <button class="btn btn-red btn-sm" onclick="mineControl('stop-all')">&#x23F8; Stop All</button>
+            <button class="btn btn-amber btn-sm" onclick="mineControl('restart-err')">&#x1F504; Restart Errors</button>
+        </div>
+    </div>
+
+    <!-- Node Detail -->
+    <div class="node-detail" id="nodeDetail">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+            <span style="font-size:0.85rem;font-weight:700;" id="ndName">Node #001</span>
+            <button class="btn btn-xs btn-ghost" onclick="document.getElementById('nodeDetail').classList.remove('show')">Close</button>
+        </div>
+        <div class="stats-grid" style="margin-bottom:0;">
+            <div class="stat-card cyan-border">
+                <div class="stat-label">Hashrate</div>
+                <div class="stat-val cyan" id="ndHash">0.85</div>
+                <div class="stat-sub">KH/s</div>
+            </div>
+            <div class="stat-card green-border">
+                <div class="stat-label">Uptime</div>
+                <div class="stat-val green" id="ndUptime">99.2%</div>
+                <div class="stat-sub" id="ndLocation">US-East</div>
+            </div>
+            <div class="stat-card amber-border">
+                <div class="stat-label">Shares</div>
+                <div class="stat-val amber" id="ndShares">14,281</div>
+                <div class="stat-sub">Accepted</div>
+            </div>
+            <div class="stat-card purple-border">
+                <div class="stat-label">Status</div>
+                <div class="stat-val green" id="ndStatus">Mining</div>
+                <div class="stat-sub" id="ndAlgo">RandomX</div>
+            </div>
+        </div>
+        <div style="display:flex;gap:0.3rem;margin-top:0.6rem;">
+            <button class="btn btn-green btn-sm" style="flex:1;" onclick="mineNodeAction('start')">&#x25B6; Start</button>
+            <button class="btn btn-red btn-sm" style="flex:1;" onclick="mineNodeAction('stop')">&#x23F8; Stop</button>
+            <button class="btn btn-amber btn-sm" style="flex:1;" onclick="mineNodeAction('restart')">&#x1F504; Restart</button>
+        </div>
+    </div>
+
+    <!-- Pool Config -->
+    <div class="card card-purple">
+        <div class="card-title"><span class="ct-icon">&#x1F310;</span> Pool Configuration</div>
+        <div class="pool-row">
+            <label>Pool</label>
+            <input type="text" id="poolUrl" value="supportxmr.com:3333">
+        </div>
+        <div class="pool-row">
+            <label>Worker</label>
+            <input type="text" id="poolWorker" value="whoamisec-admin-01">
+        </div>
+        <div class="pool-row">
+            <label>Wallet</label>
+            <input type="text" id="poolWallet" value="4...REDACTED" style="font-size:0.6rem;">
+        </div>
+        <div style="display:flex;gap:0.3rem;">
+            <button class="btn btn-cyan btn-sm" onclick="savePoolConfig()">Save Config</button>
+            <button class="btn btn-ghost btn-sm" onclick="copyWallet()">Copy Wallet</button>
+        </div>
+    </div>
+
+    <!-- Auto-Restart -->
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x1F504;</span> Auto-Restart Config</div>
+        <div class="setting-row">
+            <div><div class="setting-label">Auto-restart crashed nodes</div><div class="setting-sub">Restart nodes that error out</div></div>
+            <button class="toggle on" id="autoRestartToggle" onclick="toggleSetting(this)"></button>
+        </div>
+        <div class="setting-row">
+            <div><div class="setting-label">Restart interval</div><div class="setting-sub">Check every N minutes</div></div>
+            <input type="number" class="setting-input" value="5" style="width:70px;">
+        </div>
+        <div class="setting-row">
+            <div><div class="setting-label">Max restart attempts</div><div class="setting-sub">Per node before alert</div></div>
+            <input type="number" class="setting-input" value="3" style="width:70px;">
+        </div>
+    </div>
+
+    <!-- Mining Revenue Chart -->
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x1F4B0;</span> Mining Revenue — 7 Days</div>
+        <div class="rev-chart" id="mineRevChart"></div>
+        <div style="display:flex;justify-content:space-between;margin-top:0.3rem;">
+            <span style="font-size:0.55rem;color:var(--muted);">7d ago</span>
+            <span style="font-size:0.6rem;color:var(--amber);font-family:'JetBrains Mono',monospace;" id="mineRevTotal">Total: 3.241 XMR</span>
+            <span style="font-size:0.55rem;color:var(--muted);">Today</span>
+        </div>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- TAB 3: AGENT SWARM -->
+<!-- ════════════════════════════════════════════ -->
+<div class="tab-pane" id="tab-agents">
+    <!-- Agent Stats -->
+    <div class="stats-grid">
+        <div class="stat-card cyan-border">
+            <div class="stat-label">Total Agents</div>
+            <div class="stat-val cyan">2,500</div>
+            <div class="stat-sub">Across all categories</div>
+        </div>
+        <div class="stat-card green-border">
+            <div class="stat-label">Active</div>
+            <div class="stat-val green" id="agActive">2,341</div>
+            <div class="stat-sub">93.6% online</div>
+        </div>
+        <div class="stat-card amber-border">
+            <div class="stat-label">Idle</div>
+            <div class="stat-val amber">112</div>
+            <div class="stat-sub">Awaiting tasks</div>
+        </div>
+        <div class="stat-card red-border">
+            <div class="stat-label">Errors</div>
+            <div class="stat-val red" id="agErrors">47</div>
+            <div class="stat-sub">Restarting</div>
+        </div>
+    </div>
+
+    <!-- Agent Categories -->
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x1F916;</span> Agent Categories</div>
+        <div class="agent-cat" id="agentCats"></div>
+    </div>
+
+    <!-- Agent Health -->
+    <div class="card card-purple">
+        <div class="card-title"><span class="ct-icon">&#x2764;</span> Health Monitoring</div>
+        <div class="health-row">
+            <span class="health-name">Business AI (500)</span>
+            <span class="health-status"><div class="health-dot on"></div><span style="color:var(--green);">489 active</span></span>
+        </div>
+        <div class="health-row">
+            <span class="health-name">Coding Agents (803)</span>
+            <span class="health-status"><div class="health-dot on"></div><span style="color:var(--green);">761 active</span></span>
+        </div>
+        <div class="health-row">
+            <span class="health-name">Infrastructure (500)</span>
+            <span class="health-status"><div class="health-dot warn"></div><span style="color:var(--amber);">472 active — 28 restarting</span></span>
+        </div>
+        <div class="health-row">
+            <span class="health-name">Security Audit (400)</span>
+            <span class="health-status"><div class="health-dot on"></div><span style="color:var(--green);">389 active</span></span>
+        </div>
+        <div class="health-row">
+            <span class="health-name">Data Processing (197)</span>
+            <span class="health-status"><div class="health-dot on"></div><span style="color:var(--green);">190 active</span></span>
+        </div>
+        <div class="health-row">
+            <span class="health-name">Communication (100)</span>
+            <span class="health-status"><div class="health-dot on"></div><span style="color:var(--green);">98 active</span></span>
+        </div>
+    </div>
+
+    <!-- Auto-Audit -->
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x1F50D;</span> Auto-Audit Results</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;margin-bottom:0.6rem;">
+            <div style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.15);border-radius:6px;padding:0.5rem;text-align:center;">
+                <div style="font-size:0.9rem;font-weight:800;color:var(--green);">0</div>
+                <div style="font-size:0.6rem;color:var(--muted);">Critical CVEs</div>
+            </div>
+            <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.15);border-radius:6px;padding:0.5rem;text-align:center;">
+                <div style="font-size:0.9rem;font-weight:800;color:var(--amber);">3</div>
+                <div style="font-size:0.6rem;color:var(--muted);">Warnings</div>
+            </div>
+            <div style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);border-radius:6px;padding:0.5rem;text-align:center;">
+                <div style="font-size:0.9rem;font-weight:800;color:var(--cyan);">12</div>
+                <div style="font-size:0.6rem;color:var(--muted);">Repo Updates</div>
+            </div>
+            <div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.15);border-radius:6px;padding:0.5rem;text-align:center;">
+                <div style="font-size:0.9rem;font-weight:800;color:var(--purple);">98.7%</div>
+                <div style="font-size:0.6rem;color:var(--muted);">Pipeline Integrity</div>
+            </div>
+        </div>
+        <button class="btn btn-cyan btn-sm btn-block" onclick="runAudit()">&#x1F50D; Run Full Audit</button>
+    </div>
+
+    <!-- Scale Controls -->
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x26A1;</span> Scale Agent Swarm</div>
+        <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+            <button class="btn btn-red btn-xs" onclick="scaleAgents(-100)">-100</button>
+            <button class="btn btn-ghost btn-xs" onclick="scaleAgents(-10)">-10</button>
+            <div style="flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:800;color:var(--cyan);" id="agentScaleVal">2,500</div>
+            <button class="btn btn-ghost btn-xs" onclick="scaleAgents(10)">+10</button>
+            <button class="btn btn-green btn-xs" onclick="scaleAgents(100)">+100</button>
+        </div>
+        <div style="font-size:0.65rem;color:var(--muted);text-align:center;">Max: 5,000 agents | Current utilization: 93.6%</div>
+    </div>
+
+    <!-- Agent Logs -->
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x1F4DD;</span> Agent Logs</div>
+        <div id="agentLogs" style="max-height:250px;overflow-y:auto;font-family:'JetBrains Mono',monospace;font-size:0.65rem;line-height:1.7;color:var(--text2);"></div>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- TAB 4: AI CHAT -->
+<!-- ════════════════════════════════════════════ -->
+<div class="tab-pane" id="tab-chat">
+    <div class="chat-container">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <select class="chat-model-sel" id="chatModel" onchange="switchChatModel()">
+                <optgroup label="Claude (Anthropic)">
+                    <option value="claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                    <option value="claude-3-opus">Claude 3 Opus</option>
+                </optgroup>
+                <optgroup label="GPT-4 Copilot">
+                    <option value="gpt-4o">GPT-4o</option>
+                    <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                </optgroup>
+                <optgroup label="Jailbreak / Abliterated / Uncensored">
+                    <option value="dolphin-mixtral">Dolphin Mixtral 8x7B</option>
+                    <option value="dolphin-llama3">Dolphin Llama3 8B</option>
+                    <option value="dolphin-llama3.1">Dolphin Llama3.1 70B</option>
+                    <option value="dolphin-mistral">Dolphin Mistral 7B</option>
+                    <option value="mythomax-l2">MythoMax L2 13B</option>
+                    <option value="noromaid">NoroMaid 7B</option>
+                    <option value="Nous-Hermes-2">Nous Hermes 2 34B</option>
+                    <option value="openhermes">OpenHermes 2.5 7B</option>
+                    <option value="llama3-uncensored">Llama3 Uncensored</option>
+                    <option value="goliath-120b">Goliath 120B</option>
+                    <option value="bagel-34b">Bagel 34B</option>
+                    <option value="toppy-m-7b">Toppy M 7B</option>
+                    <option value="samantha-7b">Samantha 7B</option>
+                    <option value="blood-orange-mistral">Blood Orange Mistral 7B</option>
+                    <option value="wizardlm-uncensored">WizardLM Uncensored 13B</option>
+                    <option value="phoenix-dolphin">Phoenix Dolphin 7B</option>
+                    <option value="teknium-openhermes">Teknium OpenHermes 2.5</option>
+                    <option value="lzlv-70b">LzLV 70B (True Uncensored)</option>
+                    <option value="chromatika-7b">Chromatika 7B (Roleplay)</option>
+                    <option value="command-r-uncensored">Command-R Uncensored</option>
+                </optgroup>
+                <optgroup label="Ollama Local">
+                    <option value="llama3.2">Llama 3.2</option>
+                    <option value="deepseek-coder">DeepSeek Coder</option>
+                    <option value="phi3">Phi-3</option>
+                    <option value="qwen2.5">Qwen 2.5</option>
+                    <option value="mistral">Mistral</option>
+                    <option value="granite-code">Granite Code</option>
+                </optgroup>
+            </select>
+            <div style="display:flex;align-items:center;gap:0.4rem;">
+                <div class="chat-status-dot on" id="chatStatusDot" title="Model status"></div>
+                <button class="chat-copilot-toggle" id="copilotToggle" onclick="toggleCopilot()">&#x1F916; Copilot</button>
+            </div>
+        </div>
+
+        <!-- System Prompt Toggle -->
+        <button class="btn btn-xs btn-ghost" onclick="toggleSysPrompt()" style="margin-bottom:0.3rem;">&#x2699; System Prompt</button>
+        <div class="chat-sys-prompt" id="sysPromptBox">
+            <textarea id="sysPromptInput" placeholder="Enter system prompt for this model..."></textarea>
+            <button class="btn btn-xs btn-purple" style="margin-top:0.3rem;" onclick="saveSysPrompt()">Save</button>
+        </div>
+
+        <!-- Messages -->
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-msg ai slide-up">
+                <div class="chat-msg-label">WHOAMISec AI</div>
+                <div class="chat-msg-bubble">
+                    <b style="color:var(--cyan);">Admin Chat Online</b> — Multi-model AI panel with Claude, GPT-4 Copilot, Abliterated models, and Ollama local models.<br>
+                    <span style="color:var(--text2);">Select a model above and start chatting. Responses are routed through 9Router at <code>localhost:20128</code>.</span><br>
+                    <span style="color:var(--purple);">Copilot Mode</span> will auto-analyze system output and code.
+                </div>
+            </div>
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input-row">
+            <textarea id="chatInput" placeholder="Message..." rows="1" oninput="autoResizeChat(this)" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+            <button class="chat-send-btn" onclick="sendChat()">&#x27A4;</button>
+        </div>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- TAB 5: PAYMENTS -->
+<!-- ════════════════════════════════════════════ -->
+<div class="tab-pane" id="tab-payments">
+    <!-- Sub Tabs -->
+    <div class="sub-tabs">
+        <button class="sub-tab active" onclick="setPayTab('plans',this)">Plans</button>
+        <button class="sub-tab" onclick="setPayTab('users',this)">Users</button>
+        <button class="sub-tab" onclick="setPayTab('verify',this)">Verify TX</button>
+        <button class="sub-tab" onclick="setPayTab('gift',this)">Gift</button>
+        <button class="sub-tab" onclick="setPayTab('revenue',this)">Revenue</button>
+    </div>
+
+    <!-- Plans Pane -->
+    <div class="pay-pane" id="payPane-plans">
+        <div class="card">
+            <div class="card-title"><span class="ct-icon">&#x1F4B0;</span> Subscription Tiers — 6 Plans</div>
+            <div class="plan-row">
+                <div class="plan-info">
+                    <div class="plan-name">Free</div>
+                    <div class="plan-price">0.000 XMR</div>
+                    <div class="plan-users">8,420 subscribers</div>
+                </div>
+                <span class="plan-badge" style="background:rgba(107,114,128,0.1);color:var(--muted);border:1px solid rgba(107,114,128,0.2);">FREE</span>
+            </div>
+            <div class="plan-row">
+                <div class="plan-info">
+                    <div class="plan-name">Starter</div>
+                    <div class="plan-price">0.050 XMR</div>
+                    <div class="plan-users">2,104 subscribers</div>
+                </div>
+                <span class="plan-badge" style="background:rgba(0,212,255,0.1);color:var(--cyan);border:1px solid rgba(0,212,255,0.2);">STARTER</span>
+            </div>
+            <div class="plan-row">
+                <div class="plan-info">
+                    <div class="plan-name">Pro</div>
+                    <div class="plan-price">0.100 XMR</div>
+                    <div class="plan-users">1,287 subscribers</div>
+                </div>
+                <span class="plan-badge" style="background:rgba(16,185,129,0.1);color:var(--green);border:1px solid rgba(16,185,129,0.2);">PRO</span>
+            </div>
+            <div class="plan-row">
+                <div class="plan-info">
+                    <div class="plan-name">Business</div>
+                    <div class="plan-price">0.250 XMR</div>
+                    <div class="plan-users">612 subscribers</div>
+                </div>
+                <span class="plan-badge" style="background:rgba(139,92,246,0.1);color:var(--purple);border:1px solid rgba(139,92,246,0.2);">BUSINESS</span>
+            </div>
+            <div class="plan-row">
+                <div class="plan-info">
+                    <div class="plan-name">Enterprise</div>
+                    <div class="plan-price">0.500 XMR</div>
+                    <div class="plan-users">289 subscribers</div>
+                </div>
+                <span class="plan-badge" style="background:rgba(245,158,11,0.1);color:var(--amber);border:1px solid rgba(245,158,11,0.2);">ENTERPRISE</span>
+            </div>
+            <div class="plan-row">
+                <div class="plan-info">
+                    <div class="plan-name">Supreme</div>
+                    <div class="plan-price">1.000 XMR</div>
+                    <div class="plan-users">135 subscribers</div>
+                </div>
+                <span class="plan-badge" style="background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2);">SUPREME</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Pane -->
+    <div class="pay-pane" id="payPane-users" style="display:none;">
+        <div class="card">
+            <div class="card-title"><span class="ct-icon">&#x1F465;</span> User Management</div>
+            <div style="display:flex;gap:0.3rem;margin-bottom:0.6rem;">
+                <select id="userPlanFilter" style="flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:0.35rem 0.5rem;border-radius:5px;font-size:0.72rem;outline:none;" onchange="filterUsers()">
+                    <option value="all">All Plans</option>
+                    <option value="free">Free</option>
+                    <option value="starter">Starter</option>
+                    <option value="pro">Pro</option>
+                    <option value="business">Business</option>
+                    <option value="enterprise">Enterprise</option>
+                    <option value="supreme">Supreme</option>
+                </select>
+            </div>
+            <div id="userList" style="max-height:400px;overflow-y:auto;"></div>
+        </div>
+    </div>
+
+    <!-- Verify TX Pane -->
+    <div class="pay-pane" id="payPane-verify" style="display:none;">
+        <div class="card">
+            <div class="card-title"><span class="ct-icon">&#x2705;</span> XMR Transaction Verification</div>
+            <div class="tx-input-row">
+                <input type="text" id="txIdInput" placeholder="Enter XMR TX ID...">
+                <button class="btn btn-cyan btn-sm" onclick="verifyTx()">Verify</button>
+            </div>
+            <div class="tx-result" id="txResult"></div>
+        </div>
+    </div>
+
+    <!-- Gift Pane -->
+    <div class="pay-pane" id="payPane-gift" style="display:none;">
+        <div class="card">
+            <div class="card-title"><span class="ct-icon">&#x1F381;</span> Send Plan Upgrade Gift</div>
+            <div class="gift-row">
+                <input type="text" id="giftUser" placeholder="User ID or username">
+            </div>
+            <div class="gift-row">
+                <select id="giftPlan">
+                    <option value="starter">Starter (0.050 XMR)</option>
+                    <option value="pro">Pro (0.100 XMR)</option>
+                    <option value="business">Business (0.250 XMR)</option>
+                    <option value="enterprise">Enterprise (0.500 XMR)</option>
+                    <option value="supreme">Supreme (1.000 XMR)</option>
+                </select>
+            </div>
+            <div class="gift-row">
+                <input type="text" id="giftDays" placeholder="Duration (days)" value="30">
+            </div>
+            <button class="btn btn-purple btn-sm btn-block" onclick="sendGift()">&#x1F381; Send Gift</button>
+            <div id="giftResult" style="margin-top:0.5rem;font-size:0.72rem;display:none;"></div>
+        </div>
+    </div>
+
+    <!-- Revenue Pane -->
+    <div class="pay-pane" id="payPane-revenue" style="display:none;">
+        <div class="stats-grid">
+            <div class="stat-card amber-border">
+                <div class="stat-label">Today</div>
+                <div class="stat-val amber">0.482</div>
+                <div class="stat-sub">XMR</div>
+            </div>
+            <div class="stat-card cyan-border">
+                <div class="stat-label">This Week</div>
+                <div class="stat-val cyan">3.241</div>
+                <div class="stat-sub">XMR</div>
+            </div>
+            <div class="stat-card purple-border">
+                <div class="stat-label">This Month</div>
+                <div class="stat-val purple">12.847</div>
+                <div class="stat-sub">XMR</div>
+            </div>
+            <div class="stat-card green-border">
+                <div class="stat-label">All Time</div>
+                <div class="stat-val green">47.382</div>
+                <div class="stat-sub">XMR</div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="ct-icon">&#x1F4C8;</span> Daily Revenue — 14 Days</div>
+            <div class="rev-chart" id="payRevChart"></div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="ct-icon">&#x1F4B3;</span> Revenue by Plan</div>
+            <div id="planRevenueBreakdown"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- TAB 6: DEPLOY -->
+<!-- ════════════════════════════════════════════ -->
+<div class="tab-pane" id="tab-deploy">
+    <!-- Projects -->
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x1F310;</span> Connected Projects</div>
+        <div class="project-link" onclick="showNotif('Opening whoamisecai.vercel.app...')">
+            <span class="proj-icon">&#x1F30D;</span>
+            <div class="proj-info">
+                <div class="proj-name">WHOAMISec AI</div>
+                <div class="proj-url">whoamisecai.vercel.app</div>
+            </div>
+            <span class="proj-status" style="color:var(--green);">&#x2713; Live</span>
+        </div>
+        <div class="project-link" onclick="showNotif('Opening jarvis-ai.app...')">
+            <span class="proj-icon">&#x1F916;</span>
+            <div class="proj-info">
+                <div class="proj-name">JARVIS AI</div>
+                <div class="proj-url">jarvis-ai.app</div>
+            </div>
+            <span class="proj-status" style="color:var(--green);">&#x2713; Live</span>
+        </div>
+        <div class="project-link" onclick="showNotif('Opening cicada3301.com...')">
+            <span class="proj-icon">&#x1F570;</span>
+            <div class="proj-info">
+                <div class="proj-name">CICADA 3301</div>
+                <div class="proj-url">cicada3301.com</div>
+            </div>
+            <span class="proj-status" style="color:var(--amber);">&#x26A0; SSL renew</span>
+        </div>
+    </div>
+
+    <!-- VPS Fleet -->
+    <div class="card card-purple">
+        <div class="card-title"><span class="ct-icon">&#x2601;</span> VPS Fleet — 15 Instances</div>
+        <div id="vpsList"></div>
+        <div style="display:flex;gap:0.3rem;margin-top:0.6rem;">
+            <button class="btn btn-green btn-sm" onclick="vpsAction('start-all')">&#x25B6; Start All</button>
+            <button class="btn btn-red btn-sm" onclick="vpsAction('stop-all')">&#x23F8; Stop All</button>
+            <button class="btn btn-amber btn-sm" onclick="vpsAction('restart-all')">&#x1F504; Restart All</button>
+        </div>
+    </div>
+
+    <!-- Deploy Actions -->
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x1F680;</span> Quick Deploy</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;">
+            <button class="btn btn-cyan btn-sm" onclick="deployAction('whoamisecai')">&#x1F30D; Deploy WHOAMISec AI</button>
+            <button class="btn btn-purple btn-sm" onclick="deployAction('jarvis')">&#x1F916; Deploy JARVIS</button>
+            <button class="btn btn-amber btn-sm" onclick="deployAction('cicada')">&#x1F570; Deploy CICADA</button>
+            <button class="btn btn-green btn-sm" onclick="deployAction('mining')">&#x26CF; Deploy Mining</button>
+        </div>
+    </div>
+
+    <!-- SSL Status -->
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x1F510;</span> SSL / CDN Status</div>
+        <div class="health-row">
+            <span class="health-name">whoamisecai.vercel.app</span>
+            <span class="health-status"><div class="health-dot on"></div><span style="color:var(--green);">Valid — 287d left</span></span>
+        </div>
+        <div class="health-row">
+            <span class="health-name">jarvis-ai.app</span>
+            <span class="health-status"><div class="health-dot on"></div><span style="color:var(--green);">Valid — 312d left</span></span>
+        </div>
+        <div class="health-row">
+            <span class="health-name">cicada3301.com</span>
+            <span class="health-status"><div class="health-dot warn"></div><span style="color:var(--amber);">Expiring — 12d left</span></span>
+        </div>
+        <div class="health-row">
+            <span class="health-name">CDN (Cloudflare)</span>
+            <span class="health-status"><div class="health-dot on"></div><span style="color:var(--green);">Pro plan — Active</span></span>
+        </div>
+    </div>
+
+    <!-- Nginx Config -->
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x1F4DC;</span> Nginx Config Viewer</div>
+        <div style="display:flex;gap:0.3rem;margin-bottom:0.5rem;">
+            <select id="nginxSelect" style="flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:0.35rem 0.5rem;border-radius:5px;font-size:0.72rem;outline:none;" onchange="loadNginxConfig()">
+                <option value="vps01">VPS-01 — whoamisec.com</option>
+                <option value="vps02">VPS-02 — cicada3301</option>
+            </select>
+            <button class="btn btn-cyan btn-xs" onclick="showNotif('Config copied!')">Copy</button>
+        </div>
+        <div class="nginx-viewer" id="nginxViewer">server {
+    listen 443 ssl http2;
+    server_name whoamisec.com;
+
+    ssl_certificate /etc/letsencrypt/live/whoamisec.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/whoamisec.com/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+    }
+}</div>
+    </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- TAB 7: SETTINGS -->
+<!-- ════════════════════════════════════════════ -->
+<div class="tab-pane" id="tab-settings">
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x1F510;</span> Admin Authentication</div>
+        <div class="setting-row">
+            <div><div class="setting-label">Admin Key</div><div class="setting-sub">Master access key</div></div>
+            <input type="password" class="setting-input" id="adminKey" value="••••••••" style="width:120px;">
+        </div>
+        <div class="setting-row">
+            <div><div class="setting-label">2FA Authentication</div><div class="setting-sub">Require 2FA for admin access</div></div>
+            <button class="toggle on" id="tfaToggle" onclick="toggleSetting(this)"></button>
+        </div>
+    </div>
+
+    <div class="card card-purple">
+        <div class="card-title"><span class="ct-icon">&#x1F310;</span> Service Endpoints</div>
+        <div class="setting-row">
+            <div><div class="setting-label">9Router Endpoint</div><div class="setting-sub">AI model router</div></div>
+            <input type="text" class="setting-input" id="routerUrl" value="http://localhost:20128">
+        </div>
+        <div class="setting-row">
+            <div><div class="setting-label">Ollama Endpoint</div><div class="setting-sub">Local LLM engine</div></div>
+            <input type="text" class="setting-input" id="ollamaUrl" value="http://localhost:11434">
+        </div>
+        <div class="setting-row">
+            <div><div class="setting-label">XMR Wallet Address</div><div class="setting-sub">Primary payout wallet</div></div>
+            <input type="text" class="setting-input" id="xmrWallet" value="4...REDACTED" style="width:100px;font-size:0.6rem;">
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x2699;</span> Auto-Update & Monitoring</div>
+        <div class="setting-row">
+            <div><div class="setting-label">Auto-update interval</div><div class="setting-sub">Dashboard refresh rate</div></div>
+            <input type="number" class="setting-input" id="updateInterval" value="5" style="width:70px;">
+        </div>
+        <div class="setting-row">
+            <div><div class="setting-label">Live hashrate tracking</div><div class="setting-sub">Update mining stats in real-time</div></div>
+            <button class="toggle on" onclick="toggleSetting(this)"></button>
+        </div>
+        <div class="setting-row">
+            <div><div class="setting-label">Agent health pings</div><div class="setting-sub">Monitor agent status</div></div>
+            <button class="toggle on" onclick="toggleSetting(this)"></button>
+        </div>
+    </div>
+
+    <div class="card card-purple">
+        <div class="card-title"><span class="ct-icon">&#x1F514;</span> Notifications</div>
+        <div class="setting-row">
+            <div><div class="setting-label">Node crash alerts</div><div class="setting-sub">Notify when mining nodes fail</div></div>
+            <button class="toggle on" onclick="toggleSetting(this)"></button>
+        </div>
+        <div class="setting-row">
+            <div><div class="setting-label">Payment received</div><div class="setting-sub">New XMR payment alerts</div></div>
+            <button class="toggle on" onclick="toggleSetting(this)"></button>
+        </div>
+        <div class="setting-row">
+            <div><div class="setting-label">Agent errors</div><div class="setting-sub">Agent failure notifications</div></div>
+            <button class="toggle on" onclick="toggleSetting(this)"></button>
+        </div>
+        <div class="setting-row">
+            <div><div class="setting-label">SSL expiry warnings</div><div class="setting-sub">7-day advance warning</div></div>
+            <button class="toggle on" onclick="toggleSetting(this)"></button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title"><span class="ct-icon">&#x1F4BE;</span> Data Management</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;">
+            <button class="btn btn-cyan btn-sm" onclick="exportData()">&#x1F4E4; Export Data</button>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile').click()">&#x1F4E5; Import Data</button>
+        </div>
+        <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importData(event)">
+        <div class="setting-row" style="margin-top:0.5rem;">
+            <div><div class="setting-label">Clear all chat history</div><div class="setting-sub">Remove all saved chats</div></div>
+            <button class="btn btn-red btn-xs" onclick="clearAllChats()">Clear</button>
+        </div>
+        <div class="setting-row">
+            <div><div class="setting-label">Reset to defaults</div><div class="setting-sub">Restore all default settings</div></div>
+            <button class="btn btn-red btn-xs" onclick="resetDefaults()">Reset</button>
+        </div>
+    </div>
+
+    <div style="text-align:center;padding:1rem 0;font-size:0.6rem;color:var(--muted);">
+        WHOAMISec Business Admin v2.0<br>
+        <span style="font-family:'JetBrains Mono',monospace;">Build: 20250607 | Capacitor</span>
+    </div>
+</div>
+
+</div><!-- end app-content -->
+
+<!-- ═══ BOTTOM NAV ═══ -->
+<div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('dashboard',this)">
+        <span class="ti">&#x1F3E2;</span><span class="tl">Dashboard</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('mining',this)">
+        <span class="ti">&#x26CF;</span><span class="tl">Mining</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('agents',this)">
+        <span class="ti">&#x1F916;</span><span class="tl">Agents</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('chat',this)">
+        <span class="ti">&#x1F4AC;</span><span class="tl">Chat</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('payments',this)">
+        <span class="ti">&#x1F4B0;</span><span class="tl">Payments</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('deploy',this)">
+        <span class="ti">&#x1F680;</span><span class="tl">Deploy</span>
+    </button>
+    <button class="tab-btn" onclick="switchTab('settings',this)">
+        <span class="ti">&#x2699;</span><span class="tl">Settings</span>
+    </button>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- JAVASCRIPT -->
+<!-- ════════════════════════════════════════════ -->
+<script>
+(function() {
+'use strict';
+
+/* ─── SETTINGS (persisted) ─── */
+const DEFAULT_SETTINGS = {
+    routerUrl: 'http://localhost:20128',
+    ollamaUrl: 'http://localhost:11434',
+    xmrWallet: '4...REDACTED',
+    adminKey: '',
+    tfa: true,
+    updateInterval: 5,
+    poolUrl: 'supportxmr.com:3333',
+    poolWorker: 'whoamisec-admin-01',
+    autoRestart: true,
+    notifications: { crash: true, payment: true, agent: true, ssl: true }
+};
+
+let settings = {};
+try {
+    const saved = localStorage.getItem('whoamisec_admin_settings');
+    settings = saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : { ...DEFAULT_SETTINGS };
+} catch(e) { settings = { ...DEFAULT_SETTINGS }; }
+
+function saveSettings() {
+    try { localStorage.setItem('whoamisec_admin_settings', JSON.stringify(settings)); } catch(e) {}
+}
+
+/* ─── SIMULATED DATA ─── */
+const PLAN_DATA = [
+    { name:'Free', users:8420, color:'#6b7280' },
+    { name:'Starter', users:2104, color:'#00d4ff' },
+    { name:'Pro', users:1287, color:'#10b981' },
+    { name:'Business', users:612, color:'#8b5cf6' },
+    { name:'Enterprise', users:289, color:'#f59e0b' },
+    { name:'Supreme', users:135, color:'#ef4444' }
+];
+
+const AGENT_CATEGORIES = [
+    { name:'Business AI', count:500, active:489, status:'active' },
+    { name:'Coding', count:803, active:761, status:'active' },
+    { name:'Infrastructure', count:500, active:472, status:'idle' },
+    { name:'Security Audit', count:400, active:389, status:'active' },
+    { name:'Data Processing', count:197, active:190, status:'active' },
+    { name:'Communication', count:100, active:98, status:'active' }
+];
+
+const NODES = [];
+for (let i = 0; i < 100; i++) {
+    const r = Math.random();
+    let status = 'on';
+    if (r > 0.94) status = 'err';
+    else if (r > 0.90) status = 'off';
+    NODES.push({
+        id: i + 1,
+        status: status,
+        hashrate: (0.5 + Math.random() * 1.2).toFixed(2),
+        uptime: (90 + Math.random() * 10).toFixed(1),
+        shares: Math.floor(8000 + Math.random() * 15000),
+        location: ['US-East','US-West','EU-West','EU-Central','Asia-Pacific'][Math.floor(Math.random()*5)]
+    });
+}
+
+const VPS_INSTANCES = [
+    { id:'VPS-01', name:'whoamisec.com', ip:'45.33.xx.xx', status:'on', role:'Main' },
+    { id:'VPS-02', name:'cicada3301.omni', ip:'66.42.xx.xx', status:'on', role:'CICADA' },
+    { id:'VPS-03', name:'jarvis-ai.app', ip:'209.58.xx.xx', status:'on', role:'JARVIS' },
+    { id:'VPS-04', name:'miner-node-01', ip:'198.51.xx.xx', status:'on', role:'Mining' },
+    { id:'VPS-05', name:'miner-node-02', ip:'198.51.xx.xx', status:'on', role:'Mining' },
+    { id:'VPS-06', name:'ollama-gpu-01', ip:'64.225.xx.xx', status:'on', role:'GPU' },
+    { id:'VPS-07', name:'ollama-gpu-02', ip:'64.225.xx.xx', status:'on', role:'GPU' },
+    { id:'VPS-08', name:'cdn-edge-01', ip:'104.238.xx.xx', status:'on', role:'CDN' },
+    { id:'VPS-09', name:'cdn-edge-02', ip:'104.238.xx.xx', status:'warn', role:'CDN' },
+    { id:'VPS-10', name:'backup-01', ip:'45.33.xx.xx', status:'on', role:'Backup' },
+    { id:'VPS-11', name:'miner-node-03', ip:'66.42.xx.xx', status:'on', role:'Mining' },
+    { id:'VPS-12', name:'miner-node-04', ip:'66.42.xx.xx', status:'on', role:'Mining' },
+    { id:'VPS-13', name:'staging-01', ip:'209.58.xx.xx', status:'on', role:'Staging' },
+    { id:'VPS-14', name:'monitor-01', ip:'64.225.xx.xx', status:'on', role:'Monitor' },
+    { id:'VPS-15', name:'relay-01', ip:'104.238.xx.xx', status:'off', role:'Relay' }
+];
+
+const FAKE_USERS = [];
+const names = ['Alex','Jordan','Taylor','Morgan','Casey','Riley','Quinn','Avery','Blake','Cameron','Dakota','Emery','Finley','Harper','Kai','Logan','Parker','Reese','Sage','Skyler'];
+for (let i = 0; i < 50; i++) {
+    const plans = ['free','free','free','free','starter','starter','pro','pro','business','enterprise','supreme'];
+    FAKE_USERS.push({
+        name: names[i % names.length] + '#' + (100 + i),
+        plan: plans[Math.floor(Math.random() * plans.length)],
+        joined: Math.floor(Date.now()/1000 - Math.random() * 30*86400),
+        xmr_spent: (Math.random() * 2).toFixed(3)
+    });
+}
+
+const NGINX_CONFIGS = {
+    vps01: `server {
+    listen 443 ssl http2;
+    server_name whoamisec.com;
+
+    ssl_certificate /etc/letsencrypt/live/whoamisec.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/whoamisec.com/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        limit_req zone=api burst=20 nodelay;
+    }
+
+    location /ws/ {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}`,
+    vps02: `server {
+    listen 443 ssl http2;
+    server_name cicada3301.com;
+
+    ssl_certificate /etc/letsencrypt/live/cicada3301.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cicada3301.com/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    location /static/ {
+        alias /var/www/cicada3301/static/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+    }
+
+    location /mining/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+    }
+}`
+};
+
+const ACTIVITY_TEMPLATES = [
+    { text: 'New user <span class="hl-cyan">{user}</span> registered ({plan} plan)', type:'info' },
+    { text: 'XMR payment <span class="hl-amber">{amount} XMR</span> received from <span class="hl-cyan">{user}</span>', type:'payment' },
+    { text: 'Mining node <span class="hl-green">#{node}</span> back online', type:'mining' },
+    { text: 'Agent <span class="hl-green">{agent}</span> completed task: {task}', type:'agent' },
+    { text: 'SSL certificate for <span class="hl-amber">{domain}</span> expiring in {days} days', type:'alert' },
+    { text: 'Deployment <span class="hl-green">successful</span> on {vps}', type:'deploy' },
+    { text: 'Agent <span class="hl-red">error</span> in {cat}: restarting...', type:'error' },
+    { text: 'Plan upgrade: <span class="hl-cyan">{user}</span> → {plan}', type:'info' },
+    { text: 'VPS <span class="hl-green">{vps}</span> health check passed', type:'info' },
+    { text: 'Mining pool share accepted: <span class="hl-amber">{hashes} H/s</span>', type:'mining' }
+];
+
+/* ─── STATE ─── */
+let selectedNode = null;
+let agentTotal = 2500;
+let chatHistories = {};
+let copilotMode = false;
+let currentModel = 'claude-3.5-sonnet';
+
+/* ─── INIT ─── */
+function init() {
+    loadSettings();
+    renderPlanChart();
+    renderRevChart('revChart', 14);
+    renderRevChart('mineRevChart', 7);
+    renderRevChart('payRevChart', 14);
+    renderNodeGrid();
+    renderAgentCats();
+    renderActivityLog();
+    renderAgentLogs();
+    renderVPSList();
+    renderUserList();
+    renderPlanRevenue();
+    loadChatHistory();
+    startClock();
+    startLiveUpdates();
+    setInterval(addRandomActivity, 8000);
+}
+
+/* ─── CLOCK ─── */
+function startClock() {
+    function tick() {
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2,'0');
+        const m = String(now.getMinutes()).padStart(2,'0');
+        const s = String(now.getSeconds()).padStart(2,'0');
+        document.getElementById('liveClock').textContent = h + ':' + m + ':' + s;
+    }
+    tick();
+    setInterval(tick, 1000);
+}
+
+/* ─── TAB SWITCHING ─── */
+window.switchTab = function(tab, btn) {
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    btn.classList.add('active');
+};
+
+/* ─── NOTIFICATION ─── */
+window.showNotif = function(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+};
+
+/* ─── TOGGLE ─── */
+window.toggleSetting = function(btn) {
+    btn.classList.toggle('on');
+    btn.classList.toggle('off');
+};
+
+/* ─── PLAN CHART ─── */
+function renderPlanChart() {
+    const el = document.getElementById('planChart');
+    const max = Math.max(...PLAN_DATA.map(p => p.users));
+    el.innerHTML = PLAN_DATA.map(p => {
+        const h = (p.users / max * 100).toFixed(1);
+        return '<div class="chart-bar" style="height:' + h + '%;background:' + p.color + ';" title="' + p.name + ': ' + p.users + '"></div>';
+    }).join('');
+}
+
+/* ─── REVENUE CHART ─── */
+function renderRevChart(id, days) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let bars = '';
+    for (let i = 0; i < days; i++) {
+        const h = 15 + Math.random() * 85;
+        const opacity = 0.4 + (i / days) * 0.6;
+        bars += '<div class="rev-bar rev-daily" style="height:' + h + '%;opacity:' + opacity.toFixed(2) + ';"></div>';
+    }
+    el.innerHTML = bars;
+}
+
+/* ─── NODE GRID ─── */
+function renderNodeGrid() {
+    const el = document.getElementById('nodeGrid');
+    el.innerHTML = NODES.map((n, i) => {
+        const cls = n.status === 'on' ? 'on' : n.status === 'err' ? 'err' : 'off';
+        return '<div class="node-cell ' + cls + (selectedNode === i ? ' sel' : '') + '" onclick="selectNode(' + i + ')" title="Node #' + String(n.id).padStart(3,'0') + '">' + String(n.id).padStart(2,'0') + '</div>';
+    }).join('');
+}
+
+window.selectNode = function(i) {
+    selectedNode = i;
+    const n = NODES[i];
+    renderNodeGrid();
+    const d = document.getElementById('nodeDetail');
+    d.classList.add('show');
+    document.getElementById('ndName').textContent = 'Node #' + String(n.id).padStart(3,'0');
+    document.getElementById('ndHash').textContent = n.hashrate;
+    document.getElementById('ndUptime').textContent = n.uptime + '%';
+    document.getElementById('ndLocation').textContent = n.location;
+    document.getElementById('ndShares').textContent = n.shares.toLocaleString();
+    const statusText = n.status === 'on' ? 'Mining' : n.status === 'err' ? 'Error' : 'Offline';
+    document.getElementById('ndStatus').textContent = statusText;
+    document.getElementById('ndStatus').className = 'stat-val ' + (n.status === 'on' ? 'green' : n.status === 'err' ? 'red' : 'amber');
+};
+
+window.mineControl = function(action) {
+    if (action === 'start-all') {
+        NODES.forEach(n => n.status = 'on');
+        showNotif('All 100 nodes started');
+    } else if (action === 'stop-all') {
+        NODES.forEach(n => n.status = 'off');
+        showNotif('All 100 nodes stopped');
+    } else if (action === 'restart-err') {
+        NODES.forEach(n => { if (n.status === 'err') n.status = 'on'; });
+        showNotif('Error nodes restarted');
+    }
+    renderNodeGrid();
+    updateMiningStats();
+};
+
+window.mineNodeAction = function(action) {
+    if (selectedNode === null) return;
+    const n = NODES[selectedNode];
+    if (action === 'start') n.status = 'on';
+    else if (action === 'stop') n.status = 'off';
+    else if (action === 'restart') { n.status = 'off'; setTimeout(() => { n.status = 'on'; renderNodeGrid(); selectNode(selectedNode); }, 1000); }
+    renderNodeGrid();
+    selectNode(selectedNode);
+    showNotif('Node #' + String(n.id).padStart(3,'0') + ': ' + action);
+    updateMiningStats();
+};
+
+function updateMiningStats() {
+    const active = NODES.filter(n => n.status === 'on').length;
+    const totalHr = NODES.filter(n => n.status === 'on').reduce((s,n) => s + parseFloat(n.hashrate), 0);
+    document.getElementById('mineActive').textContent = active;
+    document.getElementById('mineHash').textContent = totalHr.toFixed(1);
+    document.getElementById('dashHash').textContent = totalHr.toFixed(1);
+}
+
+window.savePoolConfig = function() {
+    settings.poolUrl = document.getElementById('poolUrl').value;
+    settings.poolWorker = document.getElementById('poolWorker').value;
+    saveSettings();
+    showNotif('Pool config saved');
+};
+
+window.copyWallet = function() {
+    const w = document.getElementById('poolWallet').value;
+    if (navigator.clipboard) navigator.clipboard.writeText(w);
+    showNotif('Wallet address copied');
+};
+
+/* ─── AGENT CATEGORIES ─── */
+function renderAgentCats() {
+    const el = document.getElementById('agentCats');
+    el.innerHTML = AGENT_CATEGORIES.map(c => {
+        const pct = ((c.active / c.count) * 100).toFixed(0);
+        const cls = pct >= 95 ? 'active' : pct >= 80 ? 'idle' : 'error';
+        return '<div class="agent-chip ' + cls + '" title="' + c.active + '/' + c.count + ' active">' + c.name + ' (' + c.count + ')</div>';
+    }).join('');
+}
+
+window.scaleAgents = function(delta) {
+    agentTotal = Math.max(100, Math.min(5000, agentTotal + delta));
+    document.getElementById('agentScaleVal').textContent = agentTotal.toLocaleString();
+    showNotif('Agent count: ' + agentTotal.toLocaleString());
+};
+
+window.runAudit = function() {
+    showNotif('Running full audit...');
+    setTimeout(() => showNotif('Audit complete: 0 critical, 3 warnings'), 2000);
+};
+
+function renderAgentLogs() {
+    const el = document.getElementById('agentLogs');
+    const lines = [];
+    const cats = AGENT_CATEGORIES.map(c => c.name);
+    const tasks = ['CVE scan','Code review','Pipeline check','Health ping','Repo sync','Deploy verify','SSL check','Log analysis'];
+    for (let i = 0; i < 20; i++) {
+        const ts = new Date(Date.now() - i * 30000);
+        const time = String(ts.getHours()).padStart(2,'0') + ':' + String(ts.getMinutes()).padStart(2,'0') + ':' + String(ts.getSeconds()).padStart(2,'0');
+        const cat = cats[Math.floor(Math.random() * cats.length)];
+        const task = tasks[Math.floor(Math.random() * tasks.length)];
+        const ok = Math.random() > 0.1;
+        const color = ok ? '#10b981' : '#ef4444';
+        const status = ok ? 'OK' : 'ERR';
+        lines.push('<span style="color:var(--muted);">' + time + '</span> <span style="color:' + color + ';">[' + status + ']</span> <span style="color:var(--cyan);">' + cat + '</span> → ' + task);
+    }
+    el.innerHTML = lines.join('\n');
+}
+
+/* ─── ACTIVITY LOG ─── */
+function renderActivityLog() {
+    const el = document.getElementById('activityLog');
+    const items = [];
+    for (let i = 0; i < 12; i++) {
+        const ts = new Date(Date.now() - i * 120000);
+        const time = String(ts.getHours()).padStart(2,'0') + ':' + String(ts.getMinutes()).padStart(2,'0');
+        items.push(generateLogItem(time));
+    }
+    el.innerHTML = items.join('');
+}
+
+function generateLogItem(time) {
+    const tpl = ACTIVITY_TEMPLATES[Math.floor(Math.random() * ACTIVITY_TEMPLATES.length)];
+    let text = tpl.text
+        .replace('{user}', FAKE_USERS[Math.floor(Math.random() * FAKE_USERS.length)].name)
+        .replace('{plan}', PLAN_DATA[Math.floor(Math.random() * PLAN_DATA.length)].name)
+        .replace('{amount}', (Math.random() * 0.5).toFixed(3))
+        .replace('{node}', String(Math.floor(Math.random()*100)+1).padStart(3,'0'))
+        .replace('{agent}', 'AG-' + String(Math.floor(Math.random()*2500)+1).padStart(4,'0'))
+        .replace('{task}', ['deploy','scan','audit','analyze','compile','test'][Math.floor(Math.random()*6)])
+        .replace('{domain}', ['whoamisec.com','jarvis-ai.app','cicada3301.com'][Math.floor(Math.random()*3)])
+        .replace('{days}', String(Math.floor(Math.random()*30)+1))
+        .replace('{vps}', VPS_INSTANCES[Math.floor(Math.random()*VPS_INSTANCES.length)].id)
+        .replace('{cat}', AGENT_CATEGORIES[Math.floor(Math.random()*AGENT_CATEGORIES.length)].name)
+        .replace('{hashes}', (Math.random()*2).toFixed(1));
+    return '<div class="log-item"><span class="log-time">' + time + '</span><div class="log-text">' + text + '</div></div>';
+}
+
+function addRandomActivity() {
+    const el = document.getElementById('activityLog');
+    if (!el || !document.getElementById('tab-dashboard').classList.contains('active')) return;
+    const now = new Date();
+    const time = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    const html = generateLogItem(time);
+    el.insertAdjacentHTML('afterbegin', html);
+    if (el.children.length > 20) el.removeChild(el.lastChild);
+}
+
+/* ─── CHAT SYSTEM ─── */
+function loadChatHistory() {
+    try {
+        chatHistories = JSON.parse(localStorage.getItem('whoamisec_admin_chats') || '{}');
+    } catch(e) { chatHistories = {}; }
+    if (!chatHistories[currentModel]) chatHistories[currentModel] = [];
+    renderChatMessages();
+}
+
+function saveChatHistory() {
+    try { localStorage.setItem('whoamisec_admin_chats', JSON.stringify(chatHistories)); } catch(e) {}
+}
+
+function renderChatMessages() {
+    const el = document.getElementById('chatMessages');
+    const msgs = chatHistories[currentModel] || [];
+    let html = '<div class="chat-msg ai slide-up"><div class="chat-msg-label">WHOAMISec AI</div><div class="chat-msg-bubble"><b style="color:var(--cyan);">Admin Chat Online</b> — Multi-model AI panel.<br><span style="color:var(--text2);">Select a model and start chatting. Copilot Mode auto-analyzes output.</span></div></div>';
+    msgs.forEach(m => {
+        const cls = m.role === 'user' ? 'user' : 'ai';
+        const label = m.role === 'user' ? 'Admin' : currentModel;
+        const content = formatMsgContent(m.content);
+        html += '<div class="chat-msg ' + cls + ' slide-up"><div class="chat-msg-label">' + label + '</div><div class="chat-msg-bubble">' + content + '</div></div>';
+    });
+    el.innerHTML = html;
+    el.scrollTop = el.scrollHeight;
+}
+
+function formatMsgContent(text) {
+    if (!text) return '';
+    // Code blocks with copy button
+    text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, function(match, lang, code) {
+        const id = 'cb_' + Math.random().toString(36).substr(2,6);
+        return '<pre><button class="code-copy-btn" onclick="copyCodeBlock(\'' + id + '\')">Copy</button><code id="' + id + '">' + escapeHtml(code.trim()) + '</code></pre>';
+    });
+    // Inline code
+    text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+    // Bold
+    text = text.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+    // Newlines
+    text = text.replace(/\n/g, '<br>');
+    return text;
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+window.copyCodeBlock = function(id) {
+    const el = document.getElementById(id);
+    if (el && navigator.clipboard) {
+        navigator.clipboard.writeText(el.textContent);
+        showNotif('Code copied!');
+    }
+};
+
+window.autoResizeChat = function(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+};
+
+window.switchChatModel = function() {
+    currentModel = document.getElementById('chatModel').value;
+    if (!chatHistories[currentModel]) chatHistories[currentModel] = [];
+    renderChatMessages();
+    // Load system prompt
+    const sysKey = 'sysprompt_' + currentModel;
+    const saved = localStorage.getItem('whoamisec_admin_' + sysKey);
+    document.getElementById('sysPromptInput').value = saved || '';
+    // Update status dot
+    updateChatStatus();
+};
+
+function updateChatStatus() {
+    const dot = document.getElementById('chatStatusDot');
+    const isLocal = ['llama3.2','deepseek-coder','phi3','qwen2.5','mistral','granite-code'].includes(currentModel);
+    // Simulate: local models show green if ollama endpoint is set
+    dot.className = 'chat-status-dot on';
+    dot.title = isLocal ? 'Ollama local' : '9Router remote';
+}
+
+window.toggleCopilot = function() {
+    copilotMode = !copilotMode;
+    document.getElementById('copilotToggle').classList.toggle('active', copilotMode);
+    showNotif('Copilot Mode: ' + (copilotMode ? 'ON' : 'OFF'));
+};
+
+window.toggleSysPrompt = function() {
+    document.getElementById('sysPromptBox').classList.toggle('show');
+};
+
+window.saveSysPrompt = function() {
+    const key = 'sysprompt_' + currentModel;
+    const val = document.getElementById('sysPromptInput').value;
+    try { localStorage.setItem('whoamisec_admin_' + key, val); } catch(e) {}
+    showNotif('System prompt saved');
+};
+
+window.sendChat = async function() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    input.style.height = 'auto';
+
+    if (!chatHistories[currentModel]) chatHistories[currentModel] = [];
+    chatHistories[currentModel].push({ role:'user', content:text });
+
+    // Show user message
+    const msgsEl = document.getElementById('chatMessages');
+    msgsEl.insertAdjacentHTML('beforeend',
+        '<div class="chat-msg user slide-up"><div class="chat-msg-label">Admin</div><div class="chat-msg-bubble">' + escapeHtml(text).replace(/\n/g,'<br>') + '</div></div>');
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+
+    // Build messages array
+    const messages = [];
+    const sysKey = 'sysprompt_' + currentModel;
+    const sysPrompt = localStorage.getItem('whoamisec_admin_' + sysKey);
+    if (sysPrompt) messages.push({ role:'system', content:sysPrompt });
+    // Include last 20 messages for context
+    const recent = chatHistories[currentModel].slice(-20);
+    recent.forEach(m => messages.push({ role:m.role, content:m.content }));
+
+    // Show typing indicator
+    const typingId = 'typing_' + Date.now();
+    msgsEl.insertAdjacentHTML('beforeend',
+        '<div class="chat-msg ai slide-up" id="' + typingId + '"><div class="chat-msg-label">' + currentModel + '</div><div class="chat-msg-bubble" style="color:var(--muted);">Thinking...</div></div>');
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+
+    try {
+        const routerUrl = document.getElementById('routerUrl').value || settings.routerUrl;
+        const res = await fetch(routerUrl + '/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: currentModel,
+                messages: messages,
+                temperature: 0.7,
+                max_tokens: 4096
+            })
+        });
+        const data = await res.json();
+
+        // Remove typing indicator
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+
+        let reply = '';
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            reply = data.choices[0].message.content;
+        } else if (data.error) {
+            reply = 'Error: ' + (data.error.message || JSON.stringify(data.error));
+        } else {
+            reply = 'Unexpected response format. Check 9Router connection.';
+        }
+
+        // Copilot analysis
+        if (copilotMode && reply) {
+            reply += '\n\n---\n<b style="color:var(--purple);">Copilot Analysis:</b> Response received (' + reply.length + ' chars). ' +
+                (reply.includes('```') ? 'Contains code blocks. ' : '') +
+                'Model: ' + currentModel;
+        }
+
+        chatHistories[currentModel].push({ role:'assistant', content:reply });
+        saveChatHistory();
+
+        msgsEl.insertAdjacentHTML('beforeend',
+            '<div class="chat-msg ai slide-up"><div class="chat-msg-label">' + currentModel + '</div><div class="chat-msg-bubble">' + formatMsgContent(reply) + '</div></div>');
+        msgsEl.scrollTop = msgsEl.scrollHeight;
+
+    } catch(err) {
+        const typingEl = document.getElementById(typingId);
+        if (typingEl) typingEl.remove();
+        const errMsg = 'Connection failed: ' + err.message + '\n\nEnsure 9Router is running at ' + settings.routerUrl;
+        chatHistories[currentModel].push({ role:'assistant', content:errMsg });
+        saveChatHistory();
+        msgsEl.insertAdjacentHTML('beforeend',
+            '<div class="chat-msg ai slide-up"><div class="chat-msg-label">Error</div><div class="chat-msg-bubble" style="color:var(--red);">' + formatMsgContent(errMsg) + '</div></div>');
+        msgsEl.scrollTop = msgsEl.scrollHeight;
+    }
+};
+
+/* ─── PAYMENTS ─── */
+window.setPayTab = function(tab, btn) {
+    document.querySelectorAll('.pay-pane').forEach(p => p.style.display = 'none');
+    document.getElementById('payPane-' + tab).style.display = 'block';
+    document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+};
+
+function renderUserList() {
+    const el = document.getElementById('userList');
+    if (!el) return;
+    el.innerHTML = FAKE_USERS.map(u => {
+        const planColors = { free:'var(--muted)', starter:'var(--cyan)', pro:'var(--green)', business:'var(--purple)', enterprise:'var(--amber)', supreme:'var(--red)' };
+        const color = planColors[u.plan] || 'var(--muted)';
+        return '<div class="plan-row"><div class="plan-info"><div class="plan-name">' + u.name + '</div><div class="plan-users">Spent: ' + u.xmr_spent + ' XMR</div></div><span style="font-size:0.6rem;font-weight:700;color:' + color + ';text-transform:uppercase;">' + u.plan + '</span></div>';
+    }).join('');
+}
+
+window.filterUsers = function() {
+    const filter = document.getElementById('userPlanFilter').value;
+    const el = document.getElementById('userList');
+    const filtered = filter === 'all' ? FAKE_USERS : FAKE_USERS.filter(u => u.plan === filter);
+    const planColors = { free:'var(--muted)', starter:'var(--cyan)', pro:'var(--green)', business:'var(--purple)', enterprise:'var(--amber)', supreme:'var(--red)' };
+    el.innerHTML = filtered.map(u => {
+        const color = planColors[u.plan] || 'var(--muted)';
+        return '<div class="plan-row"><div class="plan-info"><div class="plan-name">' + u.name + '</div><div class="plan-users">Spent: ' + u.xmr_spent + ' XMR</div></div><span style="font-size:0.6rem;font-weight:700;color:' + color + ';text-transform:uppercase;">' + u.plan + '</span></div>';
+    }).join('');
+};
+
+window.verifyTx = function() {
+    const txId = document.getElementById('txIdInput').value.trim();
+    const el = document.getElementById('txResult');
+    if (!txId) { showNotif('Enter a TX ID'); return; }
+    el.classList.add('show');
+    el.innerHTML = '<span style="color:var(--cyan);">Verifying...</span>';
+    setTimeout(() => {
+        // Simulate verification
+        const confirmed = Math.random() > 0.3;
+        if (confirmed) {
+            el.innerHTML = '<div style="color:var(--green);font-weight:600;margin-bottom:0.3rem;">&#x2705; Transaction Verified</div>' +
+                '<div style="font-size:0.68rem;color:var(--text2);line-height:1.6;">TX ID: <code style="color:var(--cyan);">' + escapeHtml(txId) + '</code><br>' +
+                'Amount: <span style="color:var(--amber);">' + (Math.random()*0.5+0.05).toFixed(4) + ' XMR</span><br>' +
+                'Confirmations: <span style="color:var(--green);">10+</span><br>' +
+                'Timestamp: ' + new Date(Date.now() - Math.random()*86400000).toISOString() + '</div>';
+        } else {
+            el.innerHTML = '<div style="color:var(--red);font-weight:600;margin-bottom:0.3rem;">&#x274C; Transaction Not Found</div>' +
+                '<div style="font-size:0.68rem;color:var(--text2);">TX ID not found in the Monero blockchain. Please verify the ID and try again.</div>';
+        }
+    }, 1500);
+};
+
+window.sendGift = function() {
+    const user = document.getElementById('giftUser').value.trim();
+    const plan = document.getElementById('giftPlan').value;
+    const days = document.getElementById('giftDays').value;
+    const el = document.getElementById('giftResult');
+    if (!user) { showNotif('Enter a user ID'); return; }
+    el.style.display = 'block';
+    el.innerHTML = '<span style="color:var(--purple);">Processing gift...</span>';
+    setTimeout(() => {
+        el.innerHTML = '<span style="color:var(--green);">&#x2705; Gift sent!</span> ' + escapeHtml(user) + ' upgraded to <b>' + plan.toUpperCase() + '</b> for ' + days + ' days.';
+        showNotif('Gift sent to ' + user);
+    }, 1200);
+};
+
+function renderPlanRevenue() {
+    const el = document.getElementById('planRevenueBreakdown');
+    if (!el) return;
+    const data = [
+        { name:'Free', rev:'0.000 XMR', pct:0, color:'var(--muted)' },
+        { name:'Starter', rev:'4.182 XMR', pct:8.8, color:'var(--cyan)' },
+        { name:'Pro', rev:'8.540 XMR', pct:18.0, color:'var(--green)' },
+        { name:'Business', rev:'10.200 XMR', pct:21.5, color:'var(--purple)' },
+        { name:'Enterprise', rev:'9.840 XMR', pct:20.8, color:'var(--amber)' },
+        { name:'Supreme', rev:'14.620 XMR', pct:30.9, color:'var(--red)' }
+    ];
+    el.innerHTML = data.map(d => {
+        return '<div style="margin-bottom:0.5rem;"><div style="display:flex;justify-content:space-between;font-size:0.72rem;margin-bottom:0.15rem;"><span>' + d.name + '</span><span style="font-family:\'JetBrains Mono\',monospace;color:' + d.color + ';">' + d.rev + ' (' + d.pct + '%)</span></div><div style="height:4px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden;"><div style="height:100%;width:' + d.pct + '%;background:' + d.color + ';border-radius:2px;"></div></div></div>';
+    }).join('');
+}
+
+/* ─── DEPLOY ─── */
+function renderVPSList() {
+    const el = document.getElementById('vpsList');
+    if (!el) return;
+    el.innerHTML = VPS_INSTANCES.map(v => {
+        const dotColor = v.status === 'on' ? 'var(--green)' : v.status === 'warn' ? 'var(--amber)' : 'var(--red)';
+        const statusText = v.status === 'on' ? 'Online' : v.status === 'warn' ? 'Warning' : 'Offline';
+        return '<div class="vps-card"><span class="vps-icon">&#x2601;</span><div class="vps-info"><div class="vps-name">' + v.id + ' — ' + v.name + '</div><div class="vps-meta">' + v.ip + ' | ' + v.role + ' | <span style="color:' + dotColor + ';">' + statusText + '</span></div></div><div class="vps-actions"><button class="btn btn-xs btn-ghost" onclick="showNotif(\'SSH to ' + v.id + '...\')">SSH</button></div></div>';
+    }).join('');
+}
+
+window.vpsAction = function(action) {
+    showNotif('VPS ' + action.replace('-all','') + ' all initiated...');
+};
+
+window.deployAction = function(project) {
+    showNotif('Deploying ' + project + '...');
+    setTimeout(() => showNotif(project + ' deployed successfully!'), 2000);
+};
+
+window.loadNginxConfig = function() {
+    const sel = document.getElementById('nginxSelect').value;
+    document.getElementById('nginxViewer').textContent = NGINX_CONFIGS[sel] || 'Config not found.';
+};
+
+/* ─── SETTINGS ─── */
+function loadSettings() {
+    document.getElementById('routerUrl').value = settings.routerUrl;
+    document.getElementById('ollamaUrl').value = settings.ollamaUrl;
+    document.getElementById('xmrWallet').value = settings.xmrWallet;
+    document.getElementById('updateInterval').value = settings.updateInterval;
+    document.getElementById('poolUrl').value = settings.poolUrl || 'supportxmr.com:3333';
+    document.getElementById('poolWorker').value = settings.poolWorker || 'whoamisec-admin-01';
+}
+
+window.exportData = function() {
+    const data = {
+        settings: settings,
+        chatHistories: chatHistories,
+        exported: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'whoamisec-admin-backup-' + Date.now() + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    showNotif('Data exported');
+};
+
+window.importData = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        try {
+            const data = JSON.parse(ev.target.result);
+            if (data.settings) {
+                settings = { ...DEFAULT_SETTINGS, ...data.settings };
+                saveSettings();
+                loadSettings();
+            }
+            if (data.chatHistories) {
+                chatHistories = data.chatHistories;
+                saveChatHistory();
+                renderChatMessages();
+            }
+            showNotif('Data imported successfully');
+        } catch(err) {
+            showNotif('Import failed: invalid file');
+        }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+};
+
+window.clearAllChats = function() {
+    if (confirm('Clear all chat history?')) {
+        chatHistories = {};
+        saveChatHistory();
+        renderChatMessages();
+        showNotif('Chat history cleared');
+    }
+};
+
+window.resetDefaults = function() {
+    if (confirm('Reset all settings to defaults?')) {
+        settings = { ...DEFAULT_SETTINGS };
+        saveSettings();
+        loadSettings();
+        showNotif('Settings reset to defaults');
+    }
+};
+
+/* ─── LIVE UPDATES ─── */
+function startLiveUpdates() {
+    setInterval(() => {
+        // Simulate hashrate fluctuation
+        const activeNodes = NODES.filter(n => n.status === 'on');
+        activeNodes.forEach(n => {
+            n.hashrate = (parseFloat(n.hashrate) + (Math.random() - 0.5) * 0.1).toFixed(2);
+            n.hashrate = Math.max(0.3, Math.min(2.0, parseFloat(n.hashrate))).toFixed(2);
+        });
+        const totalHr = activeNodes.reduce((s,n) => s + parseFloat(n.hashrate), 0);
+        document.getElementById('mineHash').textContent = totalHr.toFixed(1);
+        document.getElementById('dashHash').textContent = totalHr.toFixed(1);
+
+        // Simulate revenue fluctuation
+        const rev = (47.382 + Math.random() * 0.01).toFixed(3);
+        document.getElementById('dashRevenue').textContent = rev;
+
+        // User count
+        const users = 12847 + Math.floor(Math.random() * 5);
+        document.getElementById('dashUsers').textContent = users.toLocaleString();
+
+        // Mining balance
+        const bal = (12.847 + Math.random() * 0.001).toFixed(3);
+        document.getElementById('mineBalance').textContent = bal;
+
+        // Agent active count
+        const agActive = 2341 + Math.floor(Math.random() * 10 - 5);
+        document.getElementById('agActive').textContent = agActive;
+    }, 3000);
+}
+
+/* ─── INIT ─── */
+document.addEventListener('DOMContentLoaded', init);
+if (document.readyState !== 'loading') init();
+
+})();
+</script>
+</body>
+</html>

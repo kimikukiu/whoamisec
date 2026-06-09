@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<title>JARVIS AI — HUD Mind Interface</title>
+<title>JARVIS AI — HUD Admin Interface</title>
 <link rel="manifest" href="manifest.json">
 <style>
 /* ========== RESET & BASE ========== */
@@ -762,7 +762,7 @@ body::after{
     <div class="arc-reactor"></div>
     <div>
       <div class="header-title">JARVIS AI</div>
-      <div class="header-subtitle">HUD MIND INTERFACE v3.7.1</div>
+      <div class="header-subtitle">ADMIN CONSOLE v3.7.1</div>
     </div>
   </div>
   <div class="header-right">
@@ -788,10 +788,10 @@ body::after{
 
 <!-- ========== SUBSCRIPTION BAR ========== -->
 <div id="subBar">
-  <span class="free-badge" id="subBadge">FREE</span>
+  <span class="premium-badge" id="subBadge">ADMIN</span>
   <span>JARVIS AI — jarvis-ai.app</span>
   <span style="color:#ff1a1a88">|</span>
-  <span style="color:#aaa">Upgrade to Premium →</span>
+  <span style="color:#ffd700">ALL FEATURES UNLOCKED</span>
 </div>
 
 <!-- ========== NOTIFICATION PANEL ========== -->
@@ -860,7 +860,7 @@ body::after{
     <div class="hud-separator"></div>
     <div style="font-size:.55rem;color:#666;text-align:center">
       JARVIS AI — jarvis-ai.app<br>
-      USER APK v3.7.1 • WHOAMISecAI
+      ADMIN APK v3.7.1 • WHOAMISecAI
     </div>
   </div>
 </div>
@@ -1311,7 +1311,7 @@ body::after{
       <li>Earnings dashboard & alerts</li>
       <li>Telegram payout notifications</li>
     </ul>
-    <button class="hud-btn gold" onclick="showSubscribePrompt()">⚡ Upgrade to Premium</button>
+    <button class="hud-btn gold" onclick="showAdminPanel()">⚙ Admin Panel</button>
     <button class="hud-btn ghost sm" onclick="document.getElementById('miningPremiumGate').classList.remove('show')" style="margin-top:8px">
       Continue with limited access
     </button>
@@ -2147,23 +2147,20 @@ function updateMiningSummary() {
   document.getElementById('onlineNodes').textContent = miningNodes.length;
 }
 
-// ---------- SUBSCRIPTION ----------
+// ---------- SUBSCRIPTION (ADMIN OVERRIDE) ----------
 function checkSubscription() {
-  if (state.isPremium) {
-    document.getElementById('subBadge').className = 'premium-badge';
-    document.getElementById('subBadge').textContent = 'PREMIUM';
-    document.getElementById('miningPremiumGate').classList.remove('show');
-  } else {
-    // Show premium gate on mining tab
-    // We'll show it when user switches to mining tab
-  }
+  // Admin APK — everything unlocked, no gates
+  state.isPremium = true;
+  document.getElementById('subBadge').className = 'premium-badge';
+  document.getElementById('subBadge').textContent = 'ADMIN';
+  // Remove all premium gates
+  document.querySelectorAll('.premium-gate').forEach(g => g.classList.remove('show'));
 }
 
-function showSubscribePrompt() {
-  const msg = 'Redirecting to jarvis-ai.app for Premium subscription...';
-  addSwarmLog(`[SUB] ${msg}`);
-  // In a real app, this would redirect
-  window.open('https://jarvis-ai.app', '_blank');
+function showAdminPanel() {
+  const msg = 'Admin Panel — Full system control active. All 2,700 agents online. 20 jailbreak models loaded.';
+  addSwarmLog('[ADMIN] ' + msg);
+  showToast(msg);
 }
 
 // ---------- CONNECTION INIT ----------

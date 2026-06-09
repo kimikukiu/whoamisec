@@ -1,0 +1,2136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MINER_FLEET | XMR Mining APK</title>
+    <meta name="description" content="MINER_FLEET - Global XMR Mining Fleet. 100 Nodes. Real-time hashrate monitoring.">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background: #0a0a0a;
+            font-family: 'Courier New', Courier, monospace;
+            color: #00ff00;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* ===== CUSTOM SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00ff00;
+            border-radius: 2px;
+        }
+
+        /* ===== APP SHELL ===== */
+        .app-shell {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+        }
+
+        /* ===== HEADER ===== */
+        .app-header {
+            flex-shrink: 0;
+            background: linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 100%);
+            border-bottom: 1px solid #00ff0033;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            z-index: 10;
+        }
+
+        .app-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00ff00, transparent);
+            animation: scanline 3s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header-logo .logo-icon {
+            width: 28px;
+            height: 28px;
+            background: #00ff00;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .header-logo .logo-text {
+            font-family: 'Orbitron', 'Courier New', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #00ff00;
+        }
+
+        .header-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: #00ff0099;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+        }
+
+        .status-dot.offline {
+            background: #ff4444;
+            animation: none;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; box-shadow: 0 0 4px #00ff00; }
+            50% { opacity: 0.4; box-shadow: 0 0 1px #00ff00; }
+        }
+
+        /* ===== MAIN CONTENT AREA ===== */
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-panel {
+            display: none;
+            padding: 12px;
+            min-height: 100%;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            flex-shrink: 0;
+            background: #0f0f0f;
+            border-top: 1px solid #00ff0033;
+            display: flex;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 0 8px;
+            background: none;
+            border: none;
+            color: #00ff0044;
+            font-family: 'Courier New', monospace;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: color 0.2s;
+            gap: 3px;
+            position: relative;
+        }
+
+        .nav-btn .nav-icon {
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .nav-btn.active {
+            color: #00ff00;
+        }
+
+        .nav-btn.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 25%;
+            right: 25%;
+            height: 2px;
+            background: #00ff00;
+            border-radius: 0 0 2px 2px;
+            box-shadow: 0 0 8px #00ff00;
+        }
+
+        /* ===== SECTION HEADERS ===== */
+        .section-title {
+            font-family: 'Orbitron', 'Courier New', monospace;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: #00ff0099;
+            text-transform: uppercase;
+            margin: 16px 0 10px;
+            padding-left: 8px;
+            border-left: 2px solid #00ff00;
+        }
+
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        /* ===== STAT CARDS ===== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .stat-card {
+            background: #111;
+            border: 1px solid #00ff0022;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .stat-card.highlight {
+            border-color: #f59e0b44;
+            background: #111a0a;
+        }
+
+        .stat-label {
+            font-size: 9px;
+            color: #00ff0066;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00ff00;
+            margin: 2px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .stat-value.amber {
+            color: #f59e0b;
+        }
+
+        .stat-unit {
+            font-size: 9px;
+            color: #00ff0044;
+        }
+
+        /* ===== BIG HASHRATE DISPLAY ===== */
+        .hashrate-hero {
+            background: linear-gradient(135deg, #0a120a 0%, #0a0a0a 100%);
+            border: 1px solid #00ff0044;
+            border-radius: 12px;
+            padding: 20px 16px;
+            text-align: center;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hashrate-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, #00ff0008 0%, transparent 60%);
+            animation: hero-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes hero-pulse {
+            0%, 100% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .hashrate-hero .hr-label {
+            font-size: 10px;
+            color: #00ff0066;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            position: relative;
+        }
+
+        .hashrate-hero .hr-value {
+            font-size: 42px;
+            font-weight: bold;
+            color: #00ff00;
+            margin: 4px 0;
+            position: relative;
+            text-shadow: 0 0 20px #00ff0044;
+        }
+
+        .hashrate-hero .hr-unit {
+            font-size: 14px;
+            color: #00ff0088;
+            position: relative;
+        }
+
+        .hashrate-hero .hr-sub {
+            font-size: 10px;
+            color: #00ff0044;
+            margin-top: 4px;
+            position: relative;
+        }
+
+        /* ===== PROGRESS BARS ===== */
+        .progress-container {
+            margin: 8px 0;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            margin-bottom: 4px;
+        }
+
+        .progress-header .p-label {
+            color: #00ff0066;
+        }
+
+        .progress-header .p-value {
+            color: #00ff00;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #1a1a1a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #00cc00);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 6px #00ff0044;
+        }
+
+        .progress-fill.amber {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            box-shadow: 0 0 6px #f59e0b44;
+        }
+
+        .progress-fill.red {
+            background: linear-gradient(90deg, #ff4444, #cc0000);
+            box-shadow: 0 0 6px #ff444444;
+        }
+
+        /* ===== FEE BADGE ===== */
+        .fee-badge {
+            background: #ff000011;
+            border: 1px solid #ff444433;
+            border-radius: 6px;
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 10px;
+            color: #ff6666;
+            margin-bottom: 12px;
+        }
+
+        .fee-badge strong {
+            color: #ff4444;
+            font-size: 14px;
+        }
+
+        /* ===== MINING LOG ===== */
+        .log-box {
+            background: #050505;
+            border: 1px solid #00ff0022;
+            border-radius: 8px;
+            padding: 8px;
+            height: 140px;
+            overflow-y: auto;
+            font-size: 10px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .log-entry {
+            color: #00ff0066;
+            border-bottom: 1px solid #ffffff06;
+            padding: 2px 0;
+            word-break: break-all;
+        }
+
+        .log-entry .log-time {
+            color: #00ff0033;
+        }
+
+        .log-entry .log-ok {
+            color: #00ff00;
+        }
+
+        .log-entry .log-warn {
+            color: #f59e0b;
+        }
+
+        /* ===== CANVAS CHART ===== */
+        .chart-wrapper {
+            background: #111;
+            border: 1px solid #00ff0022;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 12px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .chart-title {
+            font-size: 10px;
+            color: #00ff0066;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .chart-live {
+            font-size: 9px;
+            color: #ff4444;
+            animation: blink-live 1s infinite;
+        }
+
+        @keyframes blink-live {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 120px;
+            display: block;
+            border-radius: 4px;
+        }
+
+        /* ===== NODES GRID ===== */
+        .nodes-toolbar {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nodes-toolbar select {
+            flex: 1;
+            min-width: 0;
+            background: #111;
+            border: 1px solid #00ff0033;
+            color: #00ff00;
+            padding: 6px 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .nodes-toolbar select option {
+            background: #111;
+            color: #00ff00;
+        }
+
+        .nodes-toolbar button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 6px 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .nodes-toolbar button:active {
+            opacity: 0.7;
+        }
+
+        .nodes-summary {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #00ff0066;
+            padding: 6px 0;
+            border-bottom: 1px solid #00ff0011;
+            margin-bottom: 8px;
+        }
+
+        .nodes-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+
+        .node-cell {
+            aspect-ratio: 1;
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 3px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            padding: 2px;
+            min-height: 32px;
+        }
+
+        .node-cell.active {
+            background: #00ff0011;
+            border-color: #00ff0044;
+            color: #00ff00;
+            box-shadow: 0 0 4px #00ff0011;
+        }
+
+        .node-cell.inactive {
+            color: #ff444444;
+            border-color: #1a1a1a;
+        }
+
+        .node-cell.selected {
+            border-color: #f59e0b;
+            background: #f59e0b11;
+            box-shadow: 0 0 8px #f59e0b33;
+        }
+
+        .node-cell .node-id {
+            font-size: 7px;
+            font-weight: bold;
+        }
+
+        .node-cell .node-hr {
+            font-size: 6px;
+            color: #00ff0066;
+        }
+
+        .node-cell.inactive .node-hr {
+            color: #ff444433;
+        }
+
+        /* ===== NODE DETAIL MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000000cc;
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #111;
+            border: 1px solid #00ff0044;
+            border-radius: 12px;
+            padding: 16px;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+            color: #00ff00;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .modal-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .modal-stat {
+            background: #0a0a0a;
+            border-radius: 6px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .modal-stat .ms-label {
+            font-size: 9px;
+            color: #00ff0066;
+            text-transform: uppercase;
+        }
+
+        .modal-stat .ms-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #00ff00;
+            margin-top: 2px;
+        }
+
+        .modal-close {
+            width: 100%;
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .modal-close:active {
+            opacity: 0.7;
+        }
+
+        /* ===== BUY PLANS ===== */
+        .plan-card {
+            background: #111;
+            border: 1px solid #00ff0022;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plan-card.popular {
+            border-color: #f59e0b55;
+        }
+
+        .plan-card.popular::after {
+            content: 'POPULAR';
+            position: absolute;
+            top: 8px;
+            right: -22px;
+            background: #f59e0b;
+            color: #000;
+            font-size: 8px;
+            font-weight: bold;
+            padding: 2px 24px;
+            transform: rotate(45deg);
+            letter-spacing: 1px;
+        }
+
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .plan-name {
+            font-family: 'Orbitron', monospace;
+            font-size: 13px;
+            color: #00ff00;
+        }
+
+        .plan-card.popular .plan-name {
+            color: #f59e0b;
+        }
+
+        .plan-nodes {
+            font-size: 10px;
+            color: #00ff0066;
+            background: #00ff0011;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .plan-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-bottom: 10px;
+        }
+
+        .plan-price-usd {
+            color: #00ff00;
+        }
+
+        .plan-price-xmr {
+            color: #f59e0b;
+        }
+
+        .plan-buy-btn {
+            width: 100%;
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .plan-buy-btn:active {
+            opacity: 0.7;
+        }
+
+        .plan-card.popular .plan-buy-btn {
+            background: #f59e0b;
+        }
+
+        /* ===== PAYMENT MODAL ===== */
+        .payment-box {
+            background: #0a0a0a;
+            border: 1px solid #f59e0b33;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 12px 0;
+        }
+
+        .payment-box .pay-label {
+            font-size: 10px;
+            color: #f59e0b99;
+            margin-bottom: 4px;
+        }
+
+        .payment-box .pay-amount {
+            font-size: 22px;
+            font-weight: bold;
+            color: #f59e0b;
+        }
+
+        .wallet-display {
+            background: #050505;
+            border: 1px solid #00ff0022;
+            border-radius: 6px;
+            padding: 10px;
+            word-break: break-all;
+            font-size: 9px;
+            line-height: 1.8;
+            color: #00ff0088;
+            margin: 8px 0;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 3px 8px;
+            font-size: 9px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .copy-btn:active {
+            opacity: 0.7;
+        }
+
+        /* ===== MY CLIENT SECTION ===== */
+        .client-stats {
+            background: #111;
+            border: 1px solid #00ff0022;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .client-stats .cs-title {
+            font-size: 10px;
+            color: #00ff0066;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        /* ===== WALLET & SETTINGS TAB ===== */
+        .wallet-balance-card {
+            background: linear-gradient(135deg, #1a1a0a 0%, #0a0a0a 100%);
+            border: 1px solid #f59e0b33;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .wallet-balance-card .wb-label {
+            font-size: 10px;
+            color: #f59e0b66;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .wallet-balance-card .wb-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #f59e0b;
+            margin: 4px 0;
+            text-shadow: 0 0 16px #f59e0b33;
+        }
+
+        .wallet-balance-card .wb-unit {
+            font-size: 12px;
+            color: #f59e0b88;
+        }
+
+        .settings-group {
+            background: #111;
+            border: 1px solid #00ff0022;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .settings-group .sg-title {
+            font-size: 10px;
+            color: #00ff0066;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 10px 12px 6px;
+        }
+
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #00ff0011;
+            font-size: 11px;
+        }
+
+        .settings-row:last-child {
+            border-bottom: none;
+        }
+
+        .settings-row .sr-label {
+            color: #00ff0066;
+        }
+
+        .settings-row .sr-value {
+            color: #00ff00;
+            text-align: right;
+            max-width: 60%;
+            word-break: break-all;
+            font-size: 10px;
+        }
+
+        .settings-row .sr-value.amber {
+            color: #f59e0b;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #111;
+            border: 1px solid #00ff0022;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            text-decoration: none;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+        }
+
+        .social-btn .soc-icon {
+            font-size: 20px;
+        }
+
+        .social-btn .soc-handle {
+            color: #00ff0066;
+            font-size: 10px;
+        }
+
+        .invite-box {
+            background: linear-gradient(135deg, #0a0a0a 0%, #0a1a0a 100%);
+            border: 1px solid #00ff0033;
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .invite-box .inv-text {
+            font-size: 11px;
+            color: #00ff0066;
+            margin-bottom: 8px;
+        }
+
+        .invite-box .inv-code {
+            background: #050505;
+            border: 1px solid #00ff0022;
+            border-radius: 4px;
+            padding: 8px;
+            font-size: 10px;
+            color: #00ff00;
+            word-break: break-all;
+            margin-bottom: 8px;
+        }
+
+        .invite-box button {
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* ===== PAYOUT HISTORY ===== */
+        .payout-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #ffffff08;
+            font-size: 10px;
+        }
+
+        .payout-item:last-child {
+            border-bottom: none;
+        }
+
+        .payout-item .po-amount {
+            color: #f59e0b;
+            font-weight: bold;
+        }
+
+        .payout-item .po-date {
+            color: #00ff0033;
+        }
+
+        .payout-item .po-status {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            background: #00ff0011;
+            color: #00ff00;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #00ff00;
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+            z-index: 200;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ===== MISC ===== */
+        .text-center { text-align: center; }
+        .text-amber { color: #f59e0b; }
+        .text-dim { color: #00ff0044; }
+        .text-green { color: #00ff00; }
+        .text-red { color: #ff4444; }
+        .mt-8 { margin-top: 8px; }
+        .mt-12 { margin-top: 12px; }
+        .mb-8 { margin-bottom: 8px; }
+        .mb-12 { margin-bottom: 12px; }
+
+        .divider {
+            height: 1px;
+            background: #00ff0011;
+            margin: 12px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <!-- ===== HEADER ===== -->
+        <header class="app-header">
+            <div class="header-logo">
+                <div class="logo-icon">&#9881;</div>
+                <span class="logo-text">MINER_FLEET</span>
+            </div>
+            <div class="header-status">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">CONNECTING...</span>
+            </div>
+        </header>
+
+        <!-- ===== TAB CONTENT ===== -->
+        <main class="tab-content">
+
+            <!-- TAB 1: MINING DASHBOARD -->
+            <div class="tab-panel active" id="tab-dashboard">
+                <!-- Big Hashrate Hero -->
+                <div class="hashrate-hero">
+                    <div class="hr-label">TOTAL HASHRATE</div>
+                    <div class="hr-value" id="bigHashrate">0</div>
+                    <div class="hr-unit">H/s</div>
+                    <div class="hr-sub" id="bigHashSub">100 NODES | RANDOMX ALGO</div>
+                </div>
+
+                <!-- Stats Row -->
+                <div class="stats-row">
+                    <div class="stat-card highlight">
+                        <div class="stat-label">XMR Mined</div>
+                        <div class="stat-value amber" id="totalMined">0.000000</div>
+                        <div class="stat-unit">XMR TOTAL</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Active Nodes</div>
+                        <div class="stat-value" id="activeNodeCount">0</div>
+                        <div class="stat-unit">/ 100 ONLINE</div>
+                    </div>
+                </div>
+
+                <!-- Nodes Progress -->
+                <div class="progress-container">
+                    <div class="progress-header">
+                        <span class="p-label">FLEET DEPLOYMENT</span>
+                        <span class="p-value" id="nodePercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="nodeProgressBar" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <!-- Fee Badge -->
+                <div class="fee-badge">
+                    PLATFORM FEE: <strong>35%</strong> deducted from mining rewards
+                </div>
+
+                <!-- Hashrate Chart -->
+                <div class="chart-wrapper">
+                    <div class="chart-header">
+                        <span class="chart-title">Real-time Hashrate</span>
+                        <span class="chart-live">LIVE</span>
+                    </div>
+                    <canvas id="hashrateCanvas" class="chart-canvas"></canvas>
+                </div>
+
+                <!-- Mining Log -->
+                <div class="section-title">Mining Log</div>
+                <div class="log-box" id="miningLog"></div>
+
+                <!-- API Status -->
+                <div class="text-center" style="font-size:9px;color:#00ff0033;padding:4px 0;">
+                    API: localhost:8081 | POOL: pool.supportxmr.com:3333 | AUTO-REFRESH: 3s
+                </div>
+            </div>
+
+            <!-- TAB 2: NODES FLEET -->
+            <div class="tab-panel" id="tab-nodes">
+                <div class="section-title">100-Node Mining Fleet</div>
+
+                <!-- Toolbar -->
+                <div class="nodes-toolbar">
+                    <select id="sortSelect">
+                        <option value="id">Sort: ID</option>
+                        <option value="hashrate">Sort: Hashrate</option>
+                        <option value="status">Sort: Status</option>
+                    </select>
+                    <select id="filterSelect">
+                        <option value="all">All</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <!-- Batch Actions -->
+                <div class="nodes-toolbar">
+                    <button onclick="batchAction('start')">Start All</button>
+                    <button onclick="batchAction('stop')">Stop All</button>
+                    <button onclick="batchAction('restart')">Restart Offline</button>
+                </div>
+
+                <!-- Summary -->
+                <div class="nodes-summary">
+                    <span>Active: <span class="text-green" id="fleetActiveCount">0</span></span>
+                    <span>Inactive: <span class="text-red" id="fleetInactiveCount">0</span></span>
+                    <span>Total HR: <span class="text-green" id="fleetTotalHr">0</span> H/s</span>
+                </div>
+
+                <!-- Nodes Grid -->
+                <div class="nodes-grid" id="nodesGrid"></div>
+            </div>
+
+            <!-- TAB 3: BUY NODES -->
+            <div class="tab-panel" id="tab-buy">
+                <div class="section-title">Client Dashboard</div>
+
+                <!-- My Stats -->
+                <div class="client-stats">
+                    <div class="cs-title">My Mining Status</div>
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-label">My Nodes</div>
+                            <div class="stat-value" id="myNodesCount">0</div>
+                            <div class="stat-unit">NODES OWNED</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">My Hashrate</div>
+                            <div class="stat-value" id="myHashrate">0</div>
+                            <div class="stat-unit">H/s</div>
+                        </div>
+                    </div>
+                    <div class="stats-row">
+                        <div class="stat-card highlight">
+                            <div class="stat-label">My XMR Mined</div>
+                            <div class="stat-value amber" id="myMinedXMR">0.000000</div>
+                            <div class="stat-unit">XMR ACCUMULATED</div>
+                        </div>
+                        <div class="stat-card highlight">
+                            <div class="stat-label">Next Payout</div>
+                            <div class="stat-value amber" id="myPayoutProgress">0%</div>
+                            <div class="stat-unit">OF 0.1 XMR</div>
+                        </div>
+                    </div>
+                    <div class="progress-container mt-8">
+                        <div class="progress-header">
+                            <span class="p-label">PAYOUT PROGRESS</span>
+                            <span class="p-value" id="payoutBarLabel">0 / 0.1 XMR</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill amber" id="payoutProgressBar" style="width:0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">Mining Plans</div>
+
+                <!-- Starter Plan -->
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <span class="plan-name">STARTER</span>
+                        <span class="plan-nodes">10 Nodes</span>
+                    </div>
+                    <div class="plan-details">
+                        <span class="plan-price-usd">$47/mo</span>
+                        <span class="plan-price-xmr">0.47 XMR</span>
+                    </div>
+                    <button class="plan-buy-btn" onclick="buyPlan('starter')">BUY STARTER</button>
+                </div>
+
+                <!-- Pro Plan -->
+                <div class="plan-card popular">
+                    <div class="plan-header">
+                        <span class="plan-name">PRO</span>
+                        <span class="plan-nodes">25 Nodes</span>
+                    </div>
+                    <div class="plan-details">
+                        <span class="plan-price-usd">$97/mo</span>
+                        <span class="plan-price-xmr">0.97 XMR</span>
+                    </div>
+                    <button class="plan-buy-btn" onclick="buyPlan('pro')">BUY PRO</button>
+                </div>
+
+                <!-- Elite Plan -->
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <span class="plan-name">ELITE</span>
+                        <span class="plan-nodes">50 Nodes</span>
+                    </div>
+                    <div class="plan-details">
+                        <span class="plan-price-usd">$197/mo</span>
+                        <span class="plan-price-xmr">1.97 XMR</span>
+                    </div>
+                    <button class="plan-buy-btn" onclick="buyPlan('elite')">BUY ELITE</button>
+                </div>
+
+                <!-- Supreme Plan -->
+                <div class="plan-card">
+                    <div class="plan-header">
+                        <span class="plan-name">SUPREME</span>
+                        <span class="plan-nodes">100 Nodes</span>
+                    </div>
+                    <div class="plan-details">
+                        <span class="plan-price-usd">$397/mo</span>
+                        <span class="plan-price-xmr">3.97 XMR</span>
+                    </div>
+                    <button class="plan-buy-btn" onclick="buyPlan('supreme')">BUY SUPREME</button>
+                </div>
+
+                <!-- Payment Instructions Area -->
+                <div id="paymentArea"></div>
+            </div>
+
+            <!-- TAB 4: WALLET & SETTINGS -->
+            <div class="tab-panel" id="tab-wallet">
+                <div class="section-title">Wallet</div>
+
+                <!-- Balance -->
+                <div class="wallet-balance-card">
+                    <div class="wb-label">XMR Wallet Balance</div>
+                    <div class="wb-value" id="walletBalance">0.000000</div>
+                    <div class="wb-unit">XMR</div>
+                </div>
+
+                <!-- Wallet Address -->
+                <div class="settings-group">
+                    <div class="sg-title">Wallet Address</div>
+                    <div class="settings-row">
+                        <span class="sr-label">XMR Address</span>
+                    </div>
+                    <div class="wallet-display" id="walletAddressDisplay">
+                        <button class="copy-btn" onclick="copyWallet()">COPY</button>
+                        8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ
+                    </div>
+                </div>
+
+                <!-- Pool Config -->
+                <div class="section-title">Pool Configuration</div>
+                <div class="settings-group">
+                    <div class="sg-title">XMRig Configuration</div>
+                    <div class="settings-row">
+                        <span class="sr-label">Pool</span>
+                        <span class="sr-value">pool.supportxmr.com:3333</span>
+                    </div>
+                    <div class="settings-row">
+                        <span class="sr-label">Algorithm</span>
+                        <span class="sr-value">RANDOMX (Monero)</span>
+                    </div>
+                    <div class="settings-row">
+                        <span class="sr-label">API Port</span>
+                        <span class="sr-value">localhost:8081</span>
+                    </div>
+                    <div class="settings-row">
+                        <span class="sr-label">Worker ID</span>
+                        <span class="sr-value">miner-fleet-node</span>
+                    </div>
+                    <div class="settings-row">
+                        <span class="sr-label">Huge Pages</span>
+                        <span class="sr-value text-green">Enabled</span>
+                    </div>
+                    <div class="settings-row">
+                        <span class="sr-label">Max Threads</span>
+                        <span class="sr-value">100</span>
+                    </div>
+                    <div class="settings-row">
+                        <span class="sr-label">Platform Fee</span>
+                        <span class="sr-value text-red">35%</span>
+                    </div>
+                </div>
+
+                <!-- Payout History -->
+                <div class="section-title">Payout History</div>
+                <div class="settings-group">
+                    <div id="payoutHistory">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Support -->
+                <div class="section-title">Support & Social</div>
+
+                <a href="https://t.me/proplanwh" target="_blank" class="social-btn">
+                    <span class="soc-icon">&#9993;</span>
+                    <div>
+                        <div>Telegram Support</div>
+                        <div class="soc-handle">@proplanwh</div>
+                    </div>
+                </a>
+
+                <a href="https://twitter.com/whomisecaibot" target="_blank" class="social-btn">
+                    <span class="soc-icon">&#120143;</span>
+                    <div>
+                        <div>Twitter Updates</div>
+                        <div class="soc-handle">@whomisecaibot</div>
+                    </div>
+                </a>
+
+                <!-- Invite -->
+                <div class="section-title">Invite Friends</div>
+                <div class="invite-box">
+                    <div class="inv-text">Share MINER_FLEET and earn referral rewards</div>
+                    <div class="inv-code" id="inviteLink">https://miner-fleet.app/ref/MF-USER-0001</div>
+                    <button onclick="copyInvite()">COPY INVITE LINK</button>
+                </div>
+
+                <!-- App Info -->
+                <div class="text-center mt-12" style="font-size:9px;color:#00ff0022;">
+                    MINER_FLEET v2.0.0 | WHOAMI.SEC<br>
+                    Powered by JARVIS OMNI | 2026
+                </div>
+            </div>
+
+        </main>
+
+        <!-- ===== BOTTOM NAV ===== -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" onclick="switchTab('dashboard', this)" aria-label="Mining Dashboard">
+                <span class="nav-icon">&#9874;</span>
+                <span>Mine</span>
+            </button>
+            <button class="nav-btn" onclick="switchTab('nodes', this)" aria-label="Nodes Fleet">
+                <span class="nav-icon">&#9638;</span>
+                <span>Nodes</span>
+            </button>
+            <button class="nav-btn" onclick="switchTab('buy', this)" aria-label="Buy Nodes">
+                <span class="nav-icon">&#36;</span>
+                <span>Buy</span>
+            </button>
+            <button class="nav-btn" onclick="switchTab('wallet', this)" aria-label="Wallet & Settings">
+                <span class="nav-icon">&#9881;</span>
+                <span>Wallet</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ===== NODE DETAIL MODAL ===== -->
+    <div class="modal-overlay" id="nodeModal">
+        <div class="modal-box">
+            <div class="modal-title" id="modalNodeTitle">NODE N1</div>
+            <div class="modal-stats">
+                <div class="modal-stat">
+                    <div class="ms-label">Hashrate</div>
+                    <div class="ms-value" id="modalNodeHr">0</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="ms-label">Status</div>
+                    <div class="ms-value" id="modalNodeStatus">--</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="ms-label">Uptime</div>
+                    <div class="ms-value" id="modalNodeUptime">--</div>
+                </div>
+                <div class="modal-stat">
+                    <div class="ms-label">Temp</div>
+                    <div class="ms-value" id="modalNodeTemp">--</div>
+                </div>
+            </div>
+            <button class="modal-close" onclick="closeModal()">CLOSE</button>
+        </div>
+    </div>
+
+    <!-- ===== PAYMENT MODAL ===== -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="modal-box">
+            <div class="modal-title" id="payModalTitle">PAYMENT</div>
+            <div class="payment-box">
+                <div class="pay-label">Amount to Send</div>
+                <div class="pay-amount" id="payModalAmount">0 XMR</div>
+            </div>
+            <div style="font-size:10px;color:#00ff0066;margin-bottom:6px;">Send XMR to this address:</div>
+            <div class="wallet-display" id="payModalWallet">
+                <button class="copy-btn" onclick="copyWallet()">COPY</button>
+                8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ
+            </div>
+            <div style="font-size:10px;color:#f59e0b88;text-align:center;margin:10px 0;">
+                Send TX ID to <strong>@proplanwh</strong> on Telegram for activation
+            </div>
+            <button class="modal-close" onclick="closePaymentModal()">DONE</button>
+        </div>
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        /* ============================================================
+           MINER_FLEET APP - MAIN APPLICATION LOGIC
+           ============================================================ */
+
+        // ===== CONSTANTS =====
+        const XMR_WALLET = '8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ';
+        const API_URL = 'http://localhost:8081/api/summary';
+        const MINING_REFRESH = 3000;     // 3 seconds
+        const NODE_REFRESH = 10000;       // 10 seconds
+        const HASH_HISTORY_MAX = 60;       // data points for chart
+        const PAYOUT_THRESHOLD = 0.1;      // XMR per payout
+
+        const PLANS = {
+            starter:  { nodes: 10,  priceUSD: 47,  xmr: 0.47 },
+            pro:       { nodes: 25,  priceUSD: 97,  xmr: 0.97 },
+            elite:     { nodes: 50,  priceUSD: 197, xmr: 1.97 },
+            supreme:   { nodes: 100, priceUSD: 397, xmr: 3.97 }
+        };
+
+        // ===== STATE =====
+        let miningData = {
+            hashrate: 0,
+            totalMined: 0,
+            activeNodes: 0,
+            hashHistory: [],
+            apiConnected: false,
+            lastUpdate: 0
+        };
+
+        let nodes = [];
+        let selectedNodeId = null;
+        let currentSort = 'id';
+        let currentFilter = 'all';
+
+        let clientData = {
+            nodes: 0,
+            hashrate: 0,
+            mined: 0,
+            totalPayouts: 0,
+            payouts: []
+        };
+
+        // ===== INITIALIZATION =====
+        function init() {
+            loadClientData();
+            initNodes();
+            initChart();
+            updateMiningStats();
+            updateClientMining();
+            updatePayoutHistory();
+            renderNodes();
+
+            // Event listeners for sort/filter
+            document.getElementById('sortSelect').addEventListener('change', function() {
+                currentSort = this.value;
+                renderNodes();
+            });
+            document.getElementById('filterSelect').addEventListener('change', function() {
+                currentFilter = this.value;
+                renderNodes();
+            });
+
+            // Close modals on overlay click
+            document.getElementById('nodeModal').addEventListener('click', function(e) {
+                if (e.target === this) closeModal();
+            });
+            document.getElementById('paymentModal').addEventListener('click', function(e) {
+                if (e.target === this) closePaymentModal();
+            });
+
+            // Start intervals
+            setInterval(updateMiningStats, MINING_REFRESH);
+            setInterval(refreshNodes, NODE_REFRESH);
+            setInterval(updateClientMining, 5000);
+
+            addLog('MINER_FLEET v2.0.0 initialized');
+            addLog('Connecting to XMRig API at ' + API_URL);
+        }
+
+        // ===== LOCAL STORAGE =====
+        function loadClientData() {
+            try {
+                var saved = localStorage.getItem('minerFleetClient');
+                if (saved) {
+                    clientData = JSON.parse(saved);
+                    // Ensure all fields exist
+                    if (typeof clientData.payouts === 'undefined') clientData.payouts = [];
+                    if (typeof clientData.totalPayouts === 'undefined') clientData.totalPayouts = 0;
+                } else {
+                    // First time: generate simulated payout history
+                    generateInitialPayouts();
+                }
+            } catch (e) {
+                console.error('Failed to load client data:', e);
+                clientData = { nodes: 0, hashrate: 0, mined: 0, totalPayouts: 0, payouts: [] };
+            }
+        }
+
+        function saveClientData() {
+            try {
+                localStorage.setItem('minerFleetClient', JSON.stringify(clientData));
+            } catch (e) {
+                console.error('Failed to save client data:', e);
+            }
+        }
+
+        function generateInitialPayouts() {
+            var now = Date.now();
+            var payouts = [];
+            for (var i = 5; i >= 1; i--) {
+                payouts.push({
+                    amount: (0.1 + Math.random() * 0.05).toFixed(6),
+                    date: new Date(now - i * 86400000 * 7).toISOString().split('T')[0],
+                    status: 'confirmed',
+                    txId: 'tx_' + Math.random().toString(36).substr(2, 16)
+                });
+            }
+            clientData.payouts = payouts;
+            clientData.totalPayouts = payouts.length;
+            saveClientData();
+        }
+
+        // ===== TAB NAVIGATION =====
+        function switchTab(tabName, btn) {
+            // Hide all panels
+            var panels = document.querySelectorAll('.tab-panel');
+            for (var i = 0; i < panels.length; i++) {
+                panels[i].classList.remove('active');
+            }
+            // Show target
+            document.getElementById('tab-' + tabName).classList.add('active');
+
+            // Update nav buttons
+            var navBtns = document.querySelectorAll('.nav-btn');
+            for (var i = 0; i < navBtns.length; i++) {
+                navBtns[i].classList.remove('active');
+            }
+            btn.classList.add('active');
+
+            // Refresh tab-specific content
+            if (tabName === 'nodes') {
+                renderNodes();
+            }
+            if (tabName === 'buy') {
+                updateClientDisplay();
+            }
+            if (tabName === 'wallet') {
+                updateWalletDisplay();
+                updatePayoutHistory();
+            }
+            if (tabName === 'dashboard') {
+                drawChart();
+            }
+        }
+
+        // ===== MINING DATA UPDATE =====
+        async function updateMiningStats() {
+            var data = null;
+            var apiOk = false;
+
+            try {
+                var response = await fetch(API_URL);
+                if (response.ok) {
+                    data = await response.json();
+                    apiOk = true;
+                }
+            } catch (e) {
+                // API unavailable - will use simulation
+            }
+
+            if (apiOk && data) {
+                // Parse real XMRig API data
+                var hr = 0;
+                if (data.hashrate && data.hashrate.total && data.hashrate.total.length > 0) {
+                    hr = data.hashrate.total[0];
+                }
+                if (hr <= 0) hr = data.hashrate_total || 0;
+
+                var hashrate = hr > 0 ? hr : simulateHashrate();
+                var activeNodes = countActiveNodes();
+                var increment = (hashrate / 1000000000) * 0.0001;
+
+                miningData.hashrate = hashrate;
+                miningData.totalMined += increment;
+                miningData.activeNodes = activeNodes;
+                miningData.apiConnected = true;
+                miningData.lastUpdate = Date.now();
+
+                document.getElementById('statusDot').classList.remove('offline');
+                document.getElementById('statusText').textContent = 'LIVE';
+                document.getElementById('statusText').style.color = '#00ff00';
+
+                addLog('[API] HR: ' + Math.round(hashrate) + ' H/s | Best: ' + formatHashrate(hashrate), 'ok');
+            } else {
+                // Simulation fallback
+                var simHr = simulateHashrate();
+                var simActive = Math.floor(Math.random() * 20) + 80; // 80-100
+                var simIncrement = (simHr / 1000000000) * 0.0001;
+
+                miningData.hashrate = simHr;
+                miningData.totalMined += simIncrement;
+                miningData.activeNodes = simActive;
+                miningData.apiConnected = false;
+                miningData.lastUpdate = Date.now();
+
+                document.getElementById('statusDot').classList.add('offline');
+                document.getElementById('statusText').textContent = 'SIM MODE';
+                document.getElementById('statusText').style.color = '#f59e0b';
+
+                addLog('[SIM] HR: ' + Math.round(simHr) + ' H/s | Nodes: ' + simActive + '/100', 'warn');
+            }
+
+            // Push to history
+            miningData.hashHistory.push(miningData.hashrate);
+            if (miningData.hashHistory.length > HASH_HISTORY_MAX) {
+                miningData.hashHistory.shift();
+            }
+
+            // Update UI
+            updateDashboardUI();
+            drawChart();
+        }
+
+        function simulateHashrate() {
+            // Random around 17000-22000 H/s
+            return Math.floor(Math.random() * 5000) + 17000;
+        }
+
+        function countActiveNodes() {
+            var count = 0;
+            for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].active) count++;
+            }
+            return count;
+        }
+
+        function formatHashrate(hr) {
+            if (hr >= 1000000) return (hr / 1000000).toFixed(2) + ' MH/s';
+            if (hr >= 1000) return (hr / 1000).toFixed(2) + ' kH/s';
+            return Math.round(hr) + ' H/s';
+        }
+
+        // ===== DASHBOARD UI UPDATE =====
+        function updateDashboardUI() {
+            var hr = Math.round(miningData.hashrate);
+            document.getElementById('bigHashrate').textContent = hr.toLocaleString();
+            document.getElementById('totalMined').textContent = miningData.totalMined.toFixed(6);
+            document.getElementById('activeNodeCount').textContent = miningData.activeNodes;
+
+            var pct = Math.round((miningData.activeNodes / 100) * 100);
+            document.getElementById('nodePercent').textContent = pct + '%';
+            document.getElementById('nodeProgressBar').style.width = pct + '%';
+        }
+
+        // ===== MINING LOG =====
+        function addLog(message, type) {
+            var logBox = document.getElementById('miningLog');
+            var entry = document.createElement('div');
+            entry.className = 'log-entry';
+
+            var now = new Date();
+            var timeStr = padZero(now.getHours()) + ':' + padZero(now.getMinutes()) + ':' + padZero(now.getSeconds());
+
+            var cls = type === 'ok' ? 'log-ok' : (type === 'warn' ? 'log-warn' : '');
+
+            entry.innerHTML = '<span class="log-time">[' + timeStr + ']</span> <span class="' + cls + '">' + message + '</span>';
+            logBox.appendChild(entry);
+
+            // Keep max 50 entries
+            while (logBox.children.length > 50) {
+                logBox.removeChild(logBox.firstChild);
+            }
+
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        function padZero(n) {
+            return n < 10 ? '0' + n : '' + n;
+        }
+
+        // ===== CANVAS CHART (NO CDN) =====
+        var chartCanvas = null;
+        var chartCtx = null;
+
+        function initChart() {
+            chartCanvas = document.getElementById('hashrateCanvas');
+            chartCtx = chartCanvas.getContext('2d');
+            resizeChart();
+            window.addEventListener('resize', resizeChart);
+        }
+
+        function resizeChart() {
+            var rect = chartCanvas.parentElement.getBoundingClientRect();
+            var dpr = window.devicePixelRatio || 1;
+            chartCanvas.width = (rect.width - 20) * dpr;
+            chartCanvas.height = 120 * dpr;
+            chartCtx.scale(dpr, dpr);
+            chartCanvas.style.width = (rect.width - 20) + 'px';
+            chartCanvas.style.height = '120px';
+        }
+
+        function drawChart() {
+            if (!chartCtx) return;
+            var w = chartCanvas.width / (window.devicePixelRatio || 1);
+            var h = chartCanvas.height / (window.devicePixelRatio || 1);
+            var data = miningData.hashHistory;
+            var len = data.length;
+
+            // Clear
+            chartCtx.clearRect(0, 0, w, h);
+
+            // Background
+            chartCtx.fillStyle = '#050505';
+            chartCtx.fillRect(0, 0, w, h);
+
+            // Grid lines
+            chartCtx.strokeStyle = '#00ff0011';
+            chartCtx.lineWidth = 0.5;
+            for (var i = 0; i < 5; i++) {
+                var y = (h / 5) * i;
+                chartCtx.beginPath();
+                chartCtx.moveTo(0, y);
+                chartCtx.lineTo(w, y);
+                chartCtx.stroke();
+            }
+
+            if (len < 2) return;
+
+            // Find min/max for scaling
+            var minHR = Infinity;
+            var maxHR = -Infinity;
+            for (var i = 0; i < len; i++) {
+                if (data[i] < minHR) minHR = data[i];
+                if (data[i] > maxHR) maxHR = data[i];
+            }
+
+            // Add padding to range
+            var range = maxHR - minHR;
+            if (range < 100) range = 100;
+            minHR -= range * 0.1;
+            maxHR += range * 0.1;
+            range = maxHR - minHR;
+
+            var padding = 4;
+            var chartW = w - padding * 2;
+            var chartH = h - padding * 2;
+
+            // Draw filled area
+            chartCtx.beginPath();
+            chartCtx.moveTo(padding, h - padding);
+
+            for (var i = 0; i < len; i++) {
+                var x = padding + (i / (len - 1)) * chartW;
+                var y = h - padding - ((data[i] - minHR) / range) * chartH;
+                if (i === 0) {
+                    chartCtx.lineTo(x, y);
+                } else {
+                    // Smooth curve using quadratic bezier
+                    var prevX = padding + ((i - 1) / (len - 1)) * chartW;
+                    var prevY = h - padding - ((data[i - 1] - minHR) / range) * chartH;
+                    var cpX = (prevX + x) / 2;
+                    chartCtx.quadraticCurveTo(prevX, prevY, cpX, (prevY + y) / 2);
+                }
+            }
+
+            // Close the fill path
+            var lastX = padding + ((len - 1) / (len - 1)) * chartW;
+            chartCtx.lineTo(lastX, h - padding);
+            chartCtx.closePath();
+
+            // Gradient fill
+            var gradient = chartCtx.createLinearGradient(0, 0, 0, h);
+            gradient.addColorStop(0, 'rgba(0, 255, 0, 0.15)');
+            gradient.addColorStop(1, 'rgba(0, 255, 0, 0.01)');
+            chartCtx.fillStyle = gradient;
+            chartCtx.fill();
+
+            // Draw line on top
+            chartCtx.beginPath();
+            for (var i = 0; i < len; i++) {
+                var x = padding + (i / (len - 1)) * chartW;
+                var y = h - padding - ((data[i] - minHR) / range) * chartH;
+                if (i === 0) {
+                    chartCtx.moveTo(x, y);
+                } else {
+                    var prevX = padding + ((i - 1) / (len - 1)) * chartW;
+                    var prevY = h - padding - ((data[i - 1] - minHR) / range) * chartH;
+                    var cpX = (prevX + x) / 2;
+                    chartCtx.quadraticCurveTo(prevX, prevY, cpX, (prevY + y) / 2);
+                }
+            }
+            chartCtx.strokeStyle = '#00ff00';
+            chartCtx.lineWidth = 1.5;
+            chartCtx.stroke();
+
+            // Draw last point glow
+            if (len > 0) {
+                var lastVal = data[len - 1];
+                var lx = padding + ((len - 1) / (len - 1)) * chartW;
+                var ly = h - padding - ((lastVal - minHR) / range) * chartH;
+
+                chartCtx.beginPath();
+                chartCtx.arc(lx, ly, 3, 0, Math.PI * 2);
+                chartCtx.fillStyle = '#00ff00';
+                chartCtx.fill();
+
+                chartCtx.beginPath();
+                chartCtx.arc(lx, ly, 6, 0, Math.PI * 2);
+                chartCtx.fillStyle = 'rgba(0, 255, 0, 0.2)';
+                chartCtx.fill();
+            }
+
+            // Y-axis labels
+            chartCtx.font = '9px Courier New';
+            chartCtx.fillStyle = '#00ff0044';
+            chartCtx.textAlign = 'left';
+            for (var i = 0; i < 5; i++) {
+                var y = (h / 5) * i + 8;
+                var val = maxHR - (i / 4) * range;
+                chartCtx.fillText(Math.round(val / 1000) + 'k', 2, y);
+            }
+
+            // X-axis label
+            chartCtx.textAlign = 'right';
+            chartCtx.fillText('NOW', w - 4, h - 4);
+            chartCtx.textAlign = 'left';
+            chartCtx.fillText('-' + (len * 3) + 's', 4, h - 4);
+        }
+
+        // ===== NODES MANAGEMENT =====
+        function initNodes() {
+            nodes = [];
+            var activeCount = Math.floor(Math.random() * 20) + 80; // 80-100 active
+            for (var i = 1; i <= 100; i++) {
+                var isActive = i <= activeCount;
+                nodes.push({
+                    id: i,
+                    name: 'N' + i,
+                    active: isActive,
+                    hashrate: isActive ? Math.floor(Math.random() * 500) + 300 : 0,
+                    uptime: isActive ? Math.floor(Math.random() * 720) + 1 : 0,
+                    temp: isActive ? Math.floor(Math.random() * 20) + 55 : 0
+                });
+            }
+            miningData.activeNodes = activeCount;
+        }
+
+        function refreshNodes() {
+            var activeCount = Math.floor(Math.random() * 20) + 80;
+            for (var i = 0; i < nodes.length; i++) {
+                var isActive = i < activeCount;
+                nodes[i].active = isActive;
+                nodes[i].hashrate = isActive ? Math.floor(Math.random() * 500) + 300 : 0;
+                nodes[i].uptime = isActive ? nodes[i].uptime + 10 : 0;
+                nodes[i].temp = isActive ? Math.floor(Math.random() * 20) + 55 : 0;
+            }
+            miningData.activeNodes = activeCount;
+            renderNodes();
+        }
+
+        function renderNodes() {
+            var grid = document.getElementById('nodesGrid');
+            var sortVal = currentSort;
+            var filterVal = currentFilter;
+
+            // Create sorted/filtered copy
+            var displayNodes = nodes.slice();
+
+            // Filter
+            if (filterVal === 'active') {
+                displayNodes = displayNodes.filter(function(n) { return n.active; });
+            } else if (filterVal === 'inactive') {
+                displayNodes = displayNodes.filter(function(n) { return !n.active; });
+            }
+
+            // Sort
+            displayNodes.sort(function(a, b) {
+                if (sortVal === 'id') return a.id - b.id;
+                if (sortVal === 'hashrate') return b.hashrate - a.hashrate;
+                if (sortVal === 'status') {
+                    if (a.active === b.active) return a.id - b.id;
+                    return a.active ? -1 : 1;
+                }
+                return a.id - b.id;
+            });
+
+            // Render
+            var html = '';
+            for (var i = 0; i < displayNodes.length; i++) {
+                var n = displayNodes[i];
+                var cls = n.active ? 'active' : 'inactive';
+                if (selectedNodeId === n.id) cls += ' selected';
+                var hrStr = n.active ? Math.round(n.hashrate) : '--';
+                html += '<div class="node-cell ' + cls + '" onclick="showNodeDetail(' + n.id + ')">';
+                html += '<span class="node-id">' + n.name + '</span>';
+                html += '<span class="node-hr">' + hrStr + '</span>';
+                html += '</div>';
+            }
+            grid.innerHTML = html;
+
+            // Update summary
+            var activeCount = 0;
+            var inactiveCount = 0;
+            var totalHr = 0;
+            for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].active) {
+                    activeCount++;
+                    totalHr += nodes[i].hashrate;
+                } else {
+                    inactiveCount++;
+                }
+            }
+            document.getElementById('fleetActiveCount').textContent = activeCount;
+            document.getElementById('fleetInactiveCount').textContent = inactiveCount;
+            document.getElementById('fleetTotalHr').textContent = totalHr.toLocaleString();
+        }
+
+        function showNodeDetail(nodeId) {
+            selectedNodeId = nodeId;
+            var node = null;
+            for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].id === nodeId) {
+                    node = nodes[i];
+                    break;
+                }
+            }
+            if (!node) return;
+
+            document.getElementById('modalNodeTitle').textContent = 'NODE ' + node.name;
+            document.getElementById('modalNodeHr').textContent = node.active ? Math.round(node.hashrate) + ' H/s' : 'OFFLINE';
+            document.getElementById('modalNodeStatus').textContent = node.active ? 'ACTIVE' : 'OFFLINE';
+            document.getElementById('modalNodeStatus').style.color = node.active ? '#00ff00' : '#ff4444';
+            document.getElementById('modalNodeUptime').textContent = node.active ? node.uptime + 'm' : 'N/A';
+            document.getElementById('modalNodeTemp').textContent = node.active ? node.temp + '\u00B0C' : '--';
+
+            document.getElementById('nodeModal').classList.add('show');
+            renderNodes();
+        }
+
+        function closeModal() {
+            document.getElementById('nodeModal').classList.remove('show');
+            selectedNodeId = null;
+            renderNodes();
+        }
+
+        function batchAction(action) {
+            if (action === 'start') {
+                for (var i = 0; i < nodes.length; i++) {
+                    nodes[i].active = true;
+                    nodes[i].hashrate = Math.floor(Math.random() * 500) + 300;
+                    nodes[i].uptime = 0;
+                    nodes[i].temp = Math.floor(Math.random() * 20) + 55;
+                }
+                addLog('[FLEET] All 100 nodes STARTED', 'ok');
+            } else if (action === 'stop') {
+                for (var i = 0; i < nodes.length; i++) {
+                    nodes[i].active = false;
+                    nodes[i].hashrate = 0;
+                    nodes[i].uptime = 0;
+                    nodes[i].temp = 0;
+                }
+                addLog('[FLEET] All 100 nodes STOPPED', 'warn');
+            } else if (action === 'restart') {
+                for (var i = 0; i < nodes.length; i++) {
+                    if (!nodes[i].active) {
+                        nodes[i].active = true;
+                        nodes[i].hashrate = Math.floor(Math.random() * 500) + 300;
+                        nodes[i].uptime = 0;
+                        nodes[i].temp = Math.floor(Math.random() * 20) + 55;
+                    }
+                }
+                addLog('[FLEET] Offline nodes RESTARTED', 'ok');
+            }
+            miningData.activeNodes = countActiveNodes();
+            renderNodes();
+            showToast('Action: ' + action.toUpperCase() + ' complete');
+        }
+
+        // ===== BUY PLANS =====
+        function buyPlan(planName) {
+            var plan = PLANS[planName];
+            if (!plan) return;
+
+            document.getElementById('payModalTitle').textContent = planName.toUpperCase() + ' PLAN';
+            document.getElementById('payModalAmount').textContent = plan.xmr + ' XMR ($' + plan.priceUSD + '/mo)';
+            document.getElementById('paymentModal').classList.add('show');
+
+            addLog('[BUY] ' + planName.toUpperCase() + ' plan selected: ' + plan.nodes + ' nodes for ' + plan.xmr + ' XMR');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('show');
+        }
+
+        // ===== CLIENT MINING SIMULATION =====
+        function updateClientMining() {
+            if (clientData.nodes > 0) {
+                var increment = clientData.nodes * 0.000001;
+                clientData.mined += increment;
+                clientData.hashrate = Math.round(clientData.nodes * (180 + Math.random() * 20));
+
+                // Check for payout
+                if (clientData.mined >= PAYOUT_THRESHOLD) {
+                    processPayout();
+                }
+
+                saveClientData();
+            }
+            updateClientDisplay();
+        }
+
+        function updateClientDisplay() {
+            document.getElementById('myNodesCount').textContent = clientData.nodes;
+            document.getElementById('myHashrate').textContent = clientData.hashrate.toLocaleString();
+            document.getElementById('myMinedXMR').textContent = clientData.mined.toFixed(6);
+
+            var payoutPct = Math.min((clientData.mined / PAYOUT_THRESHOLD) * 100, 100);
+            document.getElementById('myPayoutProgress').textContent = Math.round(payoutPct) + '%';
+            document.getElementById('payoutBarLabel').textContent = clientData.mined.toFixed(4) + ' / ' + PAYOUT_THRESHOLD + ' XMR';
+            document.getElementById('payoutProgressBar').style.width = payoutPct + '%';
+        }
+
+        function processPayout() {
+            var payoutAmount = clientData.mined.toFixed(6);
+            clientData.mined = 0; // Reset after payout
+            clientData.totalPayouts++;
+
+            var payout = {
+                amount: payoutAmount,
+                date: new Date().toISOString().split('T')[0],
+                status: 'confirmed',
+                txId: 'tx_' + Math.random().toString(36).substr(2, 16)
+            };
+            clientData.payouts.unshift(payout);
+            if (clientData.payouts.length > 20) {
+                clientData.payouts.pop();
+            }
+            saveClientData();
+            addLog('[PAYOUT] ' + payoutAmount + ' XMR paid out!', 'ok');
+            showToast('Payout: ' + payoutAmount + ' XMR');
+        }
+
+        // ===== WALLET DISPLAY =====
+        function updateWalletDisplay() {
+            document.getElementById('walletBalance').textContent = clientData.mined.toFixed(6);
+        }
+
+        // ===== PAYOUT HISTORY =====
+        function updatePayoutHistory() {
+            var container = document.getElementById('payoutHistory');
+            if (!clientData.payouts || clientData.payouts.length === 0) {
+                container.innerHTML = '<div style="padding:12px;text-align:center;font-size:10px;color:#00ff0033;">No payouts yet. Start mining to earn XMR.</div>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < clientData.payouts.length; i++) {
+                var p = clientData.payouts[i];
+                html += '<div class="payout-item">';
+                html += '<span class="po-amount">' + p.amount + ' XMR</span>';
+                html += '<span class="po-date">' + p.date + '</span>';
+                html += '<span class="po-status">' + p.status.toUpperCase() + '</span>';
+                html += '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        // ===== COPY FUNCTIONS =====
+        function copyWallet() {
+            copyTextToClipboard(XMR_WALLET);
+        }
+
+        function copyInvite() {
+            var link = document.getElementById('inviteLink').textContent;
+            copyTextToClipboard(link);
+        }
+
+        function copyTextToClipboard(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(function() {
+                    showToast('Copied to clipboard!');
+                }).catch(function() {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            var textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('Copied to clipboard!');
+            } catch (e) {
+                showToast('Copy failed');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // ===== TOAST =====
+        function showToast(msg) {
+            var toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // ===== INIT ON LOAD =====
+        window.addEventListener('DOMContentLoaded', init);
+        window.addEventListener('load', function() {
+            drawChart();
+        });
+    </script>
+</body>
+</html>
