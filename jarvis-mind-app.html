@@ -22,8 +22,8 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
 .pill{font-size:.56rem;padding:.14rem .45rem;border-radius:20px;border:1px solid rgba(0,212,255,.3);color:rgba(0,212,255,.9);background:rgba(0,212,255,.07);}
 .ic{background:none;border:1px solid var(--b);border-radius:7px;color:var(--m);font-size:.82rem;padding:.26rem .38rem;cursor:pointer;}
 
-/* HUD — simplu, fara nimic suprapus */
-#hud{flex:1;display:flex;flex-direction:column;align-items:center;padding:.3rem .7rem .3rem;position:relative;overflow:hidden;}
+/* HUD */
+#hud{flex:1;display:flex;flex-direction:column;align-items:center;padding:.3rem .7rem 0;position:relative;}
 
 /* SWARM — in spatele continutului */
 #swc{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.12;}
@@ -71,8 +71,8 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
 .att.show{display:flex;}
 .att-x{background:none;border:none;color:var(--m);cursor:pointer;}
 
-/* INPUT BAR — intotdeauna accesibil */
-.inp-bar{display:flex;align-items:center;gap:.28rem;width:100%;flex-shrink:0;margin-top:auto;padding-top:.3rem;z-index:10;position:relative;}
+/* INPUT BAR — in afara HUD, mereu accesibil */
+.inp-bar{display:flex;align-items:center;gap:.28rem;width:100%;flex-shrink:0;padding:.28rem .7rem;background:rgba(0,8,20,.98);border-top:1px solid var(--b);}
 .inp{flex:1;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.25);border-radius:10px;color:rgba(0,212,255,.95);padding:.48rem .6rem;font-family:'Courier New',monospace;font-size:.78rem;outline:none;}
 .inp::placeholder{color:rgba(0,212,255,.25);}
 .ib{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.28);color:rgba(0,212,255,.85);border-radius:10px;padding:.48rem .55rem;font-size:.88rem;cursor:pointer;flex-shrink:0;}
@@ -176,15 +176,15 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
       <span id="attname">📎</span>
       <button class="att-x" onclick="clearAtt()">✕</button>
     </div>
+  </div>
 
-    <div class="inp-bar">
-      <input type="file" id="fi" style="display:none" onchange="handleFile(this)">
-      <button class="ib" onclick="fi.click()">📎</button>
-      <button class="ib" onclick="doURL()">🔗</button>
-      <input class="inp" id="tinp" placeholder="Scrie comanda..." onkeydown="if(event.key==='Enter')doSend()">
-      <button class="ib sbtn" onclick="doSend()">ZI</button>
-      <button class="ib" id="mbtn" onclick="micToggle()">🎤</button>
-    </div>
+  <div class="inp-bar">
+    <input type="file" id="fi" style="display:none" onchange="handleFile(this)">
+    <button class="ib" onclick="fi.click()">📎</button>
+    <button class="ib" onclick="doURL()">🔗</button>
+    <input class="inp" id="tinp" placeholder="Scrie comanda..." onkeydown="if(event.key==='Enter')doSend()">
+    <button class="ib sbtn" onclick="doSend()">ZI</button>
+    <button class="ib" id="mbtn" onclick="micToggle()">🎤</button>
   </div>
 
   <div class="nav">
