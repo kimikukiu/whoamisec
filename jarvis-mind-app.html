@@ -14,8 +14,7 @@
 html,body{height:100%;overflow:hidden;background:#000814;font-family:'Courier New',monospace;color:var(--t);}
 
 /* APP instantly visible */
-#app{height:100%;display:flex;flex-direction:column;opacity:0;transition:opacity .25s;}
-#app.vis{opacity:1;}
+#app{height:100%;display:flex;flex-direction:column;}
 .hdr{display:flex;align-items:center;justify-content:space-between;padding:.5rem .9rem;border-bottom:1px solid var(--b);background:rgba(0,8,20,.96);flex-shrink:0;}
 .htit{font-size:.68rem;letter-spacing:.4em;color:var(--c);font-weight:800;text-shadow:0 0 10px rgba(0,212,255,.4);}
 .hr{display:flex;align-items:center;gap:.4rem;}
@@ -289,17 +288,12 @@ const C={
 };
 let voiceOn=false,recog=null,wakeT=null,jSt='standby',AM=0,AJ=0,att=null;
 
-// Step 1: show HUD on first animation frame (before any heavy JS)
+// Boot: add animations on next frame after paint, then init
+setR('awake');
 requestAnimationFrame(()=>{
-  document.getElementById('app').classList.add('vis');
-  setR('awake');
-  // Step 2: start ring animations after HUD is painted
-  requestAnimationFrame(()=>{
-    document.getElementById('rwrap').classList.add('go');
-    document.getElementById('bars').classList.add('go');
-    // Step 3: init everything else after animations start
-    setTimeout(boot2, 100);
-  });
+  document.getElementById('rwrap').classList.add('go');
+  document.getElementById('bars').classList.add('go');
+  setTimeout(boot2, 80);
 });
 
 function boot2(){
