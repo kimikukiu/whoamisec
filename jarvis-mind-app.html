@@ -231,10 +231,14 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
     <button class="pc" onclick="closeP('settings')">✕</button>
   </div>
   <div class="pb">
-    <div style="font-size:.58rem;color:var(--t);margin-bottom:.65rem;border:1px solid rgba(0,212,255,.2);padding:.4rem .55rem;border-radius:6px;line-height:1.6;">
-      <b style="color:var(--g)">✅ GitHub Models FREE</b> — pune GitHub token → 5 modele instant<br>
-      <b style="color:#ff6b35">⚡ Groq FREE</b> — console.groq.com → free key (30s) → 4 modele rapide<br>
+    <div style="font-size:.58rem;color:var(--t);margin-bottom:.65rem;border:1px solid rgba(0,255,200,.25);padding:.4rem .55rem;border-radius:6px;line-height:1.7;">
+      <b style="color:#00ffc8">🌸 Pollinations</b> — ZERO CONFIG, fără key! Auto-activ la boot<br>
+      <b style="color:var(--g)">✅ GitHub Models</b> — github.com → Settings → Dev tokens → 5 modele<br>
+      <b style="color:#ff6b35">⚡ Groq</b> — console.groq.com → key gratuit → 4 modele rapide<br>
       <b style="color:var(--g)">🟢 NVIDIA NIM</b> — build.nvidia.com → free key → modele mari<br>
+      <b style="color:#ffaa00">🔀 OpenRouter</b> — openrouter.ai → cont gratuit → free :free models<br>
+      <b style="color:#c882ff">🔶 SambaNova</b> — api.sambanova.ai → cont gratuit → rapid<br>
+      <b style="color:#ffda00">🤗 HuggingFace</b> — huggingface.co → token gratuit<br>
       <b style="color:#c084fc">🦙 Ollama</b> — local, fără internet
     </div>
     <div class="slbl">🖥 VPS / 9ROUTER URL (ex: http://IP:5001)</div><input class="sinp" id="surl" placeholder="http://IP:5001" oninput="autoSave()">
@@ -243,6 +247,9 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
     <div class="slbl">🟢 NVIDIA NIM API KEY</div><input class="sinp" id="snvkey" type="password" placeholder="nvapi-... (build.nvidia.com → free)" oninput="autoSave()">
     <div class="slbl">⚡ GROQ API KEY</div><input class="sinp" id="sgroq" type="password" placeholder="gsk_... (console.groq.com → free)" oninput="autoSave()">
     <div class="slbl">🐙 GITHUB TOKEN (GitHub Models FREE)</div><input class="sinp" id="sgh" type="password" placeholder="ghp_... (github.com → Settings → Dev tokens)" oninput="autoSave()">
+    <div class="slbl">🔀 OPENROUTER KEY (openrouter.ai → gratuit)</div><input class="sinp" id="sor" type="password" placeholder="sk-or-... (openrouter.ai → cont gratuit)" oninput="autoSave()">
+    <div class="slbl">🔶 SAMBANOVA KEY (api.sambanova.ai → gratuit)</div><input class="sinp" id="ssb" type="password" placeholder="(api.sambanova.ai → cont gratuit)" oninput="autoSave()">
+    <div class="slbl">🤗 HUGGINGFACE TOKEN (huggingface.co → gratuit)</div><input class="sinp" id="shf" type="password" placeholder="hf_... (huggingface.co → Settings → Tokens)" oninput="autoSave()">
     <div class="slbl">📱 TELEGRAM BOT TOKEN</div><input class="sinp" id="stgbot" type="password" placeholder="..." oninput="autoSave()">
     <div class="slbl">📱 TELEGRAM CHAT ID</div><input class="sinp" id="stgid" placeholder="123456789" oninput="autoSave()">
     <button class="sbt" onclick="saveSet()">💾 Salvează + Test</button>
@@ -289,6 +296,9 @@ const C={
   nvidiaKey:localStorage.getItem('j_nvkey')||'',
   groqKey:localStorage.getItem('j_groq')||'',
   gh:localStorage.getItem('jgh')||'',
+  orKey:localStorage.getItem('j_or')||'',
+  sbKey:localStorage.getItem('j_sb')||'',
+  hfKey:localStorage.getItem('j_hf')||'',
   tgbot:localStorage.getItem('jtgbot')||'',
   tgid:localStorage.getItem('jtgid')||''
 };
@@ -316,6 +326,7 @@ function boot2(){
     speak('Online bă!');
     initGyro();
     autoCheckUpgrade();
+    setTimeout(autoProbeAPIs,800);
   }, 500);
   if(C.tgbot&&C.tgid) setTimeout(()=>sendTg('🤖 JARVIS online '+new Date().toLocaleString('ro')),3000);
   // Salvează setările când app-ul merge în background
@@ -367,6 +378,20 @@ const MODELS=[
   // ── 9router VPS (setează URL în Settings) ──
   {n:'Claude Sonnet',  i:'🤖',d:'9router VPS', m:'kr/claude-sonnet-4.5',        f:false,be:'9r'},
   {n:'Claude Opus',    i:'👑',d:'9router VPS', m:'cc/claude-opus-4-7',          f:false,be:'9r'},
+  // ── Pollinations AI — ZERO CONFIG, fără key, instant ──
+  {n:'Llama 3.3 70B',  i:'🌸',d:'Pollinations 🆓',m:'pol/openai',               f:true, be:'pol'},
+  {n:'Mistral',        i:'🌸',d:'Pollinations 🆓',m:'pol/mistral',               f:true, be:'pol'},
+  {n:'DeepSeek',       i:'🌸',d:'Pollinations 🆓',m:'pol/deepseek',              f:true, be:'pol'},
+  // ── OpenRouter FREE (openrouter.ai → cont gratuit, :free models) ──
+  {n:'Llama 3.3 70B',  i:'🔀',d:'OpenRouter FREE',m:'or/meta-llama/llama-3.3-70b-instruct:free',f:true,be:'or'},
+  {n:'DeepSeek V3',    i:'🔀',d:'OpenRouter FREE',m:'or/deepseek/deepseek-chat-v3-0324:free',   f:true,be:'or'},
+  {n:'Gemma 2 9B',     i:'🔀',d:'OpenRouter FREE',m:'or/google/gemma-2-9b-it:free',             f:true,be:'or'},
+  // ── SambaNova FREE (api.sambanova.ai → cont gratuit, rapid) ──
+  {n:'Llama 3.3 70B',  i:'🔶',d:'SambaNova FREE',m:'sb/Meta-Llama-3.3-70B-Instruct',           f:true, be:'sb'},
+  {n:'DeepSeek R1',    i:'🔶',d:'SambaNova FREE',m:'sb/DeepSeek-R1-Distill-Llama-70B',          f:true, be:'sb'},
+  // ── HuggingFace FREE (huggingface.co → token gratuit) ──
+  {n:'Llama 3.1 70B',  i:'🤗',d:'HuggingFace FREE',m:'hf/meta-llama/Meta-Llama-3.1-70B-Instruct',f:true,be:'hf'},
+  {n:'Qwen 2.5 72B',   i:'🤗',d:'HuggingFace FREE',m:'hf/Qwen/Qwen2.5-72B-Instruct',           f:true, be:'hf'},
 ];
 
 // Ollama: fetch modele reale și inject în MODELS
@@ -395,8 +420,12 @@ function buildModels(){
                 m.be==='nv'?'background:rgba(0,255,136,.12);color:#00ff88;border-color:rgba(0,255,136,.3)':
                 m.be==='ghm'?'background:rgba(0,212,255,.12);color:#00d4ff;border-color:rgba(0,212,255,.3)':
                 m.be==='groq'?'background:rgba(255,107,53,.12);color:#ff6b35;border-color:rgba(255,107,53,.3)':
+                m.be==='pol'?'background:rgba(0,255,200,.12);color:#00ffc8;border-color:rgba(0,255,200,.3)':
+                m.be==='or'?'background:rgba(255,170,0,.12);color:#ffaa00;border-color:rgba(255,170,0,.3)':
+                m.be==='sb'?'background:rgba(200,130,255,.12);color:#c882ff;border-color:rgba(200,130,255,.3)':
+                m.be==='hf'?'background:rgba(255,218,0,.12);color:#ffda00;border-color:rgba(255,218,0,.3)':
                 m.f?'':'background:rgba(255,184,0,.12);color:#f59e0b;border-color:rgba(255,184,0,.3)';
-    const label=m.be==='ol'?'LOCAL':m.be==='nv'?'NIM':m.f?'FREE':'PAID';
+    const label=m.be==='ol'?'LOCAL':m.be==='nv'?'NIM':m.be==='pol'?'🌸ZERO':m.be==='sb'?'RAPID':m.f?'FREE':'PAID';
     return `<div class="mc ${i===AM?'sel':''}" onclick="selM(${i})">
       <div style="font-size:1.4rem">${m.i}</div>
       <div><div class="mn">${m.n}</div><div class="md">${m.d}</div><span class="mbg" style="${badge}">${label}</span></div>
@@ -503,6 +532,30 @@ async function callAI(msg,ctx=''){
     modelId=mo.m.replace('nim/','');
     if(!C.nvidiaKey) return '⚠️ Pune NVIDIA API key în Settings (build.nvidia.com → free key)';
     headers['Authorization']='Bearer '+C.nvidiaKey;
+  } else if(be==='pol'){
+    // Pollinations AI — COMPLET FREE, zero config, fără key
+    ep='https://text.pollinations.ai/openai';
+    modelId=mo.m.replace('pol/','');
+  } else if(be==='or'){
+    // OpenRouter — :free models fără card (openrouter.ai)
+    ep='https://openrouter.ai/api/v1/chat/completions';
+    modelId=mo.m.replace('or/','');
+    if(!C.orKey)return '⚠️ Pune OpenRouter key în Settings (openrouter.ai → cont gratuit)';
+    headers['Authorization']='Bearer '+C.orKey;
+    headers['HTTP-Referer']='https://jarvis.whoamisec.com';
+  } else if(be==='sb'){
+    // SambaNova — gratuit generous (api.sambanova.ai)
+    ep='https://api.sambanova.ai/v1/chat/completions';
+    modelId=mo.m.replace('sb/','');
+    if(!C.sbKey)return '⚠️ Pune SambaNova key în Settings (api.sambanova.ai → cont gratuit)';
+    headers['Authorization']='Bearer '+C.sbKey;
+  } else if(be==='hf'){
+    // HuggingFace Inference — token gratuit (huggingface.co)
+    const hfModel=mo.m.replace('hf/','');
+    ep='https://api-inference.huggingface.co/models/'+hfModel+'/v1/chat/completions';
+    modelId=hfModel.split('/').pop();
+    if(!C.hfKey)return '⚠️ Pune HuggingFace token în Settings (huggingface.co → gratuit)';
+    headers['Authorization']='Bearer '+C.hfKey;
   } else {
     // 9router VPS / Vercel proxy
     const base=C.apiUrl.replace(/\/+$/,'');
@@ -670,6 +723,9 @@ function loadSet(){
   if(g('snvkey'))g('snvkey').value=C.nvidiaKey;
   if(g('sgroq'))g('sgroq').value=C.groqKey;
   if(g('sgh'))g('sgh').value=C.gh;
+  if(g('sor'))g('sor').value=C.orKey;
+  if(g('ssb'))g('ssb').value=C.sbKey;
+  if(g('shf'))g('shf').value=C.hfKey;
   if(g('stgbot'))g('stgbot').value=C.tgbot;
   if(g('stgid'))g('stgid').value=C.tgid;
 }
@@ -681,6 +737,9 @@ function autoSave(){
   const nv=g('snvkey');if(nv!==null){C.nvidiaKey=nv;localStorage.setItem('j_nvkey',nv);}
   const gq=g('sgroq');if(gq!==null){C.groqKey=gq;localStorage.setItem('j_groq',gq);}
   const gh=g('sgh');if(gh!==null){C.gh=gh;localStorage.setItem('jgh',gh);}
+  const orK=g('sor');if(orK!==null){C.orKey=orK;localStorage.setItem('j_or',orK);}
+  const sbK=g('ssb');if(sbK!==null){C.sbKey=sbK;localStorage.setItem('j_sb',sbK);}
+  const hfK=g('shf');if(hfK!==null){C.hfKey=hfK;localStorage.setItem('j_hf',hfK);}
   const tb=g('stgbot');if(tb!==null){C.tgbot=tb;localStorage.setItem('jtgbot',tb);}
   const ti=g('stgid');if(ti!==null){C.tgid=ti;localStorage.setItem('jtgid',ti);}
 }
@@ -801,6 +860,28 @@ function autoCheckUpgrade(){
     const sha=d.sha?.substring(0,12)||'';
     if(sha&&sha!==curH)showN('🆕 Upgrade!','var(--g)');
   }).catch(()=>{});
+}
+
+// AUTO-PROBE — detectează provideri free la startup, zero config
+async function autoProbeAPIs(){
+  const hasKeys=!!(C.gh||C.groqKey||C.nvidiaKey||C.orKey||C.sbKey||C.hfKey);
+  try{
+    const r=await fetch('https://text.pollinations.ai/openai',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'openai',messages:[{role:'user',content:'hi'}],max_tokens:8}),
+      signal:AbortSignal.timeout(7000)
+    });
+    if(r.ok){
+      showN('🌸 Pollinations AI: ACTIV — zero config!','#00ffc8');
+      // Dacă nu are niciun key setat, selectează automat Pollinations
+      if(!hasKeys){
+        const idx=MODELS.findIndex(m=>m.be==='pol');
+        if(idx>=0){AM=idx;buildModels();}
+      }
+      return;
+    }
+  }catch(e){}
+  if(!hasKeys)showN('⚠️ Setează un key în ⚙️ Settings → modele gratis!','#f59e0b');
 }
 
 // SWARM — 2700 agenți animați, pornit după HUD
