@@ -224,17 +224,21 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
   <div class="pb" style="padding:0;position:relative;"><canvas id="agc"></canvas></div>
 </div>
 <div class="pan" id="panel-settings">
-  <div class="ph"><span class="pt">⚙️ SETĂRI</span><button class="pc" onclick="closeP('settings')">✕</button></div>
+  <div class="ph">
+    <button class="pc" style="border-color:rgba(0,255,136,.35);color:var(--g);font-size:.72rem;padding:.22rem .7rem;" onclick="autoSave();closeP('settings');showN('✅ Salvat!','var(--g)')">← Înapoi</button>
+    <span class="pt">⚙️ SETĂRI</span>
+    <button class="pc" onclick="closeP('settings')">✕</button>
+  </div>
   <div class="pb">
     <div style="font-size:.6rem;color:var(--g);margin-bottom:.65rem;border:1px solid rgba(0,255,136,.2);padding:.38rem .55rem;border-radius:6px;">🤖 9router — FREE: kr/claude-sonnet-4.5 · kr/deepseek-3.2 · kr/glm-5</div>
-    <div class="slbl">🌐 9ROUTER URL</div><input class="sinp" id="surl" placeholder="http://IP:20128">
-    <div class="slbl">🔑 9ROUTER API KEY</div><input class="sinp" id="s9key" type="password" placeholder="(opțional dacă REQUIRE_API_KEY=false)">
-    <div class="slbl">🦙 OLLAMA URL (local)</div><input class="sinp" id="sollama" placeholder="http://localhost:11434">
-    <div class="slbl">🟢 NVIDIA NIM API KEY</div><input class="sinp" id="snvkey" type="password" placeholder="nvapi-... (build.nvidia.com → free)">
-    <div class="slbl">🐙 GITHUB TOKEN</div><input class="sinp" id="sgh" type="password" placeholder="ghp_...">
-    <div class="slbl">📱 TELEGRAM BOT TOKEN</div><input class="sinp" id="stgbot" type="password" placeholder="...">
-    <div class="slbl">📱 TELEGRAM CHAT ID</div><input class="sinp" id="stgid" placeholder="123456789">
-    <button class="sbt" onclick="saveSet()">💾 Salvează</button>
+    <div class="slbl">🌐 9ROUTER URL</div><input class="sinp" id="surl" placeholder="http://IP:20128" oninput="autoSave()">
+    <div class="slbl">🔑 9ROUTER API KEY</div><input class="sinp" id="s9key" type="password" placeholder="(opțional dacă REQUIRE_API_KEY=false)" oninput="autoSave()">
+    <div class="slbl">🦙 OLLAMA URL (local)</div><input class="sinp" id="sollama" placeholder="http://localhost:11434" oninput="autoSave()">
+    <div class="slbl">🟢 NVIDIA NIM API KEY</div><input class="sinp" id="snvkey" type="password" placeholder="nvapi-... (build.nvidia.com → free)" oninput="autoSave()">
+    <div class="slbl">🐙 GITHUB TOKEN</div><input class="sinp" id="sgh" type="password" placeholder="ghp_..." oninput="autoSave()">
+    <div class="slbl">📱 TELEGRAM BOT TOKEN</div><input class="sinp" id="stgbot" type="password" placeholder="..." oninput="autoSave()">
+    <div class="slbl">📱 TELEGRAM CHAT ID</div><input class="sinp" id="stgid" placeholder="123456789" oninput="autoSave()">
+    <button class="sbt" onclick="saveSet()">💾 Salvează + Test</button>
     <button class="sbt" style="margin-left:.4rem;background:rgba(0,255,136,.1);border-color:rgba(0,255,136,.4);color:var(--g)" onclick="checkUpgrade()">🔄 Upgrade</button>
   </div>
 </div>
@@ -631,22 +635,20 @@ function loadSet(){
   if(g('stgbot'))g('stgbot').value=C.tgbot;
   if(g('stgid'))g('stgid').value=C.tgid;
 }
+function autoSave(){
+  const g=id=>{const el=document.getElementById(id);return el?el.value.trim():null;};
+  const v=g('surl');if(v!==null){C.apiUrl=v||'https://whoamisec-repo.vercel.app';localStorage.setItem('j_url',C.apiUrl);}
+  const k=g('s9key');if(k!==null){C.nr9key=k;localStorage.setItem('j_9key',k);}
+  const ol=g('sollama');if(ol!==null){C.ollamaUrl=ol||'http://localhost:11434';localStorage.setItem('j_ollama',C.ollamaUrl);}
+  const nv=g('snvkey');if(nv!==null){C.nvidiaKey=nv;localStorage.setItem('j_nvkey',nv);}
+  const gh=g('sgh');if(gh!==null){C.gh=gh;localStorage.setItem('jgh',gh);}
+  const tb=g('stgbot');if(tb!==null){C.tgbot=tb;localStorage.setItem('jtgbot',tb);}
+  const ti=g('stgid');if(ti!==null){C.tgid=ti;localStorage.setItem('jtgid',ti);}
+}
 async function saveSet(){
-  C.apiUrl=document.getElementById('surl').value.trim()||'https://whoamisec-repo.vercel.app';
-  C.nr9key=document.getElementById('s9key').value.trim();
-  C.ollamaUrl=document.getElementById('sollama').value.trim()||'http://localhost:11434';
-  C.nvidiaKey=document.getElementById('snvkey').value.trim();
-  C.gh=document.getElementById('sgh').value.trim();
-  C.tgbot=document.getElementById('stgbot').value.trim();
-  C.tgid=document.getElementById('stgid').value.trim();
-  localStorage.setItem('j_url',C.apiUrl);
-  localStorage.setItem('j_9key',C.nr9key);
-  localStorage.setItem('j_ollama',C.ollamaUrl);
-  localStorage.setItem('j_nvkey',C.nvidiaKey);
-  localStorage.setItem('jgh',C.gh);
-  localStorage.setItem('jtgbot',C.tgbot);
-  localStorage.setItem('jtgid',C.tgid);
-  showN('⏳ Test 9router...','var(--a)');
+  autoSave();
+  closeP('settings');
+  showN('⏳ Test conexiune...','var(--a)');
   const base=C.apiUrl.replace(/\/+$/,'');
   const ep=base.includes('vercel.app')?base+'/api/chat':base+'/v1/chat/completions';
   const h={'Content-Type':'application/json'};
@@ -655,9 +657,8 @@ async function saveSet(){
     const r=await fetch(ep,{method:'POST',headers:h,
       body:JSON.stringify({model:'kr/claude-sonnet-4.5',messages:[{role:'user',content:'ping'}],max_tokens:5}),
       signal:AbortSignal.timeout(10000)});
-    showN(r.ok?'✅ 9router conectat!':'⚠️ Eroare '+r.status,r.ok?'var(--g)':'#f59e0b');
-    if(r.ok)closeP('settings');
-  }catch(e){showN('⚠️ Offline: '+e.message,'#ef4444');}
+    showN(r.ok?'✅ Salvat + conectat!':'✅ Salvat — server: '+r.status,r.ok?'var(--g)':'#f59e0b');
+  }catch(e){showN('✅ Salvat local (offline)','var(--g)');}
 }
 
 // PAYMENT
