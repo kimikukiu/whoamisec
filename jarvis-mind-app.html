@@ -92,6 +92,7 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
 .ph{display:flex;align-items:center;justify-content:space-between;padding:.6rem .85rem;border-bottom:1px solid var(--b);flex-shrink:0;}
 .pt{font-size:.7rem;letter-spacing:.2em;color:var(--c);}
 .pc{background:none;border:1px solid var(--b);color:var(--m);padding:.2rem .5rem;font-size:.7rem;cursor:pointer;border-radius:6px;}
+.pcb{border-color:rgba(0,212,255,.38)!important;color:var(--c)!important;font-size:.72rem!important;padding:.22rem .7rem!important;}
 .pb{flex:1;overflow-y:auto;padding:.7rem;scrollbar-width:thin;scrollbar-color:var(--b) transparent;}
 .mc{background:rgba(0,212,255,.04);border:1px solid var(--b);border-radius:10px;padding:.7rem;margin-bottom:.45rem;cursor:pointer;display:flex;align-items:center;gap:.6rem;}
 .mc.sel{border-color:var(--c);background:rgba(0,212,255,.08);}
@@ -201,26 +202,26 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
 
 <!-- PANELS -->
 <div class="pan" id="panel-models">
-  <div class="ph"><span class="pt">🧠 9 MODELE FREE</span><button class="pc" onclick="closeP('models')">✕</button></div>
+  <div class="ph"><button class="pc pcb" onclick="closeP('models')">← Înapoi</button><span class="pt">🧠 MODELE FREE</span><button class="pc" onclick="closeP('models')">✕</button></div>
   <div class="pb" id="mlist"></div>
 </div>
 <div class="pan" id="panel-jb">
-  <div class="ph"><span class="pt">🔓 145 JAILBREAKS</span><button class="pc" onclick="closeP('jb')">✕</button></div>
+  <div class="ph"><button class="pc pcb" onclick="closeP('jb')">← Înapoi</button><span class="pt">🔓 145 JAILBREAKS</span><button class="pc" onclick="closeP('jb')">✕</button></div>
   <div class="pb">
     <div style="font-size:.62rem;color:var(--m);margin-bottom:.6rem">Activ: <span id="jbn" style="color:var(--r)">ABLITERAT RO</span></div>
     <div class="jgrid" id="jgrid"></div>
   </div>
 </div>
 <div class="pan" id="panel-agents">
-  <div class="ph"><span class="pt">⚡ 2700 AGENȚI</span><button class="pc" onclick="closeP('agents')">✕</button></div>
+  <div class="ph"><button class="pc pcb" onclick="closeP('agents')">← Înapoi</button><span class="pt">⚡ 2700 AGENȚI</span><button class="pc" onclick="closeP('agents')">✕</button></div>
   <div class="pb" id="abody"></div>
 </div>
 <div class="pan" id="panel-obs">
-  <div class="ph"><span class="pt">🕸 OBSIDIAN · JULES 3D</span><button class="pc" onclick="closeP('obs')">✕</button></div>
+  <div class="ph"><button class="pc pcb" onclick="closeP('obs')">← Înapoi</button><span class="pt">🕸 OBSIDIAN · JULES 3D</span><button class="pc" onclick="closeP('obs')">✕</button></div>
   <div class="pb" style="padding:0;position:relative;"><canvas id="obsc"></canvas></div>
 </div>
 <div class="pan" id="panel-antigrav">
-  <div class="ph"><span class="pt">🌌 ANTIGRAVITY 3D — 2700 AGENȚI</span><button class="pc" onclick="closeP('antigrav')">✕</button></div>
+  <div class="ph"><button class="pc pcb" onclick="closeP('antigrav')">← Înapoi</button><span class="pt">🌌 ANTIGRAVITY 3D</span><button class="pc" onclick="closeP('antigrav')">✕</button></div>
   <div class="pb" style="padding:0;position:relative;"><canvas id="agc"></canvas></div>
 </div>
 <div class="pan" id="panel-settings">
@@ -230,7 +231,7 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
     <button class="pc" onclick="closeP('settings')">✕</button>
   </div>
   <div class="pb">
-    <div style="font-size:.6rem;color:var(--g);margin-bottom:.65rem;border:1px solid rgba(0,255,136,.2);padding:.38rem .55rem;border-radius:6px;">🤖 9router — FREE: kr/claude-sonnet-4.5 · kr/deepseek-3.2 · kr/glm-5</div>
+    <div style="font-size:.6rem;color:var(--g);margin-bottom:.65rem;border:1px solid rgba(0,255,136,.2);padding:.38rem .55rem;border-radius:6px;">✅ 9router.com PRE-CONFIGURAT — modele free active automat fără setări!</div>
     <div class="slbl">🌐 9ROUTER URL</div><input class="sinp" id="surl" placeholder="http://IP:20128" oninput="autoSave()">
     <div class="slbl">🔑 9ROUTER API KEY</div><input class="sinp" id="s9key" type="password" placeholder="(opțional dacă REQUIRE_API_KEY=false)" oninput="autoSave()">
     <div class="slbl">🦙 OLLAMA URL (local)</div><input class="sinp" id="sollama" placeholder="http://localhost:11434" oninput="autoSave()">

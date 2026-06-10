@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   const { messages, model = 'kr/claude-sonnet-4.5', max_tokens = 2048 } = req.body || {};
   if (!messages?.length) return res.status(400).json({ error: 'messages required' });
 
-  const nineRouterUrl = process.env.NINEROUTER_URL || 'http://localhost:20128';
+  const nineRouterUrl = process.env.NINEROUTER_URL || 'https://9router.com';
   const nineRouterKey = process.env.NINEROUTER_KEY || '';
 
   const headers = { 'Content-Type': 'application/json' };
