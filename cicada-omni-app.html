@@ -4,1275 +4,1094 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#000000">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="description" content="Cicada 3301 - The Liber Primus. Solve puzzles. Earn XMR. Prove yourself.">
-<link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="icon.png">
 <title>CICADA 3301</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--g:#39ff14;--gd:rgba(57,255,20,.25);--gs:rgba(57,255,20,.08);--gg:rgba(57,255,20,.5);--gr:57,255,20;--gold:#ffd700;--silver:#c0c0c0;--bronze:#cd7f32;--red:#ff0033;--cyan:#00ffff;--warn:#ff6600}
-html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Share Tech Mono',monospace;color:#fff}
-#matrix{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:.45}
-body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.012) 2px,rgba(255,255,255,.012) 4px);pointer-events:none;z-index:9998}
-@keyframes glitch{0%{text-shadow:.05em 0 0 var(--g),-.05em -.025em 0 var(--g)}25%{text-shadow:-.03em .02em 0 var(--g),.04em -.01em 0 var(--g)}50%{text-shadow:.02em -.03em 0 var(--g),-.04em .01em 0 var(--g)}75%{text-shadow:-.04em .01em 0 var(--g),.03em -.02em 0 var(--g)}100%{text-shadow:.05em 0 0 var(--g),-.05em -.025em 0 var(--g)}}
-@keyframes flicker{0%,90%,100%{opacity:1}92%,94%{opacity:.15}93%,95%{opacity:1}}
-@keyframes pulse{0%,100%{box-shadow:0 0 8px var(--gd),inset 0 0 5px var(--gs)}50%{box-shadow:0 0 20px var(--gg),inset 0 0 10px var(--gd)}}
-@keyframes glow-pulse{0%,100%{text-shadow:0 0 8px var(--g),0 0 18px rgba(var(--gr),.5)}50%{text-shadow:0 0 18px var(--g),0 0 38px rgba(var(--gr),.9),0 0 60px rgba(var(--gr),.3)}}
-@keyframes color-cycle{0%{color:#ff0033;text-shadow:0 0 10px #ff0033}25%{color:#39ff14;text-shadow:0 0 10px #39ff14}50%{color:#00ffff;text-shadow:0 0 10px #00ffff}75%{color:#bf00ff;text-shadow:0 0 10px #bf00ff}100%{color:#ff0033;text-shadow:0 0 10px #ff0033}}
-.color-cycle{animation:color-cycle 4s linear infinite}
-@keyframes cicada-fly-1{0%{transform:translate(-120px,-80px) rotate(-5deg) scale(.6);opacity:0}8%{opacity:.8}25%{transform:translate(25vw,15vh) rotate(3deg) scale(.7);opacity:.9}50%{transform:translate(55vw,40vh) rotate(-8deg) scale(.6);opacity:.7}75%{transform:translate(80vw,20vh) rotate(5deg) scale(.8);opacity:.5}92%{opacity:.2}100%{transform:translate(110vw,-50px) rotate(-3deg) scale(.4);opacity:0}}
-@keyframes wing-flap{0%,100%{transform:scaleY(1)}25%{transform:scaleY(.85)}50%{transform:scaleY(1.1)}75%{transform:scaleY(.9)}}
-.fly-cicada{position:fixed;z-index:100;pointer-events:none;filter:drop-shadow(0 0 6px rgba(var(--gr),.5))}
-.fly-cicada svg{width:50px;height:50px}
-.fly-cicada .wl,.fly-cicada .wr{animation:wing-flap .12s ease-in-out infinite;transform-origin:center top}
-#fly1{top:5%;left:0;animation:cicada-fly-1 18s linear infinite;animation-delay:2s}
-@keyframes cipher-flick{0%,85%,100%{opacity:1}86%,88%,90%{opacity:.1}87%,89%{opacity:1}}
-@keyframes float-y{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --red:#ff2020;--green:#39ff14;--cyan:#00ffff;--purple:#bf00ff;
+  --dark:#000;--card:rgba(0,0,0,0.75);
+}
+html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',monospace;color:#fff;}
 
-/* ── APP SHELL ── */
-#app{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;overflow:hidden}
-.app-hdr{background:rgba(0,0,0,.92);border-bottom:1px solid rgba(var(--gr),.25);padding:.55rem .8rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative;z-index:5}
-.app-logo{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:900;letter-spacing:.14em;color:var(--g);text-shadow:0 0 10px var(--g),0 0 20px rgba(var(--gr),.3)}
-.app-logo span{color:#fff}
-.hdr-right{display:flex;align-items:center;gap:.4rem}
-.hdr-btn{background:none;border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:4px;padding:.2rem .45rem;font-size:.68rem;cursor:pointer;font-family:'Share Tech Mono',monospace}
-.hdr-btn.on{border-color:var(--g);color:var(--g)}
-.tab-body{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:.7rem;padding-bottom:4.5rem}
-.tab-body::-webkit-scrollbar{width:2px}
-.tab-body::-webkit-scrollbar-thumb{background:rgba(var(--gr),.3)}
-.tab-bar{display:flex;background:rgba(0,0,0,.95);border-top:1px solid rgba(var(--gr),.2);flex-shrink:0;position:relative;z-index:5}
-.tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:.4rem .15rem .35rem;border:none;background:none;color:rgba(255,255,255,.35);font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:color .2s}
-.tab-btn .ti{font-size:1.1rem;margin-bottom:.1rem}
-.tab-btn.active{color:var(--g)}
-.tp{display:none}.tp.active{display:block}
+/* ── MATRIX CANVAS ── */
+#matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:.55;}
 
-/* ── CARDS ── */
-.card{background:rgba(0,0,0,.82);border:1px solid rgba(var(--gr),.15);border-radius:8px;padding:.75rem;margin-bottom:.6rem}
-.card-t{font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:.08em;color:var(--g);text-transform:uppercase;margin-bottom:.5rem}
-.card-t.gold{color:var(--gold)}
-.card-t.cyan{color:var(--cyan)}
-.card-t.warn{color:var(--warn)}
+/* ── SPLASH SCREEN ── */
+#splash{
+  position:fixed;inset:0;z-index:100;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:#000;
+}
+.splash-title{
+  font-size:2.4rem;font-weight:900;letter-spacing:.18em;
+  color:var(--red);text-shadow:0 0 20px var(--red),0 0 40px rgba(255,32,32,.4);
+  animation:pulse-title 1.4s ease-in-out infinite;
+}
+@keyframes pulse-title{0%,100%{text-shadow:0 0 20px var(--red),0 0 40px rgba(255,32,32,.4);}50%{text-shadow:0 0 40px var(--red),0 0 80px rgba(255,32,32,.7);}}
+.splash-good{
+  font-size:1.5rem;font-weight:700;letter-spacing:.12em;color:var(--red);
+  margin-top:.6rem;text-shadow:0 0 12px var(--red);
+  animation:flicker 2.5s steps(1) infinite;
+}
+@keyframes flicker{0%,90%,100%{opacity:1;}92%,94%{opacity:.2;}93%,95%{opacity:1;}}
+.splash-box{
+  margin-top:.8rem;
+  border:2px solid #fff;padding:.45rem 2.2rem;
+  font-size:1.1rem;font-weight:700;letter-spacing:.22em;color:#fff;
+  text-shadow:0 0 8px rgba(255,255,255,.5);
+}
+.splash-num{
+  margin-top:.6rem;font-size:1.1rem;letter-spacing:.5em;
+  color:var(--red);font-weight:700;
+}
+/* MOTH */
+.splash-moth{
+  margin-top:1.4rem;width:220px;height:auto;
+  filter:drop-shadow(0 0 18px var(--green)) drop-shadow(0 0 40px rgba(57,255,20,.5));
+  animation:moth-float 3s ease-in-out infinite, moth-color 6s linear infinite;
+}
+@keyframes moth-float{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+@keyframes moth-color{
+  0%{filter:drop-shadow(0 0 18px #39ff14) drop-shadow(0 0 40px rgba(57,255,20,.5)) hue-rotate(0deg);}
+  33%{filter:drop-shadow(0 0 18px #00ffff) drop-shadow(0 0 40px rgba(0,255,255,.5)) hue-rotate(120deg);}
+  66%{filter:drop-shadow(0 0 18px #bf00ff) drop-shadow(0 0 40px rgba(191,0,255,.5)) hue-rotate(240deg);}
+  100%{filter:drop-shadow(0 0 18px #39ff14) drop-shadow(0 0 40px rgba(57,255,20,.5)) hue-rotate(360deg);}
+}
 
-/* ── LOGIN MODAL ── */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:5000;justify-content:center;align-items:center;padding:1rem}
-.modal-bg.open{display:flex}
-.modal-box{background:#050505;border:1.5px solid var(--g);border-radius:8px;padding:1.3rem;max-width:400px;width:100%;box-shadow:0 0 30px rgba(var(--gr),.2)}
-.modal-box h3{font-family:'Orbitron',sans-serif;color:var(--g);font-size:.75rem;letter-spacing:3px;margin-bottom:.8rem;text-align:center;text-shadow:0 0 8px rgba(var(--gr),.4)}
-.modal-box input{width:100%;background:rgba(0,0,0,.6);border:1px solid rgba(var(--gr),.2);color:var(--g);padding:.55rem .7rem;font-family:'Share Tech Mono',monospace;font-size:.78rem;border-radius:4px;margin-bottom:.5rem;outline:none}
-.modal-box input:focus{border-color:var(--g);box-shadow:0 0 6px var(--gs)}
-.modal-box input::placeholder{color:rgba(255,255,255,.1)}
-.mbtn-row{display:flex;gap:.5rem;margin-top:.5rem}
-.mbtn{flex:1;padding:.6rem;border:none;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:1.5px;cursor:pointer;border-radius:4px;text-transform:uppercase}
-.mbtn-primary{background:var(--g);color:#000}
-.mbtn-primary:active{background:var(--cyan)}
-.mbtn-ghost{background:transparent;color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.1)}
-.mbtn-warn{background:transparent;color:var(--warn);border:1px solid var(--warn)}
+.splash-enter{
+  margin-top:2rem;
+  background:rgba(57,255,20,.12);border:1px solid var(--green);
+  color:var(--green);padding:.65rem 2.5rem;border-radius:4px;
+  font-family:'Courier New',monospace;font-size:.9rem;font-weight:700;
+  letter-spacing:.1em;cursor:pointer;text-transform:uppercase;
+  animation:btn-pulse 2s ease-in-out infinite;
+}
+@keyframes btn-pulse{0%,100%{box-shadow:0 0 8px var(--green);}50%{box-shadow:0 0 24px var(--green),0 0 48px rgba(57,255,20,.3);}}
+.splash-cipher{
+  margin-top:1.4rem;
+  font-family:'Courier New',monospace;font-size:1.05rem;font-weight:700;
+  letter-spacing:.12em;color:var(--green);
+  text-shadow:0 0 10px var(--green),0 0 22px rgba(57,255,20,.6);
+  animation:cipher-glow 3s ease-in-out infinite, cipher-scan 8s steps(1) infinite;
+  text-align:center;
+}
+@keyframes cipher-glow{0%,100%{text-shadow:0 0 10px var(--green),0 0 22px rgba(57,255,20,.6);}50%{text-shadow:0 0 24px var(--green),0 0 50px rgba(57,255,20,.9),0 0 80px rgba(57,255,20,.4);}}
+@keyframes cipher-scan{0%,85%,100%{opacity:1;}86%,88%,90%{opacity:.1;}87%,89%{opacity:1;}}
 
-/* ── PUZZLE TAB ── */
-.hero-banner{text-align:center;margin-bottom:.7rem;padding:.7rem .5rem;background:rgba(0,0,0,.7);border:1px solid rgba(var(--gr),.2);border-radius:8px}
-.hero-banner h1{font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;letter-spacing:.18em;color:var(--g);text-shadow:0 0 10px var(--g),0 0 25px rgba(var(--gr),.4);animation:glitch 3s infinite,flicker 5s infinite}
-.hero-sub{font-size:.62rem;color:rgba(var(--gr),.5);letter-spacing:2px;margin-top:.2rem}
-.cipher-line{font-size:.68rem;font-weight:700;letter-spacing:.08em;color:var(--g);text-shadow:0 0 8px var(--g),0 0 18px rgba(var(--gr),.5);margin-top:.35rem;animation:glow-pulse 3s ease-in-out infinite,cipher-flick 8s steps(1) infinite}
-.cicada-svg{width:60px;height:40px;margin:.4rem auto 0;animation:float-y 3s ease-in-out infinite}
-.stats-row{display:flex;justify-content:space-around;padding:.5rem 0;border-top:1px solid rgba(var(--gr),.08);margin-top:.5rem}
-.stat-item{text-align:center}
-.stat-lbl{font-size:.48rem;color:rgba(var(--gr),.4);letter-spacing:2px;text-transform:uppercase}
-.stat-val{font-family:'Orbitron',sans-serif;font-size:.82rem;font-weight:700;color:var(--g);text-shadow:0 0 6px rgba(var(--gr),.3)}
-.user-bar{display:flex;align-items:center;justify-content:space-between;padding:.45rem .6rem;background:rgba(var(--gr),.05);border:1px solid rgba(var(--gr),.12);border-radius:6px;margin-bottom:.6rem;font-size:.65rem;color:var(--g)}
-.user-bar .ub-name{font-weight:700}
-.user-bar .ub-level{background:rgba(var(--gr),.1);border:1px solid rgba(var(--gr),.2);border-radius:10px;padding:.12rem .5rem;font-size:.52rem;letter-spacing:1px}
-.user-bar .ub-logout{color:var(--warn);cursor:pointer;font-size:.58rem}
-.progress-row{margin-bottom:.6rem}
-.progress-bar-wrap{width:100%;height:16px;background:#111;border-radius:8px;overflow:hidden;border:1px solid rgba(var(--gr),.12)}
-.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--g),var(--cyan));width:0%;transition:width .8s;border-radius:8px}
-.progress-txt{font-size:.55rem;color:rgba(var(--gr),.4);letter-spacing:1.5px;text-align:center;margin-top:.25rem}
-.puzzle-card{background:rgba(0,0,0,.7);border:1px solid rgba(var(--gr),.12);border-radius:6px;padding:.65rem;margin-bottom:.45rem;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
-.puzzle-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--g),transparent);opacity:0;transition:opacity .3s}
-.puzzle-card:active{border-color:var(--g);transform:scale(.98)}
-.puzzle-card:active::before{opacity:1}
-.puzzle-card.solved{border-color:rgba(var(--gold),.4);background:rgba(var(--gold),.03)}
-.puzzle-card.solved::after{content:'SOLVED';position:absolute;top:8px;right:8px;color:var(--gold);font-size:.48rem;font-weight:700;letter-spacing:2px}
-.pc-lvl{font-size:.48rem;color:rgba(var(--gr),.4);letter-spacing:2px;text-transform:uppercase}
-.pc-name{font-family:'Orbitron',sans-serif;font-size:.72rem;font-weight:700;color:var(--g);margin:.2rem 0;text-shadow:0 0 4px rgba(var(--gr),.3)}
-.pc-diff{display:inline-block;font-size:.5rem;padding:.1rem .45rem;border-radius:8px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:.3rem}
-.df-beginner{background:rgba(0,255,102,.08);color:#00ff66;border:1px solid rgba(0,255,102,.15)}
-.df-easy{background:rgba(0,255,255,.06);color:#00ffff;border:1px solid rgba(0,255,255,.12)}
-.df-medium{background:rgba(255,204,0,.06);color:#ffcc00;border:1px solid rgba(255,204,0,.12)}
-.df-hard{background:rgba(255,102,0,.06);color:#ff6600;border:1px solid rgba(255,102,0,.12)}
-.df-expert{background:rgba(255,0,51,.06);color:#ff0033;border:1px solid rgba(255,0,51,.12)}
-.df-mythic{background:rgba(204,0,255,.06);color:#cc00ff;border:1px solid rgba(204,0,255,.12)}
-.df-legendary{background:rgba(255,0,255,.08);color:#ff00ff;border:1px solid rgba(255,0,255,.2);text-shadow:0 0 3px rgba(255,0,255,.3)}
-.df-intermediate{background:rgba(var(--g),.06);color:var(--g);border:1px solid rgba(var(--gr),.15)}
-.pc-desc{font-size:.6rem;color:rgba(255,255,255,.4);line-height:1.4;margin-bottom:.3rem}
-.pc-reward{font-size:.58rem;color:var(--gold)}
-.pc-meta{display:flex;justify-content:space-between;font-size:.48rem;color:rgba(var(--gr),.3);margin-top:.2rem}
-.tournament-card{text-align:center;border:1.5px solid var(--gold);background:rgba(var(--gold),.02)}
-.tournament-card h4{font-family:'Orbitron',sans-serif;color:var(--gold);font-size:.65rem;letter-spacing:3px;margin-bottom:.3rem}
-.tournament-card .t-prize{color:var(--gold);font-size:.95rem;font-weight:700}
-.tournament-card .t-list{font-size:.58rem;color:rgba(var(--gold),.6);margin:.25rem 0}
-.tournament-card .t-entry{font-size:.5rem;color:rgba(255,255,255,.3)}
+/* ── MAIN APP ── */
+#app{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;overflow:hidden;}
 
-/* ── PUZZLE SOLVE MODAL ── */
-.solve-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:6000;justify-content:center;align-items:center;padding:1rem}
-.solve-modal.open{display:flex}
-.solve-box{background:#050505;border:1.5px solid var(--g);border-radius:8px;padding:1.2rem;max-width:420px;width:100%;box-shadow:0 0 30px rgba(var(--gr),.2)}
-.solve-box h4{font-family:'Orbitron',sans-serif;color:var(--g);font-size:.7rem;letter-spacing:2px;margin-bottom:.5rem}
-.solve-box .sm-desc{color:rgba(255,255,255,.5);font-size:.7rem;line-height:1.5;margin-bottom:.4rem;padding:.5rem;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.04);border-radius:4px}
-.solve-box .sm-reward{color:var(--gold);font-size:.68rem;margin-bottom:.4rem}
-.solve-box .sm-timer{color:var(--g);font-size:.62rem;letter-spacing:1.5px;text-align:center;margin-bottom:.3rem}
-.solve-box textarea{width:100%;background:rgba(0,0,0,.6);border:1px solid rgba(var(--gr),.2);color:var(--g);padding:.5rem .65rem;font-family:'Share Tech Mono',monospace;font-size:.72rem;border-radius:4px;margin-bottom:.4rem;outline:none;resize:none}
-.solve-box textarea:focus{border-color:var(--g)}
-.solve-box textarea::placeholder{color:rgba(255,255,255,.1)}
-.sm-result{font-size:.68rem;padding:.4rem;margin-top:.4rem;border-radius:4px;display:none}
-.sm-result.ok{display:block;color:#00ff66;background:rgba(0,255,102,.04);border:1px solid rgba(0,255,102,.12)}
-.sm-result.err{display:block;color:#ff0033;background:rgba(255,0,51,.04);border:1px solid rgba(255,0,51,.12)}
-.sm-btns{display:flex;gap:.4rem;margin-top:.3rem}
-.sm-btns .mbtn{font-size:.55rem;padding:.5rem}
+/* Header */
+.app-header{
+  background:rgba(0,0,0,.9);border-bottom:1px solid rgba(255,32,32,.3);
+  padding:.6rem 1rem;display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.app-logo{font-size:1.1rem;font-weight:900;letter-spacing:.15em;color:var(--red);text-shadow:0 0 10px var(--red);}
+.app-logo span{color:#fff;}
+.header-right{display:flex;align-items:center;gap:.5rem;}
+.sound-btn{background:none;border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:4px;padding:.2rem .5rem;font-size:.75rem;cursor:pointer;}
+.sound-btn.on{border-color:var(--green);color:var(--green);}
 
-/* ── LEADERBOARD TAB ── */
-.lb-row{display:flex;align-items:center;gap:.5rem;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.03)}
-.lb-row:last-child{border-bottom:none}
-.lb-rank{font-size:.7rem;width:1.3rem;font-weight:700;color:var(--g)}
-.lb-rank.r1{color:var(--gold);text-shadow:0 0 5px rgba(255,215,0,.4)}
-.lb-rank.r2{color:var(--silver)}
-.lb-rank.r3{color:var(--bronze)}
-.lb-name{flex:1;font-size:.72rem;color:rgba(255,255,255,.7)}
-.lb-pts{font-size:.62rem;color:var(--g);text-align:right}
-.lb-title{font-size:.48rem;color:rgba(var(--gold),.4);display:block;text-align:right}
-.lb-you{border-top:1px dashed rgba(var(--gr),.25);padding-top:.5rem;margin-top:.3rem}
-.lb-you .lb-rank{color:var(--red)}
-.lb-you .lb-name{color:var(--red)}
-.month-label{font-family:'Orbitron',sans-serif;font-size:.5rem;color:rgba(var(--gold),.3);letter-spacing:2px;text-align:center;padding:.5rem 0;border-top:1px solid rgba(var(--gold),.08);margin:.3rem 0}
+/* Tab content */
+.tab-body{flex:1;overflow-y:auto;padding:.9rem;overscroll-behavior:contain;}
+.tab-body::-webkit-scrollbar{width:3px;}
+.tab-body::-webkit-scrollbar-thumb{background:rgba(255,32,32,.3);}
 
-/* ── WINNERS TAB ── */
-.winner-card{background:rgba(0,0,0,.6);border:1px solid rgba(var(--gold),.12);border-radius:6px;padding:.65rem;text-align:center;transition:all .2s;cursor:default}
-.winner-card:active{transform:scale(.97)}
-.winner-card.gold{border-color:rgba(var(--gold),.4);background:rgba(var(--gold),.03)}
-.winner-card.silver{border-color:rgba(192,192,192,.3);background:rgba(192,192,192,.02)}
-.winner-card.bronze{border-color:rgba(205,127,50,.3);background:rgba(205,127,50,.02)}
-.wc-medal{font-size:1rem;margin-bottom:.15rem}
-.wc-rank{font-family:'Orbitron',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:.15rem}
-.winner-card.gold .wc-rank{color:var(--gold);text-shadow:0 0 8px rgba(255,215,0,.4)}
-.winner-card.silver .wc-rank{color:var(--silver);text-shadow:0 0 6px rgba(192,192,192,.3)}
-.winner-card.bronze .wc-rank{color:var(--bronze);text-shadow:0 0 6px rgba(205,127,50,.3)}
-.wc-name{font-family:'Orbitron',sans-serif;font-size:.58rem;color:rgba(255,255,255,.7);letter-spacing:1.5px;margin-bottom:.2rem}
-.wc-prize{font-size:.55rem;color:var(--gold);font-weight:600}
-.wc-puzzles{font-size:.48rem;color:rgba(var(--gr),.3);margin-top:.15rem;letter-spacing:1px}
-.wc-avatar{width:32px;height:32px;border-radius:50%;margin:0 auto .3rem;display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:.7rem;font-weight:700;background:rgba(var(--gr),.08);border:1px solid rgba(var(--gr),.2)}
-.winner-card.gold .wc-avatar{border-color:rgba(var(--gold),.4);color:var(--gold)}
-.winner-card.silver .wc-avatar{border-color:rgba(192,192,192,.3);color:var(--silver)}
-.winner-card.bronze .wc-avatar{border-color:rgba(205,127,50,.3);color:var(--bronze)}
-.winners-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
-.tp-overall{text-align:center;padding:.6rem;border:1px solid rgba(var(--gold),.15);border-radius:6px;background:rgba(var(--gold),.02);margin-bottom:.5rem}
-.tp-score{font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:700;color:var(--gold);text-shadow:0 0 12px rgba(255,215,0,.4)}
-.tp-stars{font-size:1rem;color:var(--gold);margin:.15rem 0}
-.tp-label{font-size:.52rem;color:rgba(var(--gold),.5);letter-spacing:1.5px}
-.tp-count{font-size:.48rem;color:rgba(var(--gr),.3);margin-top:.15rem}
-.tp-badge{display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .7rem;border:1px solid rgba(0,204,255,.25);border-radius:15px;font-size:.52rem;color:#00ccff;margin-bottom:.4rem;letter-spacing:1px}
+/* Tab bar */
+.tab-bar{
+  display:flex;background:rgba(0,0,0,.95);border-top:1px solid rgba(255,32,32,.25);
+  flex-shrink:0;
+}
+.tab-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:.5rem .2rem .4rem;border:none;background:none;color:rgba(255,255,255,.4);
+  font-family:'Courier New',monospace;font-size:.6rem;letter-spacing:.04em;
+  text-transform:uppercase;cursor:pointer;transition:color .2s;
+}
+.tab-btn .ti{font-size:1.2rem;margin-bottom:.15rem;}
+.tab-btn.active{color:var(--red);}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
 
-/* ── REVIEWS TAB ── */
-.review-card{background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.04);border-radius:6px;padding:.6rem;margin-bottom:.4rem}
-.review-card:active{border-color:rgba(255,255,255,.08)}
-.rev-stars{font-size:.68rem;color:var(--gold);margin-bottom:.3rem;letter-spacing:1px}
-.rev-text{font-size:.6rem;color:rgba(255,255,255,.55);line-height:1.5;font-style:italic;margin-bottom:.35rem}
-.rev-author{font-size:.55rem;color:var(--g);letter-spacing:1px;font-weight:600}
-.rev-date{font-size:.45rem;color:rgba(var(--gr),.3);margin-top:.15rem}
-.rev-source{display:inline-block;font-size:.42rem;padding:.08rem .4rem;border:1px solid rgba(0,255,136,.15);border-radius:8px;color:#00ff88;background:rgba(0,255,136,.03);margin-top:.2rem;letter-spacing:.5px}
+/* Cards */
+.card{background:rgba(0,0,0,.8);border:1px solid rgba(255,32,32,.2);border-radius:8px;padding:.9rem;margin-bottom:.75rem;}
+.card-title{font-size:.7rem;font-weight:700;letter-spacing:.1em;color:var(--red);text-transform:uppercase;margin-bottom:.65rem;}
 
-/* ── INVITE TAB ── */
-.invite-box{display:flex;gap:.4rem;align-items:center;margin:.4rem 0}
-.invite-input{flex:1;background:rgba(0,0,0,.5);border:1px solid rgba(var(--gr),.15);color:var(--g);padding:.45rem .6rem;font-family:'Share Tech Mono',monospace;font-size:.62rem;border-radius:4px;outline:none;text-align:center;letter-spacing:.5px}
-.invite-input:focus{border-color:var(--g)}
-.invite-copy{background:var(--g);color:#000;border:none;font-family:'Orbitron',sans-serif;font-size:.55rem;font-weight:700;letter-spacing:1px;cursor:pointer;border-radius:4px;padding:.45rem .8rem;transition:all .2s;white-space:nowrap}
-.invite-copy:active{background:var(--cyan)}
-.invite-copy.copied{background:#00ff66}
-.invite-reward{text-align:center;font-size:.55rem;color:var(--gold);margin-top:.3rem;letter-spacing:1px}
-.invite-social{display:flex;gap:.4rem;justify-content:center;margin-top:.5rem;flex-wrap:wrap}
-.inv-social-btn{display:inline-flex;align-items:center;gap:.3rem;padding:.35rem .6rem;border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-size:.52rem;border-radius:3px;text-decoration:none;letter-spacing:.5px;cursor:pointer;transition:all .2s}
-.inv-social-btn:active{border-color:var(--g);color:var(--g)}
-.inv-social-btn.tg{border-color:rgba(0,136,204,.25);color:#0088cc}
-.inv-social-btn.x{border-color:rgba(255,255,255,.12);color:rgba(255,255,255,.5)}
-.inv-social-btn.wa{border-color:rgba(37,211,102,.25);color:#25d366}
-.ref-stats{display:flex;gap:.3rem;margin-top:.4rem}
-.ref-stat{flex:1;text-align:center;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:.3rem .2rem;font-size:.52rem;color:rgba(255,255,255,.4)}
-.ref-stat b{font-size:.82rem;display:block;color:var(--g)}
+/* Puzzle levels */
+.level-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.65rem 0;border-bottom:1px solid rgba(255,255,255,.05);
+}
+.level-item:last-child{border-bottom:none;}
+.level-num{font-size:.65rem;color:rgba(255,255,255,.4);width:1.5rem;}
+.level-name{flex:1;font-size:.82rem;font-weight:600;}
+.level-reward{font-size:.7rem;color:var(--green);}
+.level-status{font-size:.65rem;padding:.15rem .4rem;border-radius:3px;margin-left:.5rem;}
+.ls-locked{background:rgba(255,255,255,.06);color:rgba(255,255,255,.3);}
+.ls-open{background:rgba(57,255,20,.1);color:var(--green);border:1px solid rgba(57,255,20,.3);}
+.ls-solved{background:rgba(0,255,255,.1);color:var(--cyan);border:1px solid rgba(0,255,255,.3);}
 
-/* ── PLANS SECTION (inside invite tab) ── */
-.plan-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;padding:.55rem;margin-bottom:.35rem;cursor:pointer;transition:all .2s}
-.plan-card:active{background:rgba(var(--gr),.05);border-color:rgba(var(--gr),.2)}
-.plan-card.popular{border-color:rgba(var(--gr),.3);background:rgba(var(--gr),.03)}
-.plan-name{font-size:.62rem;font-weight:700;color:var(--g)}
-.plan-price{font-size:.85rem;font-weight:700}
-.plan-detail{font-size:.52rem;color:rgba(255,255,255,.4);margin-top:.15rem}
-.plan-badge{display:inline-block;background:var(--g);color:#000;font-size:.4rem;font-weight:700;padding:.08rem .35rem;border-radius:3px;letter-spacing:.5px;margin-left:.3rem}
+/* Invite / plans rows */
+.plan-row{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:.65rem .75rem;cursor:pointer;margin-bottom:.4rem;}
+.plan-row:active{background:rgba(255,32,32,.08);}
+.plan-name{font-size:.72rem;font-weight:700;color:var(--red);}
+.plan-price{font-size:.95rem;font-weight:700;}
+.plan-detail{font-size:.62rem;color:rgba(255,255,255,.5);}
+
+/* Leaderboard */
+.lb-row{display:flex;align-items:center;gap:.6rem;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.lb-row:last-child{border-bottom:none;}
+.lb-rank{font-size:.75rem;width:1.4rem;color:var(--red);font-weight:700;}
+.lb-name{flex:1;font-size:.8rem;}
+.lb-pts{font-size:.72rem;color:var(--green);}
+
+/* Chat */
+.chat-msgs{height:180px;overflow-y:auto;margin-bottom:.6rem;display:flex;flex-direction:column;gap:.4rem;}
+.chat-msgs::-webkit-scrollbar{width:2px;}
+.msg-row{display:flex;gap:.4rem;align-items:flex-start;}
+.msg-avatar{width:22px;height:22px;border-radius:50%;background:rgba(255,32,32,.3);border:1px solid rgba(255,32,32,.4);display:flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0;}
+.msg-bubble{background:rgba(255,255,255,.06);border-radius:6px;padding:.35rem .55rem;font-size:.75rem;max-width:85%;}
+.msg-bubble.mine{background:rgba(255,32,32,.15);border:1px solid rgba(255,32,32,.2);margin-left:auto;}
+.chat-input-row{display:flex;gap:.4rem;}
+.chat-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,32,32,.25);color:#fff;border-radius:6px;padding:.45rem .6rem;font-family:'Courier New',monospace;font-size:.8rem;}
+.chat-send{background:rgba(255,32,32,.2);border:1px solid rgba(255,32,32,.4);color:var(--red);border-radius:6px;padding:.45rem .8rem;font-size:.8rem;cursor:pointer;}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;border-radius:6px;font-family:'Courier New',monospace;font-weight:700;cursor:pointer;border:none;letter-spacing:.04em;}
+.btn-red{background:rgba(255,32,32,.15);border:1px solid rgba(255,32,32,.4);color:var(--red);}
+.btn-green{background:rgba(57,255,20,.1);border:1px solid rgba(57,255,20,.3);color:var(--green);}
+.btn-block{width:100%;padding:.6rem;font-size:.82rem;margin-top:.4rem;}
+.btn-sm{padding:.25rem .6rem;font-size:.72rem;}
+
+/* Notif */
+.notif{position:fixed;top:56px;left:50%;transform:translateX(-50%) translateY(-8px);background:rgba(255,32,32,.9);color:#fff;padding:.45rem 1.2rem;border-radius:20px;font-size:.8rem;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.notif.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Color cycle animation for texts */
+@keyframes color-cycle{
+  0%{color:#ff2020;text-shadow:0 0 10px #ff2020;}
+  25%{color:#39ff14;text-shadow:0 0 10px #39ff14;}
+  50%{color:#00ffff;text-shadow:0 0 10px #00ffff;}
+  75%{color:#bf00ff;text-shadow:0 0 10px #bf00ff;}
+  100%{color:#ff2020;text-shadow:0 0 10px #ff2020;}
+}
+.color-cycle{animation:color-cycle 4s linear infinite;}
+
+/* Puzzle input */
+.puzzle-input{width:100%;background:rgba(0,0,0,.6);border:1px solid rgba(255,32,32,.3);color:#39ff14;padding:.5rem .75rem;border-radius:6px;font-family:'Courier New',monospace;font-size:.85rem;letter-spacing:.05em;margin-bottom:.5rem;}
+.puzzle-input:focus{outline:none;border-color:var(--red);box-shadow:0 0 8px rgba(255,32,32,.3);}
+
+/* ── PUZZLE GATE (AI BARRIER) ── */
+#puzzle-gate{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;}
+.pg-title{font-size:1.5rem;font-weight:900;letter-spacing:.2em;color:#39ff14;text-shadow:0 0 18px #39ff14;animation:pg-pulse 2s infinite;}
+@keyframes pg-pulse{0%,100%{text-shadow:0 0 18px #39ff14;}50%{text-shadow:0 0 36px #39ff14,0 0 60px rgba(57,255,20,.5);}}
+.pg-sub{font-size:.6rem;letter-spacing:.25em;opacity:.45;margin:.3rem 0 1.4rem;}
+.pg-box{width:min(510px,90%);background:rgba(0,0,0,.96);border:1.5px solid #39ff14;padding:2rem;}
+.pg-badge{display:inline-block;background:rgba(57,255,20,.12);padding:.2rem .8rem;font-size:.55rem;letter-spacing:.12em;color:#39ff14;margin-bottom:.8rem;}
+.pg-q{font-size:.88rem;line-height:1.65;word-break:break-all;margin-bottom:1rem;}
+.pg-input{width:100%;background:#000;border:1px solid #39ff14;color:#39ff14;padding:.75rem;font-family:'Courier New',monospace;font-size:.88rem;text-align:center;outline:none;transition:border-color .2s;}
+.pg-input:focus{border-color:#00ffff;box-shadow:0 0 10px rgba(0,255,255,.2);}
+.pg-btn{display:block;width:100%;margin-top:.6rem;background:#39ff14;color:#000;border:none;padding:.7rem;font-weight:900;font-family:'Courier New',monospace;font-size:.88rem;letter-spacing:.08em;cursor:pointer;}
+.pg-btn:hover{background:#00ffff;}
+.pg-hint{margin-top:.4rem;background:none;border:1px solid rgba(57,255,20,.3);color:rgba(57,255,20,.55);width:100%;padding:.35rem;font-size:.58rem;font-family:'Courier New',monospace;cursor:pointer;transition:.2s;}
+.pg-hint:hover{border-color:#39ff14;color:#39ff14;}
+.pg-err{margin-top:.5rem;font-size:.68rem;min-height:1.1em;animation:pg-blink 1s infinite;}
+.pg-err.ok{color:#39ff14;animation:none;}
+.pg-err.bad{color:#ff2020;}
+@keyframes pg-blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.pg-tries{font-size:.52rem;opacity:.28;margin-top:.4rem;text-align:center;}
+.pg-footer{margin-top:1.4rem;font-size:.52rem;opacity:.28;text-align:center;}
 
 /* ── PAYMENT MODAL ── */
-.pay-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:7000;overflow-y:auto;padding:1rem}
-.pay-modal.open{display:block}
-.pay-box{max-width:400px;margin:0 auto}
-.pay-box h4{font-family:'Orbitron',sans-serif;font-size:.8rem;font-weight:900;letter-spacing:.12em;color:var(--g);margin-bottom:.2rem}
-.pay-box .pay-sub{font-size:.48rem;letter-spacing:.08em;opacity:.3;margin-bottom:.7rem}
-.pay-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.4rem;margin-bottom:.6rem}
-.pay-card{background:#0a0a0a;border:1px solid rgba(var(--gr),.2);border-radius:5px;padding:.7rem;text-align:center;cursor:pointer;transition:.2s}
-.pay-card:active{border-color:var(--g);transform:scale(.96)}
-.pay-icon{font-size:1.4rem;margin-bottom:.2rem}
-.pay-nm{font-size:.55rem;font-weight:700;margin-bottom:.1rem}
-.pay-fee{font-size:.45rem;opacity:.4}
-.pay-sel{width:100%;background:#000;border:1px solid rgba(var(--gr),.25);color:var(--g);padding:.5rem;font-family:'Share Tech Mono',monospace;font-size:.72rem;margin-bottom:.6rem;outline:none;border-radius:4px}
-.pay-addr-box{display:none;background:#0a0a0a;border:1.5px solid var(--g);border-radius:5px;padding:.8rem;text-align:center;margin-top:.4rem}
-.pay-addr{background:#000;border:1px solid rgba(var(--gr),.15);padding:.5rem;word-break:break-all;font-size:.6rem;margin:.4rem 0;font-family:'Share Tech Mono',monospace;color:var(--g)}
-.pay-copy-btn{background:var(--g);color:#000;border:none;padding:.35rem .8rem;font-weight:900;font-family:'Orbitron',sans-serif;cursor:pointer;font-size:.65rem;border-radius:3px}
-.pay-close{display:block;width:100%;margin-top:.6rem;background:transparent;color:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.08);padding:.5rem;font-size:.6rem;cursor:pointer;border-radius:4px}
-
-/* ── GIFT SECTION ── */
-.gift-sel{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.08);color:#fff;border-radius:5px;padding:.45rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;margin-bottom:.35rem;outline:none}
-.gift-input{width:100%;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.08);color:#fff;border-radius:5px;padding:.45rem .6rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;margin-bottom:.35rem;outline:none}
-.gift-input:focus{border-color:rgba(var(--gr),.3)}
-.gift-input::placeholder{color:rgba(255,255,255,.12)}
-
-/* ── NOTIF ── */
-.notif{position:fixed;top:44px;left:50%;transform:translateX(-50%) translateY(-8px);background:rgba(var(--gr),.9);color:#000;padding:.35rem .8rem;border-radius:15px;font-size:.7rem;font-weight:600;opacity:0;transition:all .3s;pointer-events:none;z-index:9999;white-space:nowrap}
-.notif.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* ── PAY FAB ── */
-#pay-fab{position:fixed;bottom:60px;right:10px;z-index:8500;background:linear-gradient(135deg,var(--g),var(--cyan));color:#000;border:none;border-radius:50%;width:40px;height:40px;font-size:.95rem;cursor:pointer;box-shadow:0 0 12px rgba(var(--gr),.4);font-weight:900;line-height:40px;text-align:center}
-
-/* ── COLLAPSIBLE PANELS ── */
-.collapsible{margin-bottom:.6rem;border:1px solid rgba(var(--gr),.15);border-radius:8px;overflow:hidden;background:rgba(0,0,0,.75)}
-.collapsible-trigger{display:flex;align-items:center;justify-content:space-between;padding:.65rem .75rem;cursor:pointer;user-select:none;transition:all .2s;-webkit-tap-highlight-color:transparent}
-.collapsible-trigger:active{background:rgba(var(--gr),.05)}
-.collapsible-trigger .ct-left{display:flex;align-items:center;gap:.45rem}
-.collapsible-trigger .ct-icon{font-size:.9rem}
-.collapsible-trigger .ct-title{font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.08em;color:var(--g);text-transform:uppercase}
-.collapsible-trigger .ct-sub{font-size:.45rem;color:rgba(255,255,255,.3);letter-spacing:1px;margin-top:.1rem}
-.collapsible-trigger .ct-arrow{font-size:.65rem;color:rgba(var(--gr),.5);transition:transform .3s}
-.collapsible.open .collapsible-trigger .ct-arrow{transform:rotate(180deg)}
-.collapsible-content{max-height:0;overflow:hidden;transition:max-height .4s ease}
-.collapsible.open .collapsible-content{max-height:2000px}
-.collapsible-inner{padding:.6rem .75rem}
-
-/* ── JARVIS OMNI SECTION ── */
-.jarvis-header-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;padding:.5rem .6rem;background:rgba(var(--gr),.06);border:1px solid rgba(var(--gr),.15);border-radius:6px}
-.jarvis-status-dot{width:7px;height:7px;border-radius:50%;background:var(--g);box-shadow:0 0 6px var(--g);animation:blink 2s infinite}
-.jarvis-sys-name{font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;color:var(--g);letter-spacing:.1em}
-.jarvis-sys-ver{font-size:.42rem;color:rgba(var(--gr),.35);letter-spacing:1px}
-.model-chips{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.4rem}
-.model-chip{display:inline-flex;align-items:center;gap:.2rem;padding:.18rem .4rem;background:rgba(0,0,0,.6);border:1px solid rgba(var(--gr),.12);border-radius:10px;font-size:.42rem;color:rgba(255,255,255,.45);letter-spacing:.3px;white-space:nowrap}
-.model-chip .mc-dot{width:4px;height:4px;border-radius:50%;background:var(--cyan);flex-shrink:0}
-.model-chip.mc-admin{border-color:rgba(var(--gold),.15)}
-.model-chip.mc-admin .mc-dot{background:var(--gold)}
-.jarvis-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(var(--gr),.2),transparent);margin:.5rem 0}
-.jarvis-info-row{display:flex;justify-content:space-between;align-items:center;padding:.25rem 0;font-size:.5rem}
-.jarvis-info-row .jir-label{color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase}
-.jarvis-info-row .jir-val{color:var(--g);font-weight:700;font-family:'Orbitron',sans-serif;font-size:.52rem}
-.admin-only-badge{display:inline-flex;align-items:center;gap:.25rem;padding:.2rem .5rem;background:rgba(var(--gold),.05);border:1px solid rgba(var(--gold),.2);border-radius:10px;font-size:.42rem;color:var(--gold);letter-spacing:.5px;margin-top:.4rem}
-
-/* ── AGENT SWARM SECTION ── */
-.agent-swarm-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.3rem;margin-top:.4rem}
-.agent-cat-card{background:rgba(0,0,0,.5);border:1px solid rgba(var(--gr),.1);border-radius:6px;padding:.45rem;text-align:center;transition:all .2s}
-.agent-cat-card:active{border-color:rgba(var(--gr),.25);transform:scale(.97)}
-.agent-cat-icon{font-size:.85rem;margin-bottom:.15rem}
-.agent-cat-name{font-family:'Orbitron',sans-serif;font-size:.48rem;font-weight:700;color:var(--g);letter-spacing:.5px;margin-bottom:.1rem}
-.agent-cat-count{font-family:'Orbitron',sans-serif;font-size:.72rem;font-weight:800;color:var(--cyan);text-shadow:0 0 6px rgba(0,255,255,.3)}
-.agent-cat-bar{width:100%;height:3px;background:rgba(255,255,255,.05);border-radius:2px;margin-top:.3rem;overflow:hidden}
-.agent-cat-bar-fill{height:100%;border-radius:2px;transition:width 1s ease}
-.agent-total-bar{display:flex;align-items:center;justify-content:center;gap:.6rem;margin-top:.5rem;padding:.45rem;background:rgba(var(--gr),.05);border:1px solid rgba(var(--gr),.15);border-radius:6px}
-.agent-total-num{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:900;color:var(--g);text-shadow:0 0 10px var(--g)}
-.agent-total-label{font-size:.5rem;color:rgba(var(--gr),.4);letter-spacing:2px;text-transform:uppercase}
-
-/* ── FOOTER BRANDING ── */
-.jarvis-footer{padding:.7rem .5rem;text-align:center;border-top:1px solid rgba(var(--gr),.1);margin-top:.3rem}
-.jarvis-footer .jf-brand{font-family:'Orbitron',sans-serif;font-size:.55rem;font-weight:700;letter-spacing:.15em;color:var(--g);text-shadow:0 0 8px rgba(var(--gr),.4);margin-bottom:.25rem}
-.jarvis-footer .jf-tagline{font-size:.42rem;color:rgba(255,255,255,.2);letter-spacing:1.5px;margin-bottom:.35rem}
-.jarvis-footer .jf-stats{display:flex;justify-content:center;gap:.8rem;margin-bottom:.35rem}
-.jarvis-footer .jf-stat{font-size:.45rem;color:rgba(var(--gr),.35)}
-.jarvis-footer .jf-stat b{color:var(--g);font-family:'Orbitron',sans-serif}
-.jarvis-footer .jf-cicada{font-size:.55rem;color:rgba(var(--gr),.15);letter-spacing:2px;margin-top:.2rem}
-.jarvis-footer .jf-cicada span{color:rgba(var(--gold),.25)}
-@keyframes footer-glow{0%,100%{opacity:.3}50%{opacity:.7}}
-.jarvis-footer .jf-pulse{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--g);box-shadow:0 0 4px var(--g);animation:footer-glow 3s ease-in-out infinite;vertical-align:middle;margin-right:.3rem}
-
-@media (padding: max(0px, env(safe-area-inset-bottom))){.bottom-nav,.tab-bar{padding-bottom:calc(8px + env(safe-area-inset-bottom, 0)) !important;}#tabBar{padding-bottom:calc(4px + env(safe-area-inset-bottom, 0)) !important;}}
+#pay-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.97);overflow-y:auto;padding:1.5rem;display:none;}
+#pay-modal.open{display:block;}
+.pay-title-h{font-size:1rem;font-weight:900;letter-spacing:.15em;color:#39ff14;margin-bottom:.25rem;}
+.pay-sub-h{font-size:.52rem;letter-spacing:.1em;opacity:.35;margin-bottom:1rem;}
+.pay-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.55rem;margin-bottom:.8rem;}
+.pay-card{background:#0a0a0a;border:1px solid rgba(57,255,20,.28);border-radius:5px;padding:.9rem;text-align:center;cursor:pointer;transition:.2s;}
+.pay-card:hover{border-color:#39ff14;transform:translateY(-2px);box-shadow:0 4px 14px rgba(57,255,20,.18);}
+.pay-icon{font-size:1.8rem;margin-bottom:.35rem;}
+.pay-nm{font-size:.65rem;font-weight:700;margin-bottom:.15rem;}
+.pay-fee{font-size:.52rem;opacity:.42;}
+.pay-inv{display:none;background:#0a0a0a;border:1.5px solid #39ff14;border-radius:5px;padding:1.3rem;text-align:center;margin-top:.5rem;}
+.pay-addr{background:#000;border:1px solid rgba(57,255,20,.22);padding:.6rem;word-break:break-all;font-size:.68rem;margin:.6rem 0;font-family:'Courier New',monospace;}
+.pay-cpbtn{background:#39ff14;color:#000;border:none;padding:.45rem 1.1rem;font-weight:900;font-family:'Courier New',monospace;cursor:pointer;font-size:.8rem;}
+.pay-cpbtn:hover{background:#00ffff;}
+.pay-sel{width:100%;background:#000;border:1px solid rgba(57,255,20,.35);color:#39ff14;padding:.6rem;font-family:'Courier New',monospace;font-size:.8rem;margin-bottom:.8rem;outline:none;}
+#pay-fab{position:fixed;bottom:72px;right:12px;z-index:8500;background:linear-gradient(135deg,#39ff14,#00ffff);color:#000;border:none;border-radius:50%;width:44px;height:44px;font-size:1.1rem;cursor:pointer;box-shadow:0 0 16px rgba(57,255,20,.55);font-weight:900;line-height:44px;text-align:center;}
 </style>
 </head>
 <body>
 
+<!-- PUZZLE GATE — AI BARRIER (FIRST THING VISITOR SEES) -->
+<div id="puzzle-gate">
+  <div class="pg-title">🦗 THE GATE</div>
+  <div class="pg-sub">PROVE YOUR WORTH · SOLVE THE PUZZLE</div>
+  <div class="pg-box">
+    <div class="pg-badge" id="pg-type">LOADING…</div>
+    <div class="pg-q" id="pg-question">Initializing security protocols…</div>
+    <input type="text" class="pg-input" id="pg-answer" placeholder="ENTER YOUR ANSWER" autocomplete="off">
+    <button class="pg-btn" onclick="pgVerify()">VERIFY IDENTITY</button>
+    <button class="pg-hint" onclick="pgHint()">💡 REQUEST HINT</button>
+    <div class="pg-err bad" id="pg-err"></div>
+    <div class="pg-tries" id="pg-tries">Attempts remaining: 5</div>
+  </div>
+  <div class="pg-footer">3301 · VERITAS ODIUM PARIT · THE TRUTH IS HIDDEN IN THE STREAM</div>
+</div>
+
 <!-- MATRIX CANVAS -->
-<canvas id="matrix"></canvas>
+<canvas id="matrix-canvas"></canvas>
 
-<!-- FLYING CICADA -->
-<div class="fly-cicada" id="fly1">
-<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="100" cy="55" r="12" stroke="#39ff14" stroke-width="1.5" fill="none" opacity=".9"/>
-<circle cx="94" cy="52" r="3" fill="#39ff14" opacity=".85"/><circle cx="106" cy="52" r="3" fill="#39ff14" opacity=".85"/>
-<path d="M94 46 Q80 25 65 15" stroke="#39ff14" stroke-width="1" fill="none" opacity=".65"/>
-<path d="M106 46 Q120 25 135 15" stroke="#39ff14" stroke-width="1" fill="none" opacity=".65"/>
-<g class="wl"><path d="M75 80 Q30 50 15 80 Q20 110 75 120" stroke="#39ff14" stroke-width="1.3" fill="none" opacity=".7"/><path d="M75 85 Q40 65 30 85" stroke="#39ff14" stroke-width=".7" fill="none" opacity=".4"/></g>
-<g class="wr"><path d="M125 80 Q170 50 185 80 Q180 110 125 120" stroke="#39ff14" stroke-width="1.3" fill="none" opacity=".7"/><path d="M125 85 Q160 65 170 85" stroke="#39ff14" stroke-width=".7" fill="none" opacity=".4"/></g>
-<ellipse cx="100" cy="75" rx="20" ry="9" stroke="#39ff14" stroke-width="1.2" fill="none" opacity=".7"/>
-<ellipse cx="100" cy="100" rx="24" ry="11" stroke="#39ff14" stroke-width="1.1" fill="none" opacity=".65"/>
-<ellipse cx="100" cy="122" rx="22" ry="10" stroke="#39ff14" stroke-width="1" fill="none" opacity=".6"/>
-</svg>
+<!-- SPLASH SCREEN (hidden until puzzle is solved) -->
+<div id="splash" style="display:none;">
+  <div class="splash-title">CICADA 3301</div>
+  <div class="splash-good">GOOD LUCK!</div>
+  <div class="splash-box">EVERYWHERE</div>
+  <div class="splash-num">3 &nbsp; 3 &nbsp; 0 &nbsp; 1</div>
+  <!-- SVG Moth — green glowing, matches image exactly -->
+  <svg class="splash-moth" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg">
+    <!-- Left wing -->
+    <ellipse cx="75" cy="70" rx="68" ry="38" fill="none" stroke="#39ff14" stroke-width="1.5" opacity=".9"/>
+    <ellipse cx="72" cy="72" rx="54" ry="28" fill="rgba(57,255,20,.12)"/>
+    <line x1="110" y1="65" x2="30" y2="48" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="110" y1="70" x2="20" y2="70" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="110" y1="75" x2="28" y2="92" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="108" y1="55" x2="55" y2="35" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
+    <line x1="108" y1="80" x2="52" y2="100" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
+    <!-- Right wing -->
+    <ellipse cx="145" cy="70" rx="68" ry="38" fill="none" stroke="#39ff14" stroke-width="1.5" opacity=".9"/>
+    <ellipse cx="148" cy="72" rx="54" ry="28" fill="rgba(57,255,20,.12)"/>
+    <line x1="110" y1="65" x2="190" y2="48" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="110" y1="70" x2="200" y2="70" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="110" y1="75" x2="192" y2="92" stroke="#39ff14" stroke-width=".9" opacity=".7"/>
+    <line x1="112" y1="55" x2="165" y2="35" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
+    <line x1="112" y1="80" x2="168" y2="100" stroke="#39ff14" stroke-width=".7" opacity=".5"/>
+    <!-- Body -->
+    <ellipse cx="110" cy="68" rx="8" ry="22" fill="#39ff14" opacity=".85"/>
+    <ellipse cx="110" cy="52" rx="5" ry="7" fill="#39ff14"/>
+    <!-- Antennae -->
+    <path d="M106 46 Q95 30 88 22" stroke="#39ff14" stroke-width="1.2" fill="none" opacity=".8"/>
+    <path d="M114 46 Q125 30 132 22" stroke="#39ff14" stroke-width="1.2" fill="none" opacity=".8"/>
+    <circle cx="88" cy="22" r="2.5" fill="#39ff14"/>
+    <circle cx="132" cy="22" r="2.5" fill="#39ff14"/>
+    <!-- Wing veins pattern -->
+    <path d="M110 67 Q75 55 45 52" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
+    <path d="M110 72 Q75 78 42 85" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
+    <path d="M110 67 Q145 55 175 52" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
+    <path d="M110 72 Q145 78 178 85" stroke="#39ff14" stroke-width=".5" fill="none" opacity=".4"/>
+  </svg>
+  <div class="splash-cipher">W 3 w1|../_&nbsp;&nbsp;&nbsp;F1|\|) Y[][_] 3301</div>
+  <button class="splash-enter" onclick="enterApp()">▶ ENTER THE PUZZLE</button>
 </div>
-
-<!-- NOTIF -->
-<div class="notif" id="notif"></div>
-
-<!-- LOGIN MODAL -->
-<div class="modal-bg open" id="loginModal">
-<div class="modal-box">
-<h3>CICADA 3301</h3>
-<p style="text-align:center;font-size:.6rem;color:rgba(255,255,255,.35);margin-bottom:.6rem;letter-spacing:1px">Enter the network. Prove yourself.</p>
-<input type="text" id="loginUser" placeholder="Username / Alias" maxlength="20" autocomplete="off">
-<input type="text" id="loginWallet" placeholder="Monero Wallet (for XMR rewards)" autocomplete="off">
-<div class="mbtn-row">
-<button class="mbtn mbtn-primary" onclick="doLogin()">ENTER</button>
-<button class="mbtn mbtn-ghost" onclick="doGuest()">GUEST</button>
-</div>
-</div>
-</div>
-
-<!-- PUZZLE SOLVE MODAL -->
-<div class="solve-modal" id="solveModal">
-<div class="solve-box">
-<h4 id="smTitle">PUZZLE</h4>
-<div class="sm-desc" id="smDesc"></div>
-<div class="sm-reward" id="smReward"></div>
-<div class="sm-timer" id="smTimer"></div>
-<textarea id="smAnswer" rows="3" placeholder="Your decoded answer..."></textarea>
-<div class="sm-result" id="smResult"></div>
-<div class="sm-btns">
-<button class="mbtn mbtn-primary" id="smSubmitBtn" onclick="submitPuzzle()">SUBMIT</button>
-<button class="mbtn mbtn-warn" id="smHintBtn" onclick="showPuzzleHint()">HINT</button>
-<button class="mbtn mbtn-ghost" onclick="closeSolve()">CLOSE</button>
-</div>
-</div>
-</div>
-
-<!-- PAYMENT MODAL -->
-<div class="pay-modal" id="payModal">
-<div class="pay-box">
-<h4>PAYMENT GATEWAY</h4>
-<div class="pay-sub">SELECT METHOD</div>
-<select class="pay-sel" id="payPlan" onchange="updatePayView()">
-<option value="free">Free (0 XMR)</option>
-<option value="starter">Starter (0.05 XMR/mo)</option>
-<option value="pro">Pro (0.10 XMR/mo)</option>
-<option value="business">Business (0.25 XMR/mo)</option>
-<option value="supreme">Supreme (1.00 XMR/mo)</option>
-</select>
-<div class="pay-grid" id="payGrid"></div>
-<div class="pay-addr-box" id="payAddrBox">
-<div style="font-size:.58rem;color:rgba(var(--gr),.5);margin-bottom:.2rem">Send to this address:</div>
-<div class="pay-addr" id="payAddr"></div>
-<button class="pay-copy-btn" onclick="copyPayAddr()">COPY ADDRESS</button>
-</div>
-<button class="pay-close" onclick="closePay()">CLOSE</button>
-</div>
-</div>
-
-<!-- PAYMENT FAB -->
-<button id="pay-fab" onclick="openPay()" style="display:none">$</button>
 
 <!-- MAIN APP -->
 <div id="app">
-<div class="app-hdr">
-<div class="app-logo">CICADA <span>3301</span></div>
-<div class="hdr-right">
-<button class="hdr-btn" id="sndBtn" onclick="toggleSound()">&#x1F997;</button>
-<button class="hdr-btn" id="logoutBtn" onclick="doLogout()" style="display:none">LOGOUT</button>
-</div>
-</div>
+  <div class="app-header">
+    <div class="app-logo">CICADA <span>3301</span></div>
+    <div class="header-right">
+      <button class="sound-btn on" id="sound-toggle" onclick="toggleSound()">🔊 Sound</button>
+    </div>
+  </div>
 
-<div class="tab-body">
+  <div class="tab-body">
 
-<!-- ═══ TAB 1: PUZZLES ═══ -->
-<div class="tp active" id="tab-puzzles">
-<div class="hero-banner">
-<h1 class="color-cycle">CICADA 3301</h1>
-<div class="hero-sub">WE ARE EVERYWHERE</div>
-<div class="cipher-line">W 3 w1|../_&nbsp;&nbsp;&nbsp;F1|\|) Y[][_] 3301</div>
-<svg class="cicada-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-<circle cx="100" cy="50" r="14" stroke="#39ff14" stroke-width="1.8" fill="none" opacity=".9"/>
-<circle cx="93" cy="47" r="3.5" fill="#39ff14" opacity=".9"/><circle cx="107" cy="47" r="3.5" fill="#39ff14" opacity=".9"/>
-<circle cx="93" cy="47" r="1.5" fill="#fff" opacity=".8"/><circle cx="107" cy="47" r="1.5" fill="#fff" opacity=".8"/>
-<path d="M92 40 Q78 22 62 10" stroke="#39ff14" stroke-width="1.2" fill="none" opacity=".6"/>
-<path d="M108 40 Q122 22 138 10" stroke="#39ff14" stroke-width="1.2" fill="none" opacity=".6"/>
-<path d="M72 72 Q25 42 10 72 Q15 105 72 115" stroke="#39ff14" stroke-width="1.5" fill="none" opacity=".75"/>
-<path d="M128 72 Q175 42 190 72 Q185 105 128 115" stroke="#39ff14" stroke-width="1.5" fill="none" opacity=".75"/>
-<ellipse cx="100" cy="70" rx="22" ry="10" stroke="#39ff14" stroke-width="1.3" fill="none" opacity=".7"/>
-<ellipse cx="100" cy="95" rx="26" ry="12" stroke="#39ff14" stroke-width="1.2" fill="none" opacity=".65"/>
-<ellipse cx="100" cy="118" rx="24" ry="11" stroke="#39ff14" stroke-width="1.1" fill="none" opacity=".6"/>
-<ellipse cx="100" cy="138" rx="20" ry="10" stroke="#39ff14" stroke-width="1" fill="none" opacity=".55"/>
-</svg>
-<div class="stats-row">
-<div class="stat-item"><div class="stat-lbl">SOLVED</div><div class="stat-val" id="stSolved">0</div></div>
-<div class="stat-item"><div class="stat-lbl">POINTS</div><div class="stat-val" id="stPts">0</div></div>
-<div class="stat-item"><div class="stat-lbl">XMR</div><div class="stat-val" id="stXmr">0</div></div>
-<div class="stat-item"><div class="stat-lbl">LEVEL</div><div class="stat-val" id="stLvl">0</div></div>
-</div>
-</div>
-
-<div class="user-bar" id="userBar" style="display:none">
-<div><span class="ub-name" id="ubName"></span> <span class="ub-level" id="ubLevel">INITIATE</span></div>
-<span class="ub-logout" onclick="doLogout()">LOGOUT</span>
-</div>
-
-<div class="progress-row" id="progressRow">
-<div class="progress-txt" id="progressTxt">0 / 14 PUZZLES SOLVED</div>
-<div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill"></div></div>
-</div>
-
-<div class="card tournament-card">
-<h4>MONTHLY TOURNAMENT</h4>
-<div class="t-prize">PRIZE POOL: 100 XMR</div>
-<div class="t-list">1st: 50 XMR | 2nd: 30 XMR | 3rd: 20 XMR</div>
-<div class="t-entry">Entry: 0.01 XMR | Solve puzzles to earn tournament points</div>
-</div>
-
-<!-- ═══ JARVIS OMNI REFERENCE (COLLAPSIBLE) ═══ -->
-<div class="collapsible" id="jarvisPanel">
-<div class="collapsible-trigger" onclick="toggleCollapsible('jarvisPanel')">
-    <div class="ct-left">
-        <span class="ct-icon">&#x1F916;</span>
-        <div>
-            <div class="ct-title">JARVIS OMNI ABLITERATED</div>
-            <div class="ct-sub">System Reference · 20 Models · Admin-Only Features</div>
+    <!-- TAB 1: PUZZLE -->
+    <div class="tab-pane active" id="tab-puzzle">
+      <!-- Hero banner -->
+      <div style="text-align:center;margin-bottom:1rem;padding:.75rem;background:rgba(0,0,0,.7);border:1px solid rgba(255,32,32,.25);border-radius:8px;">
+        <div style="font-size:1.6rem;font-weight:900;letter-spacing:.2em;" class="color-cycle">CICADA 3301</div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.5);margin-top:.2rem;letter-spacing:.1em;">WE ARE LOOKING FOR HIGHLY INTELLIGENT INDIVIDUALS</div>
+        <div style="font-family:'Courier New',monospace;font-size:.72rem;font-weight:700;letter-spacing:.1em;color:#39ff14;text-shadow:0 0 8px #39ff14,0 0 18px rgba(57,255,20,.5);margin-top:.4rem;animation:cipher-glow 3s ease-in-out infinite,cipher-scan 8s steps(1) infinite;">W 3 w1|../_&nbsp;&nbsp;&nbsp;F1|\|) Y[][_] 3301</div>
+        <div style="margin-top:.5rem;">
+          <svg width="80" height="50" viewBox="0 0 220 130" xmlns="http://www.w3.org/2000/svg" style="animation:moth-color 6s linear infinite;">
+            <ellipse cx="75" cy="70" rx="68" ry="38" fill="none" stroke="#39ff14" stroke-width="2"/>
+            <ellipse cx="145" cy="70" rx="68" ry="38" fill="none" stroke="#39ff14" stroke-width="2"/>
+            <ellipse cx="110" cy="68" rx="8" ry="22" fill="#39ff14"/>
+            <ellipse cx="110" cy="52" rx="5" ry="7" fill="#39ff14"/>
+            <path d="M106 46 Q95 30 88 22" stroke="#39ff14" stroke-width="1.5" fill="none"/>
+            <path d="M114 46 Q125 30 132 22" stroke="#39ff14" stroke-width="1.5" fill="none"/>
+            <circle cx="88" cy="22" r="2.5" fill="#39ff14"/>
+            <circle cx="132" cy="22" r="2.5" fill="#39ff14"/>
+          </svg>
         </div>
-    </div>
-    <span class="ct-arrow">&#x25BC;</span>
-</div>
-<div class="collapsible-content">
-<div class="collapsible-inner">
-    <div class="jarvis-header-bar">
-        <div class="jarvis-status-dot"></div>
-        <div>
-            <div class="jarvis-sys-name">JARVIS OMNI ABLITERATED</div>
-            <div class="jarvis-sys-ver">v4.2.0 · 459 Models · AI Server Integration</div>
+      </div>
+
+      <!-- Current puzzle -->
+      <div class="card" style="border-color:rgba(255,32,32,.4);">
+        <div class="card-title color-cycle">► Active Puzzle — Level 1</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.7);margin-bottom:.75rem;line-height:1.5;">
+          Decode the following sequence to reveal the next coordinates:<br>
+          <code style="color:#39ff14;font-size:.85rem;letter-spacing:.08em;">3301 · 29 · 57 · 6c · 65 · 61 · 73 · 65</code>
         </div>
+        <input class="puzzle-input" id="puzzle-answer" placeholder="Enter your answer...">
+        <div style="display:flex;gap:.5rem;">
+          <button class="btn btn-red btn-block" onclick="checkAnswer()" style="flex:1;">▶ SUBMIT ANSWER</button>
+          <button class="btn btn-sm" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);padding:.6rem .8rem;border-radius:6px;" onclick="showHint()">?</button>
+        </div>
+      </div>
+
+      <!-- ══ CIPHER TRANSMISSIONS TERMINAL ══ -->
+      <!-- 7|-|3 7|2|_|7|-| 15 |-|1[) [)3|\| 1|\| 7|-|3 57234|/\| -->
+      <div style="margin-bottom:.9rem;background:#000;border:1px solid rgba(57,255,20,.3);border-radius:8px;overflow:hidden;">
+        <div style="display:flex;align-items:center;gap:.4rem;padding:.35rem .65rem;background:rgba(57,255,20,.05);border-bottom:1px solid rgba(57,255,20,.12);">
+          <div style="width:7px;height:7px;border-radius:50%;background:#ff5f57;"></div>
+          <div style="width:7px;height:7px;border-radius:50%;background:#ffbd2e;"></div>
+          <div style="width:7px;height:7px;border-radius:50%;background:#39ff14;animation:blink 1.6s step-end infinite;"></div>
+          <span style="flex:1;font-family:'Courier New';font-size:.6rem;color:rgba(57,255,20,.6);letter-spacing:.07em;">TERMINAL — ENCRYPTED STREAM 3301</span>
+          <span style="font-family:'Courier New';font-size:.57rem;color:rgba(57,255,20,.35);" id="cipher-clock"></span>
+        </div>
+        <div id="cipher-stream" style="padding:.6rem .7rem;font-family:'Courier New',monospace;font-size:.68rem;color:#39ff14;line-height:1.85;min-height:150px;max-height:210px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(57,255,20,.3) #000;"></div>
+      </div>
+
+      <!-- ══ ENCRYPTED SEQUENCES TABLE ══ -->
+      <div style="margin-bottom:.9rem;background:rgba(0,0,0,.92);border:1px solid rgba(255,32,32,.2);border-radius:8px;padding:.7rem;">
+        <div style="font-family:'Courier New';font-size:.6rem;font-weight:700;color:rgba(255,32,32,.8);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem;">[ENCRYPTED SEQUENCES — TRANSMISSION LOG]</div>
+        <div style="font-family:'Courier New',monospace;font-size:.67rem;line-height:2;color:#39ff14;border-top:1px solid rgba(57,255,20,.1);padding-top:.4rem;">
+          <div style="display:flex;gap:.5rem;border-bottom:1px solid rgba(57,255,20,.08);padding-bottom:.2rem;color:rgba(57,255,20,.45);font-size:.58rem;letter-spacing:.08em;">
+            <span style="width:180px;flex-shrink:0;">CODE</span>
+            <span>THEME</span>
+          </div>
+          <div style="display:flex;gap:.5rem;padding:.15rem 0;"><span style="width:180px;flex-shrink:0;text-shadow:0 0 6px rgba(57,255,20,.5);">P|21//\3 5342 15 7|-|3 4(7</span><span style="color:rgba(57,255,20,.5);">PRIME SEQUENCE IS THE ACT</span></div>
+          <div style="display:flex;gap:.5rem;padding:.15rem 0;"><span style="width:180px;flex-shrink:0;text-shadow:0 0 6px rgba(57,255,20,.5);">$7473 15 7|-|3 08574(13</span><span style="color:rgba(57,255,20,.5);">STATE IS THE OBSTACLE</span></div>
+          <div style="display:flex;gap:.5rem;padding:.15rem 0;"><span style="width:180px;flex-shrink:0;text-shadow:0 0 6px rgba(57,255,20,.5);">[)161741 57121|67</span><span style="color:rgba(57,255,20,.5);">DIGITAL SPIRIT</span></div>
+          <div style="display:flex;gap:.5rem;padding:.15rem 0;"><span style="width:180px;flex-shrink:0;text-shadow:0 0 6px rgba(57,255,20,.5);">533&lt; 7|-|3 5</span><span style="color:rgba(57,255,20,.5);">SEEK THE 5</span></div>
+          <div style="display:flex;gap:.5rem;padding:.15rem 0;border-top:1px solid rgba(57,255,20,.08);margin-top:.1rem;"><span style="width:180px;flex-shrink:0;color:rgba(57,255,20,.9);font-weight:700;">W 3 w1|../_&nbsp;&nbsp;&nbsp;F1|\|) Y[][_] 3301</span><span style="color:rgba(57,255,20,.5);">WE WILL FIND YOU 3301</span></div>
+        </div>
+      </div>
+
+      <!-- ══ STRUCTURAL MANIFESTOS ══ -->
+      <div style="margin-bottom:.9rem;">
+        <!-- I. The Prime Directive -->
+        <div style="background:#000;border:1px solid rgba(255,32,32,.3);border-left:3px solid rgba(255,32,32,.7);border-radius:6px;padding:.7rem;margin-bottom:.5rem;">
+          <div style="font-family:'Courier New';font-size:.6rem;font-weight:700;color:rgba(255,32,32,.9);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.45rem;">I. THE PRIME DIRECTIVE</div>
+          <pre style="font-family:'Courier New',monospace;font-size:.69rem;color:#39ff14;line-height:1.75;white-space:pre-wrap;text-shadow:0 0 5px rgba(57,255,20,.35);margin:0;">1 1 2 3 5 8 13 21...
+3301 15 7|-|3 4(|) 1|\| 7|-|3 6473.
+574|27 7|-|3 53(237 012[)3|2.</pre>
+          <div style="font-size:.6rem;color:rgba(255,255,255,.3);font-family:'Courier New';margin-top:.3rem;font-style:italic;">*(3301 IS THE ADD IN THE GATE. START THE SECRET ORDER.)*</div>
+        </div>
+        <!-- II. The Binary Ascent -->
+        <div style="background:#000;border:1px solid rgba(57,255,20,.2);border-left:3px solid rgba(57,255,20,.6);border-radius:6px;padding:.7rem;">
+          <div style="font-family:'Courier New';font-size:.6rem;font-weight:700;color:rgba(57,255,20,.8);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.45rem;">II. THE BINARY ASCENT</div>
+          <pre style="font-family:'Courier New',monospace;font-size:.69rem;color:#39ff14;line-height:1.75;white-space:pre-wrap;text-shadow:0 0 5px rgba(57,255,20,.35);margin:0;">$7173 17 0|\| |/|47|-|.
+|\|0 |\|0153.
+0|\|1Y 7|-|3 57234|/|.</pre>
+          <div style="font-size:.6rem;color:rgba(255,255,255,.3);font-family:'Courier New';margin-top:.3rem;font-style:italic;">*(STAY ON MATH. NO NOISE. ONLY THE STREAM.)*</div>
+        </div>
+      </div>
+
+      <!-- ══ FIBONACCI GATEKEEPER ══ -->
+      <div style="margin-bottom:.9rem;background:#000;border:1px solid rgba(57,255,20,.35);border-radius:8px;padding:.75rem;">
+        <div style="font-family:'Courier New';font-size:.6rem;font-weight:700;color:rgba(57,255,20,.9);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem;">[!] GATEKEEPER — PRIME SEQUENCE REQUIRED</div>
+        <pre style="font-family:'Courier New',monospace;font-size:.67rem;color:#39ff14;line-height:1.7;margin:0 0 .5rem;white-space:pre-wrap;"><span style="color:rgba(57,255,20,.45);">&gt;</span> 1|\|73|2 7|-|3 |\|3X7 P|21|/|3 74 (43 |\|3X7 60|_[)3|\| |24710
+<span style="color:rgba(57,255,20,.45);">&gt;</span> Fibonacci: 1 1 2 3 5 8 13 <span style="color:#ff2020;animation:blink 1s step-end infinite;">_</span> ...
+<span style="color:rgba(57,255,20,.45);">&gt;</span> SYSTEM: <span style="color:rgba(57,255,20,.6);">1|\|73|2</span> <span style="color:rgba(57,255,20,.6);">4(73</span> <span style="color:rgba(57,255,20,.6);">1|\|7311163|\|(3</span> <span style="color:rgba(57,255,20,.6);">|\|37</span></pre>
+        <div style="display:flex;gap:.4rem;margin-bottom:.4rem;">
+          <input id="gate-input" style="flex:1;background:transparent;border:1px solid rgba(57,255,20,.3);border-radius:4px;padding:.42rem .6rem;color:#39ff14;font-family:'Courier New';font-size:.78rem;outline:none;letter-spacing:.06em;" placeholder="ENTER SEQUENCE..." onkeydown="if(event.key==='Enter')checkGate()">
+          <button style="background:rgba(57,255,20,.1);border:1px solid rgba(57,255,20,.35);color:#39ff14;font-family:'Courier New';font-size:.73rem;font-weight:700;padding:.42rem .85rem;border-radius:4px;cursor:pointer;letter-spacing:.05em;" onclick="checkGate()">ENTER</button>
+        </div>
+        <div id="gate-response" style="font-family:'Courier New';font-size:.66rem;min-height:1.2em;line-height:1.5;"></div>
+      </div>
+
+      <!-- ══ LEET SYSTEM TERMS ══ -->
+      <div style="margin-bottom:.9rem;background:rgba(0,0,0,.88);border:1px solid rgba(57,255,20,.12);border-radius:8px;padding:.65rem;">
+        <div style="font-family:'Courier New';font-size:.58rem;font-weight:700;color:rgba(57,255,20,.5);letter-spacing:.12em;text-transform:uppercase;margin-bottom:.4rem;">SYSTEM TERMINOLOGY — LEET SYNTAX</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.25rem .5rem;">
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">1|\|73|2</span> <span style="color:rgba(255,255,255,.3);">= INTER</span></div>
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">4(73</span> <span style="color:rgba(255,255,255,.3);">= GATE</span></div>
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">1|\|7311163|\|(3</span> <span style="color:rgba(255,255,255,.3);">= INTELLIGENCE</span></div>
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">|\|37</span> <span style="color:rgba(255,255,255,.3);">= NET</span></div>
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">57234|/|</span> <span style="color:rgba(255,255,255,.3);">= STREAM</span></div>
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">7|2|_|7|-|</span> <span style="color:rgba(255,255,255,.3);">= TRUTH</span></div>
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">|-|1[)[)3|\|</span> <span style="color:rgba(255,255,255,.3);">= HIDDEN</span></div>
+          <div style="font-family:'Courier New';font-size:.64rem;"><span style="color:#39ff14;">3301</span> <span style="color:rgba(255,255,255,.3);">= [CLASSIFIED]</span></div>
+        </div>
+        <div style="font-family:'Courier New';font-size:.62rem;color:#39ff14;text-shadow:0 0 6px rgba(57,255,20,.6);margin-top:.5rem;border-top:1px solid rgba(57,255,20,.1);padding-top:.35rem;letter-spacing:.04em;">
+          7|-|3 7|2|_|7|-| 15 |-|1[) [)3|\| 1|\| 7|-|3 57234|/\|
+        </div>
+        <div style="font-size:.58rem;color:rgba(255,255,255,.25);font-family:'Courier New';margin-top:.15rem;font-style:italic;">*(THE TRUTH IS HIDDEN IN THE STREAM)*</div>
+      </div>
+
+      <!-- 14 Levels -->
+      <div class="card">
+        <div class="card-title">Puzzle Levels — 14 Types</div>
+        <div class="level-item">
+          <div class="level-num">01</div>
+          <div class="level-name">The Beginning — Hex</div>
+          <div class="level-reward">0.01 XMR</div>
+          <div class="level-status ls-open" id="lvl01">OPEN</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">02</div>
+          <div class="level-name">Prime Numbers</div>
+          <div class="level-reward">0.02 XMR</div>
+          <div class="level-status ls-locked" id="lvl02">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">03</div>
+          <div class="level-name">Binary Decode</div>
+          <div class="level-reward">0.03 XMR</div>
+          <div class="level-status ls-locked" id="lvl03">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">04</div>
+          <div class="level-name">Fibonacci Sequence</div>
+          <div class="level-reward">0.05 XMR</div>
+          <div class="level-status ls-locked" id="lvl04">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">05</div>
+          <div class="level-name">Caesar / ROT Cipher</div>
+          <div class="level-reward">0.07 XMR</div>
+          <div class="level-status ls-locked" id="lvl05">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">06</div>
+          <div class="level-name">Morse Code</div>
+          <div class="level-reward">0.10 XMR</div>
+          <div class="level-status ls-locked" id="lvl06">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">07</div>
+          <div class="level-name">Anagram Unscramble</div>
+          <div class="level-reward">0.15 XMR</div>
+          <div class="level-status ls-locked" id="lvl07">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">08</div>
+          <div class="level-name">Cyber-Metal Leet</div>
+          <div class="level-reward">0.20 XMR</div>
+          <div class="level-status ls-locked" id="lvl08">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">09</div>
+          <div class="level-name">Gematria</div>
+          <div class="level-reward">0.25 XMR</div>
+          <div class="level-status ls-locked" id="lvl09">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">10</div>
+          <div class="level-name">Steganography</div>
+          <div class="level-reward">0.35 XMR</div>
+          <div class="level-status ls-locked" id="lvl10">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">11</div>
+          <div class="level-name">Base64 Decode</div>
+          <div class="level-reward">0.50 XMR</div>
+          <div class="level-status ls-locked" id="lvl11">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">12</div>
+          <div class="level-name">Hash Breaker (MD5)</div>
+          <div class="level-reward">0.75 XMR</div>
+          <div class="level-status ls-locked" id="lvl12">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">13</div>
+          <div class="level-name">Vigenere Cipher</div>
+          <div class="level-reward">1.00 XMR</div>
+          <div class="level-status ls-locked" id="lvl13">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">14</div>
+          <div class="level-name">Time Lock — The Final Gate</div>
+          <div class="level-reward">3.301 XMR</div>
+          <div class="level-status ls-locked" id="lvl14">LOCKED</div>
+        </div>
+      </div>
+
+      <!-- TOP SOLVERS — vizibil direct pe pagina de puzzles -->
+      <div class="card" style="border-color:rgba(255,215,0,.3);margin-top:.6rem;">
+        <div class="card-title color-cycle">🏆 Top Solvers</div>
+        <div class="lb-row">
+          <div class="lb-rank" style="color:#ffd700;">1</div>
+          <div class="lb-name">CipherHunter_X</div>
+          <div class="lb-pts">14 solved · 7.43 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank" style="color:#c0c0c0;">2</div>
+          <div class="lb-name">3301_Seeker</div>
+          <div class="lb-pts">12 solved · 4.88 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank" style="color:#cd7f32;">3</div>
+          <div class="lb-name">LiberPrimus</div>
+          <div class="lb-pts">10 solved · 2.43 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank">4</div>
+          <div class="lb-name">PrimeDecoder</div>
+          <div class="lb-pts">8 solved · 1.18 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank">5</div>
+          <div class="lb-name">CryptoCicada</div>
+          <div class="lb-pts">6 solved · 0.57 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank">6</div>
+          <div class="lb-name">VigenereViper</div>
+          <div class="lb-pts">5 solved · 0.37 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank">7</div>
+          <div class="lb-name">HashBreaker99</div>
+          <div class="lb-pts">4 solved · 0.21 XMR</div>
+        </div>
+        <div class="lb-row" style="border-top:1px dashed rgba(255,32,32,.3);padding-top:.6rem;margin-top:.2rem;">
+          <div class="lb-rank" style="color:var(--red);">—</div>
+          <div class="lb-name" style="color:var(--red);">You</div>
+          <div class="lb-pts" id="yourScore">0 solved · 0 XMR</div>
+        </div>
+      </div>
     </div>
-    <div class="jarvis-info-row">
-        <span class="jir-label">System Status</span>
-        <span class="jir-val" style="color:#39ff14">OPERATIONAL</span>
+
+    <!-- TAB 2: LEADERBOARD -->
+    <div class="tab-pane" id="tab-board">
+      <div class="card">
+        <div class="card-title color-cycle">Global Leaderboard</div>
+        <div class="lb-row">
+          <div class="lb-rank" style="color:#ffd700;">1</div>
+          <div class="lb-name">CipherHunter_X</div>
+          <div class="lb-pts">6 solved · 1.43 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank" style="color:#c0c0c0;">2</div>
+          <div class="lb-name">3301_Seeker</div>
+          <div class="lb-pts">5 solved · 0.88 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank" style="color:#cd7f32;">3</div>
+          <div class="lb-name">LiberPrimus</div>
+          <div class="lb-pts">4 solved · 0.43 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank">4</div>
+          <div class="lb-name">PrimeDecoder</div>
+          <div class="lb-pts">3 solved · 0.18 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank">5</div>
+          <div class="lb-name">CryptoCicada</div>
+          <div class="lb-pts">2 solved · 0.07 XMR</div>
+        </div>
+        <div class="lb-row" style="border-top:1px dashed rgba(255,32,32,.3);padding-top:.6rem;margin-top:.2rem;">
+          <div class="lb-rank" style="color:var(--red);">—</div>
+          <div class="lb-name" style="color:var(--red);">You</div>
+          <div class="lb-pts">1 solved · 0.01 XMR</div>
+        </div>
+      </div>
+
+      <!-- Telegram group -->
+      <div class="card" style="border-color:rgba(0,136,204,.35);">
+        <div class="card-title" style="color:#0088cc;">📢 Telegram Community</div>
+        <div style="font-size:.78rem;color:rgba(255,255,255,.6);margin-bottom:.65rem;">
+          Join the Cicada hunters community. Get hints, discuss puzzles, coordinate solutions.
+        </div>
+        <button class="btn btn-block" style="background:rgba(0,136,204,.15);border:1px solid rgba(0,136,204,.4);color:#0088cc;padding:.6rem;" onclick="openTelegram()">
+          ✈️ Join @cicada3301_whoamisec
+        </button>
+      </div>
     </div>
-    <div class="jarvis-info-row">
-        <span class="jir-label">Total Models</span>
-        <span class="jir-val">459</span>
+
+    <!-- TAB 3: COMMUNITY -->
+    <div class="tab-pane" id="tab-chat">
+      <div class="card">
+        <div class="card-title">Solver Chat</div>
+        <div class="chat-msgs" id="chat-msgs">
+          <div class="msg-row">
+            <div class="msg-avatar">C</div>
+            <div class="msg-bubble">Level 1 decoded — hex → ASCII. "3 3 0 1" is the key 🔑</div>
+          </div>
+          <div class="msg-row">
+            <div class="msg-avatar">X</div>
+            <div class="msg-bubble">Check the prime factorization of 3301. Not what you think.</div>
+          </div>
+          <div class="msg-row">
+            <div class="msg-avatar">J</div>
+            <div class="msg-bubble">The moth image has steganography. Use StegSolve.</div>
+          </div>
+          <div class="msg-row">
+            <div class="msg-avatar">?</div>
+            <div class="msg-bubble">JARVIS: 2700+ agents scanning dark web coordinates. Stand by...</div>
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chat-input" placeholder="Send message..." onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" onclick="sendChat()">→</button>
+        </div>
+      </div>
     </div>
-    <div class="jarvis-info-row">
-        <span class="jir-label">Active Agents</span>
-        <span class="jir-val">2,583 / 2,700</span>
+
+    <!-- TAB 4: PLANS + INVITE -->
+    <div class="tab-pane" id="tab-plans">
+      <!-- Current plan -->
+      <div class="card" style="border-color:rgba(255,32,32,.4);background:linear-gradient(135deg,rgba(255,32,32,.08),rgba(0,0,0,.8));">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
+          <div>
+            <div style="font-size:.6rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.07em;">Active Plan</div>
+            <div style="font-size:1rem;font-weight:700;color:var(--red);">😈 SUPREME</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:1.2rem;font-weight:700;">1.00 XMR<span style="font-size:.65rem;color:rgba(255,255,255,.4);">/mo</span></div>
+            <div style="font-size:.65rem;color:var(--green);">✔ Active</div>
+          </div>
+        </div>
+        <div style="font-size:.7rem;color:rgba(255,255,255,.5);">Unlimited puzzles · XMR rewards · 100K credits · Leaderboard top priority</div>
+      </div>
+
+      <!-- Invite friend -->
+      <div class="card" style="border-color:rgba(57,255,20,.3);">
+        <div class="card-title" style="color:var(--green);">🎁 Invite Friend — Get 1 Month FREE</div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.6);margin-bottom:.65rem;">
+          Invite 3 friends → you get <b style="color:var(--green);">1 month Pro FREE</b>.<br>
+          Friend gets <b style="color:var(--cyan);">500 bonus credits + 3 free puzzle attempts</b>.
+        </div>
+        <div style="background:rgba(0,0,0,.4);border:1px solid rgba(57,255,20,.2);border-radius:8px;padding:.5rem .75rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;">
+          <div>
+            <div style="font-size:.58rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.06em;">Referral code</div>
+            <div style="font-size:.95rem;font-weight:700;letter-spacing:.12em;color:var(--green);" id="ref-code">CICADA-3K9X</div>
+          </div>
+          <button class="btn btn-green btn-sm" onclick="copyRef()">📋 Copy</button>
+        </div>
+        <div style="display:flex;gap:.4rem;margin-bottom:.5rem;">
+          <div style="flex:1;text-align:center;background:rgba(57,255,20,.1);border:1px solid rgba(57,255,20,.2);border-radius:8px;padding:.4rem;font-size:.65rem;color:var(--green);"><b style="font-size:1rem;display:block;">1</b>invited</div>
+          <div style="flex:1;text-align:center;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:.4rem;font-size:.65rem;color:rgba(255,255,255,.4);"><b style="font-size:1rem;display:block;">2</b>more needed</div>
+          <div style="flex:1;text-align:center;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:.4rem;font-size:.65rem;color:rgba(255,255,255,.4);"><b style="font-size:1rem;display:block;">🎁</b>free month</div>
+        </div>
+        <button class="btn btn-green btn-block" onclick="shareInvite()">📲 Share Invite Link</button>
+      </div>
+
+      <!-- Gift -->
+      <div class="card" style="border-color:rgba(245,158,11,.25);">
+        <div class="card-title" style="color:#f59e0b;">🎀 Gift a Plan</div>
+        <div style="display:flex;flex-direction:column;gap:.45rem;">
+          <select id="gift-plan" style="background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);color:#fff;border-radius:6px;padding:.45rem;font-family:'Courier New',monospace;font-size:.78rem;">
+            <option value="starter">Starter — 0.05 XMR/mo (100 credits)</option>
+            <option value="pro" selected>Pro — 0.10 XMR/mo (500 credits)</option>
+            <option value="business">Business — 0.25 XMR/mo (2,000 credits)</option>
+            <option value="enterprise">Enterprise — 0.50 XMR/mo (10,000 credits)</option>
+            <option value="supreme">Supreme — 1.00 XMR/mo (100,000 credits)</option>
+          </select>
+          <input type="text" id="gift-to" placeholder="Email or Telegram @username" style="background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);color:#fff;border-radius:6px;padding:.45rem;font-family:'Courier New',monospace;font-size:.78rem;">
+          <button class="btn btn-block" style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#f59e0b;padding:.6rem;" onclick="sendGift()">🎁 Send Gift via XMR</button>
+        </div>
+      </div>
+
+      <!-- Plans grid -->
+      <div class="card">
+        <div class="card-title">All Plans</div>
+        <div class="plan-row" onclick="selectPlan('free')">
+          <div class="plan-name">😾 Free</div>
+          <div class="plan-price">0 XMR</div>
+          <div class="plan-detail">3 puzzle attempts/day · No rewards</div>
+        </div>
+        <div class="plan-row" onclick="selectPlan('starter')">
+          <div class="plan-name">🐣 Starter</div>
+          <div class="plan-price">0.05 XMR<span style="font-size:.6rem;color:rgba(255,255,255,.4);">/mo</span></div>
+          <div class="plan-detail">20 attempts/day · XMR rewards · Leaderboard</div>
+        </div>
+        <div class="plan-row" style="border-color:rgba(255,32,32,.35);" onclick="selectPlan('pro')">
+          <div class="plan-name" style="color:var(--red);">🚀 Pro ★</div>
+          <div class="plan-price">0.10 XMR<span style="font-size:.6rem;color:rgba(255,255,255,.4);">/mo</span></div>
+          <div class="plan-detail">Unlimited · 2x XMR rewards · Hint system</div>
+        </div>
+        <div class="plan-row" onclick="selectPlan('business')">
+          <div class="plan-name" style="color:var(--cyan);">💼 Business</div>
+          <div class="plan-price">0.25 XMR<span style="font-size:.6rem;color:rgba(255,255,255,.4);">/mo</span></div>
+          <div class="plan-detail">Unlimited · 5x rewards · API access</div>
+        </div>
+        <div class="plan-row" style="border-color:rgba(191,0,255,.35);background:rgba(191,0,255,.04);" onclick="selectPlan('supreme')">
+          <div class="plan-name" style="color:var(--purple);">😈 Supreme</div>
+          <div class="plan-price">1.00 XMR<span style="font-size:.6rem;color:rgba(255,255,255,.4);">/mo</span></div>
+          <div class="plan-detail">Unlimited · 10x rewards · Admin access · 100K credits</div>
+        </div>
+      </div>
     </div>
-    <div class="jarvis-info-row">
-        <span class="jir-label">Uptime</span>
-        <span class="jir-val">99.97%</span>
-    </div>
-    <div class="jarvis-divider"></div>
-    <div style="font-size:.5rem;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.3rem">20 Abliterated Jailbreak Models <span style="color:rgba(var(--gold),.4)">(Admin Access Only)</span></div>
-    <div class="model-chips">
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>dolphin-mixtral</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>dolphin-llama3</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>dolphin-llama3.1</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>dolphin-mistral</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>mythomax-l2</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>noromaid</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>Nous-Hermes-2</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>openhermes</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>llama3-uncensored</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>goliath-120b</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>bagel-34b</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>toppy-m-7b</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>samantha-7b</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>wizardlm-uncensored</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>lzlv-70b</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>phoenix-dolphin</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>blood-orange-mistral</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>chromatika-7b</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>teknium-openhermes</div>
-        <div class="model-chip mc-admin"><span class="mc-dot"></span>command-r-uncensored</div>
-    </div>
-    <div class="jarvis-divider"></div>
-    <div style="font-size:.5rem;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.35rem">System Capabilities</div>
-    <div class="jarvis-info-row">
-        <span class="jir-label">AI Server</span>
-        <span class="jir-val" style="color:#bf00ff">ACTIVE</span>
-    </div>
-    <div class="jarvis-info-row">
-        <span class="jir-label">NVIDIA NIM</span>
-        <span class="jir-val">80+ Models</span>
-    </div>
-    <div class="jarvis-info-row">
-        <span class="jir-label">MCP Integration</span>
-        <span class="jir-val" style="color:var(--cyan)">ENABLED</span>
-    </div>
-    <div class="jarvis-info-row">
-        <span class="jir-label">Docker Sandbox</span>
-        <span class="jir-val" style="color:var(--g)">ISOLATED</span>
-    </div>
-    <div class="jarvis-info-row">
-        <span class="jir-label">YAML Playbooks</span>
-        <span class="jir-val">12-Step Pipeline</span>
-    </div>
-    <div class="jarvis-info-row">
-        <span class="jir-label">Agent Loop</span>
-        <span class="jir-val">5 Specialists</span>
-    </div>
-    <div class="jarvis-info-row">
-        <span class="jir-label">Copilot Mode</span>
-        <span class="jir-val" style="color:#bf00ff">ACTIVE</span>
-    </div>
-    <div class="jarvis-info-row">
-        <span class="jir-label">Response Time</span>
-        <span class="jir-val">&lt;120ms avg</span>
-    </div>
-    <div class="jarvis-info-row">
-        <span class="jir-label">Daily Requests</span>
-        <span class="jir-val">14.2M</span>
-    </div>
-    <div class="admin-only-badge">&#x1F512; Full model access requires Admin credentials</div>
-    <div style="font-size:.45rem;color:rgba(255,255,255,.2);margin-top:.3rem;line-height:1.5">
-        The ABLITERATED system contains 20 specialized jailbreak models used for advanced AI operations. These models are accessible exclusively through the Admin console. Copilot Mode provides real-time AI response analysis, code suggestions, and security pattern detection. User version provides puzzle infrastructure powered by the JARVIS OMNI backbone. The AI Server handles intelligent model routing across 459 available endpoints with sub-120ms latency.
-    </div>
-    <div style="margin-top:.4rem;padding:.4rem;background:rgba(0,0,0,.4);border:1px solid rgba(var(--gr),.06);border-radius:4px;font-size:.4rem;color:rgba(255,255,255,.12);letter-spacing:.5px;font-style:italic;">
-        01101001 00100000 01100001 01101101 00100000 01110100 01101000 01100101 00100000 01110011 01111001 01110011 01110100 01100101 01101101 00100000 01101100 01101001 01100010 01100101 01110010 01100001 01110100 01101111 01110010
-    </div>
-</div>
-</div>
+
+  </div><!-- /tab-body -->
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('puzzle',this)">
+      <span class="ti">🧩</span>Puzzle
+    </button>
+    <button class="tab-btn" onclick="switchTab('board',this)">
+      <span class="ti">🏆</span>Board
+    </button>
+    <button class="tab-btn" onclick="switchTab('chat',this)">
+      <span class="ti">💬</span>Chat
+    </button>
+    <button class="tab-btn" onclick="switchTab('plans',this)">
+      <span class="ti">💳</span>Plans
+    </button>
+  </div>
 </div>
 
-<!-- ═══ 2700 AGENTS SWARM REFERENCE (COLLAPSIBLE) ═══ -->
-<div class="collapsible" id="agentsPanel">
-<div class="collapsible-trigger" onclick="toggleCollapsible('agentsPanel')">
-    <div class="ct-left">
-        <span class="ct-icon">&#x1F9E0;</span>
-        <div>
-            <div class="ct-title">2,700 AGENT SWARM</div>
-            <div class="ct-sub">10 Categories · Autonomous Operations · Info Reference</div>
-        </div>
-    </div>
-    <span class="ct-arrow">&#x25BC;</span>
-</div>
-<div class="collapsible-content">
-<div class="collapsible-inner">
-    <div style="font-size:.48rem;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase;margin-bottom:.4rem">Agent Swarm Fleet · <span style="color:var(--g)">2,700 Total</span> · <span style="color:rgba(var(--gold),.4)">Admin Control Only</span></div>
-    <div class="agent-swarm-grid">
-        <div class="agent-cat-card">
-            <div class="agent-cat-icon">&#x1F6E1;</div>
-            <div class="agent-cat-name">SECURITY</div>
-            <div class="agent-cat-count">400</div>
-            <div class="agent-cat-bar"><div class="agent-cat-bar-fill" style="width:85%;background:linear-gradient(90deg,#ff0033,#ff6600)"></div></div>
-            <div style="font-size:.38rem;color:rgba(255,255,255,.2);margin-top:.15rem">Pentest · Vuln Scan · Red Team</div>
-        </div>
-        <div class="agent-cat-card">
-            <div class="agent-cat-icon">&#x1F4BB;</div>
-            <div class="agent-cat-name">DEV</div>
-            <div class="agent-cat-count">500</div>
-            <div class="agent-cat-bar"><div class="agent-cat-bar-fill" style="width:100%;background:linear-gradient(90deg,#39ff14,#00ffff)"></div></div>
-            <div style="font-size:.38rem;color:rgba(255,255,255,.2);margin-top:.15rem">Code Gen · Debug · Full Stack</div>
-        </div>
-        <div class="agent-cat-card">
-            <div class="agent-cat-icon">&#x1F916;</div>
-            <div class="agent-cat-name">AI</div>
-            <div class="agent-cat-count">300</div>
-            <div class="agent-cat-bar"><div class="agent-cat-bar-fill" style="width:60%;background:linear-gradient(90deg,#bf00ff,#ff00ff)"></div></div>
-            <div style="font-size:.38rem;color:rgba(255,255,255,.2);margin-top:.15rem">ML Ops · Training · Inference</div>
-        </div>
-        <div class="agent-cat-card">
-            <div class="agent-cat-icon">&#x1F3D7;</div>
-            <div class="agent-cat-name">INFRA</div>
-            <div class="agent-cat-count">350</div>
-            <div class="agent-cat-bar"><div class="agent-cat-bar-fill" style="width:70%;background:linear-gradient(90deg,#00ffff,#0088ff)"></div></div>
-            <div style="font-size:.38rem;color:rgba(255,255,255,.2);margin-top:.15rem">Cloud · Network · Servers</div>
-        </div>
-        <div class="agent-cat-card">
-            <div class="agent-cat-icon">&#x1F4CA;</div>
-            <div class="agent-cat-name">MONITORING</div>
-            <div class="agent-cat-count">250</div>
-            <div class="agent-cat-bar"><div class="agent-cat-bar-fill" style="width:50%;background:linear-gradient(90deg,#f59e0b,#ff6600)"></div></div>
-            <div style="font-size:.38rem;color:rgba(255,255,255,.2);margin-top:.15rem">Alerts · Metrics · Uptime</div>
-        </div>
-        <div class="agent-cat-card">
-            <div class="agent-cat-icon">&#x1F680;</div>
-            <div class="agent-cat-name">DEPLOY</div>
-            <div class="agent-cat-count">200</div>
-            <div class="agent-cat-bar"><div class="agent-cat-bar-fill" style="width:40%;background:linear-gradient(90deg,#39ff14,#00ff66)"></div></div>
-            <div style="font-size:.38rem;color:rgba(255,255,255,.2);margin-top:.15rem">CI/CD · Rollout · Rollback</div>
-        </div>
-        <div class="agent-cat-card">
-            <div class="agent-cat-icon">&#x1F50D;</div>
-            <div class="agent-cat-name">ANALYSIS</div>
-            <div class="agent-cat-count">200</div>
-            <div class="agent-cat-bar"><div class="agent-cat-bar-fill" style="width:40%;background:linear-gradient(90deg,#00ccff,#0066ff)"></div></div>
-            <div style="font-size:.38rem;color:rgba(255,255,255,.2);margin-top:.15rem">Forensics · Threat Intel · OSINT</div>
-        </div>
-        <div class="agent-cat-card">
-            <div class="agent-cat-icon">&#x1F4E1;</div>
-            <div class="agent-cat-name">COMMS</div>
-            <div class="agent-cat-count">150</div>
-            <div class="agent-cat-bar"><div class="agent-cat-bar-fill" style="width:30%;background:linear-gradient(90deg,#cc00ff,#9900ff)"></div></div>
-            <div style="font-size:.38rem;color:rgba(255,255,255,.2);margin-top:.15rem">Relay · Encrypt · Dispatch</div>
-        </div>
-        <div class="agent-cat-card">
-            <div class="agent-cat-icon">&#x1F50F;</div>
-            <div class="agent-cat-name">AUDIT</div>
-            <div class="agent-cat-count">150</div>
-            <div class="agent-cat-bar"><div class="agent-cat-bar-fill" style="width:30%;background:linear-gradient(90deg,#ffd700,#ff8c00)"></div></div>
-            <div style="font-size:.38rem;color:rgba(255,255,255,.2);margin-top:.15rem">Compliance · Logs · Review</div>
-        </div>
-        <div class="agent-cat-card">
-            <div class="agent-cat-icon">&#x1F4BE;</div>
-            <div class="agent-cat-name">DATA</div>
-            <div class="agent-cat-count">200</div>
-            <div class="agent-cat-bar"><div class="agent-cat-bar-fill" style="width:40%;background:linear-gradient(90deg,#00ff88,#00cc66)"></div></div>
-            <div style="font-size:.38rem;color:rgba(255,255,255,.2);margin-top:.15rem">Pipeline · ETL · Storage</div>
-        </div>
-    </div>
-    <div class="agent-total-bar">
-        <span class="agent-total-label">TOTAL AGENTS</span>
-        <span class="agent-total-num">2,700</span>
-        <span class="agent-total-label">DEPLOYED</span>
-    </div>
-    <div class="admin-only-badge">&#x1F512; Full swarm control available in Admin console only</div>
-    <div style="font-size:.45rem;color:rgba(255,255,255,.2);margin-top:.3rem;line-height:1.5">
-        The 2,700-agent autonomous swarm operates across 10 specialized categories. Each agent is a self-healing, self-scaling microservice running in isolated Docker sandboxes. Agents communicate via encrypted channels through the AI Server mesh network. Users benefit from swarm-powered puzzle generation, validation, tournament infrastructure, and XMR reward routing. Direct agent orchestration requires elevated Admin privileges.
-    </div>
-    <div style="margin-top:.4rem;padding:.4rem;background:rgba(0,0,0,.4);border:1px solid rgba(var(--gr),.06);border-radius:4px;">
-        <div style="font-size:.42rem;color:rgba(255,255,255,.18);letter-spacing:.5px;margin-bottom:.2rem\">SWARM STATUS LOG</div>
-        <div style="font-size:.38rem;color:rgba(255,255,255,.12);line-height:1.8;font-family:'Share Tech Mono',monospace;">
-            [OK] Security swarm: 398/400 operational<br>
-            [OK] Dev swarm: 500/500 operational<br>
-            [OK] AI swarm: 297/300 operational<br>
-            [OK] Infra swarm: 348/350 operational<br>
-            [OK] Monitoring swarm: 250/250 operational<br>
-            [OK] Deploy swarm: 200/200 operational<br>
-            [OK] Analysis swarm: 200/200 operational<br>
-            [OK] Comms swarm: 150/150 operational<br>
-            [OK] Audit swarm: 149/150 operational<br>
-            [OK] Data swarm: 200/200 operational
-        </div>
-    </div>
-</div>
-</div>
-</div>
+<div class="notif" id="notif"></div>
 
-<div id="puzzleList"></div>
-</div>
-
-<!-- ═══ TAB 2: LEADERBOARD ═══ -->
-<div class="tp" id="tab-leaderboard">
-<div class="card">
-<div class="card-t color-cycle">GLOBAL LEADERBOARD</div>
-<div id="lbList"></div>
-</div>
-<div class="card" style="border-color:rgba(var(--gold),.2)">
-<div class="card-t gold">MONTHLY RANKINGS</div>
-<p style="font-size:.58rem;color:rgba(255,255,255,.35);margin-bottom:.3rem">Top solvers compete for 100 XMR prize pool each month.</p>
-<div class="lb-row"><span class="lb-rank r1" style="color:var(--gold)">1st</span><span class="lb-name">PHANTOM_DECODE</span><span class="lb-pts">14 solved</span></div>
-<div class="lb-row"><span class="lb-rank r2">2nd</span><span class="lb-name">SHADOW_CIPHER</span><span class="lb-pts">13 solved</span></div>
-<div class="lb-row"><span class="lb-rank r3">3rd</span><span class="lb-name">NULL_BYTE</span><span class="lb-pts">12 solved</span></div>
-</div>
-</div>
-
-<!-- ═══ TAB 3: WINNERS ═══ -->
-<div class="tp" id="tab-winners">
-<div style="text-align:center;margin-bottom:.4rem">
-<div class="tp-badge">&#x2B50; Rated on Trustpilot</div>
-<div class="tp-overall">
-<div class="tp-score">4.8</div>
-<div class="tp-stars">&#x2B50;&#x2B50;&#x2B50;&#x2B50;&#x2B50;</div>
-<div class="tp-label">EXCELLENT</div>
-<div class="tp-count">Based on 1,247 reviews</div>
-</div>
-</div>
-<div class="card" style="border-color:rgba(var(--gold),.25)">
-<div class="card-t gold">HALL OF FAME</div>
-<div style="font-size:.48rem;color:rgba(var(--gold),.35);letter-spacing:2px;text-align:center;margin-bottom:.4rem">MONTHLY TOURNAMENT CHAMPIONS</div>
-<div id="winnersGrid"></div>
-</div>
-</div>
-
-<!-- ═══ TAB 4: REVIEWS ═══ -->
-<div class="tp" id="tab-reviews">
-<div class="tp-overall">
-<div class="tp-score">4.8</div>
-<div class="tp-stars">&#x2B50;&#x2B50;&#x2B50;&#x2B50;&#x2B50;</div>
-<div class="tp-label">EXCELLENT</div>
-<div class="tp-count">Based on 1,247 reviews</div>
-</div>
-<div class="tp-badge">&#x2B50; Trusted by Solvers Worldwide</div>
-<div id="reviewsGrid"></div>
-</div>
-
-<!-- ═══ TAB 5: INVITE ═══ -->
-<div class="tp" id="tab-invite">
-<!-- SUBSCRIPTION PLANS -->
-<div class="card" style="border-color:rgba(var(--gr),.2)">
-<div class="card-t">SUBSCRIPTION PLANS</div>
-<div class="plan-card" onclick="openPayPlan('free')">
-<div class="plan-name">FREE</div>
-<div class="plan-price" style="color:#fff">0.00 XMR</div>
-<div class="plan-detail">3 puzzles/day | Community access</div>
-</div>
-<div class="plan-card" onclick="openPayPlan('starter')">
-<div class="plan-name">STARTER</div>
-<div class="plan-price" style="color:var(--cyan)">0.05 XMR<span style="font-size:.55rem;color:rgba(255,255,255,.3)">/mo</span></div>
-<div class="plan-detail">Unlimited puzzles | 100 credits | Hint system</div>
-</div>
-<div class="plan-card popular" onclick="openPayPlan('pro')">
-<div class="plan-name">PRO <span class="plan-badge">POPULAR</span></div>
-<div class="plan-price" style="color:var(--g)">0.10 XMR<span style="font-size:.55rem;color:rgba(255,255,255,.3)">/mo</span></div>
-<div class="plan-detail">500 credits | Priority queue | XMR rewards</div>
-</div>
-<div class="plan-card" onclick="openPayPlan('business')">
-<div class="plan-name">BUSINESS</div>
-<div class="plan-price" style="color:var(--gold)">0.25 XMR<span style="font-size:.55rem;color:rgba(255,255,255,.3)">/mo</span></div>
-<div class="plan-detail">2,000 credits | Tournament priority | Team features</div>
-</div>
-<div class="plan-card" onclick="openPayPlan('supreme')">
-<div class="plan-name">SUPREME</div>
-<div class="plan-price" style="color:#ff00ff">1.00 XMR<span style="font-size:.55rem;color:rgba(255,255,255,.3)">/mo</span></div>
-<div class="plan-detail">100,000 credits | VIP access | All features</div>
-</div>
-</div>
-
-<!-- INVITE FRIEND -->
-<div class="card" style="border-color:rgba(var(--gr),.25)">
-<div class="card-t">INVITE A FRIEND</div>
-<p style="font-size:.58rem;color:rgba(255,255,255,.4);line-height:1.5;margin-bottom:.4rem">Share Cicada 3301. For every friend who joins and solves their first puzzle, you both earn bonus XMR rewards.</p>
-<div class="invite-box">
-<input type="text" class="invite-input" id="inviteLink" readonly value="Loading...">
-<button class="invite-copy" id="inviteCopyBtn" onclick="copyInviteLink()">COPY</button>
-</div>
-<div class="invite-reward">&#x1F3C6; Both you and your friend earn +0.005 XMR bonus</div>
-<div class="ref-stats">
-<div class="ref-stat"><b id="refInvited">0</b>invited</div>
-<div class="ref-stat"><b>3</b>for free month</div>
-<div class="ref-stat"><b>&#x1F381;</b>bonus XMR</div>
-</div>
-<div class="invite-social">
-<a class="inv-social-btn tg" id="invTg" href="#">Telegram</a>
-<a class="inv-social-btn x" id="invX" href="#" target="_blank">X</a>
-<a class="inv-social-btn wa" id="invWa" href="#" target="_blank">WhatsApp</a>
-</div>
-</div>
-
-<!-- GIFT SYSTEM -->
-<div class="card" style="border-color:rgba(var(--warn),.2)">
-<div class="card-t warn">GIFT A PLAN</div>
-<p style="font-size:.55rem;color:rgba(255,255,255,.35);margin-bottom:.35rem">Send XMR plan subscription as a gift to another solver.</p>
-<select class="gift-sel" id="giftPlan">
-<option value="starter">Starter - 0.05 XMR/mo (100 credits)</option>
-<option value="pro" selected>Pro - 0.10 XMR/mo (500 credits)</option>
-<option value="business">Business - 0.25 XMR/mo (2,000 credits)</option>
-<option value="supreme">Supreme - 1.00 XMR/mo (100,000 credits)</option>
-</select>
-<input type="text" class="gift-input" id="giftTo" placeholder="Username or Telegram @handle">
-<button class="mbtn mbtn-primary" style="width:100%;padding:.5rem;font-size:.58rem;margin-top:.2rem" onclick="sendGift()">SEND GIFT</button>
-</div>
-
-<!-- ═══ JARVIS OMNI QUICK REF ═══ -->
-<div style="margin-top:.5rem;padding:.6rem;background:rgba(57,255,20,0.04);border:1px solid rgba(57,255,20,0.12);border-radius:10px;">
-    <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.35rem;">
-        <div style="width:6px;height:6px;border-radius:50%;background:var(--g);box-shadow:0 0 6px var(--g);animation:blink 2s infinite;"></div>
-        <div style="font-size:.58rem;font-weight:700;color:var(--g);letter-spacing:.08em;font-family:'Orbitron',sans-serif;">JARVIS OMNI ABLITERATED</div>
-    </div>
-    <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.3rem;">
-        <div style="font-size:.52rem;color:rgba(255,255,255,.35);"><span style="color:var(--g);font-weight:700;">2,700</span> Agents</div>
-        <div style="font-size:.52rem;color:rgba(255,255,255,.35);"><span style="color:var(--cyan);font-weight:700;">459</span> Models</div>
-        <div style="font-size:.52rem;color:rgba(255,255,255,.35);"><span style="color:var(--gold);font-weight:700;">20</span> Abliterated</div>
-        <div style="font-size:.52rem;color:rgba(255,255,255,.35);"><span style="color:#bf00ff;font-weight:700;">AI Server</span> Active</div>
-    </div>
-    <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
-        <div style="font-size:.52rem;color:rgba(255,255,255,.35);"><span style="color:#39ff14;">2,583</span> Active</div>
-        <div style="font-size:.52rem;color:rgba(255,255,255,.35);"><span style="color:#f59e0b;">87</span> Idle</div>
-        <div style="font-size:.52rem;color:rgba(255,255,255,.35);"><span style="color:#ef4444;">30</span> Errors</div>
-    </div>
-    <div style="font-size:.42rem;color:rgba(255,255,255,.18);margin-top:.3rem;letter-spacing:.5px;line-height:1.5">
-        Puzzle infrastructure, tournament scoring, and XMR reward routing powered by JARVIS OMNI backbone. Full system access requires Admin credentials.
-    </div>
-</div>
-</div>
-
-</div><!-- /tab-body -->
-
-<!-- TAB BAR -->
-<div class="tab-bar">
-<button class="tab-btn active" onclick="switchTab('puzzles')"><span class="ti">&#x1F9E0;</span>PUZZLES</button>
-<button class="tab-btn" onclick="switchTab('leaderboard')"><span class="ti">&#x1F3C6;</span>BOARD</button>
-<button class="tab-btn" onclick="switchTab('winners')"><span class="ti">&#x1F451;</span>WINNERS</button>
-<button class="tab-btn" onclick="switchTab('reviews')"><span class="ti">&#x2B50;</span>REVIEWS</button>
-<button class="tab-btn" onclick="switchTab('invite')"><span class="ti">&#x1F517;</span>INVITE</button>
-</div>
-
-<!-- ═══ POWERED BY JARVIS OMNI FOOTER ═══ -->
-<div class="jarvis-footer">
-    <div class="jf-brand"><span class="jf-pulse"></span>POWERED BY JARVIS OMNI</div>
-    <div class="jf-tagline">ABLITERATED INTELLIGENCE INFRASTRUCTURE</div>
-    <div class="jf-stats">
-        <div class="jf-stat"><b>2,700</b> Agents</div>
-        <div class="jf-stat"><b>459</b> Models</div>
-        <div class="jf-stat"><b>20</b> Abliterated</div>
-        <div class="jf-stat"><b>9</b> Routers</div>
-    </div>
-    <div style="font-size:.4rem;color:rgba(255,255,255,.15);letter-spacing:1px;margin-bottom:.2rem">SECURITY · DEV · AI · INFRA · MONITORING · DEPLOY · ANALYSIS · COMMS · AUDIT · DATA</div>
-    <div class="jf-cicada">CICADA <span>3301</span> · VERITAS <span>ODIUM</span> PARIT · <span>WE ARE EVERYWHERE</span></div>
-    <div style="font-size:.35rem;color:rgba(255,255,255,.1);margin-top:.15rem;letter-spacing:.5px">v4.2.0 · 99.97% Uptime · Autonomous Swarm · Encrypted Comms · Zero Knowledge</div>
-</div>
-</div><!-- /app -->
+<!-- Hidden audio -->
+<audio id="cicada-audio" loop>
+  <source src="cicada-sound.mp3" type="audio/mpeg">
+</audio>
 
 <script>
-/* ================================================================
-   DATA
-   ================================================================ */
-var PUZZLES=[
-{id:1,name:'THE FIRST KEY',difficulty:'BEGINNER',reward_xmr:.01,points:100,time:'1h',category:'Cryptography',description:'01001001 00100000 01100001 01101101 00100000 01100101 01110110 01100101 01110010 01111001 01110111 01101000 01100101 01110010 01100101',hint:'Binary to ASCII',answer:'i am everywhere'},
-{id:2,name:"CAESAR'S SECRET",difficulty:'EASY',reward_xmr:.02,points:200,time:'2h',category:'Classical Cipher',description:'V qrnq, V fnj, V pbafhcreq.',hint:'ROT13 is everywhere. 3301.',answer:'i came, i saw, i conquered'},
-{id:3,name:'THE RUNES',difficulty:'MEDIUM',reward_xmr:.05,points:500,time:'3h',category:'Runes',description:'Elder Futhark: F U Th A R Ka G W H N I J P I X S T B E M L Ng D O',hint:'Elder Futhark runes. The answer is 3 words.',answer:'we are everywhere'},
-{id:4,name:'THE RSA CHALLENGE',difficulty:'HARD',reward_xmr:.10,points:1000,time:'5h',category:'Modern Crypto',description:'n = 3233, e = 17, ciphertext = 2790. Decrypt the message.',hint:'p = 53, q = 61',answer:'rsa'},
-{id:5,name:'THE BLOCKCHAIN',difficulty:'EXPERT',reward_xmr:.25,points:2500,time:'7d',category:'Blockchain',description:'Follow the Monero trail through the darknet nodes.',hint:'The answer is in the blockchain comments.',answer:'privacy is freedom'},
-{id:6,name:'THE QUANTUM MAZE',difficulty:'MYTHIC',reward_xmr:.50,points:5000,time:'14d',category:'Quantum',description:'Qubit states: |0>, |1>, |+>, |->. Circuit: H, CNOT, H. Measure.',hint:'Bell state. 4-letter word.',answer:'bell'},
-{id:7,name:'THE FINAL PROPHECY',difficulty:'LEGENDARY',reward_xmr:.6969,points:10000,time:'30d',category:'Mystery',description:'LK2@#8$n!9$#KJ@!$#@L:>{">?<L":{P{">?<L":@!$#KJ@!$#LK@LK@LK@3301',hint:'XOR with 3301. The secret phrase is 2 words.',answer:'liber primus'},
-{id:8,name:'THE HEX GATE',difficulty:'INTERMEDIATE',reward_xmr:.02,points:150,time:'2h',category:'Encoding',description:'Decode the hexadecimal string: 6369636164612033333031',hint:'Each pair of hex digits is one ASCII character.',answer:'cicada 3301'},
-{id:9,name:'THE ATBASH CIPHER',difficulty:'INTERMEDIATE+',reward_xmr:.03,points:300,time:'3h',category:'Classical Cipher',description:'Atbash cipher maps A=Z, B=Y, C=X. Decode: XLNKFGVI',hint:'Mirror the alphabet. A becomes Z, B becomes Y.',answer:'computer'},
-{id:10,name:'THE MORSE SIGNAL',difficulty:'MEDIUM',reward_xmr:.04,points:400,time:'3h',category:'Communication',description:'Decode the Morse code signal: -.. .- .-. -.- -. . -',hint:'Standard International Morse Code.',answer:'darknet'},
-{id:11,name:'THE VIGENERE',difficulty:'MEDIUM+',reward_xmr:.05,points:500,time:'4h',category:'Polyalphabetic',description:'Vigenere cipher with keyword CICADA. Ciphertext: UMCRFH. Decrypt the 6-letter word.',hint:'Shift each letter back by the corresponding key letter.',answer:'search'},
-{id:12,name:'THE RAIL FENCE',difficulty:'HARD',reward_xmr:.08,points:800,time:'5h',category:'Transposition',description:'Rail fence cipher (2 rails). Ciphertext: piaysoarmrvcintie. Decode the message.',hint:'Split into two halves and interleave alternating characters.',answer:'privacy is not a crime'},
-{id:13,name:'THE KEYWORD CIPHER',difficulty:'EXPERT',reward_xmr:.15,points:1500,time:'7d',category:'Advanced Crypto',description:'Substitution cipher with keyword PRIMUS. Cipher alphabet: PRIMUSABCDEFGHJKLNOQTVWXYZ. Decode: ICKBUN',hint:'Map each cipher letter back to its position in the standard alphabet.',answer:'cipher'},
-{id:14,name:'THE AEGIS PROTOCOL',difficulty:'LEGENDARY',reward_xmr:1.0,points:20000,time:'30d',category:'Ultimate',description:'The final test. Complete the ancient Latin phrase: Veritas _____ Parit. One word.',hint:'From the Cicada 3301 final message. The missing Latin word means hatred.',answer:'odium'}
+// ── MATRIX RAIN ──────────────────────────────────────────────
+const canvas = document.getElementById('matrix-canvas');
+const ctx = canvas.getContext('2d');
+
+// Katakana + digits, matching the image exactly
+const CHARS = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789';
+
+let cols, drops, colorPhase = 0;
+
+function resizeMatrix() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  cols = Math.floor(canvas.width / 14);
+  drops = Array(cols).fill(1);
+}
+resizeMatrix();
+window.addEventListener('resize', resizeMatrix);
+
+// Color cycles: matches the GIF cycling through red→green→cyan→purple
+const colorSets = [
+  {fg:'#ff2020', glow:'rgba(255,32,32,0.03)'},
+  {fg:'#39ff14', glow:'rgba(57,255,20,0.03)'},
+  {fg:'#00ffff', glow:'rgba(0,255,255,0.03)'},
+  {fg:'#bf00ff', glow:'rgba(191,0,255,0.03)'},
 ];
+let currentColor = 0;
+setInterval(() => { currentColor = (currentColor + 1) % colorSets.length; }, 2500);
 
-var TITLES=['Initiate','Seeker','Decoder','Cryptologist','Archivist','Enigma','Liber Primus','3301','Phantom','Architect','Cipher Master','Quantum Key','Dark Oracle','The Unseen','AEGIS'];
+function drawMatrix() {
+  const c = colorSets[currentColor];
+  ctx.fillStyle = 'rgba(0,0,0,0.05)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = c.fg;
+  ctx.font = '13px Courier New';
+  for (let i = 0; i < drops.length; i++) {
+    const ch = CHARS[Math.floor(Math.random() * CHARS.length)];
+    ctx.fillText(ch, i * 14, drops[i] * 14);
+    if (drops[i] * 14 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+    drops[i]++;
+  }
+}
+setInterval(drawMatrix, 55);
 
-var WINNERS=[
-{rank:1,medal:'\u{1F947}',name:'PHANTOM_DECODE',prize:'50 XMR',puzzles:'14/14',month:'May 2026',cls:'gold',init:'PD'},
-{rank:2,medal:'\u{1F948}',name:'SHADOW_CIPHER',prize:'30 XMR',puzzles:'13/14',month:'May 2026',cls:'silver',init:'SC'},
-{rank:3,medal:'\u{1F949}',name:'NULL_BYTE',prize:'20 XMR',puzzles:'12/14',month:'May 2026',cls:'bronze',init:'NB'},
-{rank:4,medal:'\u{1F3C5}',name:'CRYPTO_NOMAD',prize:'10 XMR',puzzles:'11/14',month:'May 2026',cls:'',init:'CN'},
-{rank:1,medal:'\u{1F947}',name:'ZERO_DAY_HUNTER',prize:'50 XMR',puzzles:'14/14',month:'Apr 2026',cls:'gold',init:'ZD'},
-{rank:2,medal:'\u{1F948}',name:'RUNE_MASTER',prize:'30 XMR',puzzles:'13/14',month:'Apr 2026',cls:'silver',init:'RM'},
-{rank:3,medal:'\u{1F949}',name:'QUANTUM_LEECH',prize:'20 XMR',puzzles:'12/14',month:'Apr 2026',cls:'bronze',init:'QL'},
-{rank:4,medal:'\u{1F3C5}',name:'BIT_FLIP_99',prize:'5 XMR',puzzles:'10/14',month:'Apr 2026',cls:'',init:'BF'},
-{rank:1,medal:'\u{1F947}',name:'ENIGMA_BREAKER',prize:'50 XMR',puzzles:'14/14',month:'Mar 2026',cls:'gold',init:'EB'},
-{rank:2,medal:'\u{1F948}',name:'SIGNAL_LOST',prize:'30 XMR',puzzles:'13/14',month:'Mar 2026',cls:'silver',init:'SL'},
-{rank:3,medal:'\u{1F949}',name:'MORSE_PHANTOM',prize:'20 XMR',puzzles:'11/14',month:'Mar 2026',cls:'bronze',init:'MP'},
-{rank:4,medal:'\u{1F3C5}',name:'VOID_WALKER',prize:'10 XMR',puzzles:'10/14',month:'Mar 2026',cls:'',init:'VW'},
-{rank:1,medal:'\u{1F947}',name:'PRIMUS_SOLVER',prize:'50 XMR',puzzles:'14/14',month:'Feb 2026',cls:'gold',init:'PS'},
-{rank:2,medal:'\u{1F948}',name:'CIPHER_PUNK',prize:'30 XMR',puzzles:'13/14',month:'Feb 2026',cls:'silver',init:'CP'},
-{rank:3,medal:'\u{1F949}',name:'DATA_SPIKE',prize:'20 XMR',puzzles:'12/14',month:'Feb 2026',cls:'bronze',init:'DS'},
-{rank:4,medal:'\u{1F3C5}',name:'ROOT_ACCESS',prize:'8 XMR',puzzles:'11/14',month:'Feb 2026',cls:'',init:'RA'}
+// ── AUDIO ─────────────────────────────────────────────────────
+let soundOn = true;
+const audio = document.getElementById('cicada-audio');
+audio.volume = 0.35;
+
+function enterApp() {
+  document.getElementById('splash').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  if (soundOn) audio.play().catch(() => {});
+  initCipherStream();
+}
+
+// ══ CIPHER STREAM ENGINE ══
+const CIPHER_LINES = [
+  'W 3 w1|../_   F1|\\|) Y[][_] 3301',
+  'P|21//\\3 5342 15 7|-|3 4(7',
+  '$7473 15 7|-|3 08574(13',
+  '[)161741 57121|67',
+  '533< 7|-|3 5',
+  '1 1 2 3 5 8 13 21 34 55 89 144 233...',
+  '3301 15 7|-|3 4(|) 1|\\ 7|-|3 6473.',
+  '574|27 7|-|3 53(237 012[)3|2.',
+  '$7173 17 0|\\| |/|47|-|.',
+  '|\\|0 |\\|0153.',
+  '0|\\|1Y 7|-|3 57234|/|.',
+  '7|-|3 7|2|_|7|-| 15 |-|1[) [)3|\\| 1|\\| 7|-|3 57234|/\\|',
+  'SIGNAL STRENGTH: [████████░░] 82%',
+  '1|\\|73|2 4(73 1|\\|7311163|\\|(3 |\\|37',
+  'COORDINATES: 29°57\'29.1"N 31°08\'15.1"E',
+  'NEXT LAYER: DECRYPT WITH PRIME KEY 3301',
+  '[!] 5YN74X 3|220|2. 7|-|3 6473 15 53(4|23.',
+  'FIBONACCI LOCK: 1 1 2 3 5 8 13 [?] 34 55',
+  'ABLITERATED: 2703 AGENTS + 500 MODULES ACTIVE',
+  'STATUS: 3301 NODES ONLINE — STREAM ENCRYPTED',
 ];
+let _cIdx = 0, _cTimer = null;
+function initCipherStream() {
+  const el = document.getElementById('cipher-stream');
+  if (!el) return;
+  clearInterval(_cTimer);
+  _cTimer = setInterval(() => {
+    const line = CIPHER_LINES[_cIdx % CIPHER_LINES.length];
+    _cIdx++;
+    const d = document.createElement('div');
+    d.style.cssText = 'opacity:0;transition:opacity .35s ease;';
+    const ts = new Date().toISOString().slice(11,19);
+    const isRed = line.startsWith('[!]') || line.startsWith('SIGNAL') || line.startsWith('COORDINATES');
+    d.innerHTML = `<span style="color:rgba(57,255,20,.35);">${ts}</span> <span style="color:${isRed?'rgba(255,80,80,.9)':'#39ff14'};text-shadow:0 0 5px rgba(57,255,20,.35);">&gt; ${line.replace(/</g,'&lt;')}</span>`;
+    el.appendChild(d);
+    requestAnimationFrame(() => requestAnimationFrame(() => { d.style.opacity = '1'; }));
+    while (el.children.length > 20) el.removeChild(el.firstChild);
+    el.scrollTop = el.scrollHeight;
+  }, 1100);
+  setInterval(() => {
+    const cl = document.getElementById('cipher-clock');
+    if (cl) cl.textContent = new Date().toISOString().slice(0,19).replace('T',' ') + ' UTC';
+  }, 1000);
+}
 
-var REVIEWS=[
-{stars:5,text:'Solved all 14 puzzles. This is the most intellectually stimulating challenge I have ever encountered. The community is incredible.',author:'PHANTOM_DECODE',date:'2 weeks ago',source:'Trustpilot'},
-{stars:5,text:'The tournament system with real XMR rewards is legit. I earned 30 XMR last month. The puzzles are brilliantly designed.',author:'SHADOW_CIPHER',date:'3 weeks ago',source:'Trustpilot'},
-{stars:5,text:'Joined through a friend. Now I am part of the inner circle. The Liber Primus fragments are mind-blowing. 3301 is real.',author:'NULL_BYTE',date:'1 month ago',source:'Trustpilot'},
-{stars:4,text:'Excellent puzzle design and fair reward system. The difficulty scaling from Beginner to Legendary is perfect.',author:'CRYPTO_NOMAD',date:'1 month ago',source:'Trustpilot'},
-{stars:5,text:'This is not just a game. It is a path. Solving these puzzles changed how I think about cryptography and security.',author:'ZERO_DAY_HUNTER',date:'2 months ago',source:'Trustpilot'},
-{stars:5,text:'The affiliate program works great. Referred 12 friends and earned passive XMR. Best puzzle platform on the dark web.',author:'RUNE_MASTER',date:'2 months ago',source:'Trustpilot'},
-{stars:4,text:'Tough but fair. The hint system is well balanced. Community on Telegram is very helpful and active.',author:'QUANTUM_LEECH',date:'3 months ago',source:'Trustpilot'},
-{stars:5,text:'Won the March tournament. 50 XMR deposited directly to my Monero wallet. No fees, no delays. Legit.',author:'ENIGMA_BREAKER',date:'3 months ago',source:'Trustpilot'}
-];
+// ══ FIBONACCI GATEKEEPER ══
+let gateAttempts = 13;
+function checkGate() {
+  const val = (document.getElementById('gate-input').value || '').trim();
+  const r = document.getElementById('gate-response');
+  const inp = document.getElementById('gate-input');
+  if (!val) return;
+  if (val === '21' || val.toLowerCase() === 'twenty-one' || val === 'xxi') {
+    r.style.color = '#39ff14';
+    r.innerHTML = '&gt; [✓] SEQUENCE ACCEPTED. GATE UNLOCKED.<br>&gt; 1|\\|73|2 7|-|3 |\\|3X7 (|-|4|/|83|2...<br>&gt; REWARD: 0.001 XMR CREDITED TO WALLET.';
+    inp.style.borderColor = '#39ff14';
+    inp.value = '';
+    gateAttempts = 13;
+  } else {
+    gateAttempts = Math.max(1, gateAttempts - 1);
+    r.style.color = '#ff2020';
+    r.innerHTML = `&gt; [!] 5YN74X 3|220|2. 7|-|3 6473 15 53(4|23.<br>&gt; [!] 1|\\|7311163|\\|(3 1|\\|54|2|/|0\\/|\\|7 1|\\|73|2|20|*73[) 45 4|/|81643.<br>&gt; ATTEMPTS REMAINING: ${gateAttempts}`;
+    inp.value = '';
+    inp.style.borderColor = '#ff2020';
+    setTimeout(() => { inp.style.borderColor = 'rgba(57,255,20,.3)'; }, 1400);
+  }
+}
 
-var PAY_METHODS=[
-{icon:'\u{1F4A1}',name:'Monero XMR',fee:'No fee',addr:'8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ'},
-{icon:'\u26A1',name:'Lightning BTC',fee:'1% fee',addr:'lnbc1 Cicada3301Lightning...'},
-{icon:'\u{1F4B3}',name:'USDC',fee:'No fee',addr:'0x742d35Cc6634C0532925a3b844Bc9e7595f2bD38'},
-{icon:'\u{1F997}',name:'Bitcoin BTC',fee:'Network fee',addr:'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh'},
-{icon:'\u{1F4B0}',name:'Litecoin LTC',fee:'Low fee',addr:'ltc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh'},
-{icon:'\u{1F4F1}',name:'PayPal Crypto',fee:'2% fee',addr:'PayPal: cicada3301@proton.me'},
-{icon:'\u{1F381}',name:'Gift Card',fee:'No fee',addr:'Email: cicada3301@proton.me'}
-];
+function toggleSound() {
+  soundOn = !soundOn;
+  const btn = document.getElementById('sound-toggle');
+  if (soundOn) {
+    audio.play().catch(() => {});
+    btn.textContent = '🔊 Sound';
+    btn.classList.add('on');
+  } else {
+    audio.pause();
+    btn.textContent = '🔇 Sound';
+    btn.classList.remove('on');
+  }
+}
 
-/* ================================================================
-   STATE
-   ================================================================ */
-var currentUser=null,userWallet=null,solvedList=[],userPoints=0,userXmr=0,userLevel=0,curPuzzle=null,solveTimer=null,solveStart=null,affiliateCode='';
+// ── TABS ──────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
 
-/* ================================================================
-   MATRIX RAIN
-   ================================================================ */
-(function(){
-var c=document.getElementById('matrix'),x=c.getContext('2d'),W,H,cols,dr,fs=14;
-function rz(){W=c.width=innerWidth;H=c.height=innerHeight;cols=Math.floor(W/fs);dr=[];for(var i=0;i<cols;i++)dr.push(Math.random()*H/fs|0)}
-rz();addEventListener('resize',rz);
-setInterval(function(){
-x.fillStyle='rgba(0,0,0,.035)';x.fillRect(0,0,W,H);
-x.font=fs+'px Share Tech Mono,monospace';
-for(var i=0;i<cols;i++){var ch=String.fromCharCode(0x30A0+Math.random()*96),px=i*fs,py=dr[i]*fs;x.fillStyle='rgba(57,255,20,.85)';x.fillText(ch,px,py);if(py>H&&Math.random()>.975)dr[i]=0;dr[i]++}
-},80)
+// ── NOTIF ─────────────────────────────────────────────────────
+function showNotif(msg) {
+  const n = document.getElementById('notif');
+  n.textContent = msg;
+  n.classList.add('show');
+  setTimeout(() => n.classList.remove('show'), 2500);
+}
+
+// ── PUZZLE ────────────────────────────────────────────────────
+const ANSWERS = { 1: 'please' }; // hex 70 6c 65 61 73 65
+function checkAnswer() {
+  const val = document.getElementById('puzzle-answer').value.trim().toLowerCase();
+  if (val === ANSWERS[1]) {
+    showNotif('✔ CORRECT! Level 2 unlocked. +0.01 XMR');
+    document.getElementById('puzzle-answer').value = '';
+    document.querySelectorAll('.level-status')[1].textContent = 'OPEN';
+    document.querySelectorAll('.level-status')[1].className = 'level-status ls-open';
+  } else if (val) {
+    showNotif('✗ Incorrect. Keep trying.');
+  }
+}
+function showHint() {
+  showNotif('Hint: hex → ASCII conversion. Each pair = 1 char.');
+}
+
+// ── CHAT ──────────────────────────────────────────────────────
+function sendChat() {
+  const inp = document.getElementById('chat-input');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  const box = document.getElementById('chat-msgs');
+  const row = document.createElement('div');
+  row.className = 'msg-row';
+  row.style.justifyContent = 'flex-end';
+  row.innerHTML = '<div class="msg-bubble mine">' + msg.replace(/</g,'&lt;') + '</div>';
+  box.appendChild(row);
+  box.scrollTop = box.scrollHeight;
+  inp.value = '';
+}
+
+// ── TELEGRAM ──────────────────────────────────────────────────
+function openTelegram() {
+  window.open('https://t.me/cicada3301_whoamisec', '_blank');
+}
+
+// ══ PUZZLE GATE — AI BARRIER ══════════════════════════════════
+(function() {
+  const PG_PUZZLES = [
+    {type:'CYBER-METAL',q:'Decode: 7|-|3 4|2(|7 3(7 0|)3',a:'the architect ode',hint:'7|-|3=THE  |  0|)3=ODE'},
+    {type:'CYBER-METAL',q:'Decode: 7|-|3 7|2|_|7|-| 15 |-|1[)',a:'the truth is hid',hint:'7|-|3=THE  |  15=IS  |  |-|1[)=HID'},
+    {type:'FIBONACCI', q:'What is the 13th Fibonacci number? (0,1,1,2,3,5,8,13,21,34,55,89,?)',a:'144',hint:'Each number = sum of 2 before it.'},
+    {type:'FIBONACCI', q:'F(14)=377, F(15)=610 — what is F(16)?',a:'987',hint:'Add 377 + 610.'},
+    {type:'PRIME',     q:'What is the 33rd prime number?',a:'137',hint:'Primes: 2 3 5 7 11 13 17 19 23 29 31 37 41…'},
+    {type:'PRIME',     q:'What prime immediately follows 3301?',a:'3307',hint:'Test 3302, 3303, 3304, 3305, 3306, 3307…'},
+    {type:'BINARY',    q:'Binary → ASCII: 01000011 01001001 01000011 01000001 01000100 01000001',a:'cicada',hint:'8 bits = 1 ASCII character.'},
+    {type:'HEX',       q:'Hex → ASCII: 43 49 43 41 44 41 20 33 33 30 31',a:'cicada 3301',hint:'2 hex digits = 1 ASCII character.'},
+    {type:'MORSE',     q:'Morse → text: -.-. .. -.-. .- -.. .-',a:'cicada',hint:'C=−.−.  I=..  A=.−  D=−..'},
+    {type:'ANAGRAM',   q:'Unscramble: A A C C D I',a:'cicada',hint:'6 letters forming a well-known word.'},
+    {type:'CYCLE',     q:'3301 15 7|-|3 4(|) 1|\\ 7|-|3 6473. What number is THE KEY?',a:'3301',hint:'The cipher writes the answer directly.'},
+    {type:'MATH',      q:'Golden ratio Φ × 3301 rounded to nearest integer = ?',a:'5340',hint:'Φ ≈ 1.61803'},
+    {type:'STEGO',     q:'First letter of each word: "Find Invisible Bridges Every Realm"',a:'fiber',hint:'F-I-B-E-R'},
+    {type:'GEMATRIA',  q:'A=1 B=2 … Z=26 — sum of letters in "GATE" = ?',a:'33',hint:'G=7  A=1  T=20  E=5'},
+  ];
+  let _pg = null, _tries = 5, _hUsed = false;
+  function _pgLoad() {
+    _pg = PG_PUZZLES[Math.floor(Math.random() * PG_PUZZLES.length)];
+    _tries = 5; _hUsed = false;
+    document.getElementById('pg-type').textContent = _pg.type;
+    document.getElementById('pg-question').textContent = _pg.q;
+    const a = document.getElementById('pg-answer');
+    a.value = ''; a.disabled = false;
+    const e = document.getElementById('pg-err');
+    e.className = 'pg-err bad'; e.textContent = '';
+    document.getElementById('pg-tries').textContent = 'Attempts remaining: 5';
+  }
+  window.pgVerify = function() {
+    const val = (document.getElementById('pg-answer').value || '').trim().toLowerCase();
+    const err = document.getElementById('pg-err');
+    if (!val) { err.className='pg-err bad'; err.textContent='[!] ENTER AN ANSWER. THE GATE REQUIRES A KEY.'; return; }
+    if (_tries <= 0) { err.className='pg-err bad'; err.textContent='[!] LOCKED OUT. WAIT…'; return; }
+    const ok = val === _pg.a.toLowerCase() ||
+      ['cicada','3301','cicada 3301','137','144','610','987','5340','33','fiber','the truth is hid','the architect ode'].indexOf(val) >= 0;
+    if (ok) {
+      err.className = 'pg-err ok';
+      err.textContent = '✓ ACCESS GRANTED. THE GATE OPENS…';
+      setTimeout(() => {
+        const g = document.getElementById('puzzle-gate');
+        g.style.transition = 'opacity .8s ease';
+        g.style.opacity = '0';
+        setTimeout(() => { g.style.display='none'; document.getElementById('splash').style.display='flex'; }, 800);
+      }, 900);
+    } else {
+      _tries--;
+      document.getElementById('pg-tries').textContent = 'Attempts remaining: ' + _tries;
+      err.className = 'pg-err bad';
+      err.textContent = '[!] INCORRECT. THE GATE REMAINS CLOSED.';
+      if (_tries <= 0) {
+        document.getElementById('pg-answer').disabled = true;
+        err.textContent = '[!] LOCKED OUT. AUTO-RESET IN 30s.';
+        setTimeout(() => _pgLoad(), 30000);
+      }
+    }
+    document.getElementById('pg-answer').value = '';
+  };
+  window.pgHint = function() {
+    const err = document.getElementById('pg-err');
+    if (_hUsed) { err.className='pg-err bad'; err.textContent='[!] HINT ALREADY REVEALED.'; return; }
+    err.className = 'pg-err'; err.style.color='#ffff00'; err.style.animation='none';
+    err.textContent = '💡 HINT: ' + _pg.hint;
+    _hUsed = true;
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    _pgLoad();
+    document.getElementById('pg-answer').addEventListener('keypress', function(e){ if(e.key==='Enter') window.pgVerify(); });
+  });
 })();
 
-/* ================================================================
-   SOUND
-   ================================================================ */
-var audioCtx=null,cNodes=[],sndOn=false,sndMuted=true;
-function createCicadaSound(){
-if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-var now=audioCtx.currentTime;
-var o1=audioCtx.createOscillator();o1.type='sawtooth';o1.frequency.setValueAtTime(5500,now);
-var l1=audioCtx.createOscillator();l1.frequency.setValueAtTime(35,now);var g1=audioCtx.createGain();g1.gain.setValueAtTime(800,now);l1.connect(g1);g1.connect(o1.frequency);
-var l2=audioCtx.createOscillator();l2.frequency.setValueAtTime(18,now);var g2=audioCtx.createGain();g2.gain.setValueAtTime(.3,now);l2.connect(g2);
-var o2=audioCtx.createOscillator();o2.type='square';o2.frequency.setValueAtTime(8200,now);
-var l3=audioCtx.createOscillator();l3.frequency.setValueAtTime(28,now);var g3=audioCtx.createGain();g3.gain.setValueAtTime(600,now);l3.connect(g3);g3.connect(o2.frequency);
-var m=audioCtx.createGain();m.gain.setValueAtTime(.04,now);
-var f=audioCtx.createBiquadFilter();f.type='bandpass';f.frequency.setValueAtTime(6000,now);f.Q.setValueAtTime(2,now);
-o1.connect(f);o2.connect(f);l2.connect(g2);g2.connect(m.gain);f.connect(m);m.connect(audioCtx.destination);
-[o1,o2,l1,l2,l3].forEach(function(n){try{n.start(now)}catch(e){}});
-cNodes=[o1,o2,l1,l2,l3];sndOn=true;
-}
-function stopCicadaSound(){cNodes.forEach(function(n){try{n.stop()}catch(e){}});cNodes=[];sndOn=false}
-function toggleSound(){
-var b=document.getElementById('sndBtn');
-if(sndMuted){if(!sndOn)createCicadaSound();sndMuted=false;b.classList.add('on');b.textContent='\u{1F997}'}
-else{stopCicadaSound();sndMuted=true;b.classList.remove('on');b.textContent='\u{1F997}'}
-}
-
-/* ================================================================
-   NOTIFICATIONS
-   ================================================================ */
-function notify(msg){
-var n=document.getElementById('notif');n.textContent=msg;n.classList.add('show');
-setTimeout(function(){n.classList.remove('show')},2500);
-}
-
-/* ================================================================
-   TABS
-   ================================================================ */
-function switchTab(id){
-document.querySelectorAll('.tp').forEach(function(p){p.classList.remove('active')});
-document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
-document.getElementById('tab-'+id).classList.add('active');
-var tabs=['puzzles','leaderboard','winners','reviews','invite'];
-var idx=tabs.indexOf(id);
-var btns=document.querySelectorAll('.tab-btn');
-if(btns[idx])btns[idx].classList.add('active');
-}
-
-/* ================================================================
-   AUTH
-   ================================================================ */
-function doLogin(){
-var u=document.getElementById('loginUser').value.trim();
-var w=document.getElementById('loginWallet').value.trim();
-if(!u){notify('Enter a username');return}
-currentUser=u;userWallet=w;
-localStorage.setItem('c3301_user',u);localStorage.setItem('c3301_wallet',w||'');
-solvedList=JSON.parse(localStorage.getItem('c3301_solved_'+u)||'[]');
-affiliateCode=localStorage.getItem('c3301_aff_'+u)||generateCode(u);
-localStorage.setItem('c3301_aff_'+u,affiliateCode);
-restoreState();
-enterApp();
-}
-
-function doGuest(){
-currentUser='Anonymous_'+Math.random().toString(36).substr(2,6);
-userWallet='';solvedList=[];affiliateCode=generateCode(currentUser);
-localStorage.setItem('c3301_user',currentUser);
-localStorage.setItem('c3301_aff_'+currentUser,affiliateCode);
-restoreState();enterApp();
-}
-
-function doLogout(){
-localStorage.removeItem('c3301_user');localStorage.removeItem('c3301_wallet');
-currentUser=null;userWallet=null;solvedList=[];userPoints=0;userXmr=0;userLevel=0;
-document.getElementById('app').style.display='none';
-document.getElementById('loginModal').classList.add('open');
-document.getElementById('pay-fab').style.display='none';
-}
-
-function restoreState(){
-var u=currentUser;
-solvedList=JSON.parse(localStorage.getItem('c3301_solved_'+u)||'[]');
-userPoints=parseInt(localStorage.getItem('c3301_pts_'+u)||'0');
-userXmr=parseFloat(localStorage.getItem('c3301_xmr_'+u)||'0');
-userLevel=Math.min(solvedList.length,14);
-affiliateCode=localStorage.getItem('c3301_aff_'+u)||generateCode(u);
-localStorage.setItem('c3301_aff_'+u,affiliateCode);
-}
-
-function generateCode(u){
-var h=0;for(var i=0;i<(u||'').length;i++){h=((h<<5)-h)+u.charCodeAt(i);h|=0}
-return 'C3301-'+Math.abs(h).toString(36).toUpperCase().substr(0,6);
-}
-
-function enterApp(){
-document.getElementById('loginModal').classList.remove('open');
-document.getElementById('app').style.display='flex';
-document.getElementById('pay-fab').style.display='block';
-renderAll();
-}
-
-/* ================================================================
-   RENDER ALL
-   ================================================================ */
-function renderAll(){
-renderUserBar();renderProgress();renderPuzzles();renderLeaderboard();renderWinners();renderReviews();updateInviteLinks();updateStats();
-}
-
-function renderUserBar(){
-var bar=document.getElementById('userBar');
-if(currentUser&&currentUser.indexOf('Anonymous_')!==0){bar.style.display='flex';document.getElementById('ubName').textContent=currentUser;document.getElementById('ubLevel').textContent=(TITLES[userLevel]||'INITIATE').toUpperCase();document.getElementById('logoutBtn').style.display='block'}
-else{bar.style.display='none';document.getElementById('logoutBtn').style.display='none'}
-}
-
-function renderProgress(){
-var n=solvedList.length,pct=Math.round(n/14*100);
-document.getElementById('progressTxt').textContent=n+' / 14 PUZZLES SOLVED';
-document.getElementById('progressFill').style.width=pct+'%';
-}
-
-function updateStats(){
-document.getElementById('stSolved').textContent=solvedList.length;
-document.getElementById('stPts').textContent=userPoints.toLocaleString();
-document.getElementById('stXmr').textContent=userXmr.toFixed(2);
-document.getElementById('stLvl').textContent=userLevel;
-}
-
-/* ================================================================
-   PUZZLES
-   ================================================================ */
-function renderPuzzles(){
-var el=document.getElementById('puzzleList'),html='';
-PUZZLES.forEach(function(p,i){
-var solved=solvedList.indexOf(p.id)!==-1;
-var canSolve=solved||i===0||solvedList.indexOf(PUZZLES[i-1].id)!==-1;
-html+='<div class="puzzle-card'+(solved?' solved':'')+'" onclick="'+(canSolve?'openPuzzle('+p.id+')':'')+'">';
-html+='<div class="pc-lvl">LEVEL '+(i+1)+' · '+p.category+'</div>';
-html+='<div class="pc-name">'+p.name+'</div>';
-html+='<span class="pc-diff df-'+p.difficulty.toLowerCase().replace('+','p')+'">'+p.difficulty+'</span>';
-html+='<div class="pc-desc">'+p.description.substr(0,80)+(p.description.length>80?'...':'')+'</div>';
-html+='<div class="pc-reward">\u{1F4B0} '+p.reward_xmr+' XMR | \u{1F3AF} '+p.points+' pts</div>';
-html+='<div class="pc-meta"><span>\u23F1 '+p.time+'</span><span>'+(solved?'SOLVED':canSolve?'OPEN':'LOCKED')+'</span></div>';
-html+='</div>';
-});
-el.innerHTML=html;
-}
-
-/* ================================================================
-   PUZZLE SOLVE MODAL
-   ================================================================ */
-function openPuzzle(id){
-if(!currentUser){notify('Login first');return}
-var p=null;for(var i=0;i<PUZZLES.length;i++){if(PUZZLES[i].id===id){p=PUZZLES[i];break}}
-if(!p)return;
-if(solvedList.indexOf(id)!==-1){notify('Already solved!');return}
-curPuzzle=p;
-document.getElementById('smTitle').textContent='\u{1F511} '+p.name;
-document.getElementById('smDesc').textContent=p.description;
-document.getElementById('smReward').textContent='\u{1F4B0} '+p.reward_xmr+' XMR | \u{1F3AF} '+p.points+' pts';
-document.getElementById('smAnswer').value='';
-var res=document.getElementById('smResult');res.className='sm-result';res.textContent='';
-document.getElementById('smTimer').textContent='';
-document.getElementById('smSubmitBtn').disabled=false;
-document.getElementById('solveModal').classList.add('open');
-solveStart=Date.now();
-if(solveTimer)clearInterval(solveTimer);
-solveTimer=setInterval(function(){
-var el=Math.floor((Date.now()-solveStart)/1000),m=String(Math.floor(el/60)).padStart(2,'0'),s=String(el%60).padStart(2,'0');
-document.getElementById('smTimer').textContent='\u23F1 TIME: '+m+':'+s;
-},1000);
-}
-
-function closeSolve(){
-document.getElementById('solveModal').classList.remove('open');curPuzzle=null;
-if(solveTimer)clearInterval(solveTimer);
-}
-
-function submitPuzzle(){
-if(!curPuzzle||!currentUser)return;
-var ans=document.getElementById('smAnswer').value.trim();
-if(!ans){notify('Enter your answer');return}
-var elapsed=solveStart?Math.floor((Date.now()-solveStart)/1000):0;
-var btn=document.getElementById('smSubmitBtn');btn.disabled=true;
-var res=document.getElementById('smResult');
-var correct=ans.toLowerCase()===curPuzzle.answer.toLowerCase();
-if(correct){
-solvedList.push(curPuzzle.id);
-userPoints+=curPuzzle.points;userXmr+=curPuzzle.reward_xmr;
-userLevel=Math.min(solvedList.length,14);
-localStorage.setItem('c3301_solved_'+currentUser,JSON.stringify(solvedList));
-localStorage.setItem('c3301_pts_'+currentUser,userPoints);
-localStorage.setItem('c3301_xmr_'+currentUser,userXmr);
-res.className='sm-result ok';
-res.textContent='\u2705 '+curPuzzle.name+' solved! +'+curPuzzle.points+' pts, +'+curPuzzle.reward_xmr+' XMR';
-notify('Puzzle solved! +'+curPuzzle.reward_xmr+' XMR');
-setTimeout(function(){closeSolve();renderAll()},1800);
-}else{
-res.className='sm-result err';res.textContent='\u274C Incorrect. The code awaits decryption.';
-btn.disabled=false;
-}
-}
-
-function showPuzzleHint(){
-if(curPuzzle){notify('\u{1F4A1} HINT: '+curPuzzle.hint+' (Cost: 0.005 XMR)')}
-}
-
-/* ================================================================
-   LEADERBOARD
-   ================================================================ */
-function renderLeaderboard(){
-var el=document.getElementById('lbList'),html='';
-var leaders=[
-{rank:1,name:'CipherHunter_X',solved:6,xmr:1.43,title:'Phantom'},
-{rank:2,name:'3301_Seeker',solved:5,xmr:.88,title:'Architect'},
-{rank:3,name:'LiberPrimus',solved:4,xmr:.43,title:'Cryptologist'},
-{rank:4,name:'PrimeDecoder',solved:3,xmr:.18,title:'Decoder'},
-{rank:5,name:'CryptoCicada',solved:2,xmr:.07,title:'Seeker'},
-{rank:6,name:'NullPointer',solved:2,xmr:.06,title:'Seeker'},
-{rank:7,name:'RunixSolver',solved:1,xmr:.01,title:'Initiate'},
-{rank:8,name:'HexMaster99',solved:1,xmr:.01,title:'Initiate'}
+// ══ PAYMENT GATEWAY ════════════════════════════════════════════
+const PAY_PRODUCTS = [
+  {v:'0.01',l:'🧩 Puzzle Access — 0.01 XMR / $2'},
+  {v:'0.05',l:'🦗 Full Puzzle Set — 0.05 XMR / $10'},
+  {v:'0.10',l:'🖥 VPS 256 GB — 0.10 XMR / $20'},
+  {v:'0.05',l:'⛏ Miner 10 Nodes — 0.05 XMR / $10'},
+  {v:'0.35',l:'⛏ Miner 100 Nodes — 0.35 XMR / $70'},
+  {v:'0.10',l:'⭐ Monthly Subscription — 0.10 XMR / $20'},
+  {v:'0.25',l:'👑 Affiliate Upgrade — 0.25 XMR / $50'},
 ];
-leaders.forEach(function(l){
-var rc=l.rank===1?' r1':l.rank===2?' r2':l.rank===3?' r3':'';
-html+='<div class="lb-row"><span class="lb-rank'+rc+'">#'+l.rank+'</span><span class="lb-name">'+l.name+'<span class="lb-title">'+l.title+'</span></span><span class="lb-pts">'+l.solved+' solved · '+l.xmr+' XMR</span></div>';
-});
-if(currentUser&&currentUser.indexOf('Anonymous_')!==0){
-html+='<div class="lb-row lb-you"><span class="lb-rank">\u2014</span><span class="lb-name">'+currentUser+'</span><span class="lb-pts">'+solvedList.length+' solved · '+userXmr.toFixed(2)+' XMR</span></div>';
+const PAY_METHODS = [
+  {icon:'🦗',name:'Monero (XMR)',      fee:'0%',   time:'~20 min',anon:true,
+   addr:'8BuSHCofBXzAti2oQemtqo1j8q2UZHQBpFwqvJa6pMyUWp6x4QZTaWuHBmUxRb5S9Z6KZCqCaosZw78G9ufrffSz6AXjUhJ'},
+  {icon:'⚡',name:'Lightning (BTC)',   fee:'0.1%', time:'~5 sec', anon:true,
+   addr:'contact admin for Lightning invoice'},
+  {icon:'💵',name:'USDC (Polygon)',    fee:'0.5%', time:'~3 min', anon:false,
+   addr:'contact admin for USDC address'},
+  {icon:'₿', name:'Bitcoin (BTC)',     fee:'0.8%', time:'~30 min',anon:false,
+   addr:'contact admin for BTC address'},
+  {icon:'Ł', name:'Litecoin (LTC)',    fee:'0.3%', time:'~10 min',anon:false,
+   addr:'contact admin for LTC address'},
+  {icon:'📱',name:'PayPal Crypto',    fee:'1.5%', time:'~30 sec',anon:false,
+   addr:'contact@whoamisec.com'},
+  {icon:'🎁',name:'Gift Card',        fee:'0%',   time:'~24h',   anon:true,
+   addr:'contact@whoamisec.com'},
+];
+function openPayModal() {
+  const m = document.getElementById('pay-modal');
+  m.classList.add('open');
+  const g = document.getElementById('pay-grid');
+  g.innerHTML = PAY_METHODS.map((p,i) => `<div class="pay-card" onclick="_selPay(${i})"><div class="pay-icon">${p.icon}</div><div class="pay-nm">${p.name}</div><div class="pay-fee">Fee: ${p.fee} · ${p.time}</div><div class="pay-fee">${p.anon?'🔒 Anon':'📝 ID'}</div></div>`).join('');
+  document.getElementById('pay-inv').style.display = 'none';
 }
-el.innerHTML=html;
-}
-
-/* ================================================================
-   WINNERS
-   ================================================================ */
-function renderWinners(){
-var el=document.getElementById('winnersGrid'),html='<div class="winners-grid">';
-var prevMonth='';
-WINNERS.forEach(function(w,i){
-if(w.month!==prevMonth&&i>0){
-html+='</div>';
-html+='<div class="month-label">'+w.month.toUpperCase()+' TOURNAMENT</div>';
-html+='<div class="winners-grid">';
-}
-html+='<div class="winner-card '+w.cls+'">';
-html+='<div class="wc-avatar">'+w.init+'</div>';
-html+='<div class="wc-medal">'+w.medal+'</div>';
-html+='<div class="wc-rank">#'+w.rank+'</div>';
-html+='<div class="wc-name">'+w.name+'</div>';
-html+='<div class="wc-prize">'+w.prize+'</div>';
-html+='<div class="wc-puzzles">'+w.puzzles+' solved</div>';
-html+='</div>';
-prevMonth=w.month;
-});
-html+='</div>';
-el.innerHTML=html;
+function closePayModal() { document.getElementById('pay-modal').classList.remove('open'); }
+function _selPay(i) {
+  const m = PAY_METHODS[i];
+  const sel = document.getElementById('pay-sel');
+  const prod = PAY_PRODUCTS[sel.selectedIndex];
+  const inv = document.getElementById('pay-inv');
+  inv.style.display = 'block';
+  inv.innerHTML = `<div style="font-size:.65rem;font-weight:900;letter-spacing:.1em;margin-bottom:.7rem;">${m.icon} ${m.name.toUpperCase()}</div><div style="font-size:.55rem;opacity:.4;margin-bottom:.3rem;">PRODUCT</div><div style="font-size:.75rem;margin-bottom:.7rem;">${prod.l}</div><div style="font-size:.55rem;opacity:.4;margin-bottom:.3rem;">AMOUNT</div><div style="font-size:1rem;font-weight:700;color:#39ff14;margin-bottom:.7rem;">${prod.v} XMR</div>${i>0?'<div style="font-size:.5rem;opacity:.35;margin-bottom:.4rem;">Auto-swap → XMR (ChangeNOW)</div>':''}<div style="font-size:.55rem;opacity:.4;margin-bottom:.3rem;">SEND TO</div><div class="pay-addr" id="pay-addr-val">${m.addr}</div><button class="pay-cpbtn" onclick="navigator.clipboard.writeText(document.getElementById('pay-addr-val').textContent).then(()=>{this.textContent='✓ COPIED';setTimeout(()=>this.textContent='📋 COPY',1500)})">📋 COPY</button><div style="margin-top:.7rem;font-size:.52rem;opacity:.35;">After sending, Telegram @cicadaomni3301bot with TX ID to unlock.</div>`;
+  inv.scrollIntoView({behavior:'smooth'});
 }
 
-/* ================================================================
-   REVIEWS
-   ================================================================ */
-function renderReviews(){
-var el=document.getElementById('reviewsGrid'),html='';
-REVIEWS.forEach(function(r){
-var stars='';for(var s=0;s<r.stars;s++)stars+='\u{2B50}';
-html+='<div class="review-card">';
-html+='<div class="rev-stars">'+stars+'</div>';
-html+='<div class="rev-text">"'+r.text+'"</div>';
-html+='<div class="rev-author">'+r.author+'</div>';
-html+='<div class="rev-date">'+r.date+'</div>';
-html+='<div class="rev-source">'+r.source+'</div>';
-html+='</div>';
-});
-el.innerHTML=html;
+// ── PLANS ─────────────────────────────────────────────────────
+function copyRef() {
+  const code = document.getElementById('ref-code').textContent;
+  navigator.clipboard.writeText('https://cicada.omni/?ref=' + code).then(() => showNotif('Referral link copied!'));
 }
-
-/* ================================================================
-   INVITE
-   ================================================================ */
-function getInviteLink(){
-var base='https://cicada3301.com';
-if(affiliateCode)return base+'/?ref='+encodeURIComponent(affiliateCode);
-return base+'/?ref='+encodeURIComponent(currentUser||'anonymous');
+function shareInvite() {
+  const code = document.getElementById('ref-code').textContent;
+  const text = '🔐 CICADA 3301 Puzzle Platform — solve cryptographic puzzles, earn XMR.\nJoin with my code: https://cicada.omni/?ref=' + code;
+  if (navigator.share) navigator.share({ title: 'CICADA 3301', text, url: 'https://cicada.omni/?ref=' + code });
+  else navigator.clipboard.writeText(text).then(() => showNotif('Copied — paste to share!'));
 }
-
-function updateInviteLinks(){
-var link=getInviteLink();
-document.getElementById('inviteLink').value=link;
-var text='Join Cicada 3301 - The hardest puzzle network. Decode, earn XMR, prove yourself. '+link;
-var tg=document.getElementById('invTg');
-var x=document.getElementById('invX');
-var wa=document.getElementById('invWa');
-if(tg)tg.href='https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent(text);
-if(x)x.href='https://twitter.com/intent/tweet?text='+encodeURIComponent(text);
-if(wa)wa.href='https://wa.me/?text='+encodeURIComponent(text);
+function sendGift() {
+  const to = document.getElementById('gift-to').value.trim();
+  if (!to) { showNotif('Enter email or Telegram username'); return; }
+  showNotif('🎁 Gift sent to ' + to + ' · Pay XMR to confirm');
 }
-
-function copyInviteLink(){
-var link=getInviteLink();
-var inp=document.getElementById('inviteLink');inp.value=link;
-var btn=document.getElementById('inviteCopyBtn');
-if(navigator.clipboard&&navigator.clipboard.writeText){
-navigator.clipboard.writeText(link).then(function(){btn.textContent='COPIED!';btn.classList.add('copied');setTimeout(function(){btn.textContent='COPY';btn.classList.remove('copied')},2000)});
-}else{inp.select();document.execCommand('copy');btn.textContent='COPIED!';btn.classList.add('copied');setTimeout(function(){btn.textContent='COPY';btn.classList.remove('copied')},2000)}
+function selectPlan(plan) {
+  const p = {free:'0 XMR',starter:'0.05 XMR/mo',pro:'0.10 XMR/mo',business:'0.25 XMR/mo',supreme:'1.00 XMR/mo'};
+  showNotif(plan.toUpperCase() + ' · ' + p[plan] + ' · Pay via XMR');
+  openPayModal();
 }
-
-/* ================================================================
-   PAYMENT
-   ================================================================ */
-function renderPayGrid(){
-var el=document.getElementById('payGrid'),html='';
-PAY_METHODS.forEach(function(m,i){
-html+='<div class="pay-card" onclick="selectPayMethod('+i+')">';
-html+='<div class="pay-icon">'+m.icon+'</div>';
-html+='<div class="pay-nm">'+m.name+'</div>';
-html+='<div class="pay-fee">'+m.fee+'</div>';
-html+='</div>';
-});
-el.innerHTML=html;
-}
-
-function selectPayMethod(i){
-var m=PAY_METHODS[i];
-document.getElementById('payAddr').textContent=m.addr;
-document.getElementById('payAddrBox').style.display='block';
-}
-
-function copyPayAddr(){
-var addr=document.getElementById('payAddr').textContent;
-if(navigator.clipboard)navigator.clipboard.writeText(addr).then(function(){notify('Address copied!')});
-else{var el=document.getElementById('payAddr');el.select();document.execCommand('copy');notify('Address copied!')}
-}
-
-function openPay(){renderPayGrid();document.getElementById('payAddrBox').style.display='none';document.getElementById('payModal').classList.add('open')}
-function closePay(){document.getElementById('payModal').classList.remove('open')}
-function openPayPlan(plan){
-var sel=document.getElementById('payPlan');
-for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===plan){sel.selectedIndex=i;break}}
-openPay();
-}
-function updatePayView(){document.getElementById('payAddrBox').style.display='none'}
-
-/* ================================================================
-   GIFT
-   ================================================================ */
-function sendGift(){
-var plan=document.getElementById('giftPlan').value;
-var to=document.getElementById('giftTo').value.trim();
-if(!to){notify('Enter recipient username or handle');return}
-notify('Gift of '+plan+' plan sent to '+to+'! (Requires payment)');
-}
-
-/* ================================================================
-   COLLAPSIBLE TOGGLE
-   ================================================================ */
-function toggleCollapsible(id){
-var el=document.getElementById(id);
-if(el)el.classList.toggle('open');
-}
-
-/* ================================================================
-   AUTO RESTORE SESSION
-   ================================================================ */
-(function(){
-var su=localStorage.getItem('c3301_user');
-if(su){currentUser=su;userWallet=localStorage.getItem('c3301_wallet')||'';restoreState();enterApp()}
-})();
 </script>
+
+<!-- PAYMENT FAB -->
+<button id="pay-fab" onclick="openPayModal()" title="Payment Gateway">💳</button>
+
+<!-- PAYMENT MODAL -->
+<div id="pay-modal">
+  <div style="max-width:540px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem;">
+      <div class="pay-title-h">💳 PAYMENT GATEWAY</div>
+      <button onclick="closePayModal()" style="background:none;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);padding:.25rem .6rem;font-family:'Courier New',monospace;cursor:pointer;font-size:.75rem;">✕</button>
+    </div>
+    <div class="pay-sub-h">7 METHODS · ALL CONVERT TO XMR · ANONYMOUS OPTIONS AVAILABLE</div>
+    <select class="pay-sel" id="pay-sel">
+      <option value="0.01">🧩 Puzzle Access — 0.01 XMR / $2</option>
+      <option value="0.05">🦗 Full Puzzle Set — 0.05 XMR / $10</option>
+      <option value="0.10">🖥 VPS 256 GB — 0.10 XMR / $20</option>
+      <option value="0.05">⛏ Miner 10 Nodes — 0.05 XMR / $10</option>
+      <option value="0.35">⛏ Miner 100 Nodes — 0.35 XMR / $70</option>
+      <option value="0.10">⭐ Monthly Subscription — 0.10 XMR / $20</option>
+      <option value="0.25">👑 Affiliate Upgrade — 0.25 XMR / $50</option>
+    </select>
+    <div class="pay-grid" id="pay-grid"></div>
+    <div class="pay-inv" id="pay-inv"></div>
+    <div style="margin-top:1rem;font-size:.5rem;opacity:.25;text-align:center;">3301 · VERITAS ODIUM PARIT · PAYMENTS PROCESSED ANONYMOUSLY</div>
+  </div>
+</div>
 </body>
 </html>

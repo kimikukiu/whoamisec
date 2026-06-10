@@ -1362,10 +1362,11 @@ body::after{
 const WHOAMISEC_API = 'https://whoamisec.com';
 var activeEndpoint = null; // 'whoamisec' | 'ai-server' | null
 
+const VERCEL_PROXY = 'https://whoamisec-repo.vercel.app';
 function getRouterUrl() {
   var el = document.getElementById('settingsAiServerUrl');
   var v = el ? el.value.trim() : '';
-  return v || localStorage.getItem('nr9_url') || '';
+  return v || localStorage.getItem('nr9_url') || VERCEL_PROXY;
 }
 function get9RouterKey() {
   var el = document.getElementById('settings9RouterKey');
@@ -1391,16 +1392,19 @@ async function checkConnection() {
   if (routerStatusEl) { routerStatusEl.textContent = 'Scanning...'; routerStatusEl.style.color = '#ffd700'; }
   if (wsStatus) { wsStatus.textContent = 'Testing 9router...'; wsStatus.style.color = '#ffd700'; }
 
-  // Step 1: Try 9router (AI Server) FIRST
+  // Step 1: Try 9router / Vercel proxy FIRST
   var nrUrl = getRouterUrl();
   if (nrUrl) {
     try {
-      var baseUrl = nrUrl.replace(/\/v1\/.*/,'');
+      var baseUrl = nrUrl.replace(/\/v1\/.*|\/api\/.*/, '');
+      var isVercel = baseUrl.includes('vercel.app') || baseUrl.includes('whoamisec-repo');
       var nrKey = get9RouterKey();
       var nrHeaders = nrKey ? {'Authorization':'Bearer '+nrKey} : {};
       var nrCtrl = new AbortController();
-      var nrTimer = setTimeout(function(){ nrCtrl.abort(); }, 4000);
-      var nrResp = await fetch(baseUrl + '/v1/models', { headers: nrHeaders, signal: nrCtrl.signal });
+      var nrTimer = setTimeout(function(){ nrCtrl.abort(); }, 5000);
+      // Vercel proxy: ping /api/health; 9router direct: ping /v1/models
+      var pingUrl = isVercel ? baseUrl + '/api/health' : baseUrl + '/v1/models';
+      var nrResp = await fetch(pingUrl, { headers: nrHeaders, signal: nrCtrl.signal });
       clearTimeout(nrTimer);
       if (nrResp.ok) {
         var data = await nrResp.json();
@@ -1588,12 +1592,13 @@ function sendChat() {
     sendModel = model;
   } else {
     // 9router — /v1/chat/completions
-    var nrBase = getRouterUrl().replace(/\/v1\/.*/,'');
-    fetchUrl = nrBase + '/v1/chat/completions';
+    var nrBase = getRouterUrl().replace(/\/v1\/.*|\/api\/.*/, '');
+    var isVercel = nrBase.includes('vercel.app') || nrBase.includes('whoamisec-repo');
+    fetchUrl = isVercel ? nrBase + '/api/chat' : nrBase + '/v1/chat/completions';
     var nrKey = get9RouterKey();
     fetchHeaders = { 'Content-Type': 'application/json' };
     if (nrKey) fetchHeaders['Authorization'] = 'Bearer ' + nrKey;
-    sendModel = model; // model e deja în format 9router (kr/..., cc/..., etc.)
+    sendModel = model;
   }
 
   fetch(fetchUrl, {
