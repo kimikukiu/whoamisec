@@ -237,8 +237,8 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
       <b style="color:var(--g)">🟢 NVIDIA NIM</b> — build.nvidia.com → free key → modele mari<br>
       <b style="color:#c084fc">🦙 Ollama</b> — local, fără internet
     </div>
-    <div class="slbl">🌐 9ROUTER URL</div><input class="sinp" id="surl" placeholder="http://IP:20128" oninput="autoSave()">
-    <div class="slbl">🔑 9ROUTER API KEY</div><input class="sinp" id="s9key" type="password" placeholder="(opțional dacă REQUIRE_API_KEY=false)" oninput="autoSave()">
+    <div class="slbl">🖥 VPS / 9ROUTER URL (ex: http://IP:5001)</div><input class="sinp" id="surl" placeholder="http://IP:5001" oninput="autoSave()">
+    <div class="slbl">🔑 9ROUTER / VPS API KEY</div><input class="sinp" id="s9key" type="password" placeholder="(opțional)" oninput="autoSave()">
     <div class="slbl">🦙 OLLAMA URL (local)</div><input class="sinp" id="sollama" placeholder="http://localhost:11434" oninput="autoSave()">
     <div class="slbl">🟢 NVIDIA NIM API KEY</div><input class="sinp" id="snvkey" type="password" placeholder="nvapi-... (build.nvidia.com → free)" oninput="autoSave()">
     <div class="slbl">⚡ GROQ API KEY</div><input class="sinp" id="sgroq" type="password" placeholder="gsk_... (console.groq.com → free)" oninput="autoSave()">
@@ -318,6 +318,10 @@ function boot2(){
     autoCheckUpgrade();
   }, 500);
   if(C.tgbot&&C.tgid) setTimeout(()=>sendTg('🤖 JARVIS online '+new Date().toLocaleString('ro')),3000);
+  // Salvează setările când app-ul merge în background
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)autoSave();});
+  window.addEventListener('pagehide',autoSave);
+  window.addEventListener('beforeunload',autoSave);
 }
 
 function buildBars(){
@@ -638,12 +642,19 @@ function initGyro(){
 
 // PANELS
 function openP(n){
+  // Stop running canvas animations when switching panels
+  if(obsAF&&n!=='obs'){cancelAnimationFrame(obsAF);obsAF=null;const c=document.getElementById('obsc');if(c)delete c.dataset.ok;}
+  if(agAF&&n!=='antigrav'){cancelAnimationFrame(agAF);agAF=null;const c=document.getElementById('agc');if(c)delete c.dataset.ok;}
   document.querySelectorAll('.pan').forEach(p=>p.classList.remove('open'));
   document.getElementById('panel-'+n)?.classList.add('open');
   if(n==='obs')setTimeout(initObs,80);
   if(n==='antigrav')setTimeout(initAntigrav,80);
 }
-function closeP(n){document.getElementById('panel-'+n)?.classList.remove('open');}
+function closeP(n){
+  document.getElementById('panel-'+n)?.classList.remove('open');
+  if(n==='obs'&&obsAF){cancelAnimationFrame(obsAF);obsAF=null;const c=document.getElementById('obsc');if(c)delete c.dataset.ok;}
+  if(n==='antigrav'&&agAF){cancelAnimationFrame(agAF);agAF=null;const c=document.getElementById('agc');if(c)delete c.dataset.ok;}
+}
 function navHUD(){
   document.querySelectorAll('.pan').forEach(p=>p.classList.remove('open'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('ac'));
@@ -861,8 +872,12 @@ function initObs(){
     const cX=Math.cos(rx),sX=Math.sin(rx),y2=y*cX-z2*sX,z3=y*sX+z2*cX;
     const d=3.5+z3;return{sx:CX+x2*(SC/d),sy:CY+y2*(SC/d),d:z3,s:SC/d};
   }
-  function tick(){
+  let obsLast=0;
+  function tick(ts){
     if(!cv.isConnected){obsAF=null;return;}
+    obsAF=requestAnimationFrame(tick);
+    if(ts-obsLast<33)return; // max 30fps
+    obsLast=ts;
     if(!drag2)ry+=.004;
     ctx.fillStyle='rgba(0,3,12,.84)';ctx.fillRect(0,0,W,H);
     const P=N3.map(n=>p3(n.x,n.y,n.z));
@@ -919,9 +934,8 @@ function initObs(){
       }
       ctx.restore();
     });
-    obsAF=requestAnimationFrame(tick);
   }
-  tick();
+  obsAF=requestAnimationFrame(tick);
 }
 
 // ── ANTIGRAVITY 3D — agent swarm ──────────────────────────────
@@ -931,14 +945,14 @@ function initAntigrav(){
   cv.width=pb.clientWidth||window.innerWidth;cv.height=pb.clientHeight||(window.innerHeight-100);
   const W=cv.width,H=cv.height;
   const CATS=[
-    {n:'Master',   col:'#00d4ff',cnt:80},
-    {n:'Sub-A',    col:'#00ff88',cnt:60},
-    {n:'Sub-B',    col:'#c084fc',cnt:60},
-    {n:'Pipeline', col:'#ffb800',cnt:60},
-    {n:'Security', col:'#ff3b3b',cnt:40},
-    {n:'Code',     col:'#82aaff',cnt:40},
-    {n:'Voice',    col:'#ff9800',cnt:35},
-    {n:'Jules',    col:'#ff6b35',cnt:6},
+    {n:'Master',   col:'#00d4ff',cnt:35},
+    {n:'Sub-A',    col:'#00ff88',cnt:25},
+    {n:'Sub-B',    col:'#c084fc',cnt:25},
+    {n:'Pipeline', col:'#ffb800',cnt:25},
+    {n:'Security', col:'#ff3b3b',cnt:18},
+    {n:'Code',     col:'#82aaff',cnt:18},
+    {n:'Voice',    col:'#ff9800',cnt:15},
+    {n:'Jules',    col:'#ff6b35',cnt:5},
   ];
   const PTS=[];
   CATS.forEach((cat,ci)=>{
@@ -958,9 +972,12 @@ function initAntigrav(){
   cv.addEventListener('click',e=>{tapX=e.offsetX;tapY=e.offsetY;tapT=50;});
   cv.addEventListener('touchend',e=>{tapX=e.changedTouches[0].clientX;tapY=e.changedTouches[0].clientY;tapT=50;},{passive:true});
   // Tap hint label
-  let frame=0;
-  function tick(){
+  let frame=0,agLast=0;
+  function tick(ts){
     if(!cv.isConnected){agAF=null;return;}
+    agAF=requestAnimationFrame(tick);
+    if(ts-agLast<33)return; // max 30fps
+    agLast=ts;
     frame++;
     ctx.fillStyle='rgba(0,3,12,.80)';ctx.fillRect(0,0,W,H);
     if(tapT>0)tapT--;
@@ -1031,9 +1048,8 @@ function initAntigrav(){
       ctx.fillText('TAP → antigravity burst',W/2,H-18);
     }
     ctx.restore();
-    agAF=requestAnimationFrame(tick);
   }
-  tick();
+  agAF=requestAnimationFrame(tick);
 }
 </script>
 </body>
