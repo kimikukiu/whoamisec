@@ -838,6 +838,8 @@ function initSwarm(){
 // OBSIDIAN GRAPH
 let obsAF=null,agAF=null;
 function initObs(){
+  const panel=document.getElementById('panel-obs');
+  if(!panel||!panel.classList.contains('open'))return;
   const cv=document.getElementById('obsc');if(!cv||cv.dataset.ok)return;cv.dataset.ok='1';
   const ctx=cv.getContext('2d'),pb=cv.parentElement;
   cv.width=pb.clientWidth||window.innerWidth;cv.height=pb.clientHeight||(window.innerHeight-100);
@@ -874,7 +876,7 @@ function initObs(){
   }
   let obsLast=0;
   function tick(ts){
-    if(!cv.isConnected){obsAF=null;return;}
+    if(!panel.classList.contains('open')){obsAF=null;delete cv.dataset.ok;return;}
     obsAF=requestAnimationFrame(tick);
     if(ts-obsLast<33)return; // max 30fps
     obsLast=ts;
@@ -940,6 +942,8 @@ function initObs(){
 
 // ── ANTIGRAVITY 3D — agent swarm ──────────────────────────────
 function initAntigrav(){
+  const panel=document.getElementById('panel-antigrav');
+  if(!panel||!panel.classList.contains('open'))return;
   const cv=document.getElementById('agc');if(!cv||cv.dataset.ok)return;cv.dataset.ok='1';
   const ctx=cv.getContext('2d'),pb=cv.parentElement;
   cv.width=pb.clientWidth||window.innerWidth;cv.height=pb.clientHeight||(window.innerHeight-100);
@@ -968,34 +972,33 @@ function initAntigrav(){
       });
     }
   });
+  const D2=75*75; // squared distance threshold — avoids Math.hypot in hot loop
   let tapX=W/2,tapY=H/2,tapT=0;
   cv.addEventListener('click',e=>{tapX=e.offsetX;tapY=e.offsetY;tapT=50;});
   cv.addEventListener('touchend',e=>{tapX=e.changedTouches[0].clientX;tapY=e.changedTouches[0].clientY;tapT=50;},{passive:true});
-  // Tap hint label
   let frame=0,agLast=0;
   function tick(ts){
-    if(!cv.isConnected){agAF=null;return;}
+    // Stop automatically if panel is hidden (Android back btn, nav switch, etc.)
+    if(!panel.classList.contains('open')){agAF=null;delete cv.dataset.ok;return;}
     agAF=requestAnimationFrame(tick);
-    if(ts-agLast<33)return; // max 30fps
+    if(ts-agLast<33)return; // 30fps cap
     agLast=ts;
     frame++;
+    const now=Date.now();
     ctx.fillStyle='rgba(0,3,12,.80)';ctx.fillRect(0,0,W,H);
     if(tapT>0)tapT--;
     PTS.forEach(p=>{
       const dx=p.x-W/2,dy=p.y-H/2;
-      const osc=Math.sin(Date.now()*.0012+p.phase);
-      // Soft gravity toward center + oscillation
+      const osc=Math.sin(now*.0012+p.phase);
       p.vx+=(-dx*.00013+osc*.009);
       p.vy+=(-dy*.00013+osc*.007);
       p.vz+=(-p.z*.00015);
-      // Jules orbits center
       if(p.ci===7){
         const ang=Math.atan2(p.y-H/2,p.x-W/2)+.025;
-        const or=70+Math.sin(Date.now()*.0018+p.phase)*25;
+        const or=70+Math.sin(now*.0018+p.phase)*25;
         p.vx+=(W/2+Math.cos(ang)*or-p.x)*.045;
         p.vy+=(H/2+Math.sin(ang)*or-p.y)*.045;
       }
-      // Antigravity burst on tap
       if(tapT>0){
         const tx=p.x-tapX,ty=p.y-tapY,td=Math.hypot(tx,ty)||1;
         if(td<220){p.vx+=tx/td*(220-td)*.025;p.vy+=ty/td*(220-td)*.025;}
@@ -1007,17 +1010,21 @@ function initAntigrav(){
       if(p.z<-180)p.z=180;if(p.z>180)p.z=-180;
       p.trail.push({x:p.x,y:p.y});if(p.trail.length>9)p.trail.shift();
     });
-    // Mesh lines between nearby particles (sampled)
-    ctx.save();
-    for(let i=0;i<PTS.length;i+=2){
-      for(let j=i+2;j<PTS.length;j+=2){
-        const p1=PTS[i],p2=PTS[j],d=Math.hypot(p1.x-p2.x,p1.y-p2.y);
-        if(d<75){
-          ctx.globalAlpha=(1-d/75)*.28;ctx.strokeStyle=p1.c;ctx.lineWidth=.6;
-          ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();
-        }
+    // Mesh — batched by color (single stroke() per color), squared dist, every 3rd particle, max 200 lines
+    const batches={};let lc=0;
+    for(let i=0;i<PTS.length&&lc<200;i+=3){
+      const p1=PTS[i];
+      for(let j=i+3;j<PTS.length&&lc<200;j+=3){
+        const p2=PTS[j],ddx=p1.x-p2.x,ddy=p1.y-p2.y;
+        if(ddx*ddx+ddy*ddy<D2){(batches[p1.c]||(batches[p1.c]=[])).push(p1.x,p1.y,p2.x,p2.y);lc++;}
       }
     }
+    ctx.save();ctx.lineWidth=.6;ctx.globalAlpha=.28;
+    Object.entries(batches).forEach(([col,pts])=>{
+      ctx.strokeStyle=col;ctx.beginPath();
+      for(let i=0;i<pts.length;i+=4){ctx.moveTo(pts[i],pts[i+1]);ctx.lineTo(pts[i+2],pts[i+3]);}
+      ctx.stroke();
+    });
     ctx.restore();
     // Trails + dots
     PTS.forEach(p=>{
@@ -1031,17 +1038,16 @@ function initAntigrav(){
       ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);
       ctx.fillStyle=p.c;ctx.globalAlpha=.65+zs*.3;ctx.fill();ctx.restore();
     });
-    // Category labels at cluster centroid
+    // Category labels — inline centroid (no filter/reduce allocation per frame)
     ctx.save();ctx.globalAlpha=.75;
     CATS.forEach((cat,ci)=>{
-      const ps=PTS.filter(p=>p.ci===ci);if(!ps.length)return;
-      const cx2=ps.reduce((a,p)=>a+p.x,0)/ps.length;
-      const cy2=ps.reduce((a,p)=>a+p.y,0)/ps.length;
+      let sx=0,sy=0,cn=0;
+      for(let k=0;k<PTS.length;k++){if(PTS[k].ci===ci){sx+=PTS[k].x;sy+=PTS[k].y;cn++;}}
+      if(!cn)return;
       ctx.shadowColor=cat.col;ctx.shadowBlur=10;ctx.fillStyle=cat.col;
       ctx.font=`bold ${ci===7?11:9}px Courier New`;ctx.textAlign='center';
-      ctx.fillText(cat.n,cx2,cy2-(ci===7?14:10));
+      ctx.fillText(cat.n,sx/cn,sy/cn-(ci===7?14:10));
     });
-    // Tap hint
     if(frame<120){
       ctx.globalAlpha=(frame<60?frame/60:1-(frame-60)/60)*.7;
       ctx.fillStyle='#fff';ctx.font='10px Courier New';ctx.textAlign='center';

@@ -141,7 +141,7 @@ case "$TARGET" in
             "$(pwd)/jarvis-mind-app.html" \
             "com.whoamisec.jarvis" \
             "JARVIS MIND" \
-            "3"
+            "31"
         ;;
     all)
         build_apk "business" \
@@ -153,7 +153,7 @@ case "$TARGET" in
             "$(pwd)/jarvis-mind-app.html" \
             "com.whoamisec.jarvis" \
             "JARVIS MIND" \
-            "3"
+            "31"
         ;;
     *)
         err "Usage: $0 [business|jarvis|all]"
