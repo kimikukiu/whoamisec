@@ -231,12 +231,18 @@ body{padding-bottom:env(safe-area-inset-bottom,0px);}
     <button class="pc" onclick="closeP('settings')">✕</button>
   </div>
   <div class="pb">
-    <div style="font-size:.6rem;color:var(--g);margin-bottom:.65rem;border:1px solid rgba(0,255,136,.2);padding:.38rem .55rem;border-radius:6px;">✅ 9router.com PRE-CONFIGURAT — modele free active automat fără setări!</div>
+    <div style="font-size:.58rem;color:var(--t);margin-bottom:.65rem;border:1px solid rgba(0,212,255,.2);padding:.4rem .55rem;border-radius:6px;line-height:1.6;">
+      <b style="color:var(--g)">✅ GitHub Models FREE</b> — pune GitHub token → 5 modele instant<br>
+      <b style="color:#ff6b35">⚡ Groq FREE</b> — console.groq.com → free key (30s) → 4 modele rapide<br>
+      <b style="color:var(--g)">🟢 NVIDIA NIM</b> — build.nvidia.com → free key → modele mari<br>
+      <b style="color:#c084fc">🦙 Ollama</b> — local, fără internet
+    </div>
     <div class="slbl">🌐 9ROUTER URL</div><input class="sinp" id="surl" placeholder="http://IP:20128" oninput="autoSave()">
     <div class="slbl">🔑 9ROUTER API KEY</div><input class="sinp" id="s9key" type="password" placeholder="(opțional dacă REQUIRE_API_KEY=false)" oninput="autoSave()">
     <div class="slbl">🦙 OLLAMA URL (local)</div><input class="sinp" id="sollama" placeholder="http://localhost:11434" oninput="autoSave()">
     <div class="slbl">🟢 NVIDIA NIM API KEY</div><input class="sinp" id="snvkey" type="password" placeholder="nvapi-... (build.nvidia.com → free)" oninput="autoSave()">
-    <div class="slbl">🐙 GITHUB TOKEN</div><input class="sinp" id="sgh" type="password" placeholder="ghp_..." oninput="autoSave()">
+    <div class="slbl">⚡ GROQ API KEY</div><input class="sinp" id="sgroq" type="password" placeholder="gsk_... (console.groq.com → free)" oninput="autoSave()">
+    <div class="slbl">🐙 GITHUB TOKEN (GitHub Models FREE)</div><input class="sinp" id="sgh" type="password" placeholder="ghp_... (github.com → Settings → Dev tokens)" oninput="autoSave()">
     <div class="slbl">📱 TELEGRAM BOT TOKEN</div><input class="sinp" id="stgbot" type="password" placeholder="..." oninput="autoSave()">
     <div class="slbl">📱 TELEGRAM CHAT ID</div><input class="sinp" id="stgid" placeholder="123456789" oninput="autoSave()">
     <button class="sbt" onclick="saveSet()">💾 Salvează + Test</button>
@@ -281,6 +287,7 @@ const C={
   nr9key:localStorage.getItem('j_9key')||'',
   ollamaUrl:localStorage.getItem('j_ollama')||'http://localhost:11434',
   nvidiaKey:localStorage.getItem('j_nvkey')||'',
+  groqKey:localStorage.getItem('j_groq')||'',
   gh:localStorage.getItem('jgh')||'',
   tgbot:localStorage.getItem('jtgbot')||'',
   tgid:localStorage.getItem('jtgid')||''
@@ -331,25 +338,31 @@ function setR(s){
 function setT(t){document.getElementById('tbox').innerHTML=t;}
 function setResp(t){const e=document.getElementById('rbox');e.innerHTML=t;e.scrollTop=9999;}
 
-// MODELS — multi-backend: 9router / Ollama / NVIDIA NIM
+// MODELS — 5 backend-uri: GitHub Models / Groq / NVIDIA NIM / Ollama / 9router VPS
 const MODELS=[
-  // FREE — 9router Kiro
-  {n:'Claude Sonnet 4.5',i:'🤖',d:'9router FREE',m:'kr/claude-sonnet-4.5',f:true,be:'9r'},
-  {n:'DeepSeek 3.2',i:'🔮',d:'9router FREE',m:'kr/deepseek-3.2',f:true,be:'9r'},
-  {n:'GLM-5',i:'🧠',d:'9router FREE',m:'kr/glm-5',f:true,be:'9r'},
-  // NVIDIA NIM — free cu API key de la build.nvidia.com
-  {n:'Llama 3.1 70B',i:'🟢',d:'NVIDIA NIM FREE',m:'nim/meta/llama-3.1-70b-instruct',f:true,be:'nv'},
-  {n:'Nemotron 70B',i:'⚡',d:'NVIDIA NIM FREE',m:'nim/nvidia/llama-3.1-nemotron-70b-instruct',f:true,be:'nv'},
-  {n:'Mixtral 8x7B',i:'🌀',d:'NVIDIA NIM FREE',m:'nim/mistralai/mixtral-8x7b-instruct-v0.1',f:true,be:'nv'},
-  {n:'Gemma 2 27B',i:'💫',d:'NVIDIA NIM FREE',m:'nim/google/gemma-2-27b-it',f:true,be:'nv'},
-  // OLLAMA — local (modele detectate automat)
-  {n:'Llama 3.2',i:'🦙',d:'Ollama LOCAL',m:'ollama/llama3.2',f:true,be:'ol'},
-  {n:'Mistral',i:'🌊',d:'Ollama LOCAL',m:'ollama/mistral',f:true,be:'ol'},
-  {n:'DeepSeek R1',i:'🔷',d:'Ollama LOCAL',m:'ollama/deepseek-r1',f:true,be:'ol'},
-  {n:'CodeLlama',i:'💻',d:'Ollama LOCAL',m:'ollama/codellama',f:true,be:'ol'},
-  // 9router PAID
-  {n:'Claude Opus 4.7',i:'👑',d:'9router CC',m:'cc/claude-opus-4-7',f:false,be:'9r'},
-  {n:'GPT-5.4',i:'🌟',d:'9router GH',m:'gh/gpt-5.4',f:false,be:'9r'},
+  // ── GitHub Models FREE (token GitHub din Settings) ──
+  {n:'GPT-4o mini',    i:'🌟',d:'GitHub FREE',m:'ghm/gpt-4o-mini',              f:true, be:'ghm'},
+  {n:'Llama 3.1 70B',  i:'🦙',d:'GitHub FREE',m:'ghm/meta-llama-3.1-70b-instruct',f:true,be:'ghm'},
+  {n:'DeepSeek R1',    i:'🔷',d:'GitHub FREE',m:'ghm/deepseek-r1',              f:true, be:'ghm'},
+  {n:'Phi-4',          i:'💎',d:'GitHub FREE',m:'ghm/Phi-4',                    f:true, be:'ghm'},
+  {n:'Mistral Large',  i:'🌊',d:'GitHub FREE',m:'ghm/Mistral-Large-2411',       f:true, be:'ghm'},
+  // ── Groq FREE (key gratuit: console.groq.com) ──
+  {n:'Llama 3.3 70B',  i:'⚡',d:'Groq FREE',  m:'groq/llama-3.3-70b-versatile',f:true, be:'groq'},
+  {n:'Llama 3.1 8B',   i:'🟢',d:'Groq FREE',  m:'groq/llama-3.1-8b-instant',   f:true, be:'groq'},
+  {n:'DeepSeek R1 Groq',i:'🔮',d:'Groq FREE', m:'groq/deepseek-r1-distill-llama-70b',f:true,be:'groq'},
+  {n:'Mixtral 8x7B',   i:'🌀',d:'Groq FREE',  m:'groq/mixtral-8x7b-32768',     f:true, be:'groq'},
+  // ── NVIDIA NIM FREE (key gratuit: build.nvidia.com) ──
+  {n:'Llama 3.1 405B', i:'🏆',d:'NIM FREE',   m:'nim/meta/llama-3.1-405b-instruct',f:true,be:'nv'},
+  {n:'Nemotron 70B',   i:'🧠',d:'NIM FREE',   m:'nim/nvidia/llama-3.1-nemotron-70b-instruct',f:true,be:'nv'},
+  {n:'Gemma 2 27B',    i:'💫',d:'NIM FREE',   m:'nim/google/gemma-2-27b-it',   f:true, be:'nv'},
+  // ── Ollama LOCAL ──
+  {n:'Llama 3.2',      i:'🦙',d:'Ollama LOCAL',m:'ollama/llama3.2',             f:true, be:'ol'},
+  {n:'Mistral',        i:'🌊',d:'Ollama LOCAL',m:'ollama/mistral',              f:true, be:'ol'},
+  {n:'DeepSeek R1',    i:'🔷',d:'Ollama LOCAL',m:'ollama/deepseek-r1',          f:true, be:'ol'},
+  {n:'CodeLlama',      i:'💻',d:'Ollama LOCAL',m:'ollama/codellama',            f:true, be:'ol'},
+  // ── 9router VPS (setează URL în Settings) ──
+  {n:'Claude Sonnet',  i:'🤖',d:'9router VPS', m:'kr/claude-sonnet-4.5',        f:false,be:'9r'},
+  {n:'Claude Opus',    i:'👑',d:'9router VPS', m:'cc/claude-opus-4-7',          f:false,be:'9r'},
 ];
 
 // Ollama: fetch modele reale și inject în MODELS
@@ -376,6 +389,8 @@ function buildModels(){
   document.getElementById('mlist').innerHTML=MODELS.map((m,i)=>{
     const badge=m.be==='ol'?'background:rgba(192,132,252,.12);color:#c084fc;border-color:rgba(192,132,252,.3)':
                 m.be==='nv'?'background:rgba(0,255,136,.12);color:#00ff88;border-color:rgba(0,255,136,.3)':
+                m.be==='ghm'?'background:rgba(0,212,255,.12);color:#00d4ff;border-color:rgba(0,212,255,.3)':
+                m.be==='groq'?'background:rgba(255,107,53,.12);color:#ff6b35;border-color:rgba(255,107,53,.3)':
                 m.f?'':'background:rgba(255,184,0,.12);color:#f59e0b;border-color:rgba(255,184,0,.3)';
     const label=m.be==='ol'?'LOCAL':m.be==='nv'?'NIM':m.f?'FREE':'PAID';
     return `<div class="mc ${i===AM?'sel':''}" onclick="selM(${i})">
@@ -463,18 +478,29 @@ async function callAI(msg,ctx=''){
   const be=mo.be||'9r';
 
   if(be==='ol'||mo.m.startsWith('ollama/')){
-    // Ollama — OpenAI-compatible /v1
-    const base=C.ollamaUrl.replace(/\/+$/,'');
-    ep=base+'/v1/chat/completions';
+    // Ollama — local OpenAI-compatible
+    ep=C.ollamaUrl.replace(/\/+$/,'')+'/v1/chat/completions';
     modelId=mo.m.replace('ollama/','');
+  } else if(be==='ghm'||mo.m.startsWith('ghm/')){
+    // GitHub Models — gratuit cu GitHub token
+    ep='https://models.inference.ai.azure.com/chat/completions';
+    modelId=mo.m.replace('ghm/','');
+    if(!C.gh) return '⚠️ Pune GitHub token în Settings (github.com → Settings → Developer → Tokens → New token → repo scope)';
+    headers['Authorization']='Bearer '+C.gh;
+  } else if(be==='groq'||mo.m.startsWith('groq/')){
+    // Groq — gratuit, key la console.groq.com
+    ep='https://api.groq.com/openai/v1/chat/completions';
+    modelId=mo.m.replace('groq/','');
+    if(!C.groqKey) return '⚠️ Pune Groq API key în Settings (console.groq.com → free key, fără card)';
+    headers['Authorization']='Bearer '+C.groqKey;
   } else if(be==='nv'||mo.m.startsWith('nim/')){
-    // NVIDIA NIM — integrate.api.nvidia.com
+    // NVIDIA NIM — gratuit, key la build.nvidia.com
     ep='https://integrate.api.nvidia.com/v1/chat/completions';
     modelId=mo.m.replace('nim/','');
-    if(C.nvidiaKey)headers['Authorization']='Bearer '+C.nvidiaKey;
-    else return '⚠️ Setează NVIDIA API key în Settings (build.nvidia.com → free key)';
+    if(!C.nvidiaKey) return '⚠️ Pune NVIDIA API key în Settings (build.nvidia.com → free key)';
+    headers['Authorization']='Bearer '+C.nvidiaKey;
   } else {
-    // 9router / Vercel proxy
+    // 9router VPS / Vercel proxy
     const base=C.apiUrl.replace(/\/+$/,'');
     ep=base.includes('vercel.app')?base+'/api/chat':base+'/v1/chat/completions';
     if(C.nr9key)headers['Authorization']='Bearer '+C.nr9key;
@@ -632,6 +658,7 @@ function loadSet(){
   if(g('s9key'))g('s9key').value=C.nr9key;
   if(g('sollama'))g('sollama').value=C.ollamaUrl;
   if(g('snvkey'))g('snvkey').value=C.nvidiaKey;
+  if(g('sgroq'))g('sgroq').value=C.groqKey;
   if(g('sgh'))g('sgh').value=C.gh;
   if(g('stgbot'))g('stgbot').value=C.tgbot;
   if(g('stgid'))g('stgid').value=C.tgid;
@@ -642,6 +669,7 @@ function autoSave(){
   const k=g('s9key');if(k!==null){C.nr9key=k;localStorage.setItem('j_9key',k);}
   const ol=g('sollama');if(ol!==null){C.ollamaUrl=ol||'http://localhost:11434';localStorage.setItem('j_ollama',C.ollamaUrl);}
   const nv=g('snvkey');if(nv!==null){C.nvidiaKey=nv;localStorage.setItem('j_nvkey',nv);}
+  const gq=g('sgroq');if(gq!==null){C.groqKey=gq;localStorage.setItem('j_groq',gq);}
   const gh=g('sgh');if(gh!==null){C.gh=gh;localStorage.setItem('jgh',gh);}
   const tb=g('stgbot');if(tb!==null){C.tgbot=tb;localStorage.setItem('jtgbot',tb);}
   const ti=g('stgid');if(ti!==null){C.tgid=ti;localStorage.setItem('jtgid',ti);}
