@@ -412,44 +412,137 @@ html,body{height:100%;overflow:hidden;background:#000;font-family:'Courier New',
         <div style="font-size:.58rem;color:rgba(255,255,255,.25);font-family:'Courier New';margin-top:.15rem;font-style:italic;">*(THE TRUTH IS HIDDEN IN THE STREAM)*</div>
       </div>
 
-      <!-- Levels -->
+      <!-- 14 Levels -->
       <div class="card">
-        <div class="card-title">Puzzle Levels</div>
+        <div class="card-title">Puzzle Levels — 14 Types</div>
         <div class="level-item">
           <div class="level-num">01</div>
-          <div class="level-name">The Beginning</div>
+          <div class="level-name">The Beginning — Hex</div>
           <div class="level-reward">0.01 XMR</div>
-          <div class="level-status ls-open">OPEN</div>
+          <div class="level-status ls-open" id="lvl01">OPEN</div>
         </div>
         <div class="level-item">
           <div class="level-num">02</div>
           <div class="level-name">Prime Numbers</div>
           <div class="level-reward">0.02 XMR</div>
-          <div class="level-status ls-locked">LOCKED</div>
+          <div class="level-status ls-locked" id="lvl02">LOCKED</div>
         </div>
         <div class="level-item">
           <div class="level-num">03</div>
-          <div class="level-name">Cicada Frequencies</div>
-          <div class="level-reward">0.05 XMR</div>
-          <div class="level-status ls-locked">LOCKED</div>
+          <div class="level-name">Binary Decode</div>
+          <div class="level-reward">0.03 XMR</div>
+          <div class="level-status ls-locked" id="lvl03">LOCKED</div>
         </div>
         <div class="level-item">
           <div class="level-num">04</div>
-          <div class="level-name">The Liber Primus</div>
-          <div class="level-reward">0.10 XMR</div>
-          <div class="level-status ls-locked">LOCKED</div>
+          <div class="level-name">Fibonacci Sequence</div>
+          <div class="level-reward">0.05 XMR</div>
+          <div class="level-status ls-locked" id="lvl04">LOCKED</div>
         </div>
         <div class="level-item">
           <div class="level-num">05</div>
-          <div class="level-name">Dark Web Coordinates</div>
-          <div class="level-reward">0.25 XMR</div>
-          <div class="level-status ls-locked">LOCKED</div>
+          <div class="level-name">Caesar / ROT Cipher</div>
+          <div class="level-reward">0.07 XMR</div>
+          <div class="level-status ls-locked" id="lvl05">LOCKED</div>
         </div>
         <div class="level-item">
           <div class="level-num">06</div>
-          <div class="level-name">The Final Gate</div>
+          <div class="level-name">Morse Code</div>
+          <div class="level-reward">0.10 XMR</div>
+          <div class="level-status ls-locked" id="lvl06">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">07</div>
+          <div class="level-name">Anagram Unscramble</div>
+          <div class="level-reward">0.15 XMR</div>
+          <div class="level-status ls-locked" id="lvl07">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">08</div>
+          <div class="level-name">Cyber-Metal Leet</div>
+          <div class="level-reward">0.20 XMR</div>
+          <div class="level-status ls-locked" id="lvl08">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">09</div>
+          <div class="level-name">Gematria</div>
+          <div class="level-reward">0.25 XMR</div>
+          <div class="level-status ls-locked" id="lvl09">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">10</div>
+          <div class="level-name">Steganography</div>
+          <div class="level-reward">0.35 XMR</div>
+          <div class="level-status ls-locked" id="lvl10">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">11</div>
+          <div class="level-name">Base64 Decode</div>
+          <div class="level-reward">0.50 XMR</div>
+          <div class="level-status ls-locked" id="lvl11">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">12</div>
+          <div class="level-name">Hash Breaker (MD5)</div>
+          <div class="level-reward">0.75 XMR</div>
+          <div class="level-status ls-locked" id="lvl12">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">13</div>
+          <div class="level-name">Vigenere Cipher</div>
           <div class="level-reward">1.00 XMR</div>
-          <div class="level-status ls-locked">LOCKED</div>
+          <div class="level-status ls-locked" id="lvl13">LOCKED</div>
+        </div>
+        <div class="level-item">
+          <div class="level-num">14</div>
+          <div class="level-name">Time Lock — The Final Gate</div>
+          <div class="level-reward">3.301 XMR</div>
+          <div class="level-status ls-locked" id="lvl14">LOCKED</div>
+        </div>
+      </div>
+
+      <!-- TOP SOLVERS — vizibil direct pe pagina de puzzles -->
+      <div class="card" style="border-color:rgba(255,215,0,.3);margin-top:.6rem;">
+        <div class="card-title color-cycle">🏆 Top Solvers</div>
+        <div class="lb-row">
+          <div class="lb-rank" style="color:#ffd700;">1</div>
+          <div class="lb-name">CipherHunter_X</div>
+          <div class="lb-pts">14 solved · 7.43 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank" style="color:#c0c0c0;">2</div>
+          <div class="lb-name">3301_Seeker</div>
+          <div class="lb-pts">12 solved · 4.88 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank" style="color:#cd7f32;">3</div>
+          <div class="lb-name">LiberPrimus</div>
+          <div class="lb-pts">10 solved · 2.43 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank">4</div>
+          <div class="lb-name">PrimeDecoder</div>
+          <div class="lb-pts">8 solved · 1.18 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank">5</div>
+          <div class="lb-name">CryptoCicada</div>
+          <div class="lb-pts">6 solved · 0.57 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank">6</div>
+          <div class="lb-name">VigenereViper</div>
+          <div class="lb-pts">5 solved · 0.37 XMR</div>
+        </div>
+        <div class="lb-row">
+          <div class="lb-rank">7</div>
+          <div class="lb-name">HashBreaker99</div>
+          <div class="lb-pts">4 solved · 0.21 XMR</div>
+        </div>
+        <div class="lb-row" style="border-top:1px dashed rgba(255,32,32,.3);padding-top:.6rem;margin-top:.2rem;">
+          <div class="lb-rank" style="color:var(--red);">—</div>
+          <div class="lb-name" style="color:var(--red);">You</div>
+          <div class="lb-pts" id="yourScore">0 solved · 0 XMR</div>
         </div>
       </div>
     </div>

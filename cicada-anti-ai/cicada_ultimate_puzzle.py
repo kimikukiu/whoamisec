@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 CICADA 3301 — Ultimate Puzzle Gate
-12 puzzle types: Cyber-Metal, Fibonacci, Prime, Binary, Hex, Caesar,
-Morse, Anagram, Hash, Steganography, Gematria, Time Lock
+14 puzzle types: Cyber-Metal, Fibonacci, Prime, Binary, Hex, Caesar,
+Morse, Anagram, Hash, Steganography, Gematria, Time Lock, Base64, Vigenere
 No AI can pass.
 Port: 5120
 """
@@ -25,6 +25,7 @@ class PuzzleGenerator:
             self._binary, self._hex_decode, self._caesar,
             self._morse, self._anagram, self._hash_breaker,
             self._steganography, self._gematria, self._time_lock,
+            self._base64_decode, self._vigenere,
         ]
 
     def _cyber_metal(self):
@@ -156,6 +157,31 @@ class PuzzleGenerator:
         return {'type': 'TIME-LOCK', 'question': q, 'answer': a,
                 'hint': 'Use current UTC time. The gate is time-sensitive.'}
 
+    def _base64_decode(self):
+        import base64
+        bank = [
+            ('Q0lDQURBMzMwMQ==',     'CICADA3301'),
+            ('TElCRVJQUklNVVM=',     'LIBERPRIMUS'),
+            ('VkVSSVRBUw==',         'VERITAS'),
+            ('MzMwMQ==',             '3301'),
+            ('Q0lDQURB',             'CICADA'),
+        ]
+        encoded, a = random.choice(bank)
+        return {'type': 'BASE64', 'question': f'Base64 decode: {encoded}', 'answer': a.lower(),
+                'hint': 'Use atob() in browser console or: echo "..." | base64 -d'}
+
+    def _vigenere(self):
+        bank = [
+            ('Key=KEY, ciphertext=EKGYHE', 'cicada'),
+            ('Key=CICADA, ciphertext=MVKCE', 'liber'),
+            ('Key=LIBER, ciphertext=NRSMV', 'primus'),
+            ('Key=GATE, ciphertext=LVKXV', 'three'),
+            ('Key=TRUTH, ciphertext=MIBAM', 'cicada'[::-1]),
+        ]
+        q, a = random.choice(bank)
+        return {'type': 'VIGENERE', 'question': f'Vigenere cipher — {q}', 'answer': a,
+                'hint': 'Subtract key letters from cipher letters (mod 26). A=0 … Z=25'}
+
     def random(self):
         gen = random.choice(self._types)
         p = gen()
@@ -214,7 +240,7 @@ PUZZLE_HTML = r'''<!DOCTYPE html>
   <div class="gate">
     <div class="icon">🦗</div>
     <h1>THE GATE</h1>
-    <div class="sub">12 PUZZLE TYPES — PROVE YOUR WORTH</div>
+    <div class="sub">14 PUZZLE TYPES — PROVE YOUR WORTH</div>
     <div class="box">
       <div class="badge" id="ptype">LOADING</div>
       <div class="q" id="pq">Initializing…</div>
@@ -329,7 +355,7 @@ def health():
 if __name__ == '__main__':
     print("""
 ╔═══════════════════════════════════════════════════════════════╗
-║  🦗 CICADA 3301 — ULTIMATE PUZZLE GATE (12 types)           ║
+║  🦗 CICADA 3301 — ULTIMATE PUZZLE GATE (14 types)           ║
 ║  ✅ Cyber-Metal · Fibonacci · Prime · Binary · Hex          ║
 ║  ✅ Caesar · Morse · Anagram · Hash · Stego · Gematria      ║
 ║  ✅ Time Lock — dynamic, changes every minute               ║
