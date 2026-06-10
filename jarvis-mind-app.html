@@ -469,32 +469,65 @@ function selJB(i){AJ=i;buildJailbreaks();showN('JB: '+getJBS()[i].n);closeP('jb'
 
 // AGENTS
 const ACATS=[
-  {c:'Master Agents',n:1000,col:'var(--c)',i:'👑'},
-  {c:'Sub-Agents A',n:500,col:'var(--g)',i:'⚡'},
-  {c:'Sub-Agents B',n:500,col:'var(--a)',i:'🔥'},
-  {c:'Pipeline',n:500,col:'var(--p)',i:'🌀'},
-  {c:'Security',n:55,col:'var(--r)',i:'🛡'},
-  {c:'Code',n:55,col:'var(--c)',i:'⌨️'},
-  {c:'Voice/Video',n:60,col:'var(--p)',i:'🎤'},
-  {c:'Data/AI',n:30,col:'var(--g)',i:'🧠'},
-  {c:'Jules AI',n:1,col:'#ff6b35',i:'🤖'},
+  {c:'Master Agents', n:1000,col:'var(--c)',i:'👑'},
+  {c:'Sub-Agents A',  n:500, col:'var(--g)',i:'⚡'},
+  {c:'Sub-Agents B',  n:500, col:'var(--a)',i:'🔥'},
+  {c:'Pipeline',      n:500, col:'var(--p)',i:'🌀'},
+  {c:'Security',      n:55,  col:'var(--r)',i:'🛡'},
+  {c:'Code',          n:55,  col:'var(--c)',i:'⌨️'},
+  {c:'Voice/Video',   n:60,  col:'var(--p)',i:'🎤'},
+  {c:'Data/AI',       n:30,  col:'var(--g)',i:'🧠'},
+  {c:'Jules AI',      n:1,   col:'#ff6b35', i:'🤖'},
 ];
+const AG_TASKS=[
+  'scanează rețele active...','procesează date AI...','execută pipeline...','analizează trafic...',
+  'compilează cod...','rulează model local...','sincronizează baze...','monitorizează API...',
+  'decriptează stream...','optimizează rute...','extrage features...','injectează context...',
+  'recunoaște voce...','transcrie audio...','generează embeddings...','validează token...',
+  'mapează dependențe...','rulează fuzzer...','testează endpoint...','parsează răspuns...',
+];
+let agTickI=null;
 function buildAgents(){
   const tot=ACATS.reduce((a,c)=>a+c.n,0);
   let h=`<div class="asts">
-    <div class="ast"><div class="asn">${tot}</div><div class="asl">AGENȚI</div></div>
-    <div class="ast"><div class="asn">500</div><div class="asl">MODULE</div></div>
-    <div class="ast"><div class="asn">5300</div><div class="asl">FAZE</div></div>
-  </div>`;
+    <div class="ast"><div class="asn" id="ag-tot">${tot}</div><div class="asl">AGENȚI</div></div>
+    <div class="ast"><div class="asn" id="ag-mod">500</div><div class="asl">MODULE</div></div>
+    <div class="ast"><div class="asn" id="ag-ops">0</div><div class="asl">OPS/S</div></div>
+  </div>
+  <div id="ag-feed" style="font-size:.6rem;color:rgba(0,212,255,.6);height:54px;overflow:hidden;margin-bottom:.5rem;border:1px solid var(--b);border-radius:6px;padding:.3rem .5rem;font-family:monospace;line-height:1.6;"></div>`;
   ACATS.forEach(c=>{
     const j=c.c==='Jules AI';
     h+=`<div class="arw" style="${j?'border-color:#ff6b35':''}">
-      <div class="adt" style="background:${c.col}"></div>
+      <div class="adt ag-dot" style="background:${c.col};animation:pd 1s infinite" id="dot-${c.c.replace(/\s/g,'')}"></div>
       <span class="anm">${c.i} ${c.c}</span>
-      <span class="ata" style="color:${c.col}">${j?'🟢 LIVE':c.n+' ACTIV'}</span></div>`;
+      <span class="ata" id="ag-${c.c.replace(/\s/g,'')}" style="color:${c.col}">${j?'🟢 LIVE':c.n+' ACTIV'}</span>
+    </div>`;
   });
   document.getElementById('abody').innerHTML=h;
+  // Live feed ticker
+  clearInterval(agTickI);
+  let ops=0,feed=[];
+  agTickI=setInterval(()=>{
+    ops+=Math.floor(Math.random()*120)+40;
+    const el=document.getElementById('ag-ops');if(el)el.textContent=ops;
+    const cat=ACATS[Math.floor(Math.random()*ACATS.length)];
+    const task=AG_TASKS[Math.floor(Math.random()*AG_TASKS.length)];
+    const line=`[${cat.i}${cat.c.split(' ')[0]}] ${task}`;
+    feed.unshift(line);feed=feed.slice(0,4);
+    const fd=document.getElementById('ag-feed');
+    if(fd)fd.innerHTML=feed.map((l,i)=>`<div style="opacity:${1-i*.2}">${l}</div>`).join('');
+    // Animă random agent status
+    const rc=ACATS[Math.floor(Math.random()*ACATS.length)];
+    const el2=document.getElementById('ag-'+rc.c.replace(/\s/g,''));
+    if(el2&&rc.c!=='Jules AI'){
+      const n=rc.n+Math.floor(Math.random()*3)-1;
+      el2.textContent=Math.max(1,n)+' ACTIV';
+    }
+  },800);
 }
+// Oprește ticker când panoul agenți se închide
+const _origCloseP=closeP;
+function closeP(n){_origCloseP(n);if(n==='agents')clearInterval(agTickI);}
 
 // AI CALL — routing: ollama / nvidia NIM / 9router / vercel proxy
 async function callAI(msg,ctx=''){
@@ -613,13 +646,32 @@ function clearAtt(){att=null;document.getElementById('att').classList.remove('sh
 const SALUT=['Ce e mă! Zi ce vrei!','Da bă, sunt aici.','Ey vagabond, te ascult!'];
 function speak(text){
   if(!('speechSynthesis' in window))return;
-  speechSynthesis.cancel();setR('speaking');
+  // Android WebView: cancel orice e în curs, forțează audio focus
+  try{speechSynthesis.cancel();}catch(e){}
+  setR('speaking');
   const u=new SpeechSynthesisUtterance(text);
-  u.lang='ro-RO';u.rate=1.0;u.pitch=0.85;
-  const rv=speechSynthesis.getVoices().find(v=>v.lang.startsWith('ro'));
-  if(rv)u.voice=rv;
-  u.onend=()=>{setR('awake');clearTimeout(wakeT);wakeT=setTimeout(()=>setR('standby'),8000);};
-  speechSynthesis.speak(u);
+  u.lang='ro-RO';
+  u.rate=1.08;   // ritm alert, huligan
+  u.pitch=0.72;  // voce joasă, gravă, masculină
+  u.volume=1.0;
+
+  function doSpeak(){
+    const voices=speechSynthesis.getVoices();
+    // Preferă voce română, fallback la prima disponibilă
+    const ro=voices.find(v=>v.lang==='ro-RO')||voices.find(v=>v.lang.startsWith('ro'));
+    if(ro)u.voice=ro;
+    u.onend=()=>{setR('awake');clearTimeout(wakeT);wakeT=setTimeout(()=>setR('standby'),8000);};
+    u.onerror=()=>{setR('awake');};
+    try{speechSynthesis.speak(u);}catch(e){setR('awake');}
+  }
+
+  // Android: vocile se încarcă async — așteptăm onvoiceschanged dacă lista e goală
+  const v=speechSynthesis.getVoices();
+  if(v&&v.length>0){doSpeak();}
+  else{
+    speechSynthesis.onvoiceschanged=()=>{speechSynthesis.onvoiceschanged=null;doSpeak();};
+    setTimeout(doSpeak,400); // fallback dacă onvoiceschanged nu se declanșează
+  }
 }
 function startRecog(){
   const btn=document.getElementById('mbtn');
