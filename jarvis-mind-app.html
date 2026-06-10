@@ -304,6 +304,18 @@ const C={
 };
 let voiceOn=false,recog=null,wakeT=null,jSt='standby',AM=0,AJ=0,att=null;
 let ollamaModels=[];
+let obsAF=null,agAF=null,swAF=null,swLT=0;
+
+// SM + setR trebuie declarate ÎNAINTE de setR('awake') — altfel const SM e în TDZ → crash total
+const SM={standby:{t:'STANDBY',i:'🤖',b:false},awake:{t:'ACTIV',i:'👁',b:false},
+  listening:{t:'ASCULTĂ',i:'🎤',b:true},processing:{t:'PROCESEAZĂ',i:'⚙️',b:true},speaking:{t:'VORBEȘTE',i:'🔊',b:true}};
+function setR(s){
+  jSt=s;const m=SM[s]||SM.standby;
+  document.getElementById('spill').textContent=m.t;
+  const ci=document.getElementById('ci');if(ci)ci.textContent=m.i;
+  const core=document.getElementById('core');if(core)core.classList.toggle('on',s==='listening'||s==='speaking');
+  bars(m.b);
+}
 
 // Boot: add animations on next frame after paint, then init
 setR('awake');
@@ -341,15 +353,6 @@ function buildBars(){
 }
 function bars(on){document.querySelectorAll('.b').forEach(b=>b.classList.toggle('on',on));}
 
-const SM={standby:{t:'STANDBY',i:'🤖',b:false},awake:{t:'ACTIV',i:'👁',b:false},
-  listening:{t:'ASCULTĂ',i:'🎤',b:true},processing:{t:'PROCESEAZĂ',i:'⚙️',b:true},speaking:{t:'VORBEȘTE',i:'🔊',b:true}};
-function setR(s){
-  jSt=s;const m=SM[s]||SM.standby;
-  document.getElementById('spill').textContent=m.t;
-  const ci=document.getElementById('ci');if(ci)ci.textContent=m.i;
-  const core=document.getElementById('core');if(core)core.classList.toggle('on',s==='listening'||s==='speaking');
-  bars(m.b);
-}
 function setT(t){document.getElementById('tbox').innerHTML=t;}
 function setResp(t){const e=document.getElementById('rbox');e.innerHTML=t;e.scrollTop=9999;}
 
@@ -885,7 +888,6 @@ async function autoProbeAPIs(){
 }
 
 // SWARM — 2700 agenți animați, pornit după HUD
-let swAF=null,swLT=0;
 function initSwarm(){
   const cv=document.getElementById('swc');
   if(!cv||cv.style.display==='none')return;
@@ -917,7 +919,6 @@ function initSwarm(){
 }
 
 // OBSIDIAN GRAPH
-let obsAF=null,agAF=null;
 function initObs(){
   const panel=document.getElementById('panel-obs');
   if(!panel||!panel.classList.contains('open'))return;
