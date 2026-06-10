@@ -584,48 +584,47 @@ function startRecog(){
     if(fin||int)setT('🎤 '+(fin||int));
     if(fin){
       const low=fin.toLowerCase();
-      if(low.includes('jarvis')&&jSt==='standby'){
-        setR('awake');speak(SALUT[Math.floor(Math.random()*SALUT.length)]);
-        clearTimeout(wakeT);wakeT=setTimeout(()=>setR('standby'),10000);
-      } else if(jSt!=='standby'){
-        const cmd=fin.replace(/jarvis/gi,'').trim();
-        if(cmd.length>1){document.getElementById('tinp').value=cmd;doSend();}
+      const cmd=fin.replace(/jarvis/gi,'').trim();
+      const toSend=cmd||fin.trim();
+      // Dacă spune doar "JARVIS" fără comandă → salut
+      if(low.includes('jarvis')&&toSend.length<2){
+        speak(SALUT[Math.floor(Math.random()*SALUT.length)]);
+      } else if(toSend.length>0){
+        // Orice altceva → execută direct ca comandă
+        document.getElementById('tinp').value=toSend;
+        doSend();
       }
     }
   };
   recog.onerror=e=>{
-    showN('Eroare mic: '+e.error,'#ef4444');
     if(e.error==='not-allowed'||e.error==='service-not-allowed'){
-      voiceOn=false;btn.textContent='🎤';btn.classList.remove('rec');setR('standby');
+      showN('Microfon blocat — activează în Android Settings','#ef4444');
+      voiceOn=false;if(btn){btn.textContent='🎤';btn.classList.remove('rec');}setR('standby');
     }
+    // ignoră alte erori (aborted, no-speech etc) — reconectare automată
   };
   recog.onend=()=>{if(voiceOn){try{recog.start();}catch(x){}}};
-  try{recog.start();}catch(x){showN('Eroare pornire mic: '+x,'#ef4444');return;}
-  voiceOn=true;btn.textContent='🔴';btn.classList.add('rec');setR('listening');
-  showN('🎤 Zi "JARVIS"','var(--c)');
+  try{
+    recog.start();
+    voiceOn=true;
+    if(btn){btn.textContent='🔴';btn.classList.add('rec');}
+    setR('listening');
+    showN('🎤 Ascult... vorbește direct!','var(--c)');
+  }catch(x){showN('Eroare mic: '+x.message,'#ef4444');}
 }
 function micToggle(){
   const btn=document.getElementById('mbtn');
   if(!voiceOn){
-    // Request mic permission via getUserMedia first, then start recognition
+    setR('awake');
     if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
-      navigator.mediaDevices.getUserMedia({audio:true,video:false})
-        .then(stream=>{
-          stream.getTracks().forEach(t=>t.stop()); // close test stream
-          startRecog();
-        })
-        .catch(err=>{
-          showN('Microfon blocat: '+err.name,'#ef4444');
-          // Try anyway — maybe permission was already granted
-          startRecog();
-        });
-    } else {
-      startRecog();
-    }
+      navigator.mediaDevices.getUserMedia({audio:true})
+        .then(stream=>{stream.getTracks().forEach(t=>t.stop());startRecog();})
+        .catch(()=>startRecog()); // încearcă oricum — permisiunea poate fi deja acordată
+    }else{startRecog();}
   }else{
     voiceOn=false;if(recog){try{recog.stop();}catch(x){}recog=null;}
-    btn.textContent='🎤';btn.classList.remove('rec');setR('standby');clearTimeout(wakeT);
-    showN('Voce off');
+    if(btn){btn.textContent='🎤';btn.classList.remove('rec');}
+    setR('standby');clearTimeout(wakeT);showN('Voce off');
   }
 }
 
